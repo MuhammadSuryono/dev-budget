@@ -1,0 +1,24 @@
+nginx:    
+  build: ./deployment/nginx/  
+  container_name: nginx-container  
+  ports:  
+    - 80:80  
+  links:  
+    - php  
+  volumes_from:  
+    - app-data  
+
+php:    
+  image: php:7.3-fpm  
+  container_name: php-container  
+  expose:  
+    - 9000  
+  volumes_from:  
+    - app-data  
+
+app-data:    
+  image: php:7.3-fpm  
+  container_name: app-data-container  
+  volumes:  
+    - ./:/var/www/html/  
+  command: "true"
