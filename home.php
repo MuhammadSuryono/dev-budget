@@ -993,7 +993,7 @@ $formatId = $date . $count;
           });
         }
 
-        if (phoneNumber == null) {
+        if (phoneNumber == null || phoneNumber == "") {
           $('#phoneNumberModal').modal({
             backdrop: 'static',
             keyboard: false
