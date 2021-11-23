@@ -1,6 +1,6 @@
 <?php
-
-defined("DB_APP") OR define("DB_APP", getenv("DEV", true) ? getenv("DEV") : "budget");
+defined("MODE_APP") OR define("MODE_APP", "dev");
+defined("DB_APP") OR define("DB_APP", "budget");
 defined("DB_HOST") OR define("DB_HOST", "192.168.8.2");
 defined("DB_USER") OR define("DB_USER", "adam");
 defined("DB_PASS") OR define("DB_PASS", "Ad@mMR1db");
@@ -13,7 +13,7 @@ defined("DB_TRANSFER") OR define("DB_TRANSFER", "bridgetransfer");
 defined("DB_MRI_TRANSFER") OR define("DB_MRI_TRANSFER", "mritransfer");
 defined("DB_CUTI") OR define("DB_CUTI", "db_cuti");
 defined("DB_DEVELOP") OR define("DB_DEVELOP", "develop");
-defined("DB_HOST_DIGITALISASI_MARKETING") OR define("DB_HOST_DIGITALISASI_MARKETING", "192.168.10.240");
+defined("DB_HOST_DIGITALISASI_MARKETING") OR define("DB_HOST_DIGITALISASI_MARKETING", MODE_APP == "dev" ? "192.168.8.2" : "192.168.10.240");
 
 
 class Database {
