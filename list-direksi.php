@@ -424,20 +424,18 @@ $subTabUmum = ['Rutin', 'Non-Rutin']
             const href = element.attr('href').split('-');
             const tahun = href[href.length - 1];
             const tab = href[0];
-            setTimeout(function() {
-                $.ajax({
-                    type: 'post',
-                    url: 'ajax/ajax-tab-listdireksi.php',
-                    data: {
-                        tahun: tahun,
-                        tab: tab
-                    },
-                    success: function(data) {
-                        // console.log(data);
-                        $('.tab-fetched-data').html(data);
-                    }
-                });
-            }, 1000)
+            $.ajax({
+                type: 'post',
+                url: 'ajax/ajax-tab-listdireksi.php',
+                data: {
+                    tahun: tahun,
+                    tab: tab
+                },
+                success: function(data) {
+                    // console.log(data);
+                    $('.tab-fetched-data').html(data);
+                }
+            });
         }
 
         $(document).ready(function() {
