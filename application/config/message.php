@@ -220,4 +220,23 @@ Terimakasih";
 
 return $msg;
     }
+
+    public function messageApprovePengajuanBPU($userSetuju, $namaProject, $noItem, $term, $arrPenerima, $tanggalBayar, $arrPembayaran, $arrJumlah, $keterangan)
+    {
+        $msg = "Notifikasi BPU, 
+BPU telah di setujui oleh $userSetuju dengan keterangan sebagai berikut:
+Nama Project       : *" . $namaProject . "*
+Item No.           : *$noItem*
+Term               : *$term*
+Nama Penerima  : *" . implode(', ', $arrPenerima) . "*
+Tanggal Pembayaran : *$tanggalBayar*
+Metode Pembayaran  : *" . implode(', ', $arrPembayaran) . "*
+Total Diajukan : *" . implode(', ', $arrJumlah) . "*
+        ";
+        if ($keterangan != "") {
+            $msg .= "
+ Keterangan: *$keterangan*";
+        } 
+        return $msg;
+    }
 }
