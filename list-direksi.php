@@ -239,7 +239,7 @@ $subTabUmum = ['Rutin', 'Non-Rutin']
                             <?php
                             // include "listdireksi/umburek.php";
                             ?>
-                            <div class="tab-content content-umbrek"></div>
+                            <div class="tab-content content-umbrek">Sedang Mengambil data...</div>
                         </div>
                         <!-- //UM BUREK -->
 
@@ -300,7 +300,7 @@ $subTabUmum = ['Rutin', 'Non-Rutin']
                 <?php
                 // include "listdireksi/uangmuka-2021.php";
                 ?>
-                <div class="tab-content content-uang-muka"></div>
+                <div class="tab-content content-uang-muka">Sedang Mengambil data...</div>
             </div>
         </div>
     </div><!-- Content Nav -->
@@ -454,7 +454,7 @@ $subTabUmum = ['Rutin', 'Non-Rutin']
             $('.umbrek').click(function() {
             $.ajax({
                 type: 'get',
-                url: 'listdireksi/umbrek.php',
+                url: 'listdireksi/umburek.php',
                 success: function(data) {
                     // console.log(data);
                     $('.content-uang-muka').html(data);
