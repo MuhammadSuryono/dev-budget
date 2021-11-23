@@ -4,6 +4,14 @@ require "application/config/database.php";
 $con = new Database();
 $koneksi = $con->connect();
 
+$con->set_name_db(DB_MRI_TRANSFER);
+$con->init_connection();
+$koneksiMriTransfer = $con->connect();
+
+$con->set_name_db(DB_DEVELOP);
+$con->init_connection();
+$koneksiDevelop = $con->connect();
+
 error_reporting(0);
 session_start();
 if (!isset($_SESSION['nama_user'])) {

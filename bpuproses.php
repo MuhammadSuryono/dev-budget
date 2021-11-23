@@ -1,6 +1,10 @@
 <?php
 //error_reporting(0);
 require "application/config/database.php";
+require_once "application/config/message.php";
+require_once "application/config/whatsapp.php";
+
+$helper = new Message();
 
 $con = new Database();
 $koneksi = $con->connect();
@@ -213,7 +217,7 @@ if (isset($_POST['submit'])) {
 
       // var_dump($isNonRutin );
       // die;
-      $email = [];
+      $phoneNumbers = [];
       $nama = [];
 
       if ($divisi == 'FINANCE') {
@@ -227,7 +231,7 @@ if (isset($_POST['submit'])) {
               $buttonAkses = unserialize($e['hak_button']);
               if (in_array("verifikasi_bpu", $buttonAkses)) {
                 if ($e['email']) {
-                  array_push($email, $e['email']);
+                  array_push($phoneNumbers, $e['phone_number']);
                   array_push($nama, $e['nama_user']);
                 }
               }
@@ -240,7 +244,7 @@ if (isset($_POST['submit'])) {
               $buttonAkses = unserialize($e['hak_button']);
               if (in_array("verifikasi_bpu", $buttonAkses)) {
                 if ($e['email']) {
-                  array_push($email, $e['email']);
+                  array_push($phoneNumbers, $e['phone_number']);
                   array_push($nama, $e['nama_user']);
                 }
               }
@@ -248,27 +252,27 @@ if (isset($_POST['submit'])) {
           }
         }
 
-        $queryEmail = mysqli_query($koneksi, "SELECT email,nama_user,divisi FROM tb_user WHERE nama_user = '$uc[pembuat]' AND aktif='Y'");
+        $queryEmail = mysqli_query($koneksi, "SELECT phone_number,nama_user,divisi FROM tb_user WHERE nama_user = '$uc[pembuat]' AND aktif='Y'");
         $emailUser = mysqli_fetch_assoc($queryEmail);
         if ($emailUser) {
-          array_push($email, $emailUser['email']);
+          array_push($phoneNumbers, $emailUser['phone_number']);
           array_push($nama, $emailUser['nama_user']);
         }
       } else {
         $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,namabank,norek,namapenerima,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload, status_pengajuan_bpu,batas_tanggal_bayar,emailpenerima, rekening_id,tanggalbayar,created_at) VALUES
                                                 ('$no','$jumlah','$namabank','$norek','$namapenerima','$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar', '3', '$tanggalBatasBayar', '$emailpenerima', '$id_rekening', '$tanggal_bayar' ,'$time')") or die(mysqli_error($koneksi));
 
-        $queryEmail = mysqli_query($koneksi, "SELECT email,nama_user,divisi FROM tb_user WHERE nama_user = '$pengaju' AND aktif='Y'");
+        $queryEmail = mysqli_query($koneksi, "SELECT phone_number,nama_user,divisi FROM tb_user WHERE nama_user = '$pengaju' AND aktif='Y'");
         $emailUser = mysqli_fetch_assoc($queryEmail);
         if ($emailUser) {
-          array_push($email, $emailUser['email']);
+          array_push($phoneNumbers, $emailUser['phone_number']);
           array_push($nama, $emailUser['nama_user']);
         }
 
         $queryUserByDivisi = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi = '$emailUser[divisi]' AND (level = 'Manager' OR level = 'Senior Manager') AND aktif='Y'");
         $user = mysqli_fetch_assoc($queryUserByDivisi);
         if ($user) {
-          array_push($email, $user['email']);
+          array_push($phoneNumbers, $user['phone_number']);
           array_push($nama, $user['nama_user']);
         }
       }
@@ -277,32 +281,21 @@ if (isset($_POST['submit'])) {
 
       $url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
       $url = explode('/', $url);
-      $url = $url[0] . '/' . $url[1] . '/' . 'login.php';
+      $url = $url[0] . '/' . $url[1] . '/' . 'views.php?code=';
 
-      $msg = "Notifikasi BPU, <br><br>
-        BPU telah diajukan dengan keterangan sebagai berikut:<br><br>
-        Nama Project      : <strong>$namaProject</strong><br>
-        Nama Pengaju      : <strong>$pengaju</strong><br>
-        Nama Penerima     : <strong>$namapenerima</strong><br>
-        Jumlah Diajukan   : <strong>Rp. " . number_format($jumlah, 0, '', ',') . "</strong><br>
-        ";
-      if ($keterangan) {
-        $msg .= "Keterangan:<strong> $keterangan </strong><br><br>";
-      } else {
-        $msg .= "<br>";
-      }
-      $msg .= "Klik <a href='$url'>Disini</a> untuk membuka aplikasi budget.";
-      $subject = "Notifikasi Aplikasi Budget";
-
-      if ($email) {
-        $message = sendEmail($msg, $subject, $email, $name, $address = "multiple");
+      if (count($phoneNumbers) > 0) {
+        $whatsapp = new Whastapp();
+        for($i = 0; $i < count($phoneNumbers); $i++) {
+          $msg = $helper->messagePengajuanBPU($pengaju, $namaProject, $namapenerima, $jumlah, $keterangan, $url);
+          if($phoneNumbers[$i] != "") $whatsapp->sendMessage($phoneNumbers[$i], $msg);
+        }
       }
 
-      $notification = 'Pembuatan BPU Berhasil. Pemberitahuan via email telah terkirim ke ';
+      $notification = 'Pembuatan BPU Berhasil. Pemberitahuan via whatsapp sedang dikirimkan ke ';
       $i = 0;
-      for ($i = 0; $i < count($email); $i++) {
-        $notification .= ($nama[$i] . ' (' . $email[$i] . ')');
-        if ($i < count($email) - 1) $notification .= ', ';
+      for ($i = 0; $i < count($phoneNumbers); $i++) {
+        $notification .= ($nama[$i] . ' (' . $phoneNumbers[$i] . ')');
+        if ($i < count($phoneNumbers) - 1) $notification .= ', ';
         else $notification .= '.';
       }
     }
@@ -328,7 +321,7 @@ if (isset($_POST['submit'])) {
         echo "<script> document.location.href='views.php?code=" . $numb . "'; </script>";
       }
     } else {
-      $email = [];
+      $phoneNumbers = [];
       $nama = [];
 
       $selterm = mysqli_query($koneksi, "SELECT MAX(term) FROM bpu WHERE no='$no' AND waktu='$waktu'");
@@ -347,7 +340,7 @@ if (isset($_POST['submit'])) {
               $buttonAkses = unserialize($e['hak_button']);
               if (in_array("verifikasi_bpu", $buttonAkses)) {
                 if ($e['email']) {
-                  array_push($email, $e['email']);
+                  array_push($phoneNumbers, $e['phone_number']);
                   array_push($nama, $e['nama_user']);
                 }
               }
@@ -360,7 +353,7 @@ if (isset($_POST['submit'])) {
               $buttonAkses = unserialize($e['hak_button']);
               if (in_array("verifikasi_bpu", $buttonAkses)) {
                 if ($e['email']) {
-                  array_push($email, $e['email']);
+                  array_push($phoneNumbers, $e['phone_number']);
                   array_push($nama, $e['nama_user']);
                 }
               }
@@ -368,27 +361,27 @@ if (isset($_POST['submit'])) {
           }
         }
 
-        $queryEmail = mysqli_query($koneksi, "SELECT email,nama_user,divisi FROM tb_user WHERE nama_user = '$uc[pembuat]' AND aktif='Y'");
+        $queryEmail = mysqli_query($koneksi, "SELECT phone_number,nama_user,divisi FROM tb_user WHERE nama_user = '$uc[pembuat]' AND aktif='Y'");
         $emailUser = mysqli_fetch_assoc($queryEmail);
         if ($emailUser) {
-          array_push($email, $emailUser['email']);
+          array_push($phoneNumbers, $emailUser['phone_number']);
           array_push($nama, $emailUser['nama_user']);
         }
       } else {
         $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,namabank,norek,namapenerima,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload, status_pengajuan_bpu, batas_tanggal_bayar,emailpenerima, rekening_id,created_at) VALUES
                                                 ('$no','$jumlah','$namabank','$norek','$namapenerima','$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar', '3', '$tanggalBatasBayar', '$emailpenerima', '$id_rekening' ,'$time')") or die(mysqli_error($koneksi));
 
-        $queryEmail = mysqli_query($koneksi, "SELECT email,nama_user,divisi FROM tb_user WHERE nama_user = '$pengaju' AND aktif='Y'");
+        $queryEmail = mysqli_query($koneksi, "SELECT phone_number,nama_user,divisi FROM tb_user WHERE nama_user = '$pengaju' AND aktif='Y'");
         $emailUser = mysqli_fetch_assoc($queryEmail);
         if ($emailUser) {
-          array_push($email, $emailUser['email']);
+          array_push($phoneNumbers, $emailUser['phone_number']);
           array_push($nama, $emailUser['nama_user']);
         }
 
         $queryUserByDivisi = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi = '$emailUser[divisi]' AND (level = 'Manager' OR level = 'Senior Manager') AND aktif='Y'");
         $user = mysqli_fetch_assoc($queryUserByDivisi);
         if ($user) {
-          array_push($email, $user['email']);
+          array_push($phoneNumbers, $user['phone_number']);
           array_push($nama, $user['nama_user']);
         }
       }
@@ -398,34 +391,50 @@ if (isset($_POST['submit'])) {
 
       $url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
       $url = explode('/', $url);
-      $url = $url[0] . '/' . $url[1] . '/' . 'login.php';
+      $url = $url[0] . '/' . $url[1] . '/' . 'views.php?code=877';
 
-      $msg = "Notifikasi BPU, <br><br>
-              BPU telah diajukan dengan keterangan sebagai berikut:<br><br>
-              Nama Project      : <strong>$namaProject</strong><br>
-              Nama Pengaju      : <strong>$pengaju</strong><br>
-              Nama Penerima     : <strong>$namapenerima</strong><br>
-              Jumlah Diajukan   : <strong>Rp. " . number_format($jumlah, 0, '', ',') . "</strong><br>
-              ";
-      if ($keterangan) {
-        $msg .= "Keterangan:<strong> $keterangan </strong><br><br>";
-      } else {
-        $msg .= "<br>";
+      // $msg = "Notifikasi BPU, <br><br>
+      //         BPU telah diajukan dengan keterangan sebagai berikut:<br><br>
+      //         Nama Project      : <strong>$namaProject</strong><br>
+      //         Nama Pengaju      : <strong>$pengaju</strong><br>
+      //         Nama Penerima     : <strong>$namapenerima</strong><br>
+      //         Jumlah Diajukan   : <strong>Rp. " . number_format($jumlah, 0, '', ',') . "</strong><br>
+      //         ";
+      // if ($keterangan) {
+      //   $msg .= "Keterangan:<strong> $keterangan </strong><br><br>";
+      // } else {
+      //   $msg .= "<br>";
+      // }
+      // $msg .= "Klik <a href='$url'>Disini</a> untuk membuka aplikasi budget.";
+      // $subject = "Notifikasi Aplikasi Budget";
+
+      if (count($phoneNumbers) > 0) {
+        $whatsapp = new Whastapp();
+        for($i = 0; $i < count($phoneNumbers); $i++) {
+          $msg = $helper->messagePengajuanBPU($pengaju, $namaProject, $namapenerima, $jumlah, $keterangan, $url);
+          if($phoneNumbers[$i] != "") $whatsapp->sendMessage($phoneNumbers[$i], $msg);
+        }
       }
-      $msg .= "Klik <a href='$url'>Disini</a> untuk membuka aplikasi budget.";
-      $subject = "Notifikasi Aplikasi Budget";
 
-      if ($email) {
-        $message = sendEmail($msg, $subject, $email, $name, $address = "multiple");
-      }
-
-      $notification = 'Pembuatan BPU Berhasil. Pemberitahuan via email telah terkirim ke ';
+      $notification = 'Pembuatan BPU Berhasil. Pemberitahuan via whatsapp sedang dikirimkan ke ';
       $i = 0;
-      for ($i = 0; $i < count($email); $i++) {
-        $notification .= ($nama[$i] . ' (' . $email[$i] . ')');
-        if ($i < count($email) - 1) $notification .= ', ';
+      for ($i = 0; $i < count($phoneNumbers); $i++) {
+        $notification .= ($nama[$i] . ' (' . $phoneNumbers[$i] . ')');
+        if ($i < count($phoneNumbers) - 1) $notification .= ', ';
         else $notification .= '.';
       }
+
+      // if ($phoneNumbers) {
+      //   $message = sendEmail($msg, $subject, $phoneNumbers, $name, $address = "multiple");
+      // }
+
+      // $notification = 'Pembuatan BPU Berhasil. Pemberitahuan via email telah terkirim ke ';
+      // $i = 0;
+      // for ($i = 0; $i < count($phoneNumbers); $i++) {
+      //   $notification .= ($nama[$i] . ' (' . $phoneNumbers[$i] . ')');
+      //   if ($i < count($phoneNumbers) - 1) $notification .= ', ';
+      //   else $notification .= '.';
+      // }
     }
   }
 

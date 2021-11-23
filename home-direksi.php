@@ -1,5 +1,5 @@
 <?php
-error_reporting(0);
+// error_reporting(0);
 session_start();
 
 require "application/config/database.php";
@@ -17,10 +17,11 @@ if (!isset($_SESSION['nama_user'])) {
 }
 
 $idUser = $_SESSION['id_user'];
-$queryUser = mysqli_query($koneksi, "SELECT email, e_sign FROM tb_user WHERE id_user = '$idUser'");
+$queryUser = mysqli_query($koneksi, "SELECT email, e_sign, phone_number FROM tb_user WHERE id_user = '$idUser'");
 $user = mysqli_fetch_assoc($queryUser);
 $emailUser = $user['email'];
 $signUser = $user['e_sign'];
+$phoneNumber = $user['phone_number'];
 
 $querySetting = mysqli_query($koneksi, "SELECT * FROM setting_budget WHERE keterangan = 'approval_bpu'") or die(mysqli_error($koneksi));
 $setting = mysqli_fetch_assoc($querySetting);
@@ -31,7 +32,7 @@ $setting = mysqli_fetch_assoc($querySetting);
 
 <head>
   <meta charset="utf-8">
-  <title>Form Pengajuan Budget</title>
+  <title>Form Pengajuan Budget 1</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -82,58 +83,7 @@ $setting = mysqli_fetch_assoc($querySetting);
 
           <!-- <li><a href="history-direksi.php">History</a></li> -->
         </ul>
-
-        <?php
-        $cari = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE status='Pending' AND waktu != 0");
-        $belbyr = mysqli_num_rows($cari);
-        $caribpu = mysqli_query($koneksi, "SELECT * FROM bpu WHERE persetujuan='Belum Disetujui' AND waktu != 0");
-        $bpuyahud = mysqli_num_rows($caribpu);
-        $queryPengajuanReq = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE status_request = 'Di Ajukan' AND waktu != 0");
-        $countPengajuanReq = mysqli_num_rows($queryPengajuanReq);
-        $notif = $belbyr + $bpuyahud + $countPengajuanReq;
-        ?>
         <ul class="nav navbar-nav navbar-right">
-          <li class="dropdown messages-menu">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-inbox"></i><span class="label label-warning"><?php echo $notif; ?></span></a>
-            <ul class="dropdown-menu">
-              <?php
-              if (mysqli_num_rows($cari) == 0) {
-                echo "";
-              } else {
-                while ($wkt = mysqli_fetch_array($cari)) {
-                  $wktulang = $wkt['waktu'];
-                  $selectnoid = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE waktu='$wktulang'");
-                  $noid = mysqli_fetch_assoc($selectnoid);
-                  $kode = $noid['noid'];
-                  $project = $noid['nama'];
-              ?>
-                  <li class="header"><a href="view-direksi.php?code=<?= $kode ?>">Project <b><?= $project ?></b> status masih Pending</a></li>
-                <?php
-                }
-              }
-              while ($wktbpu = mysqli_fetch_array($caribpu)) {
-                $bpulagi = $wktbpu['waktu'];
-                $selectnoid2 = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE waktu='$bpulagi'");
-                $noid2 = mysqli_fetch_assoc($selectnoid2);
-                $kode2 = $noid2['noid'];
-                $project2 = $noid2['nama'];
-                ?>
-                <li class="header"><a href="views-direksi.php?code=<?= $kode2 ?>">Project <b><?= $project2 ?></b> ada BPU yang belum di setujui </a></li>
-              <?php
-              }
-              while ($qpr = mysqli_fetch_array($queryPengajuanReq)) {
-                $time = $qpr['waktu'];
-                $selectnoid3 = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE waktu='$time'");
-                $noid3 = mysqli_fetch_assoc($selectnoid3);
-                $kode3 = $noid3['id'];
-                $project3 = $noid3['nama'];
-              ?>
-                <li class="header"><a href="view-request.php?id=<?= $kode3 ?>">Pengajuan Budget <b><?= $project3 ?></b> telah diajukan </a></li>
-              <?php
-              }
-              ?>
-            </ul>
-          </li>
 
           <li><a href="#"><span class="glyphicon glyphicon-user"></span><?php echo $_SESSION['nama_user']; ?> (<?php echo $_SESSION['divisi']; ?>)</a></li>
           <li><a href="logout.php"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
@@ -306,7 +256,7 @@ $setting = mysqli_fetch_assoc($querySetting);
             <?php
             $i = 1;
             $checkWaktu = [];
-            $sql = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE (status_request!='Dihapus' AND status_request!='Disetujui')");
+            $sql = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE (status_request!='Dihapus' AND status_request!='Disetujui') ORDER BY id desc");
             while ($d = mysqli_fetch_array($sql)) {
               if (!in_array($d['waktu'], $checkWaktu)) :
 
@@ -397,7 +347,6 @@ $setting = mysqli_fetch_assoc($querySetting);
     <a href="home-direksi.php?page=1"><button type="button" class="btn btn-primary">Create Folder Project</button></a>
 
     <br /><br />
-
     <?php
     include "isi.php";
     ?>
@@ -481,6 +430,23 @@ $setting = mysqli_fetch_assoc($querySetting);
     </div>
   </div>
 
+  <div class="modal fade" id="phoneNumberModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            Pendaftaran Email
+          </div>
+          <div class="modal-body">
+            <p>Silahkan masukkan Nomor Handphone anda yang terhubung dengan layanan Whatsapp untuk melengkapi data diri anda</p>
+            <input type="text" class="form-control" id="phone_number" name="phone_number" value="" autocomplete="off" required>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" id="buttonSubmitPhonneNumber" class="btn btn-success success">Submit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   <!-- <div class="modal fade" id="sendCodeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -505,7 +471,9 @@ $setting = mysqli_fetch_assoc($querySetting);
   const emailUser = <?= json_encode($emailUser); ?>;
   const idUser = <?= json_encode($idUser); ?>;
   const signUser = <?= json_encode($signUser); ?>;
+      const phoneNumber = <?= json_encode($phoneNumber); ?>;
   $(document).ready(function() {
+    console.log(phoneNumber);
 
     $('#inputImageSign').change(function() {
       readURLSign(this);
@@ -525,6 +493,12 @@ $setting = mysqli_fetch_assoc($querySetting);
         keyboard: false
       });
     }
+    if (phoneNumber == null || phoneNumber == "") {
+          $('#phoneNumberModal').modal({
+            backdrop: 'static',
+            keyboard: false
+          });
+        }
     $('#buttonSubmitEmail').click(function() {
       const email = $('#email').val();
       if (!email) {
@@ -543,6 +517,30 @@ $setting = mysqli_fetch_assoc($querySetting);
               $('#emailModal').modal('hide');
             } else {
               alert('Pendaftaran Email Gagal, ' + result);
+            }
+          }
+        })
+      }
+    })
+
+    $('#buttonSubmitPhonneNumber').click(function() {
+      const phoneNumber = $('#phone_number').val();
+      if (!email) {
+        alert('Masukkan Phone Number Anda');
+      } else {
+        $.ajax({
+          url: "register-phone-number.php",
+          type: "post",
+          data: {
+            phoneNumber: phoneNumber,
+            id: idUser
+          },
+          success: function(result) {
+            if (result == true) {
+              alert('Pendaftaran Nomor Handphone Berhasil');
+              $('#phoneNumberModal').modal('hide');
+            } else {
+              alert('Pendaftaran Nomor Handphone Gagal, ' + result);
             }
           }
         })

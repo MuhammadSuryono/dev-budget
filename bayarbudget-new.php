@@ -60,6 +60,12 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
     </div>
 
     <div class="form-group">
+        <label for="tanggal">Upload Bukti Bayar:</label>
+        <input type="file" class="form-control" accept="image/*,application/pdf" name="gambar" id="fileInput" required>
+        <img class="img-responsive" style="display: block; margin-left: auto;  margin-right: auto; background-repeat: no-repeat; background-size: cover; background-attachment: fixed;" src="" alt="" id="imageRealisasi">
+    </div>
+
+    <div class="form-group">
         <label for="tanggal">Tanggal Pembayaran:</label>
         <input type="date" class="form-control" id="tanggal" name="tanggalbayar" required>
     </div>
@@ -68,3 +74,25 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
 }
 $koneksi->close();
 ?>
+
+<script>
+    $(document).ready(function() {
+        $('#fileInput').change(function() {
+            console.log(this)
+            readURL(this);
+          })
+        
+          function readURL(input) {
+              console.log(input.files)
+          if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function(e) {
+              $('#imageRealisasi').attr('src', e.target.result);
+            }
+
+            reader.readAsDataURL(input.files[0]); // convert to base64 string
+          }
+        }
+    })
+</script>

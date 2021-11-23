@@ -4,6 +4,10 @@ require "application/config/database.php";
 $con = new Database();
 $koneksi = $con->connect();
 
+$con->set_name_db(DB_DEVELOP);
+$con->init_connection();
+$koneksiDevelop = $con->connect();
+
 session_start();
 if (!isset($_SESSION['nama_user'])) {
     header("location:login.php");

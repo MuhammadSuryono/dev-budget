@@ -1,5 +1,5 @@
 <?php
-require "application/config/database.php";
+require_once "application/config/database.php";
 
 $con = new Database();
 $koneksi = $con->connect();
@@ -10,7 +10,7 @@ $con->init_connection();
 $koneksiJay = $con->connect();
 ?>
 
-<form class="form-horizontal" action="proses/proses-tambahbudget.php" method="POST">
+<form class="form-horizontal" action="proses/proses-tambahbudget.php" id="form-create-project" method="POST">
 
   <div class="form-group">
     <label for="jenis">Pilih Jenis Project :</label>
@@ -95,7 +95,7 @@ $koneksiJay = $con->connect();
     <input type="text" class="form-control nama" name="nama">
   </div>
 
-  <!-- <div id="namab1" class="form-group" style="display:none;">
+  <div id="namab1" class="form-group" style="display:none;">
     <label for="kodeproject">Kode Project</label>
     <select class="custom-select form-control" id="kodeproject" name="kodepro[]" multiple>
       <option selected disabled>Pilih Project</option>
@@ -108,15 +108,16 @@ $koneksiJay = $con->connect();
       }
       ?>
     </select>
-  </div> -->
+  </div>
 
   <div id="tahunNonrutDiv" class="form-group" style="display: none;">
     <label for="tahun">Tahun :</label>
-    <select class="form-control" id="tahunNonRut" name="tahun" required>
+    <select class="form-control" id="tahunNonRut" name="tahun">
       <option disabled selected>Pilih Tahun</option>
+      <option>Pilih Tahun</option>
       <?php
       for ($i = 2017; $i <= 2030; $i++) {
-        echo "<option>$i</option>";
+        echo "<option>".$i."</option>";
       }
       ?>
     </select>
@@ -124,7 +125,7 @@ $koneksiJay = $con->connect();
 
   <div id="picNonRutDiv" class="form-group" style="display: none;">
     <label for="pic">PIC Budget :</label>
-    <select class="form-control" id="picNonRut" name="idUser" required>
+    <select class="form-control" id="picNonRut" name="idUser">
       <option disabled selected>Pilih PIC Budget</option>
       <?php
       $pic = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE resign is NULL ORDER BY nama_user");
@@ -137,7 +138,7 @@ $koneksiJay = $con->connect();
   <input type="hidden" class="form-control" id="pwd" name="status" value="Belum Di Ajukan">
 
   <div class="form-group">
-    <button type="submit" class="btn btn-primary" name="submit">Submit</button>
+    <button type="submit" class="btn btn-primary btn-submit-project" name="submit">Submit</button>
   </div>
 </form>
 
@@ -146,7 +147,6 @@ $koneksiJay = $con->connect();
 <script>
   $(document).ready(function() {
     $('#project').change(function() {
-      console.log($("#project option:selected").text());
       $('.nama').val($("#project option:selected").text())
     })
 

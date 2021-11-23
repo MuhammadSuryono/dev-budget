@@ -1,6 +1,10 @@
 <?php
-error_reporting(0);
+// error_reporting(0);
 session_start();
+require_once "application/config/database.php";
+
+$con = new Database();
+$koneksi = $con->connect();
 
 if (!isset($_SESSION['nama_user'])) {
   header("location:login.php");
@@ -84,29 +88,9 @@ if (!isset($_SESSION['nama_user'])) {
 
 
         <?php if ($_SESSION['hak_akses'] != 'HRD') { ?>
-          <?php
           
-          $cari = mysqli_query($koneksi, "SELECT * FROM bpu WHERE status ='Belum Di Bayar' AND persetujuan !='Belum Disetujui' AND waktu != 0");
-          $belbyr = mysqli_num_rows($cari);
-          ?>
           <ul class="nav navbar-nav navbar-right">
-            <li class="dropdown messages-menu">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-inbox"></i><span class="label label-warning"><?= $belbyr ?></span></a>
-              <ul class="dropdown-menu">
-                <?php
-                while ($wkt = mysqli_fetch_array($cari)) {
-                  $wktulang = $wkt['waktu'];
-                  $selectnoid = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE waktu='$wktulang'");
-                  $noid = mysqli_fetch_assoc($selectnoid);
-                  $kode = $noid['noid'];
-                  $project = $noid['nama'];
-                ?>
-                  <li class="header"><a href="view-finance.php?code=<?= $kode ?>">Project <b><?= $project ?></b> BPU Belum Dibayar</a></li>
-                <?php
-                }
-                ?>
-              </ul>
-            </li>
+            
             <li><a href="#"><span class="glyphicon glyphicon-user"></span><?php echo $_SESSION['nama_user']; ?> (<?php echo $_SESSION['divisi']; ?>)</a></li>
             <li><a href="logout.php"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
           </ul>
@@ -363,6 +347,9 @@ if (!isset($_SESSION['nama_user'])) {
                     $user = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi = 'FINANCE' ORDER BY nama_user");
                     while ($a = mysqli_fetch_array($user)) {
                       $buttonAkses = unserialize($a['hak_button']);
+                      if (!is_array($buttonAkses)) {
+                        $buttonAkses = [];
+                      }
                     ?>
                       <tr>
                         <td><?php echo $i++; ?></td>

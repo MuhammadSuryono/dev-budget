@@ -1,6 +1,20 @@
 <?php
 //error_reporting(0);
-include('koneksi.php');
+require_once "application/config/database.php";
+require_once "application/config/message.php";
+require_once "application/config/whatsapp.php";
+
+$con = new Database();
+$koneksi = $con->connect();
+
+$messageHelper = new Message();
+$whatsapp = new Whastapp();
+
+$con->set_name_db(DB_TRANSFER);
+$con->init_connection();
+$koneksiTransfer = $con->connect();
+
+
 require "vendor/email/send-email.php";
 
 $url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];

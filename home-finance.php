@@ -3,9 +3,14 @@ error_reporting(0);
 session_start();
 
 require "application/config/database.php";
+require_once "application/config/whatsapp.php";
+require_once "application/config/message.php";
 
 $con = new Database();
 $koneksi = $con->connect();
+
+$helperMessage = new Message();
+$whatsapp = new Whastapp();
 require "vendor/email/send-email.php";
 
 if (!isset($_SESSION['nama_user'])) {
@@ -18,10 +23,11 @@ $url = explode('/', $url);
 $url = $url[0] . '/' . $url[1] . '/' . 'login.php';
 
 $idUser = $_SESSION['id_user'];
-$queryUser = mysqli_query($koneksi, "SELECT email, e_sign FROM tb_user WHERE id_user = '$idUser'");
+$queryUser = mysqli_query($koneksi, "SELECT email, e_sign, phone_number FROM tb_user WHERE id_user = '$idUser'");
 $user = mysqli_fetch_assoc($queryUser);
 $emailUser = $user['email'];
 $signUser = $user['e_sign'];
+$phoneNumber = $user['phone_number'];
 
 $queryRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE stat = 'MRI'");
 
@@ -33,21 +39,29 @@ $oneWeek = date('Y-m-d', strtotime('+7 days'));
 $email = [];
 $queryEmailFinance = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('2', '3')");
 while ($item = mysqli_fetch_assoc($queryEmailFinance)) {
-  array_push($email, $item['email']);
+  array_push($email, $item['phone_number']);
 }
 
 $queryReminderPembayaran = mysqli_query($koneksi, "SELECT a.*, b.nama AS nama_project, c.rincian FROM reminder_tanggal_bayar a JOIN pengajuan b ON b.waktu = a.selesai_waktu JOIN selesai c ON c.waktu = a.selesai_waktu AND c.no = a.selesai_no WHERE a.tanggal <= '$oneWeek' AND (has_send_email = 0 OR has_send_email IS NULL)");
 while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
 
-  $msg = "Reminder Pembayaran, <br><br>
-                Nama Project      : <strong>" . $item['nama_project'] . "</strong><br>
-                Nama Item Budget  : <strong>" . $item['rincian'] . "</strong><br>
-                Tanggal Bayar     : <strong>" . date('d-m-Y', strtotime($item['tanggal']))  .  "</strong><br><br>
-                Klik <a href='$url'>Disini</a> untuk membuka aplikasi budget.
-                ";
+  // $msg = "Reminder Pembayaran, <br><br>
+  //               Nama Project      : <strong>" . $item['nama_project'] . "</strong><br>
+  //               Nama Item Budget  : <strong>" . $item['rincian'] . "</strong><br>
+  //               Tanggal Bayar     : <strong>" . date('d-m-Y', strtotime($item['tanggal']))  .  "</strong><br><br>
+  //               Klik <a href='$url'>Disini</a> untuk membuka aplikasi budget.
+  //               ";
 
-  $subject = "Reminder Pembayaran";
-  $message = sendEmail($msg, $subject, $email, $name, $address = "multiple");
+  // $subject = "Reminder Pembayaran";
+
+  if (count($email) > 0) {
+    foreach($email  as $phone) {
+      $whatsapp->sendMessage($phone, $helperMessage->messageReminderPembayaran($item['nama_project'], $item['rincian'], date('d-m-Y', strtotime($item['tanggal'])), $url));
+    }
+  }
+
+
+  // $message = sendEmail($msg, $subject, $email, $name, $address = "multiple");
 
   mysqli_query($koneksi, "UPDATE reminder_tanggal_bayar SET has_send_email = 1 WHERE id = $item[id]");
 }
@@ -130,30 +144,8 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
           ?>
         </ul>
 
-        <?php
-        $cari = mysqli_query($koneksi, "SELECT * FROM bpu WHERE status ='Belum Di Bayar' AND persetujuan !='Belum Disetujui' AND waktu != 0");
-        $belbyr = mysqli_num_rows($cari);
-        ?>
+      
         <ul class="nav navbar-nav navbar-right">
-          <li class="dropdown messages-menu">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-inbox"></i><span class="label label-warning"><?= $belbyr ?></span></a>
-            <ul class="dropdown-menu">
-              <?php
-              while ($wkt = mysqli_fetch_array($cari)) {
-                $wktulang = $wkt['waktu'];
-
-                $selectnoid = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE waktu='$wktulang'");
-                $noid = mysqli_fetch_assoc($selectnoid);
-                $kode = $noid['noid'];
-                $project = $noid['nama'];
-              ?>
-                <li class="header"><a href="view-finance.php?code=<?= $kode ?>">Project <b><?= $project ?></b> BPU Belum Dibayar</a></li>
-              <?php
-                // }
-              }
-              ?>
-            </ul>
-          </li>
           <li><a href="ubahpassword.php"><span class="glyphicon glyphicon-user"></span><?php echo $_SESSION['nama_user']; ?> (<?php echo $_SESSION['divisi']; ?>)</a></li>
           <li><a href="logout.php"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
         </ul>
@@ -208,7 +200,7 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
             $i = 1;
             $divisi = $_SESSION['divisi'];
             $username = $_SESSION['nama_user'];
-            $sql = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE pengaju='$username' AND status='Belum Di Ajukan'");
+            $sql = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE pengaju='$username' AND status='Belum Di Ajukan' ORDER BY noid desc");
             while ($d = mysqli_fetch_array($sql)) {
             ?>
               <tr>
@@ -267,7 +259,7 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
                   <?php
                   $i = 1;
                   $checkUnique = [];
-                  $sql = mysqli_query($koneksi, "SELECT a.*, b.nama, b.noid AS budget_noid, b.jenis, c.rincian FROM bpu a JOIN pengajuan b ON b.waktu = a.waktu JOIN selesai c ON c.waktu = a.waktu AND c.no = a.no WHERE status_pengajuan_bpu = 1");
+                  $sql = mysqli_query($koneksi, "SELECT a.*, b.nama, b.noid AS budget_noid, b.jenis, c.rincian FROM bpu a JOIN pengajuan b ON b.waktu = a.waktu JOIN selesai c ON c.waktu = a.waktu AND c.no = a.no WHERE status_pengajuan_bpu = 1 ORDER BY a.noid desc");
                   while ($d = mysqli_fetch_array($sql)) :
                     $unique = $d['waktu'] . $d['nama'] . $d['no'] . $d['rincian'] . $d['term'];
                     if (!in_array($unique, $checkUnique)) :
@@ -336,7 +328,7 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
                     <?php
                     $i = 1;
                     $checkUnique = [];
-                    $sql = mysqli_query($koneksi, "SELECT a.*, b.nama, b.noid AS budget_noid, b.jenis, c.rincian FROM bpu a JOIN pengajuan b ON b.waktu = a.waktu JOIN selesai c ON c.waktu = a.waktu AND c.no = a.no WHERE (a.persetujuan = 'Pending' OR a.persetujuan = 'Belum Disetujui') AND (a.status_pengajuan_bpu = 0 OR a.status_pengajuan_bpu IS NULL)");
+                    $sql = mysqli_query($koneksi, "SELECT a.*, b.nama, b.noid AS budget_noid, b.jenis, c.rincian FROM bpu a JOIN pengajuan b ON b.waktu = a.waktu JOIN selesai c ON c.waktu = a.waktu AND c.no = a.no WHERE (a.persetujuan = 'Pending' OR a.persetujuan = 'Belum Disetujui') AND (a.status_pengajuan_bpu = 0 OR a.status_pengajuan_bpu IS NULL) order by a.noid desc");
                     while ($d = mysqli_fetch_array($sql)) :
                       $unique = $d['waktu'] . $d['nama'] . $d['no'] . $d['rincian'] . $d['term'];
                       if (!in_array($unique, $checkUnique)) :
@@ -502,7 +494,7 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
               <?php
               $i = 1;
               $checkWaktu = [];
-              $sql = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE jenis IN ('Non Rutin', 'Uang Muka') AND (status_request!='Dihapus' AND status_request!='Disetujui')");
+              $sql = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE jenis IN ('Non Rutin', 'Uang Muka', 'Rutin') AND totalbudget <= 1000000 AND (status_request!='Dihapus' AND status_request!='Disetujui')");
               while ($d = mysqli_fetch_array($sql)) {
                 if (!in_array($d['waktu'], $checkWaktu)) :
 
@@ -591,6 +583,23 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
     </div>
   </div>
 
+  <div class="modal fade" id="phoneNumberModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            Pendaftaran Email
+          </div>
+          <div class="modal-body">
+          <p>Silahkan masukkan Nomor Handphone anda yang terhubung dengan layanan Whatsapp untuk melengkapi data diri anda</p>
+            <input type="text" class="form-control" id="phone_number" name="phone_number" value="" autocomplete="off" required>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" id="buttonSubmitPhonneNumber" class="btn btn-success success">Submit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   <div class="modal fade" id="myModal" role="dialog">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -668,6 +677,7 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
     const idUser = <?= json_encode($idUser); ?>;
     const statusTopUp = '<?= $statusTopUp ?>';
     const signUser = <?= json_encode($signUser); ?>;
+    const phoneNumber = <?= json_encode($phoneNumber); ?>;
 
     $(document).ready(function() {
       $('#inputImageSign').change(function() {
@@ -690,6 +700,38 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
           keyboard: false
         });
       }
+
+      if (phoneNumber == null || phoneNumber == "") {
+          $('#phoneNumberModal').modal({
+            backdrop: 'static',
+            keyboard: false
+          });
+        }
+
+        $('#buttonSubmitPhonneNumber').click(function() {
+      const phoneNumber = $('#phone_number').val();
+      if (!email) {
+        alert('Masukkan Phone Number Anda');
+      } else {
+        $.ajax({
+          url: "register-phone-number.php",
+          type: "post",
+          data: {
+            phoneNumber: phoneNumber,
+            id: idUser
+          },
+          success: function(result) {
+            if (result == true) {
+              alert('Pendaftaran Nomor Handphone Berhasil');
+              $('#phoneNumberModal').modal('hide');
+            } else {
+              alert('Pendaftaran Nomor Handphone Gagal, ' + result);
+            }
+          }
+        })
+      }
+    })
+
       $('#buttonSubmitEmail').click(function() {
         const email = $('#email').val();
         if (!email) {

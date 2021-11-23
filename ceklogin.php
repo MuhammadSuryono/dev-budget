@@ -29,14 +29,14 @@ if ($op == "in") {
         if ($qry && $bfrSessionNextPath == NULL) {
           nextPage($qry['divisi']);
         } else {
-          $_SESSION['before_session_next_path'] = NULL;
-          $bfrSessionNextPath = json_decode($bfrSessionNextPath);
+        //   $_SESSION['before_session_next_path'] = NULL;
+        //   $bfrSessionNextPath = json_decode($bfrSessionNextPath);
           
-          if ($bfrSessionNextPath->id_user != $id_user) {
-            nextPage($qry["divisi"]);
-          } else {
-            header("location:" . $bfrSessionNextPath->next_path);
-          }
+        //   if ($bfrSessionNextPath->id_user != $id_user) {
+        //     nextPage($qry["divisi"]);
+        //   } else {
+        //     header("location:" . $bfrSessionNextPath->next_path);
+        //   }
         }
       } else {
         echo "<script language='JavaScript'>

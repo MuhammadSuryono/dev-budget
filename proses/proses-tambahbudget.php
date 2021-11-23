@@ -1,24 +1,27 @@
 <?php
-require "../application/config/database.php";
+require_once "../application/config/database.php";
+require_once "../application/config/whatsapp.php";
+require_once "../application/config/message.php";
 
 $con = new Database();
 $koneksi = $con->connect();
-require "../vendor/email/send-email.php";
+
+$helper = new Message();
+// require "../vendor/email/send-email.php";
 
 session_start();
 if (!isset($_SESSION['nama_user'])) {
-  header("location:../lsaogin.php");
+  header("location:../login.php");
 }
 
 if (isset($_POST['submit'])) {
-
   $jenis             = $_POST['jenis'];
-  $namaG             = $_POST['nama'];
+  $namaProject             = $_POST['nama'];
   $tahun             = $_POST['tahun'];
   $status            = $_POST['status'];
-  $idpengaju         = $_POST['idUser'];
+  $idUserPICBudget         = $_POST['idUser'];
   $katnon            = $_POST['katnon'];
-  $pembuat           = $_SESSION['nama_user'];
+  $namaCreatorProject           = $_SESSION['nama_user'];
   $idProject = $_POST['project'];
   $table = $_POST['table'];
 
@@ -32,88 +35,73 @@ if (isset($_POST['submit'])) {
   $arrStatusB2 = ['UM', 'Honor Eksternal'];
   $arrPenerimaB2 = ['Responden', 'Interviewer'];
 
-  if (!$idpengaju) {
+  if (!$idUserPICBudget) {
     if ($_SESSION['divisi'] == 'Direksi') {
-      echo "<script language='javascript'>";
-      echo "alert('Pembuatan Budget Gagal, Data PIC tidak ada.')";
-      echo "</script>";
-      echo "<script> document.location.href='../home-direksi.php'; </script>";
+      echo $helper->alertMessage("Pembuatan Budget Gagal, Data PIC Tidak ada","../home-direksi.php");
     } else if ($_SESSION['divisi'] == 'FINANCE' && $_SESSION['hak_akses']) {
-      echo "<script language='javascript'>";
-      echo "alert('Pembuatan Budget Gagal, Data PIC tidak ada.')";
-      echo "</script>";
-      echo "<script> document.location.href='../home-finance.php'; </script>";
+      echo $helper->alertMessage("Pembuatan Budget Gagal, Data PIC Tidak ada","../home-finance.php");
     } else {
-      echo "<script language='javascript'>";
-      echo "alert('Pembuatan Budget Gagal, Data PIC tidak ada.')";
-      echo "</script>";
-      echo "<script> document.location.href='../home.php'; </script>";
+      echo $helper->alertMessage("Pembuatan Budget Gagal, Data PIC Tidak ada","../home.php");
     }
     die();
   }
 
   if ($jenis == 'B1') {
-    if (!$namaG || !$tahun || !$status || !$idpengaju) {
+    if (!$namaProject || !$tahun || !$status || !$idUserPICBudget) {
       if ($_SESSION['divisi'] == 'Direksi') {
-        echo "<script language='javascript'>";
-        echo "alert('Pembuatan Budget Gagal, Harap mengisi semua data.')";
-        echo "</script>";
-        echo "<script> document.location.href='../home-direksi.php'; </script>";
+        echo $helper->alertMessage("Pembuatan Budget Gagal, Harap mengisi semua data.","../home-direksi.php");
       } else if ($_SESSION['divisi'] == 'FINANCE' && $_SESSION['hak_akses']) {
-        echo "<script language='javascript'>";
-        echo "alert('Pembuatan Budget Gagal, Harap mengisi semua data.')";
-        echo "</script>";
-        echo "<script> document.location.href='../home-finance.php'; </script>";
+        echo $helper->alertMessage("Pembuatan Budget Gagal, Harap mengisi semua data.","../home-finance.php");
       } else {
-        echo "<script language='javascript'>";
-        echo "alert('Pembuatan Budget Gagal, Harap mengisi semua data.')";
-        echo "</script>";
-        echo "<script> document.location.href='../home.php'; </script>";
+        echo $helper->alertMessage("Pembuatan Budget Gagal, Harap mengisi semua data.","../home.php");
       }
     }
   }
 
-  $email = [];
-  $namaUserEmail = [];
-  $namaDiv = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE id_user='$idpengaju' AND aktif='Y'");
-  $cn = mysqli_fetch_assoc($namaDiv);
-  $pengaju           = $cn['nama_user'];
-  $divisi            = $cn['divisi'];
-  // $email = $cn['email'];
-  array_push($email, $cn['email']);
-  array_push($namaUserEmail, $cn['nama_user']);
+  $phoneNumbers = [];
+  $namaUserSendNotifications = [];
+  $idUsersNotification = [];
 
-  $queryUserByDivisi = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi = '$divisi' AND (level = 'Manager' OR level = 'Senior Manager') AND aktif='Y'") or die(mysqli_error($koneksi));
+  // Get data user Yang Mengajukan
+  $queryCreator = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE id_user='$idUserPICBudget' AND aktif='Y'");
+  $dataCreatorBudget = mysqli_fetch_assoc($queryCreator);
+  $namaCreatorBudget           = $dataCreatorBudget['nama_user'];
+  $divisiCreatorBudget            = $dataCreatorBudget['divisi'];
+
+  // $phoneNumbers = $dataCreatorBudget['email'];
+  array_push($phoneNumbers, $dataCreatorBudget['phone_number']);
+  array_push($namaUserSendNotifications, $dataCreatorBudget['nama_user']);
+  array_push($idUsersNotification, $idUserPICBudget);
+
+  $queryUserByDivisi = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi = '$divisiCreatorBudget' AND (level = 'Manager' OR level = 'Senior Manager') AND aktif='Y'") or die(mysqli_error($koneksi));
   $user = mysqli_fetch_assoc($queryUserByDivisi);
-  array_push($email, $user['email']);
-  array_push($namaUserEmail, $user['nama_user']);
+  
+  array_push($phoneNumbers, $user['phone_number']);
+  array_push($namaUserSendNotifications, $user['nama_user']);
+  array_push($idUsersNotification, $user['id_user']);
 
-  $carirutinnya = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE jenis='Rutin' ORDER BY noid DESC LIMIT 1");
-  $crnya = mysqli_fetch_assoc($carirutinnya);
-  $wakturutin = $crnya['waktu'];
+
   $countInsert = 0;
   $insertPengajuanRequest = mysqli_query($koneksi, "INSERT INTO pengajuan_request(jenis, nama, tahun, pembuat, pengaju, divisi, totalbudget, status_request, kode_project, on_revision_status) VALUES (
                                             '$jenis', 
-                                            '$namaG', 
+                                            '$namaProject', 
                                             '$tahun',
-                                            '$pembuat',
-                                            '$pengaju',
-                                            '$divisi',
+                                            '$namaCreatorProject',
+                                            '$namaCreatorBudget',
+                                            '$divisiCreatorBudget',
                                             '0',
                                             'Belum Di Ajukan',
                                             '$kode',
                                             '1')") or die(mysqli_error($koneksi));
-
+              
+  $idUserPICBudgetanRequest = mysqli_insert_id($koneksi);
 
   if ($insertPengajuanRequest) {
-
     $cariwaktunya = mysqli_query($koneksi, "SELECT waktu FROM pengajuan_request ORDER BY id DESC LIMIT 1");
     $waktu = mysqli_fetch_assoc($cariwaktunya);
     $waktunya = $waktu['waktu'];
 
     if ($jenis == 'B1') {
-      $countSelesai = 0;
-
       $queryCheckId = mysqli_query($koneksi, "SELECT id FROM pengajuan_request ORDER BY ID DESC LIMIT 1");
       $checkId = mysqli_fetch_assoc($queryCheckId)["id"];
       $checkId -= $j;
@@ -134,15 +122,13 @@ if (isset($_POST['submit'])) {
                                                       '0',
                                                       '0',
                                                       '0',
-                                                      '$pengaju',
-                                                      '$divisi',
+                                                      '$namaCreatorBudget',
+                                                      '$divisiCreatorBudget',
                                                       '$waktunya')                           
                                                       ") or die(mysqli_error($koneksi));
       }
       $inserkeselesai5 = TRUE;
     } else if ($jenis == "B2") {
-      $countSelesai = 0;
-
       $queryCheckId = mysqli_query($koneksi, "SELECT id FROM pengajuan_request ORDER BY ID DESC LIMIT 1");
       $checkId = mysqli_fetch_assoc($queryCheckId)["id"];
       $checkId -= $j;
@@ -163,17 +149,20 @@ if (isset($_POST['submit'])) {
                                                       '0',
                                                       '0',
                                                       '0',
-                                                      '$pengaju',
-                                                      '$divisi',
+                                                      '$namaCreatorBudget',
+                                                      '$divisiCreatorBudget',
                                                       '$waktunya')                           
                                                       ") or die(mysqli_error($koneksi));
       }
       $inserkeselesai5 = TRUE;
     } else if ($jenis == 'Rutin') {
+      $sqlPengajuanRutin = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE jenis='Rutin' ORDER BY noid DESC LIMIT 1");
+      $rutin = mysqli_fetch_assoc($sqlPengajuanRutin);
+      $wakturutin = $rutin['waktu'];
+
       $queryCheckId = mysqli_query($koneksi, "SELECT id FROM pengajuan_request ORDER BY ID DESC LIMIT 1");
       $checkId = mysqli_fetch_assoc($queryCheckId)["id"];
 
-      // var_dump($wakturutin);
       $rutinselesai = mysqli_query($koneksi, "SELECT * FROM selesai WHERE waktu='$wakturutin'");
       while ($rsnya = mysqli_fetch_array($rutinselesai)) {
 
@@ -182,17 +171,7 @@ if (isset($_POST['submit'])) {
                                                              '$rsnya[total]','$rsnya[pengaju]','$rsnya[divisi]')") or die(mysqli_error($koneksi));
 
 
-
-        // var_dump($rutininsert);
-        // die;
       }
-      // $queryTotalBudget = mysqli_query($koneksi, "SELECT totalbudget FROM pengajuan WHERE waktu = '$wakturutin'");
-      // $totalBudget = mysqli_fetch_assoc($queryTotalBudget)['totalbudget'];
-      // $updateTotalBudget = mysqli_query($koneksi, "UPDATE pengajuan_request SET totalbudget='$totalBudget' WHERE id='$checkId'") or die(mysqli_error($koneksiDigitalMarket));
-      // var_dump($totalBudget);
-      // var_dump($updateTotalBudget);
-      // var_dump($checkId);
-      // die;
 
       $inserkeselesai5 = TRUE;
     } else {
@@ -202,6 +181,11 @@ if (isset($_POST['submit'])) {
   }
 
   if ($inserkeselesai5) {
+
+    $con->set_name_db(DB_DIGITAL_MARKET);
+    $con->init_connection();
+
+    $koneksiDigitalMarket = $con->connect();
 
     if ($table == "data_sindikasi") {
       $strArr = explode('-', $_POST['nama']);
@@ -228,45 +212,33 @@ if (isset($_POST['submit'])) {
 
     $url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
     $url = explode('/', $url);
-    $url = $url[0] . '/' . $url[1] . '/' . 'login.php';
+    $host = $url[0]. '/'. $url[1];
 
-    $msg = "Dear $pengaju, <br><br>
-        Akses untuk pengajuan budget telah dibuka oleh <strong> $pembuat </strong> pada <strong> " . date("d/m/Y H:i:s") . "</strong> dengan keterangan sebagai berikut: <br><br>
-        Nama Project    : <strong>$namaG</strong><br>
-        PIC Budget      : <strong>$pengaju</strong><br>
-        Divisi          : <strong>$divisi</strong><br><br>
-        Silahkan ajukan budget secepatnya.<br><br>
-        ";
-
-    $msg .= "Klik <a href='$url'>Disini</a> untuk membuka aplikasi budget.";
-    $subject = "Notifikasi Pembukaan Akses Untuk Pengajuan Budget";
-    if ($email) {
-      $message = sendEmail($msg, $subject, $email, $name, $address = "multiple");
+    if (count($phoneNumbers) > 0) {
+      $whatsapp = new Whastapp();
+      for($i = 0; $i < count($phoneNumbers); $i++) {
+        $url =  $host. '/view-request.php?id='.$idUserPICBudgetanRequest.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
+        $msg = $helper->messageCreateProject($namaUserSendNotifications[$i], $namaUserSendNotifications[0], $namaCreatorProject, $namaProject, $divisiCreatorBudget, $url, "Notifikasi Pembukaan Akses Untuk Pengajuan Budget");
+        if($phoneNumbers[$i] != "") $whatsapp->sendMessage($phoneNumbers[$i], $msg);
+      }
     }
 
-    $notification = 'Pembuatan Permohonan Budget Berhasil. Pemberitahuan via email telah terkirim ke ';
-    for ($i = 0; $i < count($email); $i++) {
-      $notification .= ($namaUserEmail[$i] . ' (' . $email[$i] . ')');
-      if ($i < count($email) - 1) $notification .= ', ';
-      else $notification .= '.';
+
+    $notification = "Pembuatan Permohonan Budget Berhasil. Pemberitahuan via whatsapp sedang dikirimkan ke $namaCreatorBudget ($phoneNumbers[0])";
+    for ($i = 0; $i < count($phoneNumbers); $i++) {
+      if ($phoneNumbers[$i] != "" && $i != 0) {
+        $notification .= ($namaUserSendNotifications[$i] . ' (' . $phoneNumbers[$i] . ')');
+        if ($i < count($phone) - 1) $notification .= ', ';
+        else $notification .= '.';
+      }
     }
-    // $notification = "Pembuatan Permohonan Budget Berhasil. Pemberitahuan via email telah terkirim ke $pengaju ($email)";
 
     if ($_SESSION['divisi'] == 'Direksi') {
-      echo "<script language='javascript'>";
-      echo "alert('$notification')";
-      echo "</script>";
-      echo "<script> document.location.href='../home-direksi.php'; </script>";
+      echo $helper->alertMessage($notification, "../home-direksi.php");
     } else if ($_SESSION['divisi'] == 'FINANCE' && $_SESSION['hak_akses']) {
-      echo "<script language='javascript'>";
-      echo "alert('$notification')";
-      echo "</script>";
-      echo "<script> document.location.href='../home-finance.php'; </script>";
+      echo $helper->alertMessage($notification, "../home-finance.php");
     } else {
-      echo "<script language='javascript'>";
-      echo "alert('$notification')";
-      echo "</script>";
-      echo "<script> document.location.href='../home.php'; </script>";
+      echo $helper->alertMessage($notification, "../home.php");
     }
   }
 }

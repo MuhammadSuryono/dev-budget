@@ -28,7 +28,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                 <?php
                 $i = 1;
                 $checkWaktu = [];
-                $sql = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE jenis ='B1' AND status !='Belum Di Ajukan' AND tahun = '$tahun'");
+                $sql = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE jenis ='B1' AND totalbudget <= 1000000 AND status !='Belum Di Ajukan' AND tahun = '$tahun'");
                 while ($d = mysqli_fetch_array($sql)) {
                   $arrDocument = [];
                   $document = unserialize($d['document']);
@@ -122,7 +122,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                 <?php
                 $i = 1;
                 $checkWaktu = [];
-                $sql = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE jenis ='B2' AND status !='Belum Di Ajukan' AND tahun = '$tahun'");
+                $sql = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE jenis ='B2' AND totalbudget <= 1000000 AND status !='Belum Di Ajukan' AND tahun = '$tahun'");
                 while ($d = mysqli_fetch_array($sql)) {
                   $arrDocument = [];
                   $document = unserialize($d['document']);
@@ -222,7 +222,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                     $sql = mysqli_query($koneksi, "SELECT
                                    *
                             FROM pengajuan
-                            WHERE jenis='Rutin' AND status ='Disetujui' AND tahun ='$tahun'
+                            WHERE jenis='Rutin' AND status ='Disetujui' AND tahun ='$tahun' AND totalbudget <= 1000000
                                OR jenis='Rutin' AND status ='Pending' AND tahun ='$tahun'
                                OR jenis='Rutin' AND status ='Disapprove' AND tahun ='$tahun'");
                     while ($d = mysqli_fetch_array($sql)) {
@@ -266,7 +266,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                                 <td bgcolor="#fcfaa4">
                                     <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
                                 </td>
-                                <td bgcolor="#fcfaa4"><a href="views-direksi.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
+                                <td bgcolor="#fcfaa4"><a href="view-finance-manager.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
                                 <td bgcolor="#fcfaa4">
                                     <center>--</center>
                                 </td>
@@ -406,7 +406,7 @@ if (strpos($tab, 'B1') !== false) : ?>
         $sql = mysqli_query($koneksi, "SELECT
                                    *
                             FROM pengajuan
-                            WHERE jenis='Non Rutin' AND status ='Disetujui' AND tahun ='2018'
+                            WHERE jenis='Non Rutin' AND status ='Disetujui' AND tahun ='2018' AND totalbudget <= 1000000
                                OR jenis='Non Rutin' AND status ='Pending' AND tahun ='2018'
                                OR jenis='Non Rutin' AND status ='Disapprove' AND tahun='2018'");
         while ($d = mysqli_fetch_array($sql)) {

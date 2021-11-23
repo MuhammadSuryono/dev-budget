@@ -398,7 +398,7 @@ if (!isset($_SESSION['nama_user'])) {
                   <th>Status</th>
                 </tr>
               </thead>
-
+<?php echo $divisi ?>
               <tbody>
                 <?php
                 $i = 1;
@@ -406,7 +406,7 @@ if (!isset($_SESSION['nama_user'])) {
                 if ($divisiSes == 'Field') {
                   $sql = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE (jenis ='B1' AND status_request !='Belum Di Ajukan') OR (jenis ='B2' AND status_request !='Belum Di Ajukan') AND divisi ='$divisi' ORDER BY jenis");
                 } else {
-                  $sql2 = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE pengaju ='$username' AND status_request <> 'Disetujui'");
+                  $sql2 = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE (pengaju ='$username' AND status_request <> 'Disetujui') OR (status_request <> 'Disetujui' AND divisi = '$divisi') ");
                 }
                 while ($e = mysqli_fetch_array($sql2)) {
                   if (!in_array($e['waktu'], $checkWaktu)) :

@@ -18,10 +18,11 @@ if (!isset($_SESSION['nama_user'])) {
 
 
 $idUser = $_SESSION['id_user'];
-$queryUser = mysqli_query($koneksi, "SELECT email, e_sign FROM tb_user WHERE id_user = '$idUser'");
+$queryUser = mysqli_query($koneksi, "SELECT email, e_sign, phone_number FROM tb_user WHERE id_user = '$idUser'");
 $user = mysqli_fetch_assoc($queryUser);
 $emailUser = $user['email'];
 $signUser = $user['e_sign'];
+$phoneNumber = $user['phone_number'];
 
 $date = date('my');
 $countQuery = mysqli_query($koneksiTransfer, "SELECT count(transfer_id) FROM data_transfer WHERE transfer_req_id LIKE '2001%'");
@@ -818,6 +819,23 @@ $formatId = $date . $count;
       </div>
     </div>
 
+    <div class="modal fade" id="phoneNumberModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            Pendaftaran Email
+          </div>
+          <div class="modal-body">
+          <p>Silahkan masukkan Nomor Handphone anda yang terhubung dengan layanan Whatsapp untuk melengkapi data diri anda</p>
+            <input type="text" class="form-control" id="phone_number" name="phone_number" value="" autocomplete="off" required>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" id="buttonSubmitPhonneNumber" class="btn btn-success success">Submit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="modal fade" id="signModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -953,6 +971,7 @@ $formatId = $date . $count;
       const emailUser = <?= json_encode($emailUser); ?>;
       const idUser = <?= json_encode($idUser); ?>;
       const signUser = <?= json_encode($signUser); ?>;
+      const phoneNumber = <?= json_encode($phoneNumber); ?>;
 
       $(document).ready(function() {
         $('#inputImageSign').change(function() {
@@ -973,6 +992,37 @@ $formatId = $date . $count;
             keyboard: false
           });
         }
+
+        if (phoneNumber == null) {
+          $('#phoneNumberModal').modal({
+            backdrop: 'static',
+            keyboard: false
+          });
+        }
+
+        $('#buttonSubmitPhonneNumber').click(function() {
+      const phoneNumber = $('#phone_number').val();
+      if (!email) {
+        alert('Masukkan Phone Number Anda');
+      } else {
+        $.ajax({
+          url: "register-phone-number.php",
+          type: "post",
+          data: {
+            phoneNumber: phoneNumber,
+            id: idUser
+          },
+          success: function(result) {
+            if (result == true) {
+              alert('Pendaftaran Nomor Handphone Berhasil');
+              $('#phoneNumberModal').modal('hide');
+            } else {
+              alert('Pendaftaran Nomor Handphone Gagal, ' + result);
+            }
+          }
+        })
+      }
+    })
 
         $('#buttonSubmitEmail').click(function() {
           const email = $('#email').val();

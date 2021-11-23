@@ -1,10 +1,12 @@
 <?php
 session_start();
 require "application/config/database.php";
+require_once "application/config/whatsapp.php";
+require_once "application/config/message.php";
 
+$helper = new Message();
 $con = new Database();
 $koneksi = $con->connect();
-require "vendor/email/send-email.php";
 require "dompdf/save-document.php";
 require_once("dompdf/dompdf_config.inc.php");
 
@@ -58,9 +60,6 @@ if ($updatePengajuanRequest) {
 
     if (!$insertkepengaju && $duplicateStatus == 1) {
         $updatePengajuanRequestDouble = mysqli_query($koneksi, "UPDATE pengajuan_request SET ket='Data Double', waktu='$waktu[waktu]', on_revision_status = '0' WHERE waktu='$waktu[waktu]'") or die(mysqli_error($koneksi));
-        // var_dump($waktu);
-        // var_dump($updatePengajuanRequestDouble);
-        // die;
         if ($_SESSION['divisi'] == 'FINANCE') {
             echo "<script language='javascript'>";
             echo "alert('Proses dihentikan, Terindikasi data double')";
@@ -107,43 +106,35 @@ if ($updatePengajuanRequest) {
     }
     if ($countTrue >= count($selesaiRequest)) {
 
-        $email = [];
-        $nama = [];
-        $queryGetEmail = mysqli_query($koneksi, "SELECT email,divisi,nama_user from tb_user WHERE nama_user='$gPengaju' AND aktif='Y'");
+        $phoneNumbers = [];
+        $namaUserSendNotifications = [];
+        $queryGetEmail = mysqli_query($koneksi, "SELECT phone_number,divisi,nama_user from tb_user WHERE nama_user='$gPengaju' AND aktif='Y'");
         $data = mysqli_fetch_assoc($queryGetEmail);
         $divisi = $data['divisi'];
-        array_push($email, $data['email']);
-        array_push($nama, $data['nama_user']);
+        array_push($phoneNumbers, $data['phone_number']);
+        array_push($namaUserSendNotifications, $data['nama_user']);
 
         $queryUserByDivisi = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi = '$data[divisi]' AND (level = 'Manager' OR level = 'Senior Manager') AND aktif='Y'") or die(mysqli_error($koneksi));
         $user = mysqli_fetch_assoc($queryUserByDivisi);
-        array_push($email, $user['email']);
-        array_push($nama, $user['nama_user']);
+        array_push($phoneNumbers, $user['phone_number']);
+        array_push($namaUserSendNotifications, $user['nama_user']);
 
         $url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
         $url = explode('/', $url);
         $url = $url[0] . '/' . $url[1] . '/' . 'login.php';
 
-        $msg = "Dear $gPengaju, <br><br>
-        Budget dengan keterangan berikut:<br><br>
-        Nama Project    : <strong>$gNamaProject</strong><br>
-        Pengaju         : <strong>$gPengaju</strong><br>
-        Divisi          : <strong>$divisi</strong><br>
-        Total Budget    : <strong>Rp. " . number_format($gTotalBudget, 0, '', ',') . "</strong><br><br>
-        
-        Telah disetujui oleh <strong> $gPembuat </strong> pada <strong> " . date("d/m/Y H:i:s") . "</strong><br><br>
-        ";
+        if (count($phoneNumbers) > 0) {
+            $whatsapp = new Whastapp();
+            for($i = 0; $i < count($phoneNumbers); $i++) {
+              $msg = $helper->messagePersetujuanBudget($namaUserSendNotifications[$i], $pengaju, $gNamaProject, $divisi, $gTotalBudget, $gPembuat);
+              if($phoneNumbers[$i] != "") $whatsapp->sendMessage($phoneNumbers[$i], $msg);
+            }
+          }
 
-        $msg .= "Klik <a href='$url'>Disini</a> untuk membuka aplikasi budget.";
-        $subject = "Notifikasi Untuk Penyetujuan Budget";
-        if ($email) {
-            $message = sendEmail($msg, $subject, $email, $name, $address = "multiple");
-        }
-
-        $notification = 'Persetujuan Berhasil. Pemberitahuan via email telah terkirim ke ';
-        for ($i = 0; $i < count($email); $i++) {
-            $notification .= ($nama[$i] . ' (' . $email[$i] . ')');
-            if ($i < count($email) - 1) $notification .= ', ';
+        $notification = 'Persetujuan Berhasil. Pemberitahuan via whatsapp sedang dikirimkan ke ';
+        for ($i = 0; $i < count($phoneNumbers); $i++) {
+            $notification .= ($namaUserSendNotifications[$i] . ' (' . $phoneNumbers[$i] . ')');
+            if ($i < count($phoneNumbers) - 1) $notification .= ', ';
             else $notification .= '.';
         }
 

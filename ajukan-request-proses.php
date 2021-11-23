@@ -1,10 +1,19 @@
 <?php
 
+session_start();
 require "application/config/database.php";
+require_once "application/config/message.php";
+require_once "application/config/whatsapp.php";
+require_once "application/config/helper.php";
+require_once "application/controllers/Cuti.php";
+
+$messageHelper = new Message();
+
+$helper = new Helper();
+$host = $helper->getHostUrl();
 
 $con = new Database();
 $koneksi = $con->connect();
-require "vendor/email/send-email.php";
 require "dompdf/save-document.php";
 require_once("dompdf/dompdf_config.inc.php");
 
@@ -19,6 +28,7 @@ $kodepro = explode(',', $_GET['kodepro']);
 
 $queryGetData = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE id=$id");
 $data = mysqli_fetch_assoc($queryGetData);
+
 $waktu = $data['waktu'];
 $pembuatG = $data['pembuat'];
 $pengaju = $data['pengaju'];
@@ -96,7 +106,7 @@ if ($jenis == 'B1' && $_GET['kodepro'] != 'undefined') {
     }
 }
 
-$name = random_bytes(15);
+$name = randomBytes(15);
 if (@unserialize($data['document'])) {
 
     $document = unserialize($data['document']);
@@ -116,20 +126,72 @@ if (@unserialize($data['document'])) {
     $document = serialize($name);
 }
 
-$email = [];
+$phoneNumbers = [];
 $nama = [];
-$queryGetEmail = mysqli_query($koneksi, "SELECT email,nama_user from tb_user WHERE nama_user='$pembuatG' AND aktif='Y'");
-$getEmail =  mysqli_fetch_assoc($queryGetEmail);
-array_push($email, $getEmail['email']);
-array_push($nama, $getEmail['nama_user']);
+$idUsersNotification = [];
 
-$queryEmail = mysqli_query($koneksi, "SELECT email,nama_user FROM tb_user WHERE divisi='Direksi' AND aktif='Y'");
-while ($e = mysqli_fetch_assoc($queryEmail)) {
-    if ($e['email']) {
-        array_push($email, $e['email']);
-        array_push($nama, $e['nama_user']);
+if ($totalbudget > 1000000) {
+    $queryEmail = mysqli_query($koneksi, "SELECT id_user,phone_number,nama_user FROM tb_user WHERE divisi='Direksi' AND aktif='Y'");
+    while ($e = mysqli_fetch_assoc($queryEmail)) {
+        if ($e['phone_number']) {
+            array_push($phoneNumbers, $e['phone_number']);
+            array_push($nama, $e['nama_user']);
+            array_push($idUsersNotification, $e['id_user']);
+        }
+    }
+} else {
+    $queryGetEmail = mysqli_query($koneksi, "SELECT id_user, email,nama_user, phone_number, divisi, level from tb_user WHERE nama_user='$pembuatG' AND aktif='Y'");
+    $getEmail =  mysqli_fetch_assoc($queryGetEmail);
+    array_push($phoneNumbers, $getEmail['phone_number']);
+    array_push($nama, $getEmail['nama_user']);
+    array_push($idUsersNotification, $getEmail['id_user']);
+
+    $cuti = new Cuti();
+    $struktural = ["Manager", 'Direksi'];
+    if ($getEmail["divisi"] != "Finance") {
+        $getDataUserFinance = false;
+        foreach ($struktural as $struktur) {
+            $queryEmail = mysqli_query($koneksi, "SELECT id_user,phone_number,nama_user FROM tb_user WHERE divisi='Finance' AND level = '$struktur' AND aktif='Y'");
+            $e = mysqli_fetch_assoc($queryEmail);
+           
+            if (!$cuti->checkStatusCutiUser($e["nama_user"])) {
+                $getDataUserFinance = true;
+                while ($e) {
+                    if ($e['phone_number']) {
+                        array_push($phoneNumbers, $e['phone_number']);
+                        array_push($nama, $e['nama_user']);
+                        array_push($idUsersNotification, $getEmail['id_user']);
+                    }
+                }
+            }
+        }
+
+    } else if ($getEmail["divisi"] == "Finance" && ($getEmail["level"] != "Manager" || $getEmail["level"] != "Senior Manager") && $cuti->checkStatusCutiUser($getEmail["nama_user"])) {
+        $queryEmail = mysqli_query($koneksi, "SELECT id_user,phone_number,nama_user FROM tb_user WHERE divisi='Finance' AND aktif='Y'");
+        $e = mysqli_fetch_assoc($queryEmail);
+        if (!$cuti->checkStatusCutiUser($e["nama_user"])) {
+            $getDataUserFinance = true;
+            while ($e) {
+                if ($e['phone_number']) {
+                    array_push($phoneNumbers, $e['phone_number']);
+                    array_push($nama, $e['nama_user']);
+                    array_push($idUsersNotification, $getEmail['id_user']);
+                }
+            }
+        }
+    } else if ($getEmail["divisi"] == "Finance" && ($getEmail["level"] == "Manager" || $getEmail["level"] == "Senior Manager") && $cuti->checkStatusCutiUser($getEmail["nama_user"])) {
+        $queryEmail = mysqli_query($koneksi, "SELECT id_user,phone_number,nama_user FROM tb_user WHERE divisi='Direksi' AND aktif='Y'");
+        while ($e = mysqli_fetch_assoc($queryEmail)) {
+            if ($e['phone_number']) {
+                array_push($phoneNumbers, $e['phone_number']);
+                array_push($nama, $e['nama_user']);
+                array_push($idUsersNotification, $getEmail['id_user']);
+            }
+        }
     }
 }
+
+// var_dump($nama);
 
 $updatePengajuanRequest = mysqli_query($koneksi, "UPDATE pengajuan_request SET status_request='Di Ajukan', waktu='$waktu', submission_note='$keterangan', document='$document' WHERE waktu='$waktu'") or die(mysqli_error($koneksi));
 $queryGetAllId = mysqli_query($koneksi, "SELECT id FROM pengajuan_request WHERE waktu='$waktu'");
@@ -139,64 +201,51 @@ while ($row = mysqli_fetch_array($queryGetAllId)) {
     $updateSelesaiRequest = mysqli_query($koneksi, "UPDATE selesai_request SET waktu='$waktu' WHERE id_pengajuan_request=$id");
 }
 
+$url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+$url = explode('/', $url);
+$host = $url[0]. '/'. $url[1];
+
 if ($updatePengajuanRequest) {
-
-    $url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
-    $url = explode('/', $url);
-    $url = $url[0] . '/' . $url[1] . '/' . 'login.php';
-
-    $msg = "Dear $pembuatG, <br><br>
-    Budget telah diajukan dengan keterangan sebagai berikut:<br><br>
-    Nama Project    : <strong>$namaProject</strong><br>
-    Pengaju         : <strong>$pengaju</strong><br>
-    Divisi          : <strong>$divisi</strong><br>
-    Total Budget    : <strong>Rp. " . number_format($totalbudget, 0, '', ',') . "</strong><br>
-    ";
-    if ($keterangan) {
-        $msg .= "Keterangan:<strong> $keterangan </strong><br><br>";
-    } else {
-        $msg .= "<br>";
-    }
-    $msg .= "Klik <a href='$url'>Disini</a> untuk membuka aplikasi budget.";
     $subject = "Notifikasi Untuk Pengajuan Budget";
-    if ($email) {
-        $message = sendEmail($msg, $subject, $email, $name, 'multiple');
+
+    if ($phoneNumbers) {
+        $wa = new Whastapp();
+
+        for($i = 0; $i < count($phoneNumbers); $i++) {
+            if ($phoneNumbers[$i] != "") {
+                $url =  $host. '/view-request.php?id='.$id.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
+                $msg = $messageHelper->messageAjukanBudget($nama[$i], $pengaju, $namaProject, $divisi, $totalbudget, $keterangan, $url);
+                $wa->sendMessage($phoneNumbers[$i], $msg);
+                if ($name != "") {
+                    $wa->sendDocumentMessage($phone, $msg, getPathFile($host, $name));
+                }
+            }
+        }
     }
 
-    $notifikasi = "Data Berhasil Diajukan. Pemberitahuan via email telah terkirim ke ";
-    $i = 0;
-    for ($i = 0; $i < count($email); $i++) {
-        $notifikasi .= ($nama[$i] . ' (' . $email[$i] . ')');
-        if ($i < count($email) - 1) $notifikasi .= ', ';
-        else $notifikasi .= '.';
+    $notification = "Data Berhasil Diajukan. Pemberitahuan via whatsapp sedang dikirimkan ke ";
+    for ($i = 0; $i < count($phoneNumbers); $i++) {
+        if ($phoneNumbers[$i] != "") {
+          $notification .= ($nama[$i] . ' (' . $phoneNumbers[$i] . ')');
+          if ($i < count($phoneNumbers) - 1) $notification .= ', ';
+          else $notification .= '.';
+        }
     }
 
     if ($_SESSION['divisi'] == 'FINANCE') {
-        echo "<script language='javascript'>";
-        echo "alert('$notifikasi')";
-        echo "</script>";
-        echo "<script> document.location.href='home-finance.php'; </script>";
+        echo $messageHelper->alertMessage($notification, "home-finance.php");
     } else {
-        echo "<script language='javascript'>";
-        echo "alert('$notifikasi')";
-        echo "</script>";
-        echo "<script> document.location.href='home.php'; </script>";
+        echo $messageHelper->alertMessage($notification, "home.php");
     }
 } else {
     if ($_SESSION['divisi'] == 'FINANCE') {
-        echo "<script language='javascript'>";
-        echo "alert('Data Gagal Diajukan')";
-        echo "</script>";
-        echo "<script> document.location.href='home-finance.php'; </script>";
+        echo $messageHelper->alertMessage("Terjadi kesalahan sistem ketika melakukan pengajuan Budget. Silahkan ulangi kembali. Jika masih mengalami kendala, silahkan kontak Tim IT", "home-finance.php");
     } else {
-        echo "<script language='javascript'>";
-        echo "alert('Data Gagal Diajukan')";
-        echo "</script>";
-        echo "<script> document.location.href='home.php'; </script>";
+        echo $messageHelper->alertMessage("Terjadi kesalahan sistem ketika melakukan pengajuan Budget. Silahkan ulangi kembali. Jika masih mengalami kendala, silahkan kontak Tim IT", "home.php");
     }
 }
 
-function random_bytes($length = 6)
+function randomBytes($length = 6)
 {
     $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $characters_length = strlen($characters);
@@ -204,4 +253,9 @@ function random_bytes($length = 6)
     for ($i = 0; $i < $length; $i++)
         $output .= $characters[rand(0, $characters_length - 1)];
     return $output;
+}
+
+function getPathFile($host, $name, $ext = ".pdf")
+{
+    return $host."document/".$name.$ext;
 }

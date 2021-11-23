@@ -228,7 +228,7 @@ $koneksiJay = $con->connect();
             <div class="row ">
                 <h3 class="text-center">Item Budget</h3>
             </div>
-            <a href="request-budget-print.php?id=<?= $id ?>" target="_blank" class="btn btn-warning pull-right">Print <i class="fas fa-print"></i></a>
+            <div id="btn-print-budget"><a href="request-budget-print.php?id=<?= $id ?>" target="_blank" class="btn btn-warning pull-right">Print <i class="fas fa-print"></i></a></div>
             <br /><br />
             <div class="panel panel-warning" data-widget="{&quot;draggable&quot;: &quot;false&quot;}" data-widget-static="">
                 <div class="panel-body no-padding">
@@ -295,13 +295,14 @@ $koneksiJay = $con->connect();
                     </table>
                 </div><!-- /.table-responsive -->
             </div>
-            <!-- <div class="tooltip">Hover over me
-                <span class="tooltiptext">Tooltip text</span>
-            </div> -->
-            <!-- <div class="tooltip" style="display: inline;">
-                dwqdwqw
-                <span class="tooltiptext">Tooltip text</span>
-            </div> -->
+            <?php if ($_SESSION['divisi'] != 'Direksi' && ($d['status_request'] == 'Belum Di Ajukan' || $d['statu_request'] == 'Ditolak')) {
+                echo '<div class="alert alert-warning" role="alert">
+                <h4 class="alert-heading">PERHATIAN!!!</h4>
+                <p>Pastikan sebelum melakukan Pengajuan, <button class="btn btn-xs btn-primary" disabled>Simpan</button> terlebih dahulu data anda.</p>
+                <hr>
+                <p><b>Note: Budget yang telah diajukan tidak bisa dirubah kembali.</b></p>
+            </div>';
+            } ?>
             <span data-toggle="modal" data-target="#requestModal">
                 <button type="button" class="btn btn-success btn-small pull-right" style="margin-left: 5px; display: none;" data-toggle="tooltip" data-placement="bottom" title="Harap Simpan data terlebih dahulu sebelum mengajukan permohonan budget" id="buttonAjukan" data-id="<?= $id ?>">Ajukan</button>
             </span>
@@ -313,7 +314,7 @@ $koneksiJay = $con->connect();
             <div class="row">
                 <div class="col-xs-2">Total Keseluruhan</div>
                 <div class="col-xs-2">: <b class="totalElement"><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></b></div>
-                <input type="hidden" name="tKeseluruhan" id="totalKeseluruhan" value="">
+                <input type="hidden" name="tKeseluruhan" id="totalKeseluruhan" value="<?php echo $d['totalbudget'] ?>">
             </div>
             <?php if ($_SESSION['divisi'] == 'Direksi') : ?>
                 <?php
@@ -365,8 +366,6 @@ $koneksiJay = $con->connect();
 
 
         </form>
-        <?php if ($_SESSION['divisi'] != 'Direksi' && ($d['status_request'] == 'Belum Di Ajukan' || $d['statu_request'] == 'Ditolak')) ?>
-        <p><b>Note: Budget yang telah diajukan tidak bisa dirubah kembali.</b></p>
     </div>
 
     <div class="modal fade" id="requestModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -383,7 +382,7 @@ $koneksiJay = $con->connect();
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <a href="" id="buttonSubmitAjukan" class="btn btn-success success">Submit</a>
+                    <button href="" id="buttonSubmitAjukan" class="btn btn-success success">Submit</button>
                 </div>
             </div>
         </div>
@@ -815,6 +814,7 @@ $koneksiJay = $con->connect();
             const buttonAjukan = document.querySelector('#buttonAjukan');
             buttonAjukan.addEventListener('click', function() {
                 let findLink = document.getElementById("buttonSubmitAjukan");
+                findLink.setAttribute("disable", "")
                 findLink.addEventListener("click", function(event) {
                     var kodePro = $('#kodeproject').map(function() {
                         return (this.value)
@@ -831,7 +831,7 @@ $koneksiJay = $con->connect();
                     let id = buttonAjukan.getAttribute("data-id");
                     let keterangan = document.getElementById("keteranganTambahan").value;
                     let kodepro = $('#kodeproject').val();
-                    findLink.href = "ajukan-request-proses.php?id=" + id + "&ket=" + keterangan + "&kodepro=" + kodepro;
+                    window.location.href = "ajukan-request-proses.php?id=" + id + "&ket=" + keterangan + "&kodepro=" + kodepro;
                 })
             })
 
@@ -870,8 +870,6 @@ $koneksiJay = $con->connect();
                 e.addEventListener("click", function() {
                     $('div.row-tanggal-bayar-appended').remove();
 
-                    console.log($(`#inputNama${numberClicked}`).value);
-
                     buttonClicked = e;
                     numberClicked = i + 1;
                     if (arrStatus.includes($(`#status${numberClicked}`).text()) || arrNamaB2.includes($(`#inputNama${numberClicked}`).val())) {
@@ -901,6 +899,15 @@ $koneksiJay = $con->connect();
         }
 
         function handleShowedButton(divisi, projectStatus, hakAkses, jenis) {
+            const allTotalHarga = document.querySelectorAll(".inputTHarga");
+            let total = 0;
+            allTotalHarga.forEach(function(e, i) {
+                let status = $(`#inputStatus${i+1}`).val();
+                if (status != "UM Burek") {
+                    let result = e.value;
+                    total += parseFloat(result);
+                }
+            })
             if (divisi == 'Direksi') {
                 $('.editButtonCol').hide();
                 $('#buttonAjukan').hide();
@@ -934,7 +941,7 @@ $koneksiJay = $con->connect();
                     $('#submitButton').hide();
                     $('#buttonTambah').hide();
                 }
-            } else if (divisi == 'FINANCE' && hakAkses == 'Manager' && jenis == 'Non Rutin') {
+            } else if (divisi == 'FINANCE' && hakAkses == 'Manager' && jenis == 'Non Rutin' || jenis == 'Rutin' && total <= 1000000) {
                 if (projectStatus == 'Belum Di Ajukan') {
                     $('.editButtonCol').show();
                     $('#buttonAjukan').show();
@@ -976,7 +983,7 @@ $koneksiJay = $con->connect();
                         $('#buttonTambahTerm').show();
                     }
                 }
-            } else if (divisi == 'FINANCE' && hakAkses == 'Manager' && jenis == 'Uang Muka') {
+            } else if (divisi == 'FINANCE' && hakAkses == 'Manager' && jenis == 'Uang Muka' && total <= 1000000) {
                 if (projectStatus == 'Belum Di Ajukan') {
                     $('#buttonSetujuiRequest').hide();
                     $('#buttonTolakRequest').hide();
@@ -1118,6 +1125,12 @@ $koneksiJay = $con->connect();
                 }
             })
             if (isNaN(total)) total = 0;
+            if (total !== parseInt($('#totalKeseluruhan').val()) || total === 0) {
+                var elmBtnAjukan = document.getElementById("buttonAjukan");
+                var elmBtnPrint = document.getElementById("btn-print-budget")
+                elmBtnAjukan.setAttribute("disabled", ""); 
+                elmBtnPrint.style.display = "none"
+            }
             $('.totalElement').text(`Rp. ${formatNumber(total)}`);
             $('#totalKeseluruhan').val((total));
         }

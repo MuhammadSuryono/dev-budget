@@ -2,9 +2,15 @@
 //error_reporting(0);
 session_start();
 require "application/config/database.php";
+require_once "application/config/whatsapp.php";
+require_once "application/config/message.php";
 
 $con = new Database();
 $koneksi = $con->connect();
+
+$messageHelpper = new Message();
+$wa = new Whastapp();
+
 require "vendor/email/send-email.php";
 
 $url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
@@ -20,6 +26,14 @@ $jumlahbayar  = $_POST['jumlahbayar'];
 $nomorvoucher = $_POST['nomorvoucher'];
 $tanggalbayar = $_POST['tanggalbayar'];
 $waktu        = $_POST['waktu'];
+
+if ($_FILES["gambar"]["name"]) {
+    $extension = pathinfo($_FILES["gambar"]["name"], PATHINFO_EXTENSION);
+    $nama_gambar = random_bytes(20) . "." . $extension;
+    $target_file = "uploads/" . $nama_gambar;
+    move_uploaded_file($_FILES["gambar"]["tmp_name"], $target_file);
+}
+
 
 $queryItemBudget = mysqli_query($koneksi, "SELECT * FROM selesai WHERE waktu = '$waktu' AND no = '$no'");
 $itemBudget = mysqli_fetch_assoc($queryItemBudget);
@@ -47,6 +61,7 @@ if (isset($_POST['submit'])) {
                                         novoucher = '$nomorvoucher',
                                         tanggalbayar = '$tanggalbayar',
                                         pembayar = '$user',
+                                        dokumen_bukti_pembayaran= '$nama_gambar',
                                         divpemb = '$divisi' WHERE no='$no' AND waktu='$waktu' AND term='$term'");
 }
 
@@ -212,4 +227,14 @@ if ($update) {
         echo "</script>";
         echo "<script> document.location.href='view-finance" . $isNonRutin  . ".php?code=" . $idBudget . "'; </script>";
     }
+}
+
+function random_bytes($length = 6)
+{
+  $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  $characters_length = strlen($characters);
+  $output = '';
+  for ($i = 0; $i < $length; $i++)
+    $output .= $characters[rand(0, $characters_length - 1)];
+  return $output;
 }

@@ -1211,7 +1211,6 @@ if (!isset($_SESSION['nama_user'])) {
         }
 
         function mengetahui(jumlah, namapenerima, no, waktu, term) {
-          console.log(term);
           $('#mengetahuiModal input[name=jumlah]').val(numberWithCommas(jumlah));
           $('#mengetahuiModal input[name=namapenerima]').val(namapenerima);
           $('#mengetahuiModal input[name=no]').val(no);

@@ -4,7 +4,9 @@ session_start();
 require "application/config/database.php";
 
 $con = new Database();
-$koneksi = $con->connect();
+$con->set_name_db(DB_TRANSFER);
+$con->init_connection();
+$koneksiTransfer = $con->connect();
 require_once("dompdf/dompdf_config.inc.php");
 
 $id = $_GET['id'];

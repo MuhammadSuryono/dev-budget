@@ -1,10 +1,10 @@
 <?php
 
 defined("DB_APP") OR define("DB_APP", "budget");
-defined("DB_HOST") OR define("DB_HOST", "180.211.92.131");
+defined("DB_HOST") OR define("DB_HOST", "192.168.8.2");
 defined("DB_USER") OR define("DB_USER", "adam");
 defined("DB_PASS") OR define("DB_PASS", "Ad@mMR1db");
-defined("DB_PORT") OR define("DB_PORT", "35728");
+defined("DB_PORT") OR define("DB_PORT", "3306");
 
 // Define other const value here
 defined("DB_JAY") OR define("DB_JAY", "jay2");
