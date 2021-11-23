@@ -129,7 +129,7 @@ if ($updatePengajuanRequest) {
         if (count($phoneNumbers) > 0) {
             $whatsapp = new Whastapp();
             for($i = 0; $i < count($phoneNumbers); $i++) {
-            $url =  $host. '/views.php?id='.$id.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
+            $url =  $host. '/views.php?code='.$id.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
               $msg = $helper->messagePersetujuanBudget($namaUserSendNotifications[$i], $pengaju, $gNamaProject, $divisi, $gTotalBudget, $gPembuat, $url);
               if($phoneNumbers[$i] != "") $whatsapp->sendMessage($phoneNumbers[$i], $msg);
             }

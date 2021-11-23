@@ -292,7 +292,7 @@ if (isset($_POST['submit'])) {
       if (count($phoneNumbers) > 0) {
         $whatsapp = new Whastapp();
         for($i = 0; $i < count($phoneNumbers); $i++) {
-          $url =  $host. '/views.php?id='.$_POST['id'].'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
+          $url =  $host. '/views.php?code='.$_POST['id'].'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
           $msg = $helper->messagePengajuanBPU($nama[$i], $pengaju, $namaProject, $namapenerima, $jumlah, $keterangan, $url);
           if($phoneNumbers[$i] != "") $whatsapp->sendMessage($phoneNumbers[$i], $msg);
         }

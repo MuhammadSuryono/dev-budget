@@ -174,6 +174,10 @@ Total Diajukan : *" . implode(', ', $arrJumlah) . "*
         $msg .= "
 Keterangan:* $keterangan *";
     }
+    $msg .="
+
+    
+Terimakasih";
         return $msg;
     }
 

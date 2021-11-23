@@ -140,14 +140,14 @@ if ($_POST['submit'] == 1) {
 
         $queryEmail = mysqli_query($koneksi, "SELECT email,nama_user FROM tb_user WHERE nama_user = '$item[pengaju]' AND aktif='Y'");
         $emailUser = mysqli_fetch_assoc($queryEmail);
-        if ($emailUser) {
+        if ($emailUser['email'] != "") {
             array_push($email, $emailUser['email']);
             array_push($nama, $emailUser['nama_user']);
         }
 
         $queryEmail = mysqli_query($koneksi, "SELECT email,nama_user,divisi FROM tb_user WHERE nama_user = '$item[acknowledged_by]' AND aktif='Y'");
         $emailUser = mysqli_fetch_assoc($queryEmail);
-        if ($emailUser) {
+        if ($emailUser['email'] != "") {
             array_push($email, $emailUser['email']);
             array_push($nama, $emailUser['nama_user']);
         }
@@ -163,7 +163,7 @@ if ($_POST['submit'] == 1) {
     if ($budget['jenis'] == 'B1' || $budget['jenis'] == 'B2') {
         $queryEmail = mysqli_query($koneksi, "SELECT email,nama_user FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1', '3')");
         while ($e = mysqli_fetch_assoc($queryEmail)) {
-            if ($e['email']) {
+            if ($e['email'] != "") {
                 array_push($email, $e['email']);
                 array_push($nama, $e['nama_user']);
             }
@@ -171,7 +171,7 @@ if ($_POST['submit'] == 1) {
     } else {
         $queryEmail = mysqli_query($koneksi, "SELECT email,nama_user FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('2', '3')");
         while ($e = mysqli_fetch_assoc($queryEmail)) {
-            if ($e['email']) {
+            if ($e['email'] != "") {
                 array_push($email, $e['email']);
                 array_push($nama, $e['nama_user']);
             }
@@ -210,15 +210,17 @@ if ($_POST['submit'] == 1) {
         $subject = "Notifikasi Aplikasi Budget";
 
         if ($email) {
-            // $message = sendEmail($msg, $subject, $email, $name, $address = "multiple");
+            $message = sendEmail($msg, $subject, implode(",", $email), $name, $address = "multiple");
         }
 
         $notification = 'BPU Telah Disetujui. Pemberitahuan via email telah terkirim ke ';
         $i = 0;
         for ($i = 0; $i < count($email); $i++) {
-            $notification .= ($nama[$i] . ' (' . $email[$i] . ')');
-            if ($i < count($email) - 1) $notification .= ', ';
-            else $notification .= '.';
+            if ($email[$i] != "") {
+                $notification .= ($nama[$i] . ' (' . $email[$i] . ')');
+                if ($i < count($email) - 1) $notification .= ', ';
+                else $notification .= '.';
+            }
         }
     }
 } else if ($submit == 0) {
