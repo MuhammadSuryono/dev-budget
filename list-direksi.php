@@ -408,12 +408,14 @@ $subTabUmum = ['Rutin', 'Non-Rutin']
 
 
     <script type="text/javascript">
-        $(document).ajaxStart(function() {
-            // $('#loader').removeClass('hidden');
-            $('.tab-fetched-data').html('<p>Sedang mengambil...</p>');
-        }).ajaxSuccess(function() {
-            // $('#loader').addClass('hidden');
-        });
+        // setTimeout(function() {
+        //     // $(document).ajaxStart(function() {
+        //     // // $('#loader').removeClass('hidden');
+        //     // $('.tab-fetched-data').html('<p>Sedang mengambil...</p>');
+        //     // }).ajaxSuccess(function() {
+        //     //     // $('#loader').addClass('hidden');
+        //     // });
+        // }, 500)
 
         const element = $('li.active .end-button').first();
         // console.log(element.attr('href'));
@@ -422,18 +424,20 @@ $subTabUmum = ['Rutin', 'Non-Rutin']
             const href = element.attr('href').split('-');
             const tahun = href[href.length - 1];
             const tab = href[0];
-            $.ajax({
-                type: 'post',
-                url: 'ajax/ajax-tab-listdireksi.php',
-                data: {
-                    tahun: tahun,
-                    tab: tab
-                },
-                success: function(data) {
-                    // console.log(data);
-                    $('.tab-fetched-data').html(data);
-                }
-            });
+            setTimeout(function() {
+                $.ajax({
+                    type: 'post',
+                    url: 'ajax/ajax-tab-listdireksi.php',
+                    data: {
+                        tahun: tahun,
+                        tab: tab
+                    },
+                    success: function(data) {
+                        // console.log(data);
+                        $('.tab-fetched-data').html(data);
+                    }
+                });
+            }, 1000)
         }
 
         $(document).ready(function() {
