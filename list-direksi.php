@@ -457,7 +457,7 @@ $subTabUmum = ['Rutin', 'Non-Rutin']
                 url: 'listdireksi/umburek.php',
                 success: function(data) {
                     // console.log(data);
-                    $('.content-uang-muka').html(data);
+                    $('.content-umbrek').html(data);
                 }
             });
             })
