@@ -48,7 +48,7 @@ http://$urlPengajuan";
 return $msg;
     }
 
-    public function messagePersetujuanBudget($dear, $pengaju, $namaProject, $divisi, $totalbudget = 0, $penyetuju)
+    public function messagePersetujuanBudget($dear, $pengaju, $namaProject, $divisi, $totalbudget = 0, $penyetuju, $urlBpu)
     {
         $msg = "*Notifikasi Untuk Persetujuan Budget*
 Dear $dear, 
@@ -59,15 +59,19 @@ Divisi          : *$divisi*
 Total Budget    : *Rp. " . number_format($totalbudget, 0, '', ',') . "*
 
 Telah disetujui oleh *$penyetuju* pada *" . date("d/m/Y H:i:s") . "*
+
+Klik link berikut untuk pembuatan BPU
+http://$urlBpu
+
 Terimakasih";
 
 return $msg;
     }
 
-    public function messagePengajuanBPU($pengaju, $namaProject, $penerima, $totalPengajuan = 0, $keterangan = "", $urlPengajuan)
+    public function messagePengajuanBPU($dear, $pengaju, $namaProject, $penerima, $totalPengajuan = 0, $keterangan = "", $urlPengajuan)
     {
         $msg = "*Notifikasi Untuk Pengajuan BPU*
-Dear $pengaju, 
+Dear $dear, 
 BPU telah diajukan dengan keterangan sebagai berikut:
 Nama Project    : *$namaProject*
 Pengaju         : *$pengaju*
@@ -189,5 +193,27 @@ Total Diajukan : *" . implode(', ', $arrJumlah) . "*
 Keterangan:* $keterangan *";
     }
         return $msg;
+    }
+
+    public function messagePengajuanBPUKadiv($dear, $pengaju, $namaProject, $penerima, $totalPengajuan = 0, $keterangan = "", $urlPengajuan)
+    {
+        $msg = "*Notifikasi Untuk Pengajuan BPU*
+Dear $dear, 
+BPU telah diketahui oleh KADIV dengan keterangan sebagai berikut:
+Nama Project    : *$namaProject*
+Pengaju         : *$pengaju*
+Penerima          : *$penerima*
+Jumlah Yang Diajukan    : *Rp. " . number_format($totalPengajuan, 0, '', ',') . "*
+
+";
+
+if ($keterangan != "") {
+    $msg .= "Keterangan: *$keterangan*";
+}
+$msg .= "
+
+Terimakasih";
+
+return $msg;
     }
 }

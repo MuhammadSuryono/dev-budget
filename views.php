@@ -150,7 +150,7 @@ if (!isset($_SESSION['nama_user'])) {
                 <table class="table table-striped table-bordered">
                   <thead>
                     <tr class="warning">
-                      <th>No</th>
+                      <th>No </th>
                       <th>Nama</th>
                       <th>Kota</th>
                       <th>Status</th>
@@ -169,6 +169,7 @@ if (!isset($_SESSION['nama_user'])) {
                       <th>Action</th>
                       <?php
                       $waktu = $d['waktu'];
+                      $code = $_GET["code"];
                       $selno = mysqli_query($koneksi, "SELECT no FROM selesai WHERE waktu ='$waktu'");
                       $wkwk = mysqli_fetch_assoc($selno);
                       $no = $wkwk['no'];
@@ -248,7 +249,7 @@ if (!isset($_SESSION['nama_user'])) {
                                 //   echo "<a href='#' data-toggle='tooltip' title='Harap scan QR Code terlebih dahulu sebelum membuat bpu'>QR Required</a>";
                                 // }else{
                               ?>
-                                <button type="button" class="btn btn-default btn-small" onclick="edit_budget('<?php echo $no; ?>','<?php echo $waktu; ?>')">BPU</button>
+                                <button type="button" class="btn btn-default btn-small" onclick="edit_budget('<?php echo $no; ?>','<?php echo $waktu; ?>', '<?php echo $code ?>')">BPU</button>
                               <?php
                               } else {
                                 echo "<a href='#' data-toggle='tooltip' title='Untuk pembayaran External, Harap lampirkan dokumen terkait seperti Invoice, Berita Acara DSB. Untuk di ajukan ke Ibu Ina Puspito untuk mendapatkan persetujuan'>External</a>";
@@ -1467,7 +1468,7 @@ if (!isset($_SESSION['nama_user'])) {
         //
         // });
 
-        function edit_budget(no, waktu) {
+        function edit_budget(no, waktu, id) {
           // alert(noid+' - '+waktu);
           $.ajax({
             type: 'post',
@@ -1475,7 +1476,8 @@ if (!isset($_SESSION['nama_user'])) {
             data: {
               no: no,
               waktu: waktu,
-              page: 'views'
+              page: 'views',
+              id: id,
             },
             success: function(data) {
               $('.fetched-data').html(data); //menampilkan data ke dalam modal

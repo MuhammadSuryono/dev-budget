@@ -108,25 +108,29 @@ if ($updatePengajuanRequest) {
 
         $phoneNumbers = [];
         $namaUserSendNotifications = [];
-        $queryGetEmail = mysqli_query($koneksi, "SELECT phone_number,divisi,nama_user from tb_user WHERE nama_user='$gPengaju' AND aktif='Y'");
+        $idUsersNotification = [];
+        $queryGetEmail = mysqli_query($koneksi, "SELECT phone_number,divisi,nama_user,id_user from tb_user WHERE nama_user='$gPengaju' AND aktif='Y'");
         $data = mysqli_fetch_assoc($queryGetEmail);
         $divisi = $data['divisi'];
         array_push($phoneNumbers, $data['phone_number']);
         array_push($namaUserSendNotifications, $data['nama_user']);
+        array_push($idUsersNotification, $data['id_user']);
 
         $queryUserByDivisi = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi = '$data[divisi]' AND (level = 'Manager' OR level = 'Senior Manager') AND aktif='Y'") or die(mysqli_error($koneksi));
         $user = mysqli_fetch_assoc($queryUserByDivisi);
         array_push($phoneNumbers, $user['phone_number']);
         array_push($namaUserSendNotifications, $user['nama_user']);
+        array_push($idUsersNotification, $data['id_user']);
 
         $url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
         $url = explode('/', $url);
-        $url = $url[0] . '/' . $url[1] . '/' . 'login.php';
+        $host = $url[0] . '/' . $url[1];
 
         if (count($phoneNumbers) > 0) {
             $whatsapp = new Whastapp();
             for($i = 0; $i < count($phoneNumbers); $i++) {
-              $msg = $helper->messagePersetujuanBudget($namaUserSendNotifications[$i], $pengaju, $gNamaProject, $divisi, $gTotalBudget, $gPembuat);
+            $url =  $host. '/views.php?id='.$id.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
+              $msg = $helper->messagePersetujuanBudget($namaUserSendNotifications[$i], $pengaju, $gNamaProject, $divisi, $gTotalBudget, $gPembuat, $url);
               if($phoneNumbers[$i] != "") $whatsapp->sendMessage($phoneNumbers[$i], $msg);
             }
           }

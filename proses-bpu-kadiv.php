@@ -105,7 +105,7 @@ $i = 0;
 for ($i = 0; $i < count($email); $i++) {
     if ($email[$i] != "") {
         $notification .= ($nama[$i] . ' (' . $email[$i] . ')');
-        $whatsapp->sendMessage($email[$i], $messageHelper->messagePengajuanBPU($bpu['pengaju'], $namaProject, $bpu['namapenerima'], $bpu['pengajuan_jumlah'], $keterangan, $url));
+        $whatsapp->sendMessage($email[$i], $messageHelper->messagePengajuanBPUKadiv($nama[$i], $bpu['pengaju'], $namaProject, $bpu['namapenerima'], $bpu['pengajuan_jumlah'], $keterangan, $url));
         if ($i++ < count($email) - 1) $notification .= ', ';
         else $notification .= '.';
     }

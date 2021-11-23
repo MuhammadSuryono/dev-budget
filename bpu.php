@@ -22,6 +22,7 @@ while ($a = mysqli_fetch_assoc($queryAplikasi)) {
 if ($_POST['no'] && $_POST['waktu']) {
   $id = $_POST['no'];
   $waktu = $_POST['waktu'];
+  $code = $_POST['id'];
 
 
   // mengambil data berdasarkan id
@@ -49,6 +50,7 @@ if ($_POST['no'] && $_POST['waktu']) {
     <!-- MEMBUAT FORM -->
     <form action="bpuproses.php" method="post" name="Form" onsubmit="return validateForm()" enctype="multipart/form-data" runat="server">
 
+      <input type="hidden" name="id" value="<?php echo $code ?>">
       <input type="hidden" name="no" value="<?php echo $baris['no']; ?>">
       <input type="hidden" name="waktu" value="<?php echo $baris['waktu']; ?>">
       <input type="hidden" name="pengaju" value="<?php echo $_SESSION['nama_user']; ?>">
