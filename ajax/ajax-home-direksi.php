@@ -5,6 +5,7 @@ require "../application/config/database.php";
 $con = new Database();
 $koneksi = $con->connect();
 
+$con->set_host_db(DB_HOST_DIGITALISASI_MARKETING);
 $con->set_name_db(DB_DIGITAL_MARKET);
 $con->init_connection();
 $koneksiDigitalMarket = $con->connect();

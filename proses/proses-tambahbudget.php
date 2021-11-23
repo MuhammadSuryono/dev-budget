@@ -182,6 +182,7 @@ if (isset($_POST['submit'])) {
 
   if ($inserkeselesai5) {
 
+    $con->set_host_db(DB_HOST_DIGITALISASI_MARKETING);
     $con->set_name_db(DB_DIGITAL_MARKET);
     $con->init_connection();
 
