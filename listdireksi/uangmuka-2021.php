@@ -1,3 +1,9 @@
+<?php
+require_once "../application/config/database.php";
+
+$con = new Database();
+$koneksi = $con->connect();
+?>
 <div class="panel panel-warning" data-widget="{&quot;draggable&quot;: &quot;false&quot;}" data-widget-static="">
     <div class="panel-body no-padding">
         <table class="table table-striped">

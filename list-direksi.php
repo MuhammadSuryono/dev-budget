@@ -167,8 +167,8 @@ $subTabUmum = ['Rutin', 'Non-Rutin']
                         <li><a data-toggle="pill" href="#<?= $i ?>" class="tab-year-button">List Budget <?= $i ?></a></li>
                     <?php endif; ?>
                 <?php endfor; ?>
-                <li><a data-toggle="pill" href="#menu2">UM Burek, Honor SHP PWT, STKB</a></li>
-                <li> <a data-toggle="pill" href="#uangmuka2021">Rekap Monitoring Uang Muka</a></li=>
+                <li class="umbrek"><a data-toggle="pill" href="#menu2">UM Burek, Honor SHP PWT, STKB</a></li>
+                <li class="uangMuka"> <a data-toggle="pill" href="#uangmuka2021">Rekap Monitoring Uang Muka</a></li=>
             </ul>
         </ul>
 
@@ -237,8 +237,9 @@ $subTabUmum = ['Rutin', 'Non-Rutin']
                         <!-- UM BUREK -->
                         <div role="tabpanel" class="tab-pane fade in active" id="umburek" aria-labelledby="umburek-tab">
                             <?php
-                            include "listdireksi/umburek.php";
+                            // include "listdireksi/umburek.php";
                             ?>
+                            <div class="tab-content content-umbrek"></div>
                         </div>
                         <!-- //UM BUREK -->
 
@@ -297,8 +298,9 @@ $subTabUmum = ['Rutin', 'Non-Rutin']
 
             <div role="tabpanel" class="tab-pane fade" id="uangmuka2021" aria-labelledby="uangmuka-tab">
                 <?php
-                include "listdireksi/uangmuka-2021.php";
+                // include "listdireksi/uangmuka-2021.php";
                 ?>
+                <div class="tab-content content-uang-muka"></div>
             </div>
         </div>
     </div><!-- Content Nav -->
@@ -437,6 +439,28 @@ $subTabUmum = ['Rutin', 'Non-Rutin']
                 }
             });
         }
+
+        $('.uangMuka').click(function() {
+            $.ajax({
+                type: 'get',
+                url: 'listdireksi/uangmuka-2021.php',
+                success: function(data) {
+                    // console.log(data);
+                    $('.content-uang-muka').html(data);
+                }
+            });
+            })
+
+            $('.umbrek').click(function() {
+            $.ajax({
+                type: 'get',
+                url: 'listdireksi/umbrek.php',
+                success: function(data) {
+                    // console.log(data);
+                    $('.content-uang-muka').html(data);
+                }
+            });
+            })
 
         $(document).ready(function() {
             $('.end-button').click(function() {
