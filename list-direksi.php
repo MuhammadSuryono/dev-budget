@@ -409,12 +409,12 @@ $subTabUmum = ['Rutin', 'Non-Rutin']
 
     <script type="text/javascript">
         // setTimeout(function() {
-        //     // $(document).ajaxStart(function() {
-        //     // // $('#loader').removeClass('hidden');
-        //     // $('.tab-fetched-data').html('<p>Sedang mengambil...</p>');
-        //     // }).ajaxSuccess(function() {
-        //     //     // $('#loader').addClass('hidden');
-        //     // });
+            $(document).ajaxStart(function() {
+            // $('#loader').removeClass('hidden');
+            $('.tab-fetched-data').html('<p>Sedang mengambil...</p>');
+            }).ajaxSuccess(function() {
+                // $('#loader').addClass('hidden');
+            });
         // }, 500)
 
         const element = $('li.active .end-button').first();
