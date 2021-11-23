@@ -459,6 +459,8 @@ $setting = mysqli_fetch_assoc($querySetting);
                               echo "</b><br/>";
                               echo "Tgl Bayar : <br><b> $tanggalbayar";
                               echo "</b><br/>";
+                              echo "Tgl Bayar : <br><b> ". $bayar['metode_pembayaran'];
+                              echo "</b><br/>";
                               echo "Kasir : <br><b> $pembayar ";
                               echo "</b><br/>";
                               echo "File Rincian BPU : <br>";

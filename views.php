@@ -422,6 +422,8 @@ if (!isset($_SESSION['nama_user'])) {
                                 echo "</b><br/>";
                                 echo "Tgl Bayar : <br><b> $tanggalbayar";
                                 echo "</b><br/>";
+                                echo "Metode Pembayaran : <br><b> ".$bayar['metode_pembayaran'];
+                                echo "</b><br/>";
                                 echo "Kasir : <br><b> $pembayar ";
                                 echo "</b><br/>";
                                 echo "File Rincian BPU : <br>";
