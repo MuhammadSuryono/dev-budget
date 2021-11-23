@@ -95,55 +95,9 @@ if (!isset($_SESSION['nama_user'])) {
             <li><a href="logout.php"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
           </ul>
         <?php } else {
-          
-          $cari = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE status='Pending'");
-          $belbyr = mysqli_num_rows($cari);
-          $caribpu = mysqli_query($koneksi, "SELECT * FROM bpu WHERE persetujuan='Belum Disetujui'");
-          $bpuyahud = mysqli_num_rows($caribpu);
-          $queryPengajuanReq = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE status_request = 'Di Ajukan' AND waktu != 0");
-          $countPengajuanReq = mysqli_num_rows($queryPengajuanReq);
-          $notif = $belbyr + $bpuyahud + $countPengajuanReq;
         ?>
           <ul class="nav navbar-nav navbar-right">
-            <li class="dropdown messages-menu">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-inbox"></i><span class="label label-warning"><?= $notif ?></span></a>
-              <ul class="dropdown-menu">
-                <?php
-                while ($wkt = mysqli_fetch_array($cari)) {
-                  $wktulang = $wkt['waktu'];
-                  $selectnoid = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE waktu='$wktulang'");
-                  $noid = mysqli_fetch_assoc($selectnoid);
-                  $kode = $noid['noid'];
-                  $project = $noid['nama'];
-                ?>
-                  <li class="header"><a href="view-direksi.php?code=<?= $kode ?>">Project <b><?= $project ?></b> status masih Pending</a></li>
-                  <?php
-                  while ($wktbpu = mysqli_fetch_array($caribpu)) {
-                    $bpulagi = $wktbpu['waktu'];
-                    $selectnoid2 = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE waktu='$bpulagi'");
-                    $noid2 = mysqli_fetch_assoc($selectnoid2);
-                    $kode2 = $noid2['noid'];
-                    $project2 = $noid2['nama'];
-                  ?>
-                    <li class="header"><a href="views-direksi.php?code=<?= $kode2 ?>">Project <b><?= $project2 ?></b> ada BPU yang belum di setujui</a></li>
-                <?php
-                  }
-                }
-                ?>
-                <?php
-                while ($qpr = mysqli_fetch_array($queryPengajuanReq)) {
-                  $time = $qpr['waktu'];
-                  $selectnoid3 = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE waktu='$time'");
-                  $noid3 = mysqli_fetch_assoc($selectnoid3);
-                  $kode3 = $noid3['id'];
-                  $project3 = $noid3['nama'];
-                ?>
-                  <li class="header"><a href="view-request.php?id=<?= $kode3 ?>">Pengajuan Budget <b><?= $project3 ?></b> telah diajukan </a></li>
-                <?php
-                }
-                ?>
-              </ul>
-            </li>
+            
 
             <li><a href="#"><span class="glyphicon glyphicon-user"></span><?php echo $_SESSION['nama_user']; ?> (<?php echo $_SESSION['divisi']; ?>)</a></li>
             <li><a href="logout.php"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
