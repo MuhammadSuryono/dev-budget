@@ -22,7 +22,7 @@ function sendEmail($msg = '', $subject = '', $email, $attachment = '', $address 
         array_push($body, ["attachment" => ["filename" => $attachment.".pdf", "url" => $path]]);
     }
 
-    return $httpRequest->HTTPPost($url, $body, "json");
+    return $httpRequest->HTTPPost($url, $body);
 
 
     // $mail = new PHPMailer(true);
