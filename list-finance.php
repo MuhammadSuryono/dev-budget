@@ -110,8 +110,9 @@ $subTabUmum = ['Rutin', 'Non-Rutin']
                     <li><a href="home-finance.php">Home</a></li>
                     <li class="active"><a href="list-finance.php">List</a></li>
                     <li><a href="saldobpu.php">Data User</a></li>
-                    <!--<li><a href="summary.php">Summary</a></li>-->
-                    <!-- <li><a href="hak-akses.php">Hak Akses</a></li> -->
+                    <li><a href="history-finance.php">History</a></li>
+          <li><a href="list.php">Personal</a></li>
+          <li><a href="summary-finance.php">Summary</a></li>
                     <li><a href="listfinish-finance.php">Budget Finish</a></li>
                     <!-- <li><a href="history-direksi.php">History</a></li> -->
                     <li class="dropdown">

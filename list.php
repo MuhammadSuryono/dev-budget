@@ -94,48 +94,8 @@ if (!isset($_SESSION['nama_user'])) {
           <?php endif; ?>
         </ul>
 
-        <?php
-        $pengaju = $_SESSION['nama_user'];
-        $cari = mysqli_query($koneksi, "SELECT * FROM bpu WHERE pengaju ='$pengaju' AND persetujuan ='Belum Disetujui' OR pengaju ='$pengaju' AND persetujuan ='Pending'");
-        $belbyr = mysqli_num_rows($cari);
-        $queryPengajuanReq = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE (status_request = 'Ditolak' OR status_request = 'Belum Di Ajukan') AND pengaju='$pengaju' AND waktu != 0");
-        $countPengajuanReq = mysqli_num_rows($queryPengajuanReq);
-        $totalNotif = $belbyr + $countPengajuanReq;
-        ?>
+        
         <ul class="nav navbar-nav navbar-right">
-          <li class="dropdown messages-menu">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-inbox"></i><span class="label label-warning"><?= $totalNotif ?></span></a>
-            <ul class="dropdown-menu">
-              <?php
-              while ($wkt = mysqli_fetch_array($cari)) {
-                $wktulang = $wkt['waktu'];
-                $selectnoid = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE waktu='$wktulang'");
-                $noid = mysqli_fetch_assoc($selectnoid);
-                $kode = $noid['noid'];
-                $project = $noid['nama'];
-              ?>
-                <li class="header"><a href="view.php?code=<?= $kode ?>">Project <b><?= $project ?></b> BPU Belum Dibayar</a></li>
-              <?php
-              }
-              ?>
-              <?php
-              while ($qpr = mysqli_fetch_array($queryPengajuanReq)) {
-                $time = $qpr['waktu'];
-                $selectnoid3 = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE waktu='$time'");
-                $noid3 = mysqli_fetch_assoc($selectnoid3);
-                $kode3 = $noid3['id'];
-                $project3 = $noid3['nama'];
-                if ($noid3['status_request'] == 'Belum Di Ajukan') :
-              ?>
-                  <li class="header"><a href="view-request.php?id=<?= $kode3 ?>">Akses Pengajuan Budget <b><?= $project3 ?></b> telah dibuka</a></li>
-                <?php elseif ($noid3['status_request'] == 'Ditolak') : ?>
-                  <li class="header"><a href="view-request.php?id=<?= $kode3 ?>">Pengajuan Budget <b><?= $project3 ?></b> telah ditolak</a></li>
-                <?php endif; ?>
-              <?php
-              }
-              ?>
-            </ul>
-          </li>
           <ul class="nav navbar-nav navbar-right">
             <li><a href="ubahpassword.php"><span class="glyphicon glyphicon-user"></span><?php echo $_SESSION['nama_user']; ?> (<?php echo $_SESSION['divisi']; ?>)</a></li>
             <li><a href="logout.php"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
