@@ -28,7 +28,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                 <?php
                 $i = 1;
                 $checkWaktu = [];
-                $sql = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE jenis ='B1' AND totalbudget <= 1000000 AND status !='Belum Di Ajukan' AND tahun = '$tahun'");
+                $sql = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE jenis ='B1' AND status !='Belum Di Ajukan' AND tahun = '$tahun'");
                 while ($d = mysqli_fetch_array($sql)) {
                   $arrDocument = [];
                   $document = unserialize($d['document']);
@@ -122,7 +122,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                 <?php
                 $i = 1;
                 $checkWaktu = [];
-                $sql = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE jenis ='B2' AND totalbudget <= 1000000 AND status !='Belum Di Ajukan' AND tahun = '$tahun'");
+                $sql = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE jenis ='B2' AND status !='Belum Di Ajukan' AND tahun = '$tahun'");
                 while ($d = mysqli_fetch_array($sql)) {
                   $arrDocument = [];
                   $document = unserialize($d['document']);
