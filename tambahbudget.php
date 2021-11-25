@@ -8,6 +8,8 @@ $koneksi = $con->connect();
 $con->set_name_db(DB_JAY);
 $con->init_connection();
 $koneksiJay = $con->connect();
+
+
 ?>
 
 <form class="form-horizontal" action="proses/proses-tambahbudget.php" id="form-create-project" method="POST">
@@ -22,10 +24,20 @@ $koneksiJay = $con->connect();
         <option value="Rutin">Rutin</option>
         <option value="Non Rutin">Non Rutin</option>
         <option value="Lainnya">Lainnya</option>
-      <?php else : ?>
+      <?php elseif (strtolower($_SESSION['divisi']) == 'finance') : ?>
         <option value="Rutin">Rutin</option>
         <option value="Non Rutin">Non Rutin</option>
-        <!-- <option value="Uang Muka">Uang Muka</option> -->
+      <?php elseif (strtolower($_SESSION['hak_akses']) == 'manager') : ?>
+
+        <?php if(strpos($_SESSION['divisi'],'B1')) {
+          echo '<option value="B1">B1</option>';
+        } ?>
+        <?php if(strpos($_SESSION['divisi'],'B2')) {
+          echo '<option value="B2">B2</option>';
+        } ?>
+        <option value="Rutin">Rutin</option>
+        <option value="Non Rutin">Non Rutin</option>
+        <option value="Lainnya">Lainnya</option>
       <?php endif; ?>
 
     </select>

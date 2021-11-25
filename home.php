@@ -16,7 +16,6 @@ if (!isset($_SESSION['nama_user'])) {
   // die('location:login.php');//jika belum login jangan lanjut
 }
 
-
 $idUser = $_SESSION['id_user'];
 $queryUser = mysqli_query($koneksi, "SELECT email, e_sign, phone_number FROM tb_user WHERE id_user = '$idUser'");
 $user = mysqli_fetch_assoc($queryUser);
@@ -745,6 +744,12 @@ $formatId = $date . $count;
     </p>
 
     </br></br>
+    <?php
+    if(strtolower($_SESSION['hak_akses']) == 'manager') {
+      echo '<a href="home.php?page=1"><button type="button" class="btn btn-primary">Create Folder Project</button></a>';
+    }
+    ?>
+    
 
     <?php
     if ($_SESSION['hak_page'] == 'Create') {
@@ -757,8 +762,9 @@ $formatId = $date . $count;
     </br></br>
 
     <?php
-
-    include "isi.php";
+    if(strtolower($_SESSION['hak_akses']) == 'manager') {
+      include "isi.php";
+    }
 
     ?>
 
