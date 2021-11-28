@@ -259,7 +259,7 @@ if (!isset($_SESSION['nama_user'])) {
                                 $jumlbayar        = $bayar['jumlah'];
                                 $statusPengajuanBpu = $bayar['status_pengajuan_bpu'];
                                 $tglbyr           = $bayar['tglcair'];
-                                // $statusbayar      = $bayar['status'];
+                                $statusbayar      = $bayar['status'];
                                 $persetujuan      = $bayar['persetujuan'];
                                 $bayarfinance     = $bayar['jumlahbayar'];
                                 $novoucher        = $bayar['novoucher'];

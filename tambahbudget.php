@@ -27,7 +27,7 @@ $koneksiJay = $con->connect();
       <?php elseif (strtolower($_SESSION['divisi']) == 'finance') : ?>
         <option value="Rutin">Rutin</option>
         <option value="Non Rutin">Non Rutin</option>
-      <?php elseif (strtolower($_SESSION['hak_akses']) == 'manager') : ?>
+      <?php elseif (strtolower($_SESSION['level']) == 'manager' || strtolower($_SESSION['level']) == 'senior manager') : ?>
 
         <?php if(strpos($_SESSION['divisi'],'B1')) {
           echo '<option value="B1">B1</option>';
@@ -35,9 +35,6 @@ $koneksiJay = $con->connect();
         <?php if(strpos($_SESSION['divisi'],'B2')) {
           echo '<option value="B2">B2</option>';
         } ?>
-        <option value="Rutin">Rutin</option>
-        <option value="Non Rutin">Non Rutin</option>
-        <option value="Lainnya">Lainnya</option>
       <?php endif; ?>
 
     </select>

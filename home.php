@@ -789,7 +789,7 @@ $formatId = $date . $count;
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            Pendaftaran Email
+          Pendaftaran Nomor Handphone
           </div>
           <div class="modal-body">
           <p>Silahkan masukkan Nomor Handphone anda yang terhubung dengan layanan Whatsapp untuk melengkapi data diri anda</p>
@@ -967,28 +967,30 @@ $formatId = $date . $count;
         }
 
         $('#buttonSubmitPhonneNumber').click(function() {
-      const phoneNumber = $('#phone_number').val();
-      if (!email) {
-        alert('Masukkan Phone Number Anda');
-      } else {
-        $.ajax({
-          url: "register-phone-number.php",
-          type: "post",
-          data: {
-            phoneNumber: phoneNumber,
-            id: idUser
-          },
-          success: function(result) {
-            if (result == true) {
-              alert('Pendaftaran Nomor Handphone Berhasil');
-              $('#phoneNumberModal').modal('hide');
-            } else {
-              alert('Pendaftaran Nomor Handphone Gagal, ' + result);
+          let phoneNumber = $('#phone_number').val();
+          if (phoneNumber === "") {
+            alert('Masukkan Phone Number Anda');
+          } else {
+            if (phoneNumber[0] == "0") {
+              phoneNumber = replaceAtIndex(phoneNumber, 0, "62")
             }
+            $.ajax({
+              url: "register-phone-number.php",
+              type: "post",
+              data: {
+                phoneNumber: phoneNumber,
+                id: idUser
+              },
+              success: function(result) {
+                if (result == true) {
+                  alert('Pendaftaran Nomor Handphone Berhasil');
+                  $('#phoneNumberModal').modal('hide');
+                } else {
+                  alert('Pendaftaran Nomor Handphone Gagal, ' + result);
+                }
+              }
+            })
           }
-        })
-      }
-    })
 
         $('#buttonSubmitEmail').click(function() {
           const email = $('#email').val();

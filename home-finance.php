@@ -556,7 +556,7 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
       </div>
     <?php endif; ?>
 
-    <a href="home-finance.php?page=1"><button type="button" class="btn btn-primary">Tambah Baru</button></a>
+    <a href="home-finance.php?page=1"><button type="button" class="btn btn-primary">Create Folder Project</button></a>
 
     <br /><br />
 
@@ -587,7 +587,7 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            Pendaftaran Email
+          Pendaftaran Nomor Handphone
           </div>
           <div class="modal-body">
           <p>Silahkan masukkan Nomor Handphone anda yang terhubung dengan layanan Whatsapp untuk melengkapi data diri anda</p>
@@ -694,7 +694,7 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
         $('#rekeningModal').modal();
       }
 
-      if (emailUser == null) {
+      if (emailUser == null || emailUser == "") {
         $('#emailModal').modal({
           backdrop: 'static',
           keyboard: false
@@ -709,27 +709,30 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
         }
 
         $('#buttonSubmitPhonneNumber').click(function() {
-      const phoneNumber = $('#phone_number').val();
-      if (!email) {
-        alert('Masukkan Phone Number Anda');
-      } else {
-        $.ajax({
-          url: "register-phone-number.php",
-          type: "post",
-          data: {
-            phoneNumber: phoneNumber,
-            id: idUser
-          },
-          success: function(result) {
-            if (result == true) {
-              alert('Pendaftaran Nomor Handphone Berhasil');
-              $('#phoneNumberModal').modal('hide');
-            } else {
-              alert('Pendaftaran Nomor Handphone Gagal, ' + result);
+          let phoneNumber = $('#phone_number').val();
+          if (phoneNumber === "") {
+            alert('Masukkan Phone Number Anda');
+          } else {
+            if (phoneNumber[0] == "0") {
+              phoneNumber = replaceAtIndex(phoneNumber, 0, "62")
             }
+            $.ajax({
+              url: "register-phone-number.php",
+              type: "post",
+              data: {
+                phoneNumber: phoneNumber,
+                id: idUser
+              },
+              success: function(result) {
+                if (result == true) {
+                  alert('Pendaftaran Nomor Handphone Berhasil');
+                  $('#phoneNumberModal').modal('hide');
+                } else {
+                  alert('Pendaftaran Nomor Handphone Gagal, ' + result);
+                }
+              }
+            })
           }
-        })
-      }
     })
 
       $('#buttonSubmitEmail').click(function() {
@@ -781,6 +784,16 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
 
         reader.readAsDataURL(input.files[0]); // convert to base64 string
       }
+    }
+
+    function replaceAtIndex(_string,_index,_newValue) {
+        if(_index > _string.length-1) 
+        {
+            return string
+        }
+        else{
+        return _string.substring(0,_index) + _newValue + _string.substring(_index+1)
+        }
     }
   </script>
 

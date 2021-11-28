@@ -9,9 +9,9 @@ class Message {
 Dear $namaCreatorBudget,
 Akses untuk pengajuan budget telah dibuka oleh *$pembuat* pada *" . date("d/m/Y H:i:s") . "* dengan keterangan sebagai berikut:
 
-Nama Project    : *$projectName*
-PIC Budget      : *$namaUserPic*
-Divisi          : *$divisi*
+Nama Project       : *$projectName*
+PIC Budget       : *$namaUserPic*
+Divisi       : *$divisi*
 Silahkan ajukan budget secepatnya.
 
 Klik link berikut untuk membuka Pengajuan Budget.
@@ -34,10 +34,10 @@ http://$urlPengajuan";
     {
         $msg = "Dear $creator,
 Budget telah diajukan dengan keterangan sebagai berikut:
-Nama Project    : *$namaProject*
-Pengaju         : *$pengaju*
-Divisi          : *$divisi*
-Total Budget    : *Rp. " . number_format($totalbudget, 0, '', ',') . "*
+Nama Project       : *$namaProject*
+Pengaju       : *$pengaju*
+Divisi       : *$divisi*
+Total Budget       : *Rp. " . number_format($totalbudget, 0, '', ',') . "*
 ";
     if ($keterangan != "") {
         $msg .= "Keterangan: *$keterangan*";

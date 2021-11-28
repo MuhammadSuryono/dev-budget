@@ -23,6 +23,7 @@ if ($op == "in") {
         $_SESSION['hak_akses'] = $qry['hak_akses'];
         $_SESSION['id_user'] = $qry['id_user'];
         $_SESSION['hak_page'] = $qry['hak_page'];
+        $_SESSION['level'] = $qry['level'];
 
         $bfrSessionNextPath = isset($_SESSION['before_session_next_path']) ? $_SESSION['before_session_next_path'] : NULL;
 
