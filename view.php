@@ -194,7 +194,10 @@ if (!isset($_SESSION['nama_user'])) {
                           $pilihtotal = mysqli_query($koneksi, "SELECT total FROM selesai WHERE no='$no' AND waktu='$waktu'");
                           $aw = mysqli_fetch_assoc($pilihtotal);
                           $hargaah = $aw['total'];
-                          $query = "SELECT sum(jumlahbayar) AS sum FROM pembayaran WHERE no='$no' AND waktu='$waktu'";
+                          // $query = "SELECT sum(jumlahbayar) AS sum FROM pembayaran WHERE no='$no' AND waktu='$waktu'";
+                          // $result = mysqli_query($koneksi, $query);
+                          // $row = mysqli_fetch_array($result);
+                          $query = "SELECT sum(jumlah) AS sum FROM bpu WHERE no='$no' AND waktu='$waktu'";
                           $result = mysqli_query($koneksi, $query);
                           $row = mysqli_fetch_array($result);
                           $total = $row[0];
