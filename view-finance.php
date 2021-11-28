@@ -287,8 +287,8 @@ if (!isset($_SESSION['nama_user'])) {
                               <?php
                               endif;
                             }
-
-                            if ($d['jenis'] != 'B1') :
+                            
+                            if ($d['jenis'] == 'B1') :
                               if ($aksesSes != "Level 1") {
                               ?>
                                 <?php if ($a['status'] == 'UM' || $a['status'] == 'Pulsa' || $a['status'] == 'Biaya External' || $a['status'] == 'Biaya' || $a['status'] == 'UM Burek' || $a['status'] == 'Biaya Lumpsum') { ?>
