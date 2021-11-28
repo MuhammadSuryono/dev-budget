@@ -745,24 +745,25 @@ $formatId = $date . $count;
 
     </br></br>
     <?php
-    if(strtolower($_SESSION['hak_akses']) == 'manager') {
+
+    if(strtolower($_SESSION['level']) == 'manager' || strtolower($_SESSION['level']) == 'senior manager' || $_SESSION['hak_page'] == 'Create') {
       echo '<a href="home.php?page=1"><button type="button" class="btn btn-primary">Create Folder Project</button></a>';
     }
     ?>
     
 
     <?php
-    if ($_SESSION['hak_page'] == 'Create') {
-      echo "<a href='home.php?page=1'><button type='button' class='btn btn-primary'>Tambah Project</button></a>";
-    } else {
-      echo "";
-    }
+    // if ($_SESSION['hak_page'] == 'Create') {
+    //   echo "<a href='home.php?page=1'><button type='button' class='btn btn-primary'>Tambah Project</button></a>";
+    // } else {
+    //   echo "";
+    // }
     ?>
 
     </br></br>
 
     <?php
-    if(strtolower($_SESSION['hak_akses']) == 'manager') {
+    if(strtolower($_SESSION['level']) == 'manager' || strtolower($_SESSION['level']) == 'senior manager') {
       include "isi.php";
     }
 
@@ -938,6 +939,8 @@ $formatId = $date . $count;
       const idUser = <?= json_encode($idUser); ?>;
       const signUser = <?= json_encode($signUser); ?>;
       const phoneNumber = <?= json_encode($phoneNumber); ?>;
+
+      console.log(phoneNumber);
 
       $(document).ready(function() {
         $('#inputImageSign').change(function() {
