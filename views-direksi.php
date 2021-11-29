@@ -322,7 +322,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                               $jumlbayar        = $bayar['jumlah'];
                               $pengajuanJumlah = $bayar['pengajuan_jumlah'];
                               $tglbyr           = $bayar['tglcair'];
-                              // $statusbayar      = $bayar['status'];
+                              $statusbayar      = $bayar['status'];
                               $persetujuan      = $bayar['persetujuan'];
                               $bayarfinance     = $bayar['jumlahbayar'];
                               $novoucher        = $bayar['novoucher'];
@@ -593,9 +593,11 @@ $setting = mysqli_fetch_assoc($querySetting);
             </div>
 
             <?php
+            // echo $waktu . "\n";
             $query2 = "SELECT sum(jumlahbayar) AS sum FROM bpu WHERE waktu='$waktu'";
             $result2 = mysqli_query($koneksi, $query2);
             $row2 = mysqli_fetch_array($result2);
+            // echo $row2['sum'];
 
             $q_real = "SELECT sum(realisasi) AS sum FROM bpu WHERE waktu='$waktu'";
             $r_real = mysqli_query($koneksi, $q_real);
