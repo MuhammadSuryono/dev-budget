@@ -10,8 +10,8 @@ Dear $namaCreatorBudget,
 Akses untuk pengajuan budget telah dibuka oleh *$pembuat* pada *" . date("d/m/Y H:i:s") . "* dengan keterangan sebagai berikut:
 
 Nama Project       : *$projectName*
-PIC Budget       : *$namaUserPic*
-Divisi       : *$divisi*
+PIC Budget            : *$namaUserPic*
+Divisi                       : *$divisi*
 Silahkan ajukan budget secepatnya.
 
 Klik link berikut untuk membuka Pengajuan Budget.

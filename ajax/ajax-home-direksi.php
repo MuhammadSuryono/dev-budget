@@ -28,8 +28,9 @@ if ($jenis) {
         $queryUser = mysqli_query($koneksiDigitalMarket, "SELECT * FROM data_user WHERE id_user = $p[research_executive]");
         $user = mysqli_fetch_assoc($queryUser);
         // $tipeProject = unserialize($p['tipe_project']);
-        // var_dump($user);
-        if ($user['dept'] == 76) {
+        // var_dump($user['dept']);
+        // die;
+        if ($user['dept'] == "76") {
             array_push($arrNameB1, $p['nama_project_internal']);
             array_push($arrIdB1, $p['id_comm_voucher']);
             array_push($arrTableB1, "comm_voucher");
@@ -52,7 +53,7 @@ if ($jenis) {
                     $methodology = mysqli_fetch_assoc($queryMethodology)['methodology'];
                     $queryUser = mysqli_query($koneksiDigitalMarket, "SELECT * FROM data_user WHERE id_user = $p[user_add]");
                     $user = mysqli_fetch_assoc($queryUser);
-                    if ($user['dept'] == 76) {
+                    if ($user['dept'] == "76") {
                         array_push($arrNameB1, $p['nama_project'] . ' - ' .  $methodology);
                         array_push($arrIdB1, $p['id']);
                         array_push($arrTableB1, "data_sindikasi");
@@ -67,7 +68,7 @@ if ($jenis) {
                 $methodology = mysqli_fetch_assoc($queryMethodology)['methodology'];
                 $queryUser = mysqli_query($koneksiDigitalMarket, "SELECT * FROM data_user WHERE id_user = $p[user_add]");
                 $user = mysqli_fetch_assoc($queryUser);
-                if ($user['dept'] == 76) {
+                if ($user['dept'] == "76") {
                     array_push($arrNameB1, $p['nama_project'] . ' - ' .  $methodology);
                     array_push($arrIdB1, $p['id']);
                     array_push($arrTableB1, "data_sindikasi");
