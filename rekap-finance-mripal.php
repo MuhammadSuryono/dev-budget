@@ -1,5 +1,10 @@
 <?php
 error_reporting(0);
+
+require "application/config/database.php";
+
+$con = new Database();
+$koneksi = $con->connect();
 session_start();
 if (!isset($_SESSION['nama_user'])) {
     header("location:login.php");
