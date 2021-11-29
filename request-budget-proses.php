@@ -1,11 +1,11 @@
 <?php
 
+session_start();
+
 require "application/config/database.php";
 
 $con = new Database();
 $koneksi = $con->connect();
-
-session_start();
 
 if ($_SESSION['divisi'] == 'Direksi') {
     $url = "home-direksi.php";

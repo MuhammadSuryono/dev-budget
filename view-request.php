@@ -941,7 +941,7 @@ $koneksiJay = $con->connect();
                     $('#submitButton').hide();
                     $('#buttonTambah').hide();
                 }
-            } else if (divisi == 'FINANCE' && hakAkses == 'Manager' && jenis == 'Non Rutin' || jenis == 'Rutin' && total <= 1000000) {
+            } else if (divisi == 'FINANCE' && hakAkses == 'Manager' && jenis == 'Non Rutin' || total <= 1000000) {
                 if (projectStatus == 'Belum Di Ajukan') {
                     $('.editButtonCol').show();
                     $('#buttonAjukan').show();

@@ -471,9 +471,9 @@ $setting = mysqli_fetch_assoc($querySetting);
   const emailUser = <?= json_encode($emailUser); ?>;
   const idUser = <?= json_encode($idUser); ?>;
   const signUser = <?= json_encode($signUser); ?>;
-      const phoneNumber = <?= json_encode($phoneNumber); ?>;
+  const phoneNumber = <?= json_encode($phoneNumber); ?>;
   $(document).ready(function() {
-    console.log(phoneNumber);
+  //   console.log(phoneNumber);
 
     $('#inputImageSign').change(function() {
       readURLSign(this);
@@ -528,9 +528,9 @@ $setting = mysqli_fetch_assoc($querySetting);
           if (phoneNumber === "") {
             alert('Masukkan Phone Number Anda');
           } else {
-            if (phoneNumber[0] == "0") {
-              phoneNumber = replaceAtIndex(phoneNumber, 0, "62")
-            }
+            // if (phoneNumber[0] == "0") {
+            //   phoneNumber = replaceAtIndex(phoneNumber, 0, "62")
+            // }
             $.ajax({
               url: "register-phone-number.php",
               type: "post",
@@ -548,6 +548,7 @@ $setting = mysqli_fetch_assoc($querySetting);
               }
             })
           }
+        })
 
     function readURLSign(input) {
       if (input.files && input.files[0]) {
@@ -596,22 +597,32 @@ $setting = mysqli_fetch_assoc($querySetting);
       })
     })
 
-    // const buttonSubmitEmail = document.getElementById("buttonSubmitEmail");
-    // buttonSubmitEmail.addEventListener("click", function() {
-    //   const email = $('#email').val();
-    //   $.ajax({
-    //     url: 'kirim-email.php',
-    //     type: 'post',
-    //     data: {
-    //       code: fullcode,
-    //       email: email
-    //     },
-    //     success: function(data) {
-    //       $('#sendCodeModal').modal('toggle')
-    //     }
-    //   })
-    // })
-  });
+    const buttonSubmitEmail = document.getElementById("buttonSubmitEmail");
+    buttonSubmitEmail.addEventListener("click", function() {
+      const email = $('#email').val();
+      $.ajax({
+        url: 'kirim-email.php',
+        type: 'post',
+        data: {
+          code: fullcode,
+          email: email
+        },
+        success: function(data) {
+          $('#sendCodeModal').modal('toggle')
+        }
+      })
+    })
+
+    function replaceAtIndex(_string,_index,_newValue) {
+        if(_index > _string.length-1) 
+        {
+            return string
+        }
+        else{
+        return _string.substring(0,_index) + _newValue + _string.substring(_index+1)
+        }
+    }
+  })
 </script>
 
 </html>

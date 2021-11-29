@@ -33,7 +33,7 @@ if ($_POST['no'] && $_POST['waktu']) {
             <input type="hidden" name="divisi" value="<?php echo $_SESSION['divisi']; ?>">
             <input type="hidden" name="statusbpu" value="<?php echo $baris['status']; ?>">
 
-            <?php if ($baris['status'] == 'Honor Eksternal') : ?>
+            <?php if ($baris['status'] == 'Honor Eksternal' || $baris['status'] == 'Honor Area Head') : ?>
                 <div style="display: flex; justify-content: end; margin-bottom: 10px;">
                     <button type="button" class="btn btn-sm btn-primary btn-tambah-row">Tambah Penerima</button>
                 </div>

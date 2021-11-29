@@ -279,7 +279,7 @@ if (!isset($_SESSION['nama_user'])) {
                             <?php
 
 
-                            if ($a['status'] == 'Honor Eksternal' || $a['status'] == 'Vendor/Supplier') {
+                            if ($a['status'] == 'Honor Eksternal' || $a['status'] == 'Vendor/Supplier' || $a['status'] == 'Honor Area Head') {
 
                               if (in_array("eksternal_bpu", $buttonAkses)) :
                             ?>
@@ -289,11 +289,12 @@ if (!isset($_SESSION['nama_user'])) {
                             }
                             
                             if ($d['jenis'] == 'B1') :
+                              // echo $a['status'];
                               if ($aksesSes != "Level 1") {
                               ?>
-                                <?php if ($a['status'] == 'UM' || $a['status'] == 'Pulsa' || $a['status'] == 'Biaya External' || $a['status'] == 'Biaya' || $a['status'] == 'UM Burek' || $a['status'] == 'Biaya Lumpsum') { ?>
+                                <!-- <?php if ($a['status'] == 'UM' || $a['status'] == 'Pulsa' || $a['status'] == 'Biaya External' || $a['status'] == 'Biaya' || $a['status'] == 'UM Burek' || $a['status'] == 'Biaya Lumpsum') { ?> -->
                                   <button type="button" style="margin-top: 5px;" class="btn btn-default btn-small" onclick="bpu_budget('<?php echo $no; ?>','<?php echo $waktu; ?>')">BPU</button>
-                                <?php } ?>
+                                <!-- <?php } ?> -->
                               <?php } ?>
                             <?php endif; ?>
                           </td>

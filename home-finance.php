@@ -713,9 +713,9 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
           if (phoneNumber === "") {
             alert('Masukkan Phone Number Anda');
           } else {
-            if (phoneNumber[0] == "0") {
-              phoneNumber = replaceAtIndex(phoneNumber, 0, "62")
-            }
+            // if (phoneNumber[0] == "0") {
+            //   phoneNumber = replaceAtIndex(phoneNumber, 0, "62")
+            // }
             $.ajax({
               url: "register-phone-number.php",
               type: "post",

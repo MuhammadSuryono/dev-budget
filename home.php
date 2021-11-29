@@ -940,8 +940,6 @@ $formatId = $date . $count;
       const signUser = <?= json_encode($signUser); ?>;
       const phoneNumber = <?= json_encode($phoneNumber); ?>;
 
-      console.log(phoneNumber);
-
       $(document).ready(function() {
         $('#inputImageSign').change(function() {
           readURLSign(this);
@@ -974,9 +972,9 @@ $formatId = $date . $count;
           if (phoneNumber === "") {
             alert('Masukkan Phone Number Anda');
           } else {
-            if (phoneNumber[0] == "0") {
-              phoneNumber = replaceAtIndex(phoneNumber, 0, "62")
-            }
+            // if (phoneNumber[0] == "0") {
+            //   phoneNumber = replaceAtIndex(phoneNumber, 0, "62")
+            // }
             $.ajax({
               url: "register-phone-number.php",
               type: "post",
@@ -994,6 +992,7 @@ $formatId = $date . $count;
               }
             })
           }
+        })
 
         $('#buttonSubmitEmail').click(function() {
           const email = $('#email').val();
@@ -1097,6 +1096,16 @@ $formatId = $date . $count;
       function numberWithCommas(x) {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
       }
+
+      function replaceAtIndex(_string,_index,_newValue) {
+        if(_index > _string.length-1) 
+        {
+            return string
+        }
+        else{
+        return _string.substring(0,_index) + _newValue + _string.substring(_index+1)
+        }
+    }
     </script>
 
 </body>
