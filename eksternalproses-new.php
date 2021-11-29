@@ -63,7 +63,7 @@ if (isset($_POST['submit'])) {
     if ($_SESSION['divisi'] == 'FINANCE') {
         $nama_gambar  = $_FILES['gambar']['name'];
         $lokasi       = $_FILES['gambar']['tmp_name']; // Menyiapkan tempat nemapung gambar yang diupload
-        $lokasitujuan = "uploads/"; // Menguplaod gambar kedalam folder ./image
+        $lokasitujuan = "uploads"; // Menguplaod gambar kedalam folder ./image
         $upload       = move_uploaded_file($lokasi, $lokasitujuan . "/" . $nama_gambar);
     } else {
         echo "";
