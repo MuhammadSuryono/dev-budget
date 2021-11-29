@@ -5,7 +5,7 @@ require_once 'application/config/helper.php';
 
 function sendEmail($msg = '', $subject = '', $email, $attachment = '', $address = "single")
 {
-    $host = "http://localhost:8081/api/v1/email";
+    $host = "http://192.168.8.2:8081/api/v1/email";
 
     $httpRequest = new HTTPRequester();
     $url = $host."/send-notification-message";
