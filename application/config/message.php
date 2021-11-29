@@ -35,8 +35,8 @@ http://$urlPengajuan";
         $msg = "Dear $creator,
 Budget telah diajukan dengan keterangan sebagai berikut:
 Nama Project       : *$namaProject*
-Pengaju       : *$pengaju*
-Divisi       : *$divisi*
+Pengaju                  :*$pengaju*
+Divisi                      : *$divisi*
 Total Budget       : *Rp. " . number_format($totalbudget, 0, '', ',') . "*
 ";
     if ($keterangan != "") {
