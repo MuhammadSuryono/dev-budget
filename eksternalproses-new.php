@@ -1,10 +1,20 @@
 <?php
 //error_reporting(0);
 require "application/config/database.php";
+require_once "application/config/whatsapp.php";
+require_once "application/config/message.php";
 
 $con = new Database();
 $koneksi = $con->connect();
 require "vendor/email/send-email.php";
+
+$wa = new Whastapp();
+$messageHelper = new Message();
+
+
+$con->set_name_db(DB_TRANSFER);
+$con->init_connection();
+$koneksiTransfer = $con->connect();
 
 session_start();
 if (!isset($_SESSION['nama_user'])) {
