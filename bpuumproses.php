@@ -69,3 +69,14 @@ if (isset($_POST['submit'])) {
     echo "<script> document.location.href='list-direksi.php'; </script>";
   }
 }
+
+
+function random_bytes($length = 6)
+{
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $characters_length = strlen($characters);
+    $output = '';
+    for ($i = 0; $i < $length; $i++)
+        $output .= $characters[rand(0, $characters_length - 1)];
+    return $output;
+}
