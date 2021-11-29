@@ -202,8 +202,13 @@ while ($row = mysqli_fetch_array($queryGetAllId)) {
 }
 
 $url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+$port = $_SERVER['SERVER_PORT'];
 $url = explode('/', $url);
-$host = $url[0]. '/'. $url[1];
+$hostProtocol = $url[0];
+if ($port != "") {
+    $hostProtocol = $hostProtocol . ":" . $port;
+}
+$host = $hostProtocol. '/'. $url[1];
 
 if ($updatePengajuanRequest) {
     $subject = "Notifikasi Untuk Pengajuan Budget";

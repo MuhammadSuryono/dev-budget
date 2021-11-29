@@ -123,8 +123,13 @@ if ($updatePengajuanRequest) {
         array_push($idUsersNotification, $data['id_user']);
 
         $url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+        $port = $_SERVER['SERVER_PORT'];
         $url = explode('/', $url);
-        $host = $url[0] . '/' . $url[1];
+        $hostProtocol = $url[0];
+        if ($port != "") {
+        $hostProtocol = $hostProtocol . ":" . $port;
+        }
+        $host = $hostProtocol. '/'. $url[1];
 
         if (count($phoneNumbers) > 0) {
             $whatsapp = new Whastapp();

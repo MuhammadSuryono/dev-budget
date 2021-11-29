@@ -141,6 +141,14 @@ if (isset($_POST['submit'])) {
   if (count($email)>0) {
     // $message = sendEmail($msg, $subject, $email, $name, $address = "multiple");
     $notifikasi = 'Bayar Budget Berhasil. Pemberitahuan via whatsapp sedang dikirimkan ke ';
+    $url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+    $port = $_SERVER['SERVER_PORT'];
+    $url = explode('/', $url);
+    $hostProtocol = $url[0];
+    if ($port != "") {
+      $hostProtocol = $hostProtocol . ":" . $port;
+    }
+    $host = $hostProtocol. '/'. $url[1];
     for ($i = 0; $i < count($email); $i++) {
       if ($email[$i] != "") {
         $whatsapp->sendMessage($email[$i], $helperMessage->messagePembayaranBPU($namaProject, $no, $term, $namapenerima, $pembayar, $tanggalbayar, $nomorvoucher, $jumlahbayar, $keterangan));
