@@ -959,13 +959,13 @@ $formatId = $date . $count;
             keyboard: false
           });
         }
-
-        if (phoneNumber == null || phoneNumber == "") {
-          $('#phoneNumberModal').modal({
-            backdrop: 'static',
-            keyboard: false
-          });
-        }
+        
+        // if (phoneNumber == null || phoneNumber == "") {
+        //   $('#phoneNumberModal').modal({
+        //     backdrop: 'static',
+        //     keyboard: false
+        //   });
+        // }
 
         $('#buttonSubmitPhonneNumber').click(function() {
           let phoneNumber = $('#phone_number').val();

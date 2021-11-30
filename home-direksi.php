@@ -493,12 +493,12 @@ $setting = mysqli_fetch_assoc($querySetting);
         keyboard: false
       });
     }
-    if (phoneNumber == null || phoneNumber == "") {
-          $('#phoneNumberModal').modal({
-            backdrop: 'static',
-            keyboard: false
-          });
-        }
+    // if (phoneNumber == null || phoneNumber == "") {
+    //       $('#phoneNumberModal').modal({
+    //         backdrop: 'static',
+    //         keyboard: false
+    //       });
+    //     }
     $('#buttonSubmitEmail').click(function() {
       const email = $('#email').val();
       if (!email) {
