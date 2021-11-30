@@ -288,7 +288,6 @@ if (!isset($_SESSION['nama_user'])) {
                               endif;
                             }
                             
-                            if ($d['jenis'] == 'B1') :
                               // echo $a['status'];
                               if ($aksesSes != "Level 1") {
                               ?>
@@ -296,7 +295,6 @@ if (!isset($_SESSION['nama_user'])) {
                                   <button type="button" style="margin-top: 5px;" class="btn btn-default btn-small" onclick="bpu_budget('<?php echo $no; ?>','<?php echo $waktu; ?>')">BPU</button>
                                 <!-- <?php } ?> -->
                               <?php } ?>
-                            <?php endif; ?>
                           </td>
 
                           <?php
