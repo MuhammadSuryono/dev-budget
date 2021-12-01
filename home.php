@@ -102,137 +102,7 @@ $formatId = $date . $count;
 
     <br />
 
-    <!-- OUTSTANDING BPU UM -->
-    <!-- <h5>Outstanding BPU UM </h5>
-    <div class="panel panel-warning" data-widget="{&quot;draggable&quot;: &quot;false&quot;}" data-widget-static="">
-      <div class="panel-body no-padding">
-        <table class="table table-striped">
-          <thead>
-            <tr class="warning">
-              <th>No</th>
-              <th>Nama</th>
-              <th>Divisi</th>
-              <th>Total Outstanding</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <?php
-            // 
-            $i = 1;
-            $divisi   = strtolower(mb_substr($_SESSION['divisi'], 0, 5));
-            $username = $_SESSION['nama_user'];
-            $divisiSes = $_SESSION['divisi'];
-
-            if ($_SESSION['hak_akses'] == 'Manager') {
-              $sql2 = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='$divisi' AND aktif = 'Y' ORDER BY nama_user ASC");
-            } else if ($divisiSes == 'field') {
-              $sql2 = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi LIKE '%FIELD%' ORDER BY nama_user ASC");
-            } else {
-              $sql2 = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user='$nuser'");
-            }
-
-            while ($e = mysqli_fetch_array($sql2)) {
-            ?>
-              <tr>
-                <td scope="row"><?php echo $i++; ?></td>
-                <td><?php echo $e['nama_user']; ?></td>
-                <td><?php echo $e['divisi']; ?></td>
-                <td>
-                  <?php
-                  $usernya = $e['nama_user'];
-                  // var_dump($usernya);
-                  $getUm = mysqli_query($koneksi, "SELECT sum(jumlah) AS sumjum FROM bpu WHERE namapenerima='$usernya' AND status !='Realisasi (Direksi)' AND statusbpu IN ('UM', 'UM Burek')");
-                  $um = mysqli_fetch_array($getUm);
-                  echo 'Rp. ' . number_format($um[0], 0, '', ',');
-                  ?>
-                </td>
-                <?php
-                $caribpunya2 = mysqli_query($koneksi, "SELECT
-                                              pengajuan.noid AS kode,
-                                              pengajuan.nama AS nama,
-                                              bpu.status AS status_bpu,
-                                              bpu.status_pengajuan_realisasi AS status_pengajuan_realisasi,
-                                              bpu.no AS no,
-                                              bpu.waktu AS waktu,
-                                              bpu.term AS term,
-                                              bpu.jumlah AS jumlah,
-                                              bpu.realisasi AS realisasi,
-                                              bpu.uangkembali AS uangkembali,
-                                              bpu.fileupload_realisasi AS fileupload_realisasi,
-                                              bpu.pengajuan_realisasi,
-                                              bpu.pengajuan_uangkembali AS pengajuan_uangkembali,
-                                              bpu.pengajuan_tanggalrealisasi AS pengajuan_tanggalrealisasi,
-                                              bpu.alasan_tolak_realisasi,
-                                              selesai.status AS status_selesai,
-                                              pengajuan.jenis AS jenis
-                                              FROM
-                                                bpu
-                                              LEFT JOIN pengajuan ON bpu.waktu = pengajuan.waktu
-                                              LEFT JOIN selesai ON bpu.waktu = selesai.waktu
-                                              AND bpu.no = selesai.no
-                                              WHERE
-                                                bpu.namapenerima = '$usernya'
-                                              AND bpu.status = 'Telah Di Bayar'
-                                              AND bpu.statusbpu = 'UM'");
-                $checkName = [];
-                while ($cb = mysqli_fetch_array($caribpunya2)) {
-                  $key = $cb['jenis'] . '-' . $cb['nama'] . '-' . $cb['no'] . '-' . $cb['term'];
-
-                  if (!in_array($key, $checkName)) :
-                ?>
-                    <td bgcolor="#8aad70">
-                      Jenis : <b><?php echo $cb['jenis']; ?></b>
-                      <br />
-                      Project :
-                      <b><a href="views.php?code=<?php echo $cb['kode']; ?>"><?php echo $cb['nama']; ?></a></b>
-                      <br />
-                      Item No : <b><?php echo $cb['no']; ?></b>
-                      <br />
-                      Term : <b><?php echo $cb['term']; ?></b>
-                      <br />
-                      Jumlah :
-                      <br />
-                      <b>
-                        <?php
-                        $jumlahnya     = $cb['jumlah'];
-                        $realisasinya  = $cb['realisasi'];
-                        $jadinya = $jumlahnya - $realisasinya;
-                        echo 'Rp. ' . number_format($jadinya, 0, '', ',');
-                        ?>
-                      </b><br>
-                      <?php
-
-                      $statusbayar         = $cb['status_bpu'];
-                      $statusPengajuanRealisasi = $cb['status_pengajuan_realisasi'];
-                      $no = $cb['no'];
-                      $term = $cb['term'];
-                      $waktu = $cb['waktu'];
-                      $jumlbayar = $cb['jumlah'];
-                      $realisasi           = $cb['realisasi'];
-                      $uangkembali         = $cb['uangkembali'];
-                      $kembreal         = $realisasi + $uangkembali;
-                      $sisarealisasi    = $jumlbayar - $kembreal;
-                      $fileuploadRealisasi       = $cb['fileupload_realisasi'];
-                      $pengajuan_realisasi = $cb['pengajuan_realisasi'];
-                      $pengajuan_uangkembali = $cb['pengajuan_uangkembali'];
-                      $pengajuan_tanggalrealisasi  = $cb['pengajuan_tanggalrealisasi'];
-                      $alasan_tolak_realisasi  = $cb['alasan_tolak_realisasi'];
-
-                      ?>
-                    </td>
-                    <?php array_push($checkName, $key); ?>
-                  <?php endif; ?>
-                <?php
-                }
-                ?>
-              </tr>
-            <?php } ?>
-          </tbody>
-        </table>
-      </div>
-    </div> -->
-    <!-- //OUTSTANDING BPU UM -->
+    
 
     <!-- BPU UM -->
     <?php if ($_SESSION['jabatan'] != 'Manager' && $_SESSION['jabatan'] != 'Senior Manager') : ?>
@@ -361,124 +231,9 @@ $formatId = $date . $count;
               Action
             </li>
           </ul>
-          <?php
-          $i = 1;
-          $sql = mysqli_query($koneksi, "SELECT a.namapenerima, SUM(a.jumlah) AS total_pengajuan, c.saldo FROM bpu a JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no JOIN tb_user c ON c.nama_user = a.namapenerima JOIN pengajuan d ON d.waktu = a.waktu WHERE b.status IN ('UM', 'UM Burek') AND a.status IN ('Telah Di Bayar', 'Belum Di Bayar') AND c.aktif = 'Y' AND c.divisi = '$_SESSION[divisi]' GROUP BY a.namapenerima") or die(mysqli_error($koneksi));
-          while ($d = mysqli_fetch_assoc($sql)) :
-            $sql2 = mysqli_query($koneksi, "SELECT SUM(jumlah) AS total_pengajuan FROM (SELECT DISTINCT a.* FROM bpu a JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no WHERE b.status IN ('UM', 'UM Burek') AND a.status = 'Telah Di Bayar' AND a.namapenerima = '$d[namapenerima]') AS t") or die(mysqli_error($koneksi));
-            $terbayar = mysqli_fetch_assoc($sql2);
-            $sql3 = mysqli_query($koneksi, "SELECT SUM(jumlah) AS total_pengajuan FROM (SELECT DISTINCT a.* FROM bpu a JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no WHERE b.status IN ('UM', 'UM Burek') AND a.status = 'Belum Di Bayar' AND a.namapenerima = '$d[namapenerima]') AS t") or die(mysqli_error($koneksi));
-            $belumTerbayar = mysqli_fetch_assoc($sql3);
-          ?>
-
-            <div class="list-group-item border" id="grandparent<?= $d['namapenerima'] ?>" style="border: 1px solid black !important;">
-              <div id="expander" data-target="#grandparentContent<?= $d['namapenerima'] ?>" data-toggle="collapse" data-group-id="grandparent<?= $d['namapenerima'] ?>" data-role="expander">
-                <ul class="list-inline row border">
-                  <li class="col-lg-1"><?= $i++ ?>. <?= $d['namapenerima'] ?></li>
-                  <li class="col-lg-2">Rp. <?php echo number_format($d['saldo']); ?></li>
-                  <li class="col-lg-2">Rp. <?php echo number_format($terbayar['total_pengajuan']); ?></li>
-                  <li class="col-lg-2">Rp. <?php echo number_format($belumTerbayar['total_pengajuan']); ?></li>
-                  <li class="col-lg-2">Rp. <?php echo number_format($terbayar['total_pengajuan'] + $belumTerbayar['total_pengajuan']); ?></li>
-                  <li class="col-lg-2">Rp. <?php echo number_format($d['saldo'] - ($terbayar['total_pengajuan'] + $belumTerbayar['total_pengajuan'])); ?></li>
-                  <li class="col-lg-1">
-                    <span id="grandparentIcon<?= $d['namapenerima'] ?>" style="cursor: pointer; margin: 0 10px;" class="col-lg-1"><a><i class="fas fa-eye" title="View Rincian"></i></a></span>
-                  </li>
-                </ul>
-              </div>
-              <div class="collapse" id="grandparentContent<?= $d['namapenerima'] ?>" aria-expanded="true">
-                <h3 class="text-center">Outstanding</h3>
-                <table class="table table-striped">
-                  <thead>
-                    <tr class="warning">
-                      <th>No.</th>
-                      <th>Nama Project</th>
-                      <th>Nomor Item Budget</th>
-                      <th>Rincian Item Budget</th>
-                      <th>Term Bpu</th>
-                      <th>Jumlah</th>
-                      <th>Tanggal Bayar</th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    <?php
-                    $j = 1;
-                    $checkUnique = [];
-                    $queryDetailBpu = mysqli_query($koneksi, "SELECT a.*, b.rincian FROM bpu a JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no JOIN pengajuan c ON c.waktu = a.waktu WHERE b.status IN ('UM', 'UM Burek') AND a.namapenerima = '$d[namapenerima]' AND a.status = 'Telah Di Bayar'") or die(mysqli_error($koneksi));
-                    if (mysqli_num_rows($queryDetailBpu)) {
-                      while ($item2 = mysqli_fetch_assoc($queryDetailBpu)) :
-                        $unique = $item2['waktu'] . $item2['nama'] . $item2['no'] . $item2['rincian'] . $item2['term'];
-                        if (!in_array($unique, $checkUnique)) :
-
-                          $totalTerbayar += $item2['jumlah'];
-                    ?>
-                          <tr data-toggle="collapse" data-target=".child1">
-                            <td><?= $j++ ?></td>
-                            <td><?= $item2['namaproject'] ?></td>
-                            <td><?= $item2['no'] ?></td>
-                            <td><?= $item2['rincian'] ?></td>
-                            <td><?= $item2['term'] ?></td>
-                            <td>Rp.<?= number_format($item2['jumlah']) ?></td>
-                            <td><?= $item2['tanggalbayar'] ?></td>
-                          </tr>
-                          <?php array_push($checkUnique, $unique); ?>
-                        <?php endif; ?>
-                      <?php endwhile; ?>
-                    <?php } else { ?>
-                      <tr data-toggle="collapse" data-target=".child1">
-                        <!-- <td></td> -->
-                        <td>Tidak ada outstanding</td>
-                        <!-- <td></td> -->
-                        <!-- <td></td> -->
-                      </tr>
-                    <?php } ?>
-
-                  </tbody>
-                </table>
-                <br>
-                <h3 class="text-center">Pengajuan</h3>
-                <table class="table table-striped">
-                  <thead>
-                    <tr class="warning">
-                      <th>No.</th>
-                      <th>Nama Project</th>
-                      <th>Nomor Item Budget</th>
-                      <th>Rincian Item Budget</th>
-                      <th>Term Bpu</th>
-                      <th>Jumlah</th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    <?php
-                    $checkUnique = [];
-                    $queryDetailBpu = mysqli_query($koneksi, "SELECT a.*, b.rincian, c.nama AS namaproject FROM bpu a JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no JOIN pengajuan c ON c.waktu = a.waktu WHERE b.status IN ('UM', 'UM Burek') AND a.namapenerima = '$d[namapenerima]' AND a.status = 'Belum Di Bayar'") or die(mysqli_error($koneksi));
-                    if (mysqli_num_rows($queryDetailBpu)) {
-                      while ($item2 = mysqli_fetch_assoc($queryDetailBpu)) :
-
-                        $unique = $item2['waktu'] . $item2['nama'] . $item2['no'] . $item2['rincian'] . $item2['term'];
-                        if (!in_array($unique, $checkUnique)) :
-                          $totalBelumTerbayar += $item2['jumlah'];
-                    ?>
-                          <tr data-toggle="collapse" data-target=".child1">
-                            <td><?= $j++ ?></td>
-                            <td><?= $item2['namaproject'] ?></td>
-                            <td><?= $item2['no'] ?></td>
-                            <td><?= $item2['rincian'] ?></td>
-                            <td><?= $item2['term'] ?></td>
-                            <td>Rp.<?= number_format($item2['jumlah']) ?></td>
-                          </tr>
-                          <?php array_push($checkUnique, $unique); ?>
-                        <?php endif; ?>
-                      <?php endwhile; ?>
-                    <?php } else { ?>
-                      <td>Tidak ada pengajuan Uang Muka</td>
-                    <?php } ?>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          <?php endwhile; ?>
+          <div class="fetch-data-bpu-um">
+            <div class="text-center">Sedang Memuat Data ...</div>
+          </div>
         </div>
       </div>
     <?php endif; ?>
@@ -939,11 +694,22 @@ $formatId = $date . $count;
       const idUser = <?= json_encode($idUser); ?>;
       const signUser = <?= json_encode($signUser); ?>;
       const phoneNumber = <?= json_encode($phoneNumber); ?>;
+      const isManager = <?= json_encode($_SESSION['jabatan'] != 'Manager' && $_SESSION['jabatan'] != 'Senior Manager'); ?>
 
       $(document).ready(function() {
         $('#inputImageSign').change(function() {
           readURLSign(this);
         })
+
+        if (isManager == false) {
+          $.ajax({
+            type: 'get',
+            url: 'ajax/ajax-home.php',
+            success: function(data) {
+              $('.fetch-data-bpu-um').html(data); //menampilkan data ke dalam modal
+            }
+          });
+        }
 
         if (signUser == null) {
           $('#signModal').modal({
