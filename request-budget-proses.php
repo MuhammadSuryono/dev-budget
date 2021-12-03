@@ -121,7 +121,7 @@ if ($jenis == 'B1' && $_POST['kodeProject'] != 'undefined') {
 if ($id) {
     $queryWaktu = mysqli_query($koneksi, "SELECT waktu FROM pengajuan_request WHERE id=$id") or die(mysqli_error($koneksi));
     $waktu = mysqli_fetch_array($queryWaktu)[0];
-    $updatePengajuaRequest = mysqli_query($koneksi, "UPDATE pengajuan_request SET totalbudget='$totalKategori', waktu='$waktuG' WHERE waktu='$waktuG'") or die(mysqli_error($koneksi));
+    $updatePengajuaRequest = mysqli_query($koneksi, "UPDATE pengajuan_request SET totalbudget='$totalKategori', waktu='$waktuG' WHERE id='$id'") or die(mysqli_error($koneksi));
 
     mysqli_query($koneksi, "DELETE FROM reminder_tanggal_bayar WHERE selesai_waktu = '$waktuG'");
     // var_dump($arrIdData);
@@ -142,7 +142,7 @@ if ($id) {
                 $data = mysqli_fetch_assoc($querySelesaiReq);
                 $urutan = $data['urutan'];
 
-                $insertSelesaiRequest = mysqli_query($koneksi, "UPDATE selesai_request SET rincian = '$nama', kota = '$kota', status = '$status', penerima = '$pUang', harga = '$harga', quantity = '$quantity', total = '$tHarga', waktu='$waktuG' WHERE waktu='$waktuG' AND urutan='$urutan'") or die(mysqli_error($koneksi));
+                $insertSelesaiRequest = mysqli_query($koneksi, "UPDATE selesai_request SET rincian = '$nama', kota = '$kota', status = '$status', penerima = '$pUang', harga = '$harga', quantity = '$quantity', total = '$tHarga', waktu='$waktuG' WHERE id_pengajuan_request='$id' AND urutan='$urutan'") or die(mysqli_error($koneksi));
 
                 $arrTanggal = explode(',', $tanggalPembayaran[$i]);
                 foreach ($arrTanggal as $at) {
