@@ -1,4 +1,5 @@
 <?php
+session_start();
 require "../application/config/database.php";
 
 $con = new Database();
@@ -6,7 +7,7 @@ $koneksi = $con->connect();;
 
 $tab = $_POST['tab'];
 $tahun = $_POST['tahun'];
-$aksesSes = $_POST['hak_akses'];
+$aksesSes = $_SESSION['hak_akses'];
 if (strpos($tab, 'B1') !== false) : ?>
     <div class="panel panel-warning" data-widget="{&quot;draggable&quot;: &quot;false&quot;}" data-widget-static="">
           <div class="panel-body no-padding">
@@ -205,7 +206,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                         <th>Nama Project</th>
                         <th>Tahun</th>
                         <th>Nama Yang Mengajukan</th>
-                        <th>Divisi</th>
+                        <th>Divisi <?= $tahun ?></th>
                         <th>Total</th>
                         <th>Sisa Budget</th>
                         <th>Total DiBayar</th>
@@ -222,9 +223,10 @@ if (strpos($tab, 'B1') !== false) : ?>
                     $sql = mysqli_query($koneksi, "SELECT
                                    *
                             FROM pengajuan
-                            WHERE jenis='Rutin' AND status ='Disetujui' AND tahun ='$tahun' AND totalbudget <= 1000000
+                            WHERE jenis='Rutin' AND status ='Disetujui' AND tahun ='$tahun'
                                OR jenis='Rutin' AND status ='Pending' AND tahun ='$tahun'
                                OR jenis='Rutin' AND status ='Disapprove' AND tahun ='$tahun'");
+
                     while ($d = mysqli_fetch_array($sql)) {
 
                         $waktu = $d['waktu'];
@@ -406,9 +408,9 @@ if (strpos($tab, 'B1') !== false) : ?>
         $sql = mysqli_query($koneksi, "SELECT
                                    *
                             FROM pengajuan
-                            WHERE jenis='Non Rutin' AND status ='Disetujui' AND tahun ='2018' AND totalbudget <= 1000000
-                               OR jenis='Non Rutin' AND status ='Pending' AND tahun ='2018'
-                               OR jenis='Non Rutin' AND status ='Disapprove' AND tahun='2018'");
+                            WHERE jenis='Non Rutin' AND status ='Disetujui' AND tahun ='$tahun' AND totalbudget
+                               OR jenis='Non Rutin' AND status ='Pending' AND tahun ='$tahun'
+                               OR jenis='Non Rutin' AND status ='Disapprove' AND tahun='$tahun'");
         while ($d = mysqli_fetch_array($sql)) {
 
           $waktu = $d['waktu'];
