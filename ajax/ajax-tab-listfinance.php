@@ -164,11 +164,11 @@ if (strpos($tab, 'B1') !== false) : ?>
                           <?php
                           if ($aksesSes == 'Manager') {
                           ?>
-                            <a href="view-finance-manager-b1.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a>
+                            <a href="view-finance-manager.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a>
                           <?php
                           } else if ($aksesSes == 'Melinda') {
                           ?>
-                            <a href="view-finance-melinda-b1.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a>
+                            <a href="view-finance-melinda-melinda-b1.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a>
                           <?php
                           } else {
                           ?>
@@ -316,7 +316,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                                 <td bgcolor="#ff99a1">
                                     <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
                                 </td>
-                                <td bgcolor="#ff99a1"><a href="view-direksi.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
+                                <td bgcolor="#ff99a1"><a href="view-finance-manager.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
                                 <td bgcolor="#ff99a1">
                                     <center>--</center>
                                 </td>
@@ -453,7 +453,7 @@ if (strpos($tab, 'B1') !== false) : ?>
               <td bgcolor="#fcfaa4">
                 <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
               </td>
-              <td bgcolor="#fcfaa4"><a href="views-direksi.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
+              <td bgcolor="#fcfaa4"><a href="view-finance-nonrutin-manager.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
               <td bgcolor="#fcfaa4">
                 <center>--</center>
               </td>
@@ -502,7 +502,7 @@ if (strpos($tab, 'B1') !== false) : ?>
               <td bgcolor="#ff99a1">
                 <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
               </td>
-              <td bgcolor="#ff99a1"><a href="view-direksi.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
+              <td bgcolor="#ff99a1"><a href="view-finance-nonrutin-manager.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
               <td bgcolor="#ff99a1">
                 <center>--</center>
               </td>
@@ -546,7 +546,7 @@ if (strpos($tab, 'B1') !== false) : ?>
               </td>
               <td><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
               </td>
-              <td><a href="view-direksi.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
+              <td><a href="view-finance-nonrutin-manager.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
               <td>
                 <?php
                 echo "<a href='#myModal' class='btn btn-default btn-small' id='custId' data-toggle='modal' data-id=" . $d['noid'] . ">Setujui</a>";
