@@ -401,6 +401,12 @@ $setting = mysqli_fetch_assoc($querySetting);
                                 $color = '#DEB887';
                               }
 
+                              $isEksternalProcess = $statusbpu == 'Vendor/Supplier' || $statusbpu == 'Honor Area Head' || $statusbpu == 'STKB OPS' || $statusbpu == 'STKB TRK Luar Kota' || $statusbpu == 'Honor Luar Kota' || $statusbpu == 'Honor Jakarta' || $statusbpu == 'STKB TRK Jakarta' ? true : false;
+
+                              if ($statusPengajuanBpu == 1 && $isEksternalProcess) {
+                                $color = 'orange';
+                              }
+
                               // if ($statusPengajuanRealisasi == 1) {
                               //   $color = '#8aad70';
                               // } else if ($statusPengajuanRealisasi == 2) {
@@ -408,7 +414,6 @@ $setting = mysqli_fetch_assoc($querySetting);
                               // } else if ($statusPengajuanRealisasi == 3) {
                               //   $color = '#9932CC';
                               // }
-
 
                               echo "<td bgcolor=' $color '>";
                               echo "No :<b> $term";
@@ -474,16 +479,19 @@ $setting = mysqli_fetch_assoc($querySetting);
                                 echo "<i class='far fa-square'></i> Paid ";
                                 echo "</b><br/>";
                               } else if ($statusPengajuanBpu == 1) {
+                                $statusCheckApproval = $persetujuan == "Disetujui (Direksi)" && $isEksternalProcess ? 'fa-check-square' : 'fa-square';
                                 echo "<i class='far fa-check-square'></i> Diajukan Oleh $pengaju";
                                 echo "</b><br/>";
                                 echo "<i class='far fa-check-square'></i> Mengetahui (" . (!is_null($userMengetahui) ? $userMengetahui : '-') . ")";
                                 echo "</b><br/>";
                                 echo "<i class='far fa-square'></i> Verifikasi ";
                                 echo "</b><br/>";
-                                echo "<i class='far fa-square'></i> Approval ";
+                                echo "<i class='far ".$statusCheckApproval  ."'></i> Approval ";
                                 echo "</b><br/>";
                                 echo "<i class='far fa-square'></i> Paid ";
                                 echo "</b><br/>";
+
+                                echo $persetujuan;
                               } else if ($statusPengajuanBpu == 0) {
                                 echo "<i class='far fa-check-square'></i> Diajukan Oleh $pengaju";
                                 echo "</b><br/>";
@@ -597,7 +605,6 @@ $setting = mysqli_fetch_assoc($querySetting);
             $query2 = "SELECT sum(jumlahbayar) AS sum FROM bpu WHERE waktu='$waktu'";
             $result2 = mysqli_query($koneksi, $query2);
             $row2 = mysqli_fetch_array($result2);
-            // echo $row2['sum'];
 
             $q_real = "SELECT sum(realisasi) AS sum FROM bpu WHERE waktu='$waktu'";
             $r_real = mysqli_query($koneksi, $q_real);
