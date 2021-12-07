@@ -557,9 +557,10 @@ if (!isset($_SESSION['nama_user'])) {
                                 <?php
                                 }
 
-                                if (($a['status'] == 'UM' || $a['status'] == 'UM Burek' || $a['status'] == 'Finance' || $a['status'] == 'Pulsa' || $a['status'] == 'Biaya' || $a['status'] == 'Biaya Lumpsum' || $a['status'] == 'Vendor/Supplier' || $a['status'] == 'Honor Eksternal') && ($statusbayar == 'Belum Di Bayar' && ($persetujuan == 'Disetujui (Direksi)' || $persetujuan == 'Disetujui (Sri Dewi Marpaung)' || $persetujuan == 'Disetujui oleh sistem')) && $showButtonBayar && $metodePembayaran != "MRI PAL") {
+                                if (($a['status'] == 'UM' || $a['status'] == 'UM Burek' || $a['status'] == 'Finance' || $a['status'] == 'Pulsa' || $a['status'] == 'Biaya' || $a['status'] == 'Biaya Lumpsum' || $a['status'] == 'Vendor/Supplier' || $a['status'] == 'Honor Eksternal' || $a['status'] == 'Honor Area Head') && ($statusbayar == 'Belum Di Bayar' && ($persetujuan == 'Disetujui (Direksi)' || $persetujuan == 'Disetujui (Sri Dewi Marpaung)' || $persetujuan == 'Disetujui oleh sistem')) && $showButtonBayar && $metodePembayaran != "MRI PAL") {
 
-                                ?>
+                                  
+                                  ?>
                                   <?php if (is_null($batasTanggalBayar)) { ?>
                                     <button style="margin:3px 0" type="button" class="btn btn-info btn-small" onclick="bayarBpu('<?php echo $no; ?>','<?php echo $waktu; ?>','<?= $termm ?>')">Bayar</button>
                                     <?php } else {
