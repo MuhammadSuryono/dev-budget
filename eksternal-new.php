@@ -1,6 +1,5 @@
 <?php
 session_start();
-
 require "application/config/database.php";
 
 $con = new Database();
@@ -11,7 +10,7 @@ if (!isset($_SESSION['nama_user'])) {
     // die('location:login.php');//jika belum login jangan lanjut
 }
 
-
+$level = $_SESSION['level'];
 if ($_POST['no'] && $_POST['waktu']) {
     $id = $_POST['no'];
     $waktu = $_POST['waktu'];
@@ -22,7 +21,9 @@ if ($_POST['no'] && $_POST['waktu']) {
     $sql = "SELECT * FROM selesai WHERE no = '$id' AND waktu = '$waktu'";
     $result = $koneksi->query($sql);
     foreach ($result as $baris) {
+
 ?>
+
 
         <!-- MEMBUAT FORM -->
         <form action="eksternalproses-new.php" method="post" name="Form" onsubmit="return validateForm()" enctype="multipart/form-data">
@@ -88,12 +89,14 @@ if ($_POST['no'] && $_POST['waktu']) {
                     <label for="tglcair" class="control-label">Tanggal Permintaan Pencairan :</label>
                     <input type="date" class="form-control" name="tglcair">
                 </div>
-
-                <div class="form-group form-group-file">
+                
+                <?php if ($level != "Managemen") {
+                    echo '<div class="form-group form-group-file">
                     <label class="control-label">Upload File <a href="#" data-toggle="tooltip" title="Upload File Rincian BPU"><i class="fa fa-question-circle"></i></a></label>
                     <input type="file" class="form-control" accept="image/*" name="gambar" id="fileInputEksternal" required>
                     <img class="img-responsive" style="display: block; margin-left: auto;  margin-right: auto; background-repeat: no-repeat; background-size: cover; background-attachment: fixed;" src="" id="imageBpuEksternal">
-                </div>
+                </div>';
+                } ?>
 
                 <div class="form-group">
                     <label for="berita-transfer" class="control-label">Keterangan Pembayaran/Berita Transfer :</label>
@@ -111,12 +114,20 @@ if ($_POST['no'] && $_POST['waktu']) {
                     <label for="tglcair" class="control-label">Tanggal Permintaan Pencairan :</label>
                     <input type="date" class="form-control" name="tglcair">
                 </div>
-
-                <div class="form-group form-group-file">
+                
+                <?php if ($level != "Managemen") {
+                    echo '<div class="form-group form-group-file">
                     <label class="control-label">Upload File <a href="#" data-toggle="tooltip" title="Upload File Rincian BPU"><i class="fa fa-question-circle"></i></a></label>
                     <input type="file" class="form-control" accept="image/*" name="gambar" id="fileInputEksternal" required>
                     <img class="img-responsive" style="display: block; margin-left: auto;  margin-right: auto; background-repeat: no-repeat; background-size: cover; background-attachment: fixed;" src="" id="imageBpuEksternal">
-                </div>
+                </div>';
+                } ?>
+
+                <!-- <div class="form-group form-group-file">
+                    <label class="control-label">Upload File <a href="#" data-toggle="tooltip" title="Upload File Rincian BPU"><i class="fa fa-question-circle"></i></a></label>
+                    <input type="file" class="form-control" accept="image/*" name="gambar" id="fileInputEksternal" required>
+                    <img class="img-responsive" style="display: block; margin-left: auto;  margin-right: auto; background-repeat: no-repeat; background-size: cover; background-attachment: fixed;" src="" id="imageBpuEksternal">
+                </div> -->
 
                 <div class="div-penerima">
                     <div class="sub-penerima">
