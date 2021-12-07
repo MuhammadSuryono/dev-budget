@@ -42,6 +42,28 @@ $setting = mysqli_fetch_assoc($querySetting);
 
 </head>
 
+<style>
+  .text-blink {
+  animation: blinker 1s linear infinite;
+  }
+
+  @keyframes blinker {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  .alert-blink {
+  animation: blinker-alert 5s linear infinite;
+  }
+
+  @keyframes blinker-alert {
+    50% {
+      opacity: 0;
+    }
+  }
+</style>
+
 <body>
   <nav class="navbar navbar-inverse">
     <div class="container-fluid">
@@ -95,6 +117,7 @@ $setting = mysqli_fetch_assoc($querySetting);
   <br /><br />
 
   <div class="container">
+    <div id="reminder-um-jatuh-tempo"></div>
 
     <h5>Daftar BPU yang perlu follow up</h5>
     <div class="panel panel-warning" data-widget="{&quot;draggable&quot;: &quot;false&quot;}" data-widget-static="">
@@ -157,8 +180,42 @@ $setting = mysqli_fetch_assoc($querySetting);
               </table>
           </div>
         </div>
+        <div class="list-group-item border" id="reminder-um-jatuh-tempo" style="border: 1px solid black !important;">
+          <div id="expander" data-target="#content-reminder-um-jatuh-tempo" data-toggle="collapse" data-group-id="grandparent<?= $i ?>" data-role="expander">
+
+            <ul class="list-inline row border">
+              <li class="col-lg-11" id="title-reminder-um-jatuh-tempo">2. Reminder Approval UM Perpanjangan Jatuh Tempo <span class="text-danger">(*)</span></li>
+              <li class="col-lg-1">
+                <span id="grandparentIcon1" style="cursor: pointer; margin: 0 10px;" class="col-lg-1"><a><i class="fas fa-eye" title="View Rincian"></i></a></span>
+              </li>
+            </ul>
+          </div>
+          <div class="collapse" id="content-reminder-um-jatuh-tempo" aria-expanded="true">
+            <table class="table table-striped">
+              <table class="table table-striped">
+                <thead>
+                  <tr class="warning">
+                    <th>No</th>
+                    <th>Nama Project</th>
+                    <th>Nomor Item Budget</th>
+                    <th>Jenis Item Budget</th>
+                    <th>Term BPU</th>
+                    <th>Tanggal Jatuh Tempo</th>
+                    <th>Tanggal Perpanjangan</th>
+                    <th>Action</th>
+                    <!-- <th>Pengajuan Request</th> -->
+                  </tr>
+                </thead>
+
+                <tbody id="data-bpu-jatuh-tempo">
+                  
+                </tbody>
+              </table>
+          </div>
+        </div>
       </div>
     </div>
+
     <br>
 
     <div class="panel panel-warning" data-widget="{&quot;draggable&quot;: &quot;false&quot;}" data-widget-static="">
@@ -472,12 +529,21 @@ $setting = mysqli_fetch_assoc($querySetting);
   const idUser = <?= json_encode($idUser); ?>;
   const signUser = <?= json_encode($signUser); ?>;
   const phoneNumber = <?= json_encode($phoneNumber); ?>;
+
+
+  const titleReminderUmJatuhTempo = document.getElementById('title-reminder-um-jatuh-tempo')
+  const reminderReminderUmJatuhTempo = document.getElementById('reminder-um-jatuh-tempo')
+
   $(document).ready(function() {
   //   console.log(phoneNumber);
 
     $('#inputImageSign').change(function() {
       readURLSign(this);
     })
+
+    setTimeout(() => {
+        bpuUMJatuhTempo()
+      }, 1000)
 
     if (signUser == null) {
       $('#signModal').modal({
@@ -621,6 +687,34 @@ $setting = mysqli_fetch_assoc($querySetting);
         else{
         return _string.substring(0,_index) + _newValue + _string.substring(_index+1)
         }
+    }
+
+    function bpuUMJatuhTempo() {
+      let bodyTable = document.getElementById('data-bpu-jatuh-tempo')
+      httpRequestGet('/ajax/ajax-um-jatuh-tempo.php?action=direksi-get-list').then((res) => {
+        if (res.data !== null && res.data.length > 0) {
+          titleReminderUmJatuhTempo.classList.add('text-blink')
+          reminderReminderUmJatuhTempo.innerHTML = `<div class="alert alert-danger" role="alert"><i class='fa fa-bell text-blink'></i>
+  Anda memiliki <b>Pengajuan Perpanjangan</b> BPU yang telah Jatuh Tempo
+</div>`
+
+          let htmlBody = '';
+          let data = res.data
+
+          data.forEach((element, i) => {
+            htmlBody += `<tr><td>${i + 1}</td><td>${element.nama}</td><td>${element.no_urut}</td><td>${element.jenis}</td><td>${element.term}</td><td>${element.tanggal_jatuh_tempo}</td><td>${element.tanggal_perpanjangan}</td><td><a href="bpu-perpanjangan.php?id=${element.id}&bpu=${element.id_bpu}"><i class="fas fa-calendar-alt" title="View Jatuh Tempo"></i></a></td></tr>`
+          });
+
+          bodyTable.innerHTML = htmlBody
+          
+        }
+      })
+    }
+
+    function httpRequestGet(url) {
+      return fetch(url)
+      .then((response) => response.json())
+      .then(data => data);
     }
   })
 </script>

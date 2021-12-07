@@ -83,6 +83,27 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
 
 </head>
+<style>
+  .text-blink {
+  animation: blinker 1s linear infinite;
+  }
+
+  @keyframes blinker {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  .alert-blink {
+  animation: blinker-alert 5s linear infinite;
+  }
+
+  @keyframes blinker-alert {
+    50% {
+      opacity: 0;
+    }
+  }
+</style>
 
 <body>
 
@@ -156,7 +177,7 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
   <br /><br />
 
   <div class="container">
-
+    <div id="reminder-um-jatuh-tempo"></div>
     <p>
     <h4> Saldo BPU :
       <?php
@@ -465,6 +486,72 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
               </table>
           </div>
         </div>
+        <?php if ($_SESSION['hak_akses'] != 'Manager') { ?>
+        <div class="list-group-item border" id="bpu-eksternal-need-verifikasi" style="border: 1px solid black !important;">
+          <div id="expander" data-target="#bpu-content-eksternal-need-verifikasi" data-toggle="collapse" data-group-id="grandparent<?= $i ?>" data-role="expander">
+
+            <ul class="list-inline row border">
+              <li class="col-lg-11" id="title-text-bpu-eksternal"><?= $j++ ?>. BPU Eksternal Perlu di Verifikasi <span class="text-danger">(*)</span></li>
+              <li class="col-lg-1">
+                <span id="grandparentIcon1" style="cursor: pointer; margin: 0 10px;" class="col-lg-1"><a><i class="fas fa-eye" title="View Rincian"></i></a></span>
+              </li>
+            </ul>
+          </div>
+          <div class="collapse" id="bpu-content-eksternal-need-verifikasi" aria-expanded="true">
+            <table class="table table-striped">
+              <table class="table table-striped">
+                <thead>
+                  <tr class="warning">
+                    <th>No</th>
+                    <th>Nama Project</th>
+                    <th>Nomor Item Budget</th>
+                    <th>Jenis Item Budget</th>
+                    <th>Term BPU</th>
+                    <th>Action</th>
+                    <!-- <th>Pengajuan Request</th> -->
+                  </tr>
+                </thead>
+
+                <tbody id="data-bpu-need-verifikasi">
+                  
+                </tbody>
+              </table>
+          </div>
+        </div>
+        <?php } ?>
+        <div class="list-group-item border" id="reminder-um-jatuh-tempo" style="border: 1px solid black !important;">
+          <div id="expander" data-target="#content-reminder-um-jatuh-tempo" data-toggle="collapse" data-group-id="grandparent<?= $i ?>" data-role="expander">
+
+            <ul class="list-inline row border">
+              <li class="col-lg-11" id="title-reminder-um-jatuh-tempo"><?= $j++ ?>. Reminder UM Jatuh Tempo <span class="text-danger">(*)</span></li>
+              <li class="col-lg-1">
+                <span id="grandparentIcon1" style="cursor: pointer; margin: 0 10px;" class="col-lg-1"><a><i class="fas fa-eye" title="View Rincian"></i></a></span>
+              </li>
+            </ul>
+          </div>
+          <div class="collapse" id="content-reminder-um-jatuh-tempo" aria-expanded="true">
+            <table class="table table-striped">
+              <table class="table table-striped">
+                <thead>
+                  <tr class="warning">
+                    <th>No</th>
+                    <th>Nama Project</th>
+                    <th>Nomor Item Budget</th>
+                    <th>Jenis Item Budget</th>
+                    <th>Term BPU</th>
+                    <th>Tanggal Jatuh Tempo</th>
+                    <th>Keterangan</th>
+                    <th>Action</th>
+                    <!-- <th>Pengajuan Request</th> -->
+                  </tr>
+                </thead>
+
+                <tbody id="data-bpu-jatuh-tempo">
+                  
+                </tbody>
+              </table>
+          </div>
+        </div>
       </div>
     </div>
     <br>
@@ -679,10 +766,23 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
     const signUser = <?= json_encode($signUser); ?>;
     const phoneNumber = <?= json_encode($phoneNumber); ?>;
 
+    const titleBpuEksternalVerifikasi = document.getElementById('title-text-bpu-eksternal');
+    const titleReminderUmJatuhTempo = document.getElementById('title-reminder-um-jatuh-tempo')
+    const reminderReminderUmJatuhTempo = document.getElementById('reminder-um-jatuh-tempo')
+
     $(document).ready(function() {
       $('#inputImageSign').change(function() {
         readURLSign(this);
       })
+
+      setTimeout(() => {
+        bpuEksternalNeedVerify()
+      }, 1000)
+
+      setTimeout(() => {
+        bpuUMJatuhTempo()
+      }, 1000)
+
 
       if (signUser == null) {
         $('#signModal').modal({
@@ -693,75 +793,75 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
       if (statusTopUp == 1) {
         $('#rekeningModal').modal();
       }
-
+      
       if (emailUser == null || emailUser == "") {
         $('#emailModal').modal({
           backdrop: 'static',
           keyboard: false
         });
       }
-
+      
       // if (phoneNumber == null || phoneNumber == "") {
-      //     $('#phoneNumberModal').modal({
-      //       backdrop: 'static',
-      //       keyboard: false
-      //     });
-      //   }
-
-        $('#buttonSubmitPhonneNumber').click(function() {
-          let phoneNumber = $('#phone_number').val();
-          if (phoneNumber === "") {
-            alert('Masukkan Phone Number Anda');
-          } else {
-            // if (phoneNumber[0] == "0") {
-            //   phoneNumber = replaceAtIndex(phoneNumber, 0, "62")
-            // }
-            $.ajax({
-              url: "register-phone-number.php",
-              type: "post",
-              data: {
-                phoneNumber: phoneNumber,
-                id: idUser
-              },
-              success: function(result) {
-                if (result == true) {
-                  alert('Pendaftaran Nomor Handphone Berhasil');
-                  $('#phoneNumberModal').modal('hide');
-                } else {
-                  alert('Pendaftaran Nomor Handphone Gagal, ' + result);
-                }
+        //     $('#phoneNumberModal').modal({
+          //       backdrop: 'static',
+          //       keyboard: false
+          //     });
+          //   }
+          
+          $('#buttonSubmitPhonneNumber').click(function() {
+            let phoneNumber = $('#phone_number').val();
+            if (phoneNumber === "") {
+              alert('Masukkan Phone Number Anda');
+            } else {
+              // if (phoneNumber[0] == "0") {
+                //   phoneNumber = replaceAtIndex(phoneNumber, 0, "62")
+                // }
+                $.ajax({
+                  url: "register-phone-number.php",
+                  type: "post",
+                  data: {
+                    phoneNumber: phoneNumber,
+                    id: idUser
+                  },
+                  success: function(result) {
+                    if (result == true) {
+                      alert('Pendaftaran Nomor Handphone Berhasil');
+                      $('#phoneNumberModal').modal('hide');
+                    } else {
+                      alert('Pendaftaran Nomor Handphone Gagal, ' + result);
+                    }
+                  }
+                })
               }
             })
-          }
-    })
-
-      $('#buttonSubmitEmail').click(function() {
-        const email = $('#email').val();
-        if (!email) {
-          alert('Masukkan Email Anda');
-        } else {
-          $.ajax({
-            url: "pendaftaran-email.php",
-            type: "post",
-            data: {
-              email: email,
-              id: idUser
-            },
-            success: function(result) {
-              if (result == true) {
-                alert('Pendaftaran Email Berhasil');
-                $('#emailModal').modal('hide');
+            
+            $('#buttonSubmitEmail').click(function() {
+              const email = $('#email').val();
+              if (!email) {
+                alert('Masukkan Email Anda');
               } else {
-                alert('Pendaftaran Email Gagal, ' + result);
+                $.ajax({
+                  url: "pendaftaran-email.php",
+                  type: "post",
+                  data: {
+                    email: email,
+                    id: idUser
+                  },
+                  success: function(result) {
+                    if (result == true) {
+                      alert('Pendaftaran Email Berhasil');
+                      $('#emailModal').modal('hide');
+                    } else {
+                      alert('Pendaftaran Email Gagal, ' + result);
+                    }
+                  }
+                })
               }
-            }
-          })
-        }
-      })
+            })
+            
 
-
-      $('#myModal').on('show.bs.modal', function(e) {
-        var rowid = $(e.relatedTarget).data('id');
+            $('#myModal').on('show.bs.modal', function(e) {
+              var rowid = $(e.relatedTarget).data('id');
         //menggunakan fungsi ajax untuk pengambilan data
         $.ajax({
           type: 'post',
@@ -777,23 +877,70 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
     function readURLSign(input) {
       if (input.files && input.files[0]) {
         var reader = new FileReader();
-
+        
         reader.onload = function(e) {
           $('#imageSign').attr('src', e.target.result);
         }
-
+        
         reader.readAsDataURL(input.files[0]); // convert to base64 string
       }
     }
-
+    
     function replaceAtIndex(_string,_index,_newValue) {
-        if(_index > _string.length-1) 
-        {
-            return string
-        }
-        else{
+      if(_index > _string.length-1) 
+      {
+        return string
+      }
+      else{
         return _string.substring(0,_index) + _newValue + _string.substring(_index+1)
+      }
+    }
+    
+    function httpRequestGet(url) {
+      return fetch(url)
+      .then((response) => response.json())
+      .then(data => data);
+    }
+    
+    function bpuEksternalNeedVerify() {
+      let bodyTable = document.getElementById('data-bpu-need-verifikasi')
+      httpRequestGet('/ajax/ajax-bpu-need-verify.php?action=get-data').then((res) => {
+        if (res.data !== null && res.data.length > 0) {
+          titleBpuEksternalVerifikasi.classList.add('text-blink')
+
+          let htmlBody = '';
+          let data = res.data
+
+          data.forEach((element, i) => {
+            htmlBody += `<tr><td>${i + 1}</td><td>${element.nama}</td><td>${element.no_urut}</td><td>${element.jenis}</td><td>${element.term}</td><td><a href="view-bpu-verify.php?id=${element.id}&bpu=${element.id_bpu}"><i class="fas fa-external-link-alt" title="View Verify"></i></a></td></tr>`
+          });
+
+          bodyTable.innerHTML = htmlBody
+          
         }
+      })
+    }
+
+    function bpuUMJatuhTempo() {
+      let bodyTable = document.getElementById('data-bpu-jatuh-tempo')
+      httpRequestGet('/ajax/ajax-um-jatuh-tempo.php?action=get-list').then((res) => {
+        if (res.data !== null && res.data.length > 0) {
+          titleReminderUmJatuhTempo.classList.add('text-blink')
+          reminderReminderUmJatuhTempo.innerHTML = `<div class="alert alert-danger" role="alert"><i class='fa fa-bell text-blink'></i>
+  Anda memiliki Penagihan BPU yang telah Jatuh Tempo
+</div>`
+
+          let htmlBody = '';
+          let data = res.data
+
+          data.forEach((element, i) => {
+            htmlBody += `<tr><td>${i + 1}</td><td>${element.nama}</td><td>${element.no_urut}</td><td>${element.jenis}</td><td>${element.term}</td><td>${element.tanggal_jatuh_tempo}</td><td></td><td><a href="bpu-perpanjangan.php?id=${element.id}&bpu=${element.id_bpu}"><i class="fas fa-calendar-alt" title="View Jatuh Tempo"></i></a></td></tr>`
+          });
+
+          bodyTable.innerHTML = htmlBody
+          
+        }
+      })
     }
   </script>
 

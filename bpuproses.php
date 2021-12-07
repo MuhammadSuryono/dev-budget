@@ -39,6 +39,7 @@ if (isset($_POST['submit'])) {
   $metodePembayaran = $_POST['metodePembayaran'];
   $statusbpu    = $_POST['statusbpu'];
   $tanggal_bayar = $_POST['tanggal_bayar'];
+  $tanggalJatuhTempo = $_POST['tanggal_jatuh_tempo'];
 
   if ($statusbpu == 'UM' || $statusbpu == 'UM Burek') {
     $queryRekening = mysqli_query($koneksi, "SELECT * FROM rekening WHERE no=$id_rekening");
@@ -145,9 +146,14 @@ if (isset($_POST['submit'])) {
     if ($divisi == 'FINANCE') {
       $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,namabank,norek,namapenerima,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload, status_pengajuan_bpu,batas_tanggal_bayar,emailpenerima, rekening_id,tanggalbayar,created_at) VALUES
                                                 ('$no','$jumlah','$namabank','$norek','$namapenerima','$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar', '1', '$tanggalBatasBayar', '$emailpenerima', '$id_rekening', '$tanggal_bayar' ,'$time')") or die(mysqli_error($koneksi));
+      $idBpu = mysqli_insert_id($koneksi);
+      
+      $insert = mysqli_query($koneksi, "INSERT INTO tb_jatuh_tempo (id_bpu, tanggal_jatuh_tempo) VALUES ('$idBpu', '$tanggalJatuhTempo')") or die(mysqli_error($koneksi));
     } else {
       $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,namabank,norek,namapenerima,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload, status_pengajuan_bpu,batas_tanggal_bayar,emailpenerima, rekening_id,tanggalbayar,created_at) VALUES
                                                 ('$no','$jumlah','$namabank','$norek','$namapenerima','$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar', '3', '$tanggalBatasBayar', '$emailpenerima', '$id_rekening','$tanggal_bayar' ,'$time')") or die(mysqli_error($koneksi));
+      $idBpu = mysqli_insert_id($koneksi);
+      $insert = mysqli_query($koneksi, "INSERT INTO tb_jatuh_tempo (id_bpu, tanggal_jatuh_tempo) VALUES ('$idBpu', '$tanggalJatuhTempo')") or die(mysqli_error($koneksi));
     }
     echo "<script language='javascript'>";
     echo "alert('Pembuatan BPU Berhasil')";
@@ -224,7 +230,9 @@ if (isset($_POST['submit'])) {
       if ($divisi == 'FINANCE') {
         $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,namabank,norek,namapenerima,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload, status_pengajuan_bpu,batas_tanggal_bayar,emailpenerima, rekening_id,tanggalbayar,created_at) VALUES
                                                   ('$no','$jumlah','$namabank','$norek','$namapenerima','$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar', '1', '$tanggalBatasBayar', '$emailpenerima', '$id_rekening', '$tanggal_bayar' ,'$time')") or die(mysqli_error($koneksi));
-
+        $idBpu = mysqli_insert_id($koneksi);
+        
+        $insert = mysqli_query($koneksi, "INSERT INTO tb_jatuh_tempo (id_bpu, tanggal_jatuh_tempo) VALUES ('$idBpu', '$tanggalJatuhTempo')") or die(mysqli_error($koneksi));
         if ($uc['jenis'] == 'B1' || $uc['jenis'] == 'B2') {
           $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1', '3')");
           while ($e = mysqli_fetch_assoc($queryEmail)) {
@@ -265,6 +273,8 @@ if (isset($_POST['submit'])) {
       } else {
         $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,namabank,norek,namapenerima,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload, status_pengajuan_bpu,batas_tanggal_bayar,emailpenerima, rekening_id,tanggalbayar,created_at) VALUES
                                                 ('$no','$jumlah','$namabank','$norek','$namapenerima','$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar', '3', '$tanggalBatasBayar', '$emailpenerima', '$id_rekening', '$tanggal_bayar' ,'$time')") or die(mysqli_error($koneksi));
+        $idBpu = mysqli_insert_id($koneksi);
+        $insert = mysqli_query($koneksi, "INSERT INTO tb_jatuh_tempo (id_bpu, tanggal_jatuh_tempo) VALUES ('$idBpu', '$tanggalJatuhTempo')") or die(mysqli_error($koneksi));
 
         $queryEmail = mysqli_query($koneksi, "SELECT phone_number,nama_user,divisi,id_user FROM tb_user WHERE nama_user = '$pengaju' AND aktif='Y'");
         $emailUser = mysqli_fetch_assoc($queryEmail);
@@ -339,6 +349,9 @@ if (isset($_POST['submit'])) {
       if ($divisi == 'FINANCE') {
         $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,namabank,norek,namapenerima,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload, status_pengajuan_bpu, batas_tanggal_bayar,emailpenerima, rekening_id, created_at) VALUES
       ('$no','$jumlah','$namabank','$norek','$namapenerima','$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar', '1', '$tanggalBatasBayar', '$emailpenerima', '$id_rekening' ,'$time')") or die(mysqli_error($koneksi));
+      $idBpu = mysqli_insert_id($koneksi);
+      
+      $insert = mysqli_query($koneksi, "INSERT INTO tb_jatuh_tempo (id_bpu, tanggal_jatuh_tempo) VALUES ('$idBpu', '$tanggalJatuhTempo')") or die(mysqli_error($koneksi));
 
         if ($uc['jenis'] == 'B1' || $uc['jenis'] == 'B2') {
           $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1', '3')");
@@ -377,7 +390,9 @@ if (isset($_POST['submit'])) {
       } else {
         $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,namabank,norek,namapenerima,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload, status_pengajuan_bpu, batas_tanggal_bayar,emailpenerima, rekening_id,created_at) VALUES
                                                 ('$no','$jumlah','$namabank','$norek','$namapenerima','$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar', '3', '$tanggalBatasBayar', '$emailpenerima', '$id_rekening' ,'$time')") or die(mysqli_error($koneksi));
-
+        $idBpu = mysqli_insert_id($koneksi);
+        
+        $insert = mysqli_query($koneksi, "INSERT INTO tb_jatuh_tempo (id_bpu, tanggal_jatuh_tempo) VALUES ('$idBpu', '$tanggalJatuhTempo')") or die(mysqli_error($koneksi));
         $queryEmail = mysqli_query($koneksi, "SELECT phone_number,nama_user,divisi FROM tb_user WHERE nama_user = '$pengaju' AND aktif='Y'");
         $emailUser = mysqli_fetch_assoc($queryEmail);
         if ($emailUser) {
@@ -488,12 +503,12 @@ if (isset($_POST['submit'])) {
 }
 
 
-function random_bytes($length = 6)
-{
-  $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  $characters_length = strlen($characters);
-  $output = '';
-  for ($i = 0; $i < $length; $i++)
-    $output .= $characters[rand(0, $characters_length - 1)];
-  return $output;
-}
+// function random_bytes($length = 6)
+// {
+//   $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+//   $characters_length = strlen($characters);
+//   $output = '';
+//   for ($i = 0; $i < $length; $i++)
+//     $output .= $characters[rand(0, $characters_length - 1)];
+//   return $output;
+// }

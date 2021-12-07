@@ -135,6 +135,11 @@ if ($_POST['no'] && $_POST['waktu']) {
           <input type="date" class="form-control" name="tanggal_bayar" id="tanggal-bayar" min="<?= date('Y-m-d', strtotime($Date . ' + 2 days')) ?>">
         </div>
 
+        <div class="form-group">
+          <label for="namabank" class="control-label">Tanggal Jatuh Tempo :</label>
+          <input type="date" class="form-control" name="tanggal_jatuh_tempo" id="tanggal-jatuh-tempo" min="<?= date('Y-m-d', strtotime($Date . ' + 2 days')) ?>">
+        </div>
+
         <button class="btn btn-primary" type="submit" name="submit">SUBMIT</button>
 
       <?php
