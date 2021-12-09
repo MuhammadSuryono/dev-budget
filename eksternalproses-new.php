@@ -3,6 +3,9 @@
 require "application/config/database.php";
 require_once "application/config/whatsapp.php";
 require_once "application/config/message.php";
+require_once "application/config/email.php";
+
+$emailHelper = new Email();
 
 $con = new Database();
 $koneksi = $con->connect();
@@ -183,7 +186,7 @@ if (isset($_POST['submit'])) {
                     $subject = "Informasi Pembayaran";
 
                     if ($arremailpenerima[$i]) {
-                        $message = sendEmail($msg, $subject, $arremailpenerima[$i], $name = '', $address = "single");
+                        $message = $emailHelper->sendEmail($msg, $subject, $arremailpenerima[$i], $name = '', $address = "single");
                     }
                 }
                 if ($_SESSION['divisi'] == 'Direksi') {
@@ -239,7 +242,7 @@ if (isset($_POST['submit'])) {
                 $subject = "Informasi Pembayaran";
 
                 if ($emailpenerima) {
-                    $message = sendEmail($msg, $subject, $emailpenerima, $name = '', $address = "single");
+                    $message = $emailHelper->sendEmail($msg, $subject, $emailpenerima, $name = '', $address = "single");
                 }
             }
             if ($_SESSION['divisi'] == 'Direksi') {
