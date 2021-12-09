@@ -183,7 +183,6 @@ if (isset($_POST['submit'])) {
                         Finance Marketing Research Indonesia
                         ";
                     }
-                    
                     if ($arremailpenerima[$i]) {
                         $message = $emailHelper->sendEmail($msg, $subject, $arremailpenerima[$i], $name = '', $address = "single");
                     }
@@ -191,6 +190,8 @@ if (isset($_POST['submit'])) {
                 if ($_SESSION['divisi'] == 'Direksi') {
                     $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,tglcair,namabank,norek,namapenerima,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,transfer_req_id,status_pengajuan_bpu,emailpenerima,ket_pembayaran,created_at) VALUES
                                                         ('$no','$arrjumlah[$i]','$tglcair','$arrnamabank[$i]','$arrnorek[$i]','$arrnamapenerima[$i]','$pengaju','$divisi','$waktu','Belum Di Bayar','Disetujui (Direksi)','$termfinal','$statusbpu','$transferid', 1, '$arremailpenerima[$i]', '$keterangan_pembayaran', '$time')");
+                                                        $idBpu = mysqli_insert_id($koneksi);
+                                                        $insertDataNeedVerifikasi = mysqli_query($koneksi, "INSERT INTO bpu_verify (id_bpu) VALUES ('$idBpu')");
                 } else {
                     $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,tglcair,namabank,norek,namapenerima,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload,transfer_req_id, status_pengajuan_bpu,emailpenerima,ket_pembayaran,created_at) VALUES
                                                         ('$no','$arrjumlah[$i]','$tglcair','$arrnamabank[$i]','$arrnorek[$i]','$arrnamapenerima[$i]','$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar','$transferid', 1, '$arremailpenerima[$i]', '$keterangan_pembayaran', '$time')");
