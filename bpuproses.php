@@ -329,7 +329,7 @@ if (isset($_POST['submit'])) {
           } else if ($dataDivisi[$i] == 'Direksi') {
               $path = '/views-direksi.php';
           }
-          $url =  $host. $path.'?code='.$_POST['id'].'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
+          $url =  $host. $path.'?code='.$numb.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
           $msg = $helper->messagePengajuanBPU($nama[$i], $pengaju, $namaProject, $namapenerima, $jumlah, $keterangan, $url);
           if($phoneNumbers[$i] != "") $whatsapp->sendMessage($phoneNumbers[$i], $msg);
         }
@@ -491,7 +491,7 @@ if (isset($_POST['submit'])) {
           } else if ($dataDivisi[$i] == 'Direksi') {
               $path = '/views-direksi.php';
           }
-          $url =  $host. $path.'?code='.$_POST['id'].'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
+          $url =  $host. $path.'?code='.$numb.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
           $msg = $helper->messagePengajuanBPU($nama[$i], $pengaju, $namaProject, $namapenerima, $jumlah, $keterangan, $url);
           if($phoneNumbers[$i] != "") $whatsapp->sendMessage($phoneNumbers[$i], $msg);
         }
