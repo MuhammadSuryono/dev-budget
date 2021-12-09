@@ -1,7 +1,10 @@
 <?php
 session_start();
 include_once '../application/config/database.php';
+require_once '../application/config/email.php';
 // include_once "../vendor/email/send-email.php";
+
+$emailHelper = new Email();
 
 $db = new Database();
 $koneksi = $db->connect();
@@ -58,9 +61,32 @@ if ($action == 'simpan-verifikasi') {
     $update = mysqli_query($koneksi, "UPDATE bpu_verify SET created_by = '$_SESSION[id_user]', is_verified = '1', is_need_approved = '1', total_verify = '$nominal', document = '$upload[filename]' WHERE id = '$id'");
     $update = mysqli_query($koneksi, "UPDATE bpu SET metode_pembayaran = '$metode_pembayaran', jumlah = '$nominal', status_pengajuan_bpu = '0', fileupload = '$upload[filename]', checkby='$_SESSION[nama_user]', tglcheck = '$today' WHERE noid = '$bpu'");
     
+    
+
     if ($upload['error'] == null) {
         $upload['is_success'] = true;
-        sendEmailPemeritahuan($koneksi, $bpu);
+        $query = mysqli_query($koneksi, "SELECT a.*, b.* FROM bpu a LEFT JOIN pengajuan b ON a.waktu = b.waktu where a.noid = '$bpu'");
+        $dataBpu = [];
+        while ($row = $query->fetch_assoc()) {
+            $data[] = $row;
+        }
+        
+        if (count($dataBpu)) {
+            $dataBpu = $dataBpu[0];
+            $msg = "Notifikasi BPU, <br><br>
+            BPU telah di verifikasi oleh Finance dengan keterangan sebagai berikut:<br><br>
+            Nama Project   : <strong>" . $dataBpu['nama'] . "</strong><br>
+            Item No.       : <strong>".$dataBpu['no']."</strong><br>
+            Term           : <strong>".$dataBpu['term']."</strong><br>
+            Nama Pengaju   : <strong>".$dataBpu['pengaju']."</strong><br>
+            Nama Penerima  : <strong>".$dataBpu['namapenerima']."</strong><br>
+            Total Diajukan : <strong>".$dataBpu['pengaju']."</strong><br>
+            ";
+
+            $subject = "Notifikasi Aplikasi Budget";
+            $emailHelper->sendEmail($msg, $subject, $dataBpu['emailpenerima']);
+        }
+
         echo json_encode($upload);
     } else {
         $upload['is_success'] = false;
@@ -100,28 +126,6 @@ function uploadFile($files)
 }
 
 function sendEmailPemeritahuan($koneksi, $idBpu) {
-    $query = mysqli_query($koneksi, "SELECT a.*, b.* FROM bpu a LEFT JOIN pengajuan b ON a.waktu = b.waktu where a.noid = '$idBpu'");
-    $dataBpu = [];
-    while ($row = $query->fetch_assoc()) {
-        $data[] = $row;
-    }
     
-    if (count($dataBpu)) {
-        $dataBpu = $dataBpu[0];
-        $msg = "Notifikasi BPU, <br><br>
-        BPU telah di verifikasi oleh Finance dengan keterangan sebagai berikut:<br><br>
-        Nama Project   : <strong>" . $dataBpu['nama'] . "</strong><br>
-        Item No.       : <strong>".$dataBpu['no']."</strong><br>
-        Term           : <strong>".$dataBpu['term']."</strong><br>
-        Nama Pengaju   : <strong>".$dataBpu['pengaju']."</strong><br>
-        Nama Penerima  : <strong>".$dataBpu['namapenerima']."</strong><br>
-        Total Diajukan : <strong>".$dataBpu['pengaju']."</strong><br>
-        ";
-
-        // $msg .= "Klik <a href='$url'>Disini</a> untuk membuka aplikasi budget.";
-        $subject = "Notifikasi Aplikasi Budget";
-
-        sendEmail($msg, $subject, $dataBpu['emailpenerima']);
-    }
 
 }
