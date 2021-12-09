@@ -5,18 +5,15 @@ session_start();
 require "application/config/database.php";
 require_once "application/config/whatsapp.php";
 require_once "application/config/message.php";
+require_once "application/config/helper.php";
+
+$helper = new Helper();
 
 $con = new Database();
 $koneksi = $con->connect();
 
 $helperMessage = new Message();
 $whatsapp = new Whastapp();
-require "vendor/email/send-email.php";
-
-if (!isset($_SESSION['nama_user'])) {
-  header("location:login.php");
-  // die('location:login.php');//jika belum login jangan lanjut
-}
 
 $url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
 $url = explode('/', $url);
@@ -45,23 +42,12 @@ while ($item = mysqli_fetch_assoc($queryEmailFinance)) {
 $queryReminderPembayaran = mysqli_query($koneksi, "SELECT a.*, b.nama AS nama_project, c.rincian FROM reminder_tanggal_bayar a JOIN pengajuan b ON b.waktu = a.selesai_waktu JOIN selesai c ON c.waktu = a.selesai_waktu AND c.no = a.selesai_no WHERE a.tanggal <= '$oneWeek' AND (has_send_email = 0 OR has_send_email IS NULL)");
 while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
 
-  // $msg = "Reminder Pembayaran, <br><br>
-  //               Nama Project      : <strong>" . $item['nama_project'] . "</strong><br>
-  //               Nama Item Budget  : <strong>" . $item['rincian'] . "</strong><br>
-  //               Tanggal Bayar     : <strong>" . date('d-m-Y', strtotime($item['tanggal']))  .  "</strong><br><br>
-  //               Klik <a href='$url'>Disini</a> untuk membuka aplikasi budget.
-  //               ";
-
-  // $subject = "Reminder Pembayaran";
 
   if (count($email) > 0) {
     foreach($email  as $phone) {
       $whatsapp->sendMessage($phone, $helperMessage->messageReminderPembayaran($item['nama_project'], $item['rincian'], date('d-m-Y', strtotime($item['tanggal'])), $url));
     }
   }
-
-
-  // $message = sendEmail($msg, $subject, $email, $name, $address = "multiple");
 
   mysqli_query($koneksi, "UPDATE reminder_tanggal_bayar SET has_send_email = 1 WHERE id = $item[id]");
 }
@@ -265,15 +251,15 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
   }
 
   function getDataBpu(id, idBpu) {
-    httpRequestGet(`/ajax/ajax-bpu-need-verify.php?action=get-data-single&id=${id}&id-bpu=${idBpu}`).then((res) => {
+    httpRequestGet(`/dev-budget/ajax/ajax-bpu-need-verify.php?action=get-data-single&id=${id}&id-bpu=${idBpu}`).then((res) => {
       if (res.data.length > 0 && res.data !== null) {
         let data = res.data
         data = data[0]
         window.localStorage.setItem('stateNominal', data.pengajuan_jumlah)
 
-        if (data.is_verified === '1') {
+        if (data.is_verified === '1' && data.is_need_approved === '1') {
           document.getElementById("btn-submit").disabled = true;
-          notifAlreadyVerify.innerHTML = alertError('success', `Data BPU sudah di <b>VERIFIKASI</b> oleh <b>${data.checkby}</b> pada <b>${data.tglcheck}</b>`)
+          notifAlreadyVerify.innerHTML = alertError('success', `Data BPU sudah di <b>VERIFIKASI</b> oleh <b>${data.checkby}</b> pada <b>${data.tglcheck}</b> `)
         }
       }
     })
@@ -288,7 +274,7 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
   function uploadFile(file, nominal, id, idBpu) {
 		const fd = new FormData();
 		fd.append('file', file);
-		let url = `/ajax/ajax-bpu-need-verify.php?action=simpan-verifikasi&id=${id}&id-bpu=${idBpu}&nominal=${nominal}`
+		let url = `/dev-budget/ajax/ajax-bpu-need-verify.php?action=simpan-verifikasi&id=${id}&id-bpu=${idBpu}&nominal=${nominal}`
 
 		return fetch(url, {
 			method: 'POST',
