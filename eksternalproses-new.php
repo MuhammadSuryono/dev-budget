@@ -62,8 +62,8 @@ while ($e = mysqli_fetch_assoc($queryUser)) {
         array_push($emailInternal, $e['phone_number']);
         array_push($namaInternal, $e['nama_user']);
         array_push($idUserInternal, $e['id_user']);
-        array_push($dataDivisi, $emailUser['divisi']);
-        array_push($dataLevel, $emailUser['level']);
+        array_push($dataDivisi, $e['divisi']);
+        array_push($dataLevel, $e['level']);
     }
 }
 
@@ -73,8 +73,8 @@ while ($e = mysqli_fetch_assoc($queryUser)) {
         array_push($emailInternal, $e['phone_number']);
         array_push($namaInternal, $e['nama_user']);
         array_push($idUserInternal, $e['id_user']);
-        array_push($dataDivisi, $emailUser['divisi']);
-        array_push($dataLevel, $emailUser['level']);
+        array_push($dataDivisi, $e['divisi']);
+        array_push($dataLevel, $e['level']);
     }
 }
 
@@ -259,14 +259,14 @@ if (isset($_POST['submit'])) {
             for($i = 0; $i < count($emailInternal); $i++) {
                 $path = '/views.php';
                 if ($dataDivisi[$i] == 'FINANCE') {
-                    $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $dataPengajuan['jenis'] == 'B1' ? '/view-finance-manager-b1.php' : '/view-finance-manager.php';
-                    $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $dataPengajuan['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin-manager.php' : '/view-finance-manager.php';
-                    $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $dataPengajuan['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin.php' : '/view-finance.php';
+                    $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $jenis == 'B1' ? '/view-finance-manager-b1.php' : '/view-finance-manager.php';
+                    $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $jenis == 'Non Rutin' ? '/view-finance-nonrutin-manager.php' : '/view-finance-manager.php';
+                    $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $jenis == 'Non Rutin' ? '/view-finance-nonrutin.php' : '/view-finance.php';
                     $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
                 } else if ($dataDivisi[$i] == 'Direksi') {
                     $path = '/views-direksi.php';
                 }
-              $url =  $host. $path.'?code='.$id.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
+              $url =  $host. $path.'?code='.$numb.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
               $msg = $messageHelper->messagePengajuanBPU($namaInternal[$i], $pengaju, $namaProject, $namaPenerima, $jumlahDiterima, "", $url);
               if($emailInternal[$i] != "") $wa->sendMessage($emailInternal[$i], $msg);
 
@@ -317,15 +317,15 @@ if (isset($_POST['submit'])) {
                 for($i = 0; $i < count($emailInternal); $i++) {
                     $path = '/views.php';
                     if ($dataDivisi[$i] == 'FINANCE') {
-                        $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $dataPengajuan['jenis'] == 'B1' ? '/view-finance-manager-b1.php' : '/view-finance-manager.php';
-                        $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $dataPengajuan['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin-manager.php' : '/view-finance-manager.php';
-                        $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $dataPengajuan['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin.php' : '/view-finance.php';
+                        $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $jenis == 'B1' ? '/view-finance-manager-b1.php' : '/view-finance-manager.php';
+                        $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $jenis == 'Non Rutin' ? '/view-finance-nonrutin-manager.php' : '/view-finance-manager.php';
+                        $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $jenis == 'Non Rutin' ? '/view-finance-nonrutin.php' : '/view-finance.php';
                         $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
                     } else if ($dataDivisi[$i] == 'Direksi') {
                         $path = '/views-direksi.php';
                     }
-                  $url =  $host. $path.'?code='.$id.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
-                  $msg = $messageHelper->messagePengajuanBPU($namaInternal[$i], $pengaju, $namaProject, $bpu['namapenerima'], $bpu['pengajuan_jumlah'], "", $url);
+                  $url =  $host. $path.'?code='.$numb.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
+                  $msg = $messageHelper->messagePengajuanBPU($namaInternal[$i], $pengaju, $namaProject, $namapenerima, $jumlah, "", $url);
                   if($emailInternal[$i] != "") $wa->sendMessage($emailInternal[$i], $msg);
 
                   $notification .= ($namaInternal[$i] . ' (' . $emailInternal[$i] . ')');
