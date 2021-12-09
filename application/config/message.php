@@ -11,7 +11,7 @@ Akses untuk pengajuan budget telah dibuka oleh *$pembuat* pada *" . date("d/m/Y 
 
 Nama Project       : *$projectName*
 PIC Budget            : *$namaUserPic*
-Divisi                       : *$divisi*
+Divisi                        : *$divisi*
 Silahkan ajukan budget secepatnya.
 
 Klik link berikut untuk membuka Pengajuan Budget.
@@ -33,16 +33,19 @@ http://$urlPengajuan";
     public function messageAjukanBudget($creator, $pengaju, $namaProject, $divisi, $totalbudget = 0,$keterangan = "", $urlPengajuan)
     {
         $msg = "Dear $creator,
+
 Budget telah diajukan dengan keterangan sebagai berikut:
 Nama Project       : *$namaProject*
 Pengaju                  :*$pengaju*
-Divisi                      : *$divisi*
-Total Budget       : *Rp. " . number_format($totalbudget, 0, '', ',') . "*
+Divisi                        : *$divisi*
+Total Budget         : *Rp. " . number_format($totalbudget, 0, '', ',') . "*
 ";
     if ($keterangan != "") {
         $msg .= "Keterangan: *$keterangan*";
     }
     $msg .= "
+
+
 Selengkapnya pengajuan anda bisa dilihat dibawah ini.
 http://$urlPengajuan";
 return $msg;
@@ -51,6 +54,7 @@ return $msg;
     public function messagePersetujuanBudget($dear, $pengaju, $namaProject, $divisi, $totalbudget = 0, $penyetuju, $urlBpu)
     {
         $msg = "*Notifikasi Untuk Persetujuan Budget*
+
 Dear $dear, 
 Budget dengan keterangan berikut:
 Nama Project    : *$namaProject*
@@ -159,7 +163,7 @@ $link
         return $msg;
     }
 
-    public function messageProcessBPUFinance($namaProject, $item, $term, $pengaju, $arrPenerima, $arrJumlah, $keterangan = "")
+    public function messageProcessBPUFinance($namaProject, $item, $term, $pengaju, $arrPenerima, $arrJumlah, $keterangan = "", $link)
     {
         $msg = "Notifikasi BPU, 
 BPU telah di *verifikasi* oleh Finance dengan keterangan sebagai berikut:
@@ -176,12 +180,12 @@ Keterangan:* $keterangan *";
     }
     $msg .="
 
-    
-Terimakasih";
+ Lihat selengkapnya dibawah ini:".
+ $link;
         return $msg;
     }
 
-    public function messageProcessTolakBPUFinance($namaProject, $item, $term, $pengaju, $arrPenerima, $arrJumlah, $keterangan = "")
+    public function messageProcessTolakBPUFinance($namaProject, $item, $term, $pengaju, $arrPenerima, $arrJumlah, $keterangan = "", $link)
     {
         $msg = "Notifikasi BPU, 
 BPU telah di *Tolak* oleh Finance dengan keterangan sebagai berikut:
@@ -196,6 +200,10 @@ Total Diajukan : *" . implode(', ', $arrJumlah) . "*
         $msg .= "
 Keterangan:* $keterangan *";
     }
+    $msg .="
+
+Lihat selengkapnya dibawah ini:".
+    $link;
         return $msg;
     }
 
@@ -221,7 +229,7 @@ Terimakasih";
 return $msg;
     }
 
-    public function messageApprovePengajuanBPU($userSetuju, $namaProject, $noItem, $term, $arrPenerima, $tanggalBayar, $arrPembayaran, $arrJumlah, $keterangan)
+    public function messageApprovePengajuanBPU($userSetuju, $namaProject, $noItem, $term, $arrPenerima, $tanggalBayar, $arrPembayaran, $arrJumlah, $keterangan, $link)
     {
         $msg = "Notifikasi BPU, 
 BPU telah di setujui oleh $userSetuju dengan keterangan sebagai berikut:
@@ -237,6 +245,52 @@ Total Diajukan : *" . implode(', ', $arrJumlah) . "*
             $msg .= "
  Keterangan: *$keterangan*";
         } 
+        $msg .="
+
+Lihat selengkapnya dibawah ini:".
+    $link;
+        return $msg;
+    }
+
+    public function messageTolakPengajuanBPU($userSetuju, $namaProject, $noItem, $term, $arrPenerima, $tanggalBayar, $arrPembayaran, $arrJumlah, $keterangan, $link)
+    {
+        $msg = "Notifikasi BPU, 
+BPU telah di TOLAK oleh $userSetuju dengan keterangan sebagai berikut:
+Nama Project       : *" . $namaProject . "*
+Item No.           : *$noItem*
+Term               : *$term*
+Nama Penerima  : *" . implode(', ', $arrPenerima) . "*
+Tanggal Pembayaran : *$tanggalBayar*
+Metode Pembayaran  : *" . implode(', ', $arrPembayaran) . "*
+Total Diajukan : *" . implode(', ', $arrJumlah) . "*
+        ";
+        if ($keterangan != "") {
+            $msg .= "
+ Keterangan: *$keterangan*";
+        } 
+
+        $msg .="
+Lihat selengkapnya dibawah ini:".
+    $link;
+        return $msg;
+    }
+
+    public function messageDissaproveBudget($pengaju, $namaProject, $divisi, $totalbudget, $alasanTolak, $pembuat, $url)
+    {
+        $msg = "Dear $pengaju, 
+Budget dengan keterangan berikut:
+Nama Project    : *$namaProject*
+Pengaju         : *$pengaju*
+Divisi          : *$divisi*
+Total Budget    : *Rp. " . number_format($totalbudget, 0, '', ',') . "*
+
+Telah Ditolak oleh *$pembuat* pada *" . date("d/m/Y H:i:s") . "* dengan keterangan *$alasanTolak* 
+";
+
+    $msg .= "
+Klik $url untuk membuka aplikasi budget.";
         return $msg;
     }
 }
+
+    

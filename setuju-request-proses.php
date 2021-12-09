@@ -13,8 +13,9 @@ require_once("dompdf/dompdf_config.inc.php");
 $user = $_SESSION['nama_user'];
 $time = date("Y-m-d h:i:sa");
 $id = $_GET['id'];
-$queryWaktu = mysqli_query($koneksi, "SELECT waktu FROM pengajuan_request WHERE id=$id") or die(mysqli_error($koneksi));
-$waktu = mysqli_fetch_array($queryWaktu)[0];
+$queryWaktu = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE id=$id") or die(mysqli_error($koneksi));
+$dataPengajuan = mysqli_fetch_assoc($queryWaktu);
+$waktu = $dataPengajuan['waktu'];
 $gPengaju = '';
 $gNamaProject = '';
 $gTotalBudget = '';
@@ -109,18 +110,24 @@ if ($updatePengajuanRequest) {
         $phoneNumbers = [];
         $namaUserSendNotifications = [];
         $idUsersNotification = [];
-        $queryGetEmail = mysqli_query($koneksi, "SELECT phone_number,divisi,nama_user,id_user from tb_user WHERE nama_user='$gPengaju' AND aktif='Y'");
+        $dataDivisi = [];
+        $dataLevel = [];
+        $queryGetEmail = mysqli_query($koneksi, "SELECT phone_number,divisi,nama_user,id_user,level from tb_user WHERE nama_user='$gPengaju' AND aktif='Y'");
         $data = mysqli_fetch_assoc($queryGetEmail);
         $divisi = $data['divisi'];
         array_push($phoneNumbers, $data['phone_number']);
         array_push($namaUserSendNotifications, $data['nama_user']);
         array_push($idUsersNotification, $data['id_user']);
+        array_push($dataDivisi, $data['divisi']);
+        array_push($dataLevel, $data['level']);
 
         $queryUserByDivisi = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi = '$data[divisi]' AND (level = 'Manager' OR level = 'Senior Manager') AND aktif='Y'") or die(mysqli_error($koneksi));
         $user = mysqli_fetch_assoc($queryUserByDivisi);
         array_push($phoneNumbers, $user['phone_number']);
         array_push($namaUserSendNotifications, $user['nama_user']);
         array_push($idUsersNotification, $data['id_user']);
+        array_push($dataDivisi, $data['divisi']);
+        array_push($dataLevel, $data['level']);
 
         $url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
         $port = $_SERVER['SERVER_PORT'];
@@ -134,7 +141,16 @@ if ($updatePengajuanRequest) {
         if (count($phoneNumbers) > 0) {
             $whatsapp = new Whastapp();
             for($i = 0; $i < count($phoneNumbers); $i++) {
-            $url =  $host. '/views.php?code='.$id.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
+                $path = '/views.php';
+                if ($dataDivisi[$i] == 'FINANCE') {
+                    $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $dataPengajuan['jenis'] == 'B1' ? '/view-finance-manager-b1.php' : '/view-finance-manager.php';
+                    $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $dataPengajuan['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin-manager.php' : '/view-finance-manager.php';
+                    $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $dataPengajuan['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin.php' : '/view-finance.php';
+                    $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
+                } else if ($dataDivisi[$i] == 'Direksi') {
+                    $path = '/views-direksi.php';
+                }
+              $url =  $host. $path.'?code='.$id.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
               $msg = $helper->messagePersetujuanBudget($namaUserSendNotifications[$i], $pengaju, $gNamaProject, $divisi, $gTotalBudget, $gPembuat, $url);
               if($phoneNumbers[$i] != "") $whatsapp->sendMessage($phoneNumbers[$i], $msg);
             }

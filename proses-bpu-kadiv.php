@@ -7,11 +7,13 @@ require "vendor/email/send-email.php";
 require_once "application/config/whatsapp.php";
 require_once "application/config/helper.php";
 require_once "application/config/message.php";
+require_once "application/config/email.php";
 
 session_start();
 $helper = new Helper();
 $messageHelper = new Message();
 $whatsapp = new Whastapp();
+$emailHelper = new Email();
 
 $userCheck = $_SESSION['nama_user'];
 $now = date_create('now')->format('Y-m-d H:i:s');
@@ -33,6 +35,19 @@ $numb = $pengajuan['noid'];
 
 $email = [];
 $nama = [];
+$idUsersNotification = [];
+$dataDivisi = [];
+$dataLevel = [];
+$arremailpenerima = [];
+
+$url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+$port = $_SERVER['SERVER_PORT'];
+$url = explode('/', $url);
+$hostProtocol = $url[0];
+if ($port != "") {
+$hostProtocol = $hostProtocol . ":" . $port;
+}
+$host = $hostProtocol. '/'. $url[1];
 
 if ($pengajuan['jenis'] == 'B1' || $pengajuan['jenis'] == 'B2') {
     $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1', '3')");
@@ -43,6 +58,9 @@ if ($pengajuan['jenis'] == 'B1' || $pengajuan['jenis'] == 'B2') {
                 if ($e['phone_number']) {
                     array_push($email, $e['phone_number']);
                     array_push($nama, $e['nama_user']);
+                    array_push($idUsersNotification, $e['id_user']);
+                    array_push($dataDivisi, $e['divisi']);
+                    array_push($dataLevel, $e['level']);
                 }
             }
         }
@@ -56,32 +74,38 @@ if ($pengajuan['jenis'] == 'B1' || $pengajuan['jenis'] == 'B2') {
                 if ($e['phone_number']) {
                     array_push($email, $e['phone_number']);
                     array_push($nama, $e['nama_user']);
+                    array_push($idUsersNotification, $e['id_user']);
+                    array_push($dataDivisi, $e['divisi']);
+                    array_push($dataLevel, $e['level']);
                 }
             }
         }
     }
 }
 
-$queryEmail = mysqli_query($koneksi, "SELECT phone_number,nama_user,divisi FROM tb_user WHERE nama_user = '$pengajuan[pembuat]' AND aktif='Y'");
+$queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$pengajuan[pembuat]' AND aktif='Y'");
 $emailUser = mysqli_fetch_assoc($queryEmail);
 if ($emailUser) {
     array_push($email, $emailUser['phone_number']);
     array_push($nama, $emailUser['nama_user']);
+    array_push($idUsersNotification, $emailUser['id_user']);
+    array_push($dataDivisi, $emailUser['divisi']);
+    array_push($dataLevel, $emailUser['level']);
 }
 
-$queryEmail = mysqli_query($koneksi, "SELECT phone_number,nama_user,divisi FROM tb_user WHERE nama_user = '$bpu[pengaju]' AND aktif='Y'");
+$queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$bpu[pengaju]' AND aktif='Y'");
 $emailUser = mysqli_fetch_assoc($queryEmail);
 if ($emailUser) {
     array_push($email, $emailUser['phone_number']);
     array_push($nama, $emailUser['nama_user']);
+    array_push($idUsersNotification, $emailUser['id_user']);
+    array_push($dataDivisi, $emailUser['divisi']);
+    array_push($dataLevel, $emailUser['level']);
 }
 
 $queryProject = mysqli_query($koneksi, "SELECT nama FROM pengajuan WHERE waktu='$waktu'");
 $namaProject = mysqli_fetch_array($queryProject)[0];
 
-$url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
-$url = explode('/', $url);
-$url = $url[0] . '/' . $url[1] . '/' . 'login.php';
 
 // $msg = "Notifikasi BPU, <br><br>
 //   BPU telah diajukan dengan keterangan sebagai berikut:<br><br>
@@ -104,16 +128,23 @@ $notification = 'Persetujuan BPU Sukses. Pemberitahuan via whatsapp sedang dikir
 $i = 0;
 for ($i = 0; $i < count($email); $i++) {
     if ($email[$i] != "") {
-        $notification .= ($nama[$i] . ' (' . $email[$i] . ')');
-        $whatsapp->sendMessage($email[$i], $messageHelper->messagePengajuanBPUKadiv($nama[$i], $bpu['pengaju'], $namaProject, $bpu['namapenerima'], $bpu['pengajuan_jumlah'], $keterangan, $url));
+        $path = '/views.php';
+        if ($dataDivisi[$i] == 'FINANCE') {
+            $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $dataPengajuan['jenis'] == 'B1' ? '/view-finance-manager-b1.php' : '/view-finance-manager.php';
+            $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $dataPengajuan['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin-manager.php' : '/view-finance-manager.php';
+            $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $dataPengajuan['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin.php' : '/view-finance.php';
+            $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
+        } else if ($dataDivisi[$i] == 'Direksi') {
+            $path = '/views-direksi.php';
+        }
+        $url =  $host. $path.'?code='.$id.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
+        $msg = $messageHelper->messagePengajuanBPUKadiv($nama[$i], $bpu['pengaju'], $namaProject, $bpu['namapenerima'], $bpu['pengajuan_jumlah'], $keterangan, $url);
+        $whatsapp->sendMessage($email[$i], $msg);
+
         if ($i++ < count($email) - 1) $notification .= ', ';
         else $notification .= '.';
     }
 }
-
-// if ($email) {
-//     $message = sendEmail($msg, $subject, $email, $name, $address = "multiple");
-// }
 
 if ($update) {
     echo "<script language='javascript'>";
