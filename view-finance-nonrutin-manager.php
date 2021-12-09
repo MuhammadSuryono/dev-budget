@@ -7,10 +7,9 @@ require "application/config/database.php";
 $con = new Database();
 $koneksi = $con->connect();
 
-if (!isset($_SESSION['nama_user'])) {
-  header("location:login.php");
-  // die('location:login.php');//jika belum login jangan lanjut
-}
+
+require_once "application/config/helper.php";
+$helper = new Helper();
 
 $querySetting = mysqli_query($koneksi, "SELECT * FROM setting_budget WHERE keterangan = 'approval_bpu'") or die(mysqli_error($koneksi));
 $setting = mysqli_fetch_assoc($querySetting);

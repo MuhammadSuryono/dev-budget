@@ -124,6 +124,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                         <tr class="warning">
                             <th>No</th>
                             <th>Email</th>
+                            <th>Content</th>
                             <th>Status</th>
                         </tr>
                     </thead>

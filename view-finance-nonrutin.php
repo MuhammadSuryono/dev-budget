@@ -2,13 +2,13 @@
 error_reporting(0);
 session_start();
 require "application/config/database.php";
+require "application/config/helper.php";
 
 $con = new Database();
 $koneksi = $con->connect();
-if (!isset($_SESSION['nama_user'])) {
-  header("location:login.php");
-  // die('location:login.php');//jika belum login jangan lanjut
-}
+
+$helper = new Helper();
+
 ?>
 
 <!DOCTYPE html>
