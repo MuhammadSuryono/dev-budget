@@ -691,7 +691,7 @@ $setting = mysqli_fetch_assoc($querySetting);
 
     function bpuUMJatuhTempo() {
       let bodyTable = document.getElementById('data-bpu-jatuh-tempo')
-      httpRequestGet('/ajax/ajax-um-jatuh-tempo.php?action=direksi-get-list').then((res) => {
+      httpRequestGet('/dev-budget/ajax/ajax-um-jatuh-tempo.php?action=direksi-get-list').then((res) => {
         if (res.data !== null && res.data.length > 0) {
           titleReminderUmJatuhTempo.classList.add('text-blink')
           reminderReminderUmJatuhTempo.innerHTML = `<div class="alert alert-danger" role="alert"><i class='fa fa-bell text-blink'></i>
