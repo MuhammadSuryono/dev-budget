@@ -148,27 +148,27 @@ if (isset($_POST['submit'])) {
         } else {
             $tglcairnya = null;
         }
+
         if (is_array($_POST['jumlah'])) {
             for ($i = 0; $i < count($arrjumlah); $i++) {
-                if ($aw['status'] == 'Vendor/Supplier' || $aw['status'] == 'Honor Eksternal') {
+                if ($aw['status'] == 'Vendor/Supplier' || $aw['status'] == 'Honor Eksternal' || $aw['status'] == 'Honor Area Head') {
                     $queryBank = mysqli_query($koneksi, "SELECT * FROM bank WHERE kodebank = '$arrnamabank[$i]'");
                     $bank = mysqli_fetch_assoc($queryBank);
                     if ($aw['status'] == 'Vendor/Supplier') {
                         $msg = "Kepada $arrnamapenerima[$i], <br><br>
-                Berikut informasi status pembayaran Anda:<br><br>
-                No.Invoice       : <strong>$invoice</strong><br>
-                Tgl. Invoice     : <strong>" . date_format($tgl, 'd/m/Y') . "</strong><br>
-                Term             : <strong>$term1 of $term2</strong><br>
-                Jenis Pembayaran : <strong>$jenis_pembayaran</strong><br>
-                No. Rekening Anda : <strong>$arrnorek[$i]</strong><br>
-                Bank             : <strong>" . $bank['namabank'] . "</strong><br>
-                Nama Penerima    : <strong>$arrnamapenerima[$i]</strong><br>
-                Jumlah Dibayarkan : <strong>Rp. " . number_format($arrjumlah[$i], 0, '', '.') . "</strong><br>
-                Status           : <strong>Sedang Diproses</strong><br><br>
-                Informasi update status pembayaran akan kami kirimkan kembali melalui email. Jika ada pertanyaan lebih lanjut, silahkan email Divisi Finance ke finance@mri-research-ind.com.<br><br>
-                Hormat kami,<br>
-                Finance Marketing Research Indonesia
-                ";
+                        Berikut informasi status pembayaran Anda:<br><br>
+                        No.Invoice       : <strong>$invoice</strong><br>
+                        Tgl. Invoice     : <strong>" . date_format($tgl, 'd/m/Y') . "</strong><br>
+                        Term             : <strong>$term1 of $term2</strong><br>
+                        Jenis Pembayaran : <strong>$jenis_pembayaran</strong><br>
+                        No. Rekening Anda : <strong>$arrnorek[$i]</strong><br>
+                        Bank             : <strong>" . $bank['namabank'] . "</strong><br>
+                        Nama Penerima    : <strong>$arrnamapenerima[$i]</strong><br>
+                        Jumlah Dibayarkan : <strong>Rp. " . number_format($arrjumlah[$i], 0, '', '.') . "</strong><br>
+                        Status           : <strong>Sedang Diproses</strong><br><br>
+                        Informasi update status pembayaran akan kami kirimkan kembali melalui email. Jika ada pertanyaan lebih lanjut, silahkan email Divisi Finance ke finance@mri-research-ind.com.<br><br>
+                        Hormat kami,<br>
+                        Finance Marketing Research Indonesia";
                     } else {
                         $msg = "Kepada $arrnamapenerima[$i], <br><br>
                         Berikut informasi status pembayaran Anda:<br><br>
@@ -183,8 +183,7 @@ if (isset($_POST['submit'])) {
                         Finance Marketing Research Indonesia
                         ";
                     }
-                    $subject = "Informasi Pembayaran";
-
+                    
                     if ($arremailpenerima[$i]) {
                         $message = $emailHelper->sendEmail($msg, $subject, $arremailpenerima[$i], $name = '', $address = "single");
                     }
@@ -254,7 +253,9 @@ if (isset($_POST['submit'])) {
                 $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,tglcair,namabank,norek,namapenerima,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload,transfer_req_id, status_pengajuan_bpu,emailpenerima,ket_pembayaran,created_at) VALUES
                                                     ('$no','$jumlah','$tglcair','$namabank','$norek','$namapenerima','$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar','$transferid', 1, '$emailpenerima', '$keterangan_pembayaran', '$time')");
             }
-            $notification = "Pembuatan BPU Eksternal Berhasil. Pemberitahuan via email telah terkirim ke $namapenerima ($emailpenerima)";
+
+            
+            $notification = "Pembuatan BPU Eksternal Berhasil. Pemberitahuan via email telah terkirim ke - $namapenerima ($emailpenerima)";
         }
     }
 
