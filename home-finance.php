@@ -905,7 +905,7 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
     
     function bpuEksternalNeedVerify() {
       let bodyTable = document.getElementById('data-bpu-need-verifikasi')
-      httpRequestGet('/ajax/ajax-bpu-need-verify.php?action=get-data').then((res) => {
+      httpRequestGet('/dev-budget/ajax/ajax-bpu-need-verify.php?action=get-data').then((res) => {
         if (res.data !== null && res.data.length > 0) {
           titleBpuEksternalVerifikasi.classList.add('text-blink')
 
@@ -924,7 +924,7 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
 
     function bpuUMJatuhTempo() {
       let bodyTable = document.getElementById('data-bpu-jatuh-tempo')
-      httpRequestGet('/ajax/ajax-um-jatuh-tempo.php?action=get-list').then((res) => {
+      httpRequestGet('/dev-budget/ajax/ajax-um-jatuh-tempo.php?action=get-list').then((res) => {
         if (res.data !== null && res.data.length > 0) {
           titleReminderUmJatuhTempo.classList.add('text-blink')
           reminderReminderUmJatuhTempo.innerHTML = `<div class="alert alert-danger" role="alert"><i class='fa fa-bell text-blink'></i>

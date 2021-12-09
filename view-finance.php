@@ -5,10 +5,9 @@ require "application/config/database.php";
 
 $con = new Database();
 $koneksi = $con->connect();
-if (!isset($_SESSION['nama_user'])) {
-  header("location:login.php");
-  // die('location:login.php');//jika belum login jangan lanjut
-}
+
+require_once "application/config/helper.php";
+$helper = new Helper();
 ?>
 
 <!DOCTYPE html>
