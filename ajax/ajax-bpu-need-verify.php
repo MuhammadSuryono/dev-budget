@@ -15,7 +15,7 @@ $koneksiMriTransfer = $db->connect();
 $action = $_GET['action'];
 
 if ($action == 'get-data') {
-    $query = mysqli_query($koneksi, "SELECT a.id, a.id_bpu, b.no as no_urut, c.nama, c.jenis, b.term FROM bpu_verify a LEFT JOIN bpu b ON a.id_bpu = b.noid LEFT JOIN pengajuan c ON c.waktu = b.waktu where a.is_verified = '0' ORDER BY a.id asc");
+    $query = mysqli_query($koneksi, "SELECT a.id, a.id_bpu, b.no as no_urut, c.nama, c.jenis, b.term FROM bpu_verify a LEFT JOIN bpu b ON a.id_bpu = b.noid LEFT JOIN pengajuan c ON c.waktu = b.waktu where a.is_verified = '0' AND a.is_need_approved = '0' ORDER BY a.id asc");
     $data = [];
     while ($row = $query->fetch_assoc()) {
         $data[] = $row;
@@ -55,18 +55,27 @@ if ($action == 'simpan-verifikasi') {
         $metode_pembayaran = "MRI PAL";
     }
 
-    $update = mysqli_query($koneksi, "UPDATE bpu_verify SET created_by = '$_SESSION[id_user]', is_verified = '1', total_verify = '$nominal', document = '$upload[filename]' WHERE id = '$id'");
+    $update = mysqli_query($koneksi, "UPDATE bpu_verify SET created_by = '$_SESSION[id_user]', is_verified = '1', is_need_approved = '1', total_verify = '$nominal', document = '$upload[filename]' WHERE id = '$id'");
     $update = mysqli_query($koneksi, "UPDATE bpu SET metode_pembayaran = '$metode_pembayaran', jumlah = '$nominal', status_pengajuan_bpu = '0', fileupload = '$upload[filename]', checkby='$_SESSION[nama_user]', tglcheck = '$today' WHERE noid = '$bpu'");
     
     if ($upload['error'] == null) {
         $upload['is_success'] = true;
-        // sendEmailPemeritahuan($koneksi, $bpu);
+        sendEmailPemeritahuan($koneksi, $bpu);
         echo json_encode($upload);
     } else {
         $upload['is_success'] = false;
         echo json_encode($upload);
     }
+}
+
+if ($action == 'approval') {
+    $id = $_GET['id'];
+    $verify = $_GET['approval'];
+
+    $update = mysqli_query($koneksi, "UPDATE bpu_verify SET is_approved = '$verify', is_need_approved = '0' WHERE id = '$id'");
     
+    $upload['is_success'] = true;
+    echo json_encode($upload);
 }
 
 
