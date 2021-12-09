@@ -230,7 +230,7 @@ if ($submit == 1) {
             } else if ($dataDivisi[$i] == 'Direksi') {
                 $path = '/views-direksi.php';
             }
-          $url =  $host. $path.'?code='.$id.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
+          $url =  $host. $path.'?code='.$kode.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
           $msg = $messageHelper->messageProcessBPUFinance($pengajuan["nama"], $no, $term, $bpu["pengaju"], $arrPenerima, $arrJumlah, $keterangan, $url);
           if($email[$i] != "") $whatsapp->sendMessage($email[$i], $msg);
         }
@@ -332,7 +332,7 @@ if ($submit == 1) {
             } else if ($dataDivisi[$i] == 'Direksi') {
                 $path = '/views-direksi.php';
             }
-          $url =  $host. $path.'?code='.$id.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
+          $url =  $host. $path.'?code='.$kode.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
           $msg = $messageHelper->messageProcessTolakBPUFinance($pengajuan["nama"], $no, $term, $bpu["pengaju"], $arrPenerima, $arrJumlah, $keterangan, $url);
           if($email[$i] != "") $whatsapp->sendMessage($email[$i], $msg);
         }
