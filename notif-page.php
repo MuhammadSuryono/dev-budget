@@ -130,6 +130,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                     <tbody>
                         <?php
                         $sql = mysqli_query($koneksiLog, "SELECT * FROM log_emails WHERE application_code = 'budget-001' ORDER BY id desc LIMIT 10 ");
+                        $i = 1;
                         while ($a = mysqli_fetch_array($sql)) {
                         ?>
                             <tr>
