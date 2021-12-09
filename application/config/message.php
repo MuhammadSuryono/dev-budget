@@ -182,7 +182,8 @@ Keterangan:* $keterangan *";
     }
     $msg .="
 
- Lihat selengkapnya dibawah ini:".
+ Lihat selengkapnya dibawah ini:
+ ".
  $link;
         return $msg;
     }
