@@ -93,6 +93,15 @@ if ($statusbpu == 'Vendor/Supplier') {
     $keterangan_pembayaran    = $_POST['keterangan_pembayaran'];
 }
 
+$url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+$port = $_SERVER['SERVER_PORT'];
+$url = explode('/', $url);
+$hostProtocol = $url[0];
+if ($port != "") {
+$hostProtocol = $hostProtocol . ":" . $port;
+}
+$host = $hostProtocol. '/'. $url[1];
+
 //periksa apakah udah submit
 if (isset($_POST['submit'])) {
 
@@ -185,7 +194,9 @@ if (isset($_POST['submit'])) {
         }
 
         if (is_array($_POST['jumlah'])) {
+            $jumlahDiterima = "0";
             for ($i = 0; $i < count($arrjumlah); $i++) {
+                $jumlahDiterima += $arrjumlah[$i];
                 if ($aw['status'] == 'Vendor/Supplier' || $aw['status'] == 'Honor Eksternal' || $aw['status'] == 'Honor Area Head') {
                     $queryBank = mysqli_query($koneksi, "SELECT * FROM bank WHERE kodebank = '$arrnamabank[$i]'");
                     $bank = mysqli_fetch_assoc($queryBank);
@@ -235,8 +246,11 @@ if (isset($_POST['submit'])) {
 
             $notification = 'Pembuatan BPU Eksternal Berhasil. Pemberitahuan via email telah terkirim ke ';
             $i = 0;
+
+            $namaPenerima = "";
             for ($i = 0; $i < count($arremailpenerima); $i++) {
                 $notification .= ($arrnamapenerima[$i] . ' (' . $arremailpenerima[$i] . ')');
+                $namaPenerima .= $arrnamapenerima[$i];
                 if ($i < count($arremailpenerima) - 1) $notification .= ', ';
                 else $notification .= '.';
             }
@@ -253,7 +267,7 @@ if (isset($_POST['submit'])) {
                     $path = '/views-direksi.php';
                 }
               $url =  $host. $path.'?code='.$id.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
-              $msg = $messageHelper->messagePengajuanBPU($namaInternal[$i], $pengaju, $namaProject, implode(",", $arrnamapenerima), implode(",", $arrjumlah), "", $url);
+              $msg = $messageHelper->messagePengajuanBPU($namaInternal[$i], $pengaju, $namaProject, $namaPenerima, $jumlahDiterima, "", $url);
               if($emailInternal[$i] != "") $wa->sendMessage($emailInternal[$i], $msg);
 
               $notification .= ($namaInternal[$i] . ' (' . $emailInternal[$i] . ')');
