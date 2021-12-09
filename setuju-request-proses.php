@@ -33,8 +33,8 @@ if ($updatePengajuanRequest) {
     $queryGetAllId = mysqli_query($koneksi, "SELECT id FROM pengajuan_request WHERE waktu='$waktunya'");
     while ($row = mysqli_fetch_array($queryGetAllId)) {
 
-        $id = $row['id'];
-        $queryPengajuanRequest = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE id='$id'") or die(mysqli_error($koneksi));
+        $idGet = $row['id'];
+        $queryPengajuanRequest = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE id='$idGet'") or die(mysqli_error($koneksi));
         $pengajuanRequest = mysqli_fetch_assoc($queryPengajuanRequest);
         $jenis = $pengajuanRequest['jenis'];
         $nama = $pengajuanRequest['nama'];
@@ -121,13 +121,13 @@ if ($updatePengajuanRequest) {
         array_push($dataDivisi, $data['divisi']);
         array_push($dataLevel, $data['level']);
 
-        $queryUserByDivisi = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi = '$data[divisi]' AND (level = 'Manager' OR level = 'Senior Manager') AND aktif='Y'") or die(mysqli_error($koneksi));
-        $user = mysqli_fetch_assoc($queryUserByDivisi);
-        array_push($phoneNumbers, $user['phone_number']);
-        array_push($namaUserSendNotifications, $user['nama_user']);
-        array_push($idUsersNotification, $data['id_user']);
-        array_push($dataDivisi, $data['divisi']);
-        array_push($dataLevel, $data['level']);
+        // $queryUserByDivisi = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi = '$data[divisi]' AND (level = 'Manager' OR level = 'Senior Manager') AND aktif='Y'") or die(mysqli_error($koneksi));
+        // $user = mysqli_fetch_assoc($queryUserByDivisi);
+        // array_push($phoneNumbers, $user['phone_number']);
+        // array_push($namaUserSendNotifications, $user['nama_user']);
+        // array_push($idUsersNotification, $data['id_user']);
+        // array_push($dataDivisi, $data['divisi']);
+        // array_push($dataLevel, $data['level']);
 
         $url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
         $port = $_SERVER['SERVER_PORT'];

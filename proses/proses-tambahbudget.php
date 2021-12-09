@@ -73,12 +73,12 @@ if (isset($_POST['submit'])) {
   array_push($namaUserSendNotifications, $dataCreatorBudget['nama_user']);
   array_push($idUsersNotification, $idUserPICBudget);
 
-  $queryUserByDivisi = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi = '$divisiCreatorBudget' AND (level = 'Manager' OR level = 'Senior Manager') AND aktif='Y'") or die(mysqli_error($koneksi));
-  $user = mysqli_fetch_assoc($queryUserByDivisi);
+  // $queryUserByDivisi = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi = '$divisiCreatorBudget' AND (level = 'Manager' OR level = 'Senior Manager') AND aktif='Y'") or die(mysqli_error($koneksi));
+  // $user = mysqli_fetch_assoc($queryUserByDivisi);
   
-  array_push($phoneNumbers, $user['phone_number']);
-  array_push($namaUserSendNotifications, $user['nama_user']);
-  array_push($idUsersNotification, $user['id_user']);
+  // array_push($phoneNumbers, $user['phone_number']);
+  // array_push($namaUserSendNotifications, $user['nama_user']);
+  // array_push($idUsersNotification, $user['id_user']);
 
 
   $countInsert = 0;
