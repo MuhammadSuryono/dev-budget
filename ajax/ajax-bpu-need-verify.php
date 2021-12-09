@@ -16,7 +16,11 @@ $action = $_GET['action'];
 
 if ($action == 'get-data') {
     $query = mysqli_query($koneksi, "SELECT a.id, a.id_bpu, b.no as no_urut, c.nama, c.jenis, b.term FROM bpu_verify a LEFT JOIN bpu b ON a.id_bpu = b.noid LEFT JOIN pengajuan c ON c.waktu = b.waktu where a.is_verified = '0' ORDER BY a.id asc");
-    echo json_encode(["data" => mysqli_fetch_all($query)]);
+    $data = [];
+    while ($row = $query->fetch_assoc()) {
+        $data[] = $row;
+    }
+    echo json_encode(["data" => $data]);
 }
 
 if ($action == 'get-data-single') {
@@ -24,7 +28,12 @@ if ($action == 'get-data-single') {
     $bpu = $_GET['id-bpu'];
 
     $query = mysqli_query($koneksi, "SELECT a.is_verified, b.tglcheck, b.checkby, a.id, a.id_bpu, b.no as no_urut, c.nama, c.jenis, b.term, b.pengajuan_jumlah FROM bpu_verify a LEFT JOIN bpu b ON a.id_bpu = b.noid LEFT JOIN pengajuan c ON c.waktu = b.waktu where a.id = '$id' AND a.id_bpu = '$bpu' ORDER BY a.id asc");
-    echo json_encode(["data" => mysqli_fetch_all($query), "request" => ["id" => $id, "bpu" => $bpu]]);
+    $data = [];
+    while ($row = $query->fetch_assoc()) {
+        $data[] = $row;
+    }
+    
+    echo json_encode(["data" => $data, "request" => ["id" => $id, "bpu" => $bpu]]);
 }
 
 // simpan-verifikasi&id=${id}&id-bpu=${idBpu}
@@ -83,7 +92,10 @@ function uploadFile($files)
 
 function sendEmailPemeritahuan($koneksi, $idBpu) {
     $query = mysqli_query($koneksi, "SELECT a.*, b.* FROM bpu a LEFT JOIN pengajuan b ON a.waktu = b.waktu where a.noid = '$idBpu'");
-    $dataBpu = mysqli_fetch_all($query);
+    $dataBpu = [];
+    while ($row = $query->fetch_assoc()) {
+        $data[] = $row;
+    }
     
     if (count($dataBpu)) {
         $dataBpu = $dataBpu[0];
