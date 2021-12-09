@@ -126,7 +126,8 @@ if (!isset($_SESSION['nama_user'])) {
       $cari = mysqli_query($koneksi, "SELECT * FROM bpu WHERE pengaju ='$pengaju' AND persetujuan ='Belum Disetujui' OR pengaju ='$pengaju' AND persetujuan ='Pending'");
       $belbyr = mysqli_num_rows($cari);
       ?>
-      <ul class="nav navbar-nav navbar-right">
+     <ul class="nav navbar-nav navbar-right">
+                        <li><a href="notif-page.php"><i class="fa fa-envelope"></i></a></li>
         <li class="dropdown messages-menu">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-inbox"></i><span class="label label-warning"><?= $belbyr ?></span></a>
           <ul class="dropdown-menu">
@@ -144,7 +145,8 @@ if (!isset($_SESSION['nama_user'])) {
             ?>
           </ul>
         </li>
-        <ul class="nav navbar-nav navbar-right">
+       <ul class="nav navbar-nav navbar-right">
+                        <li><a href="notif-page.php"><i class="fa fa-envelope"></i></a></li>
           <li><a href="ubahpassword.php"><span class="glyphicon glyphicon-user"></span><?php echo $_SESSION['nama_user']; ?> (<?php echo $_SESSION['divisi']; ?>)</a></li>
           <li><a href="logout.php"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
         </ul>

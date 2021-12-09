@@ -166,7 +166,8 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
         </ul>
 
       
-        <ul class="nav navbar-nav navbar-right">
+       <ul class="nav navbar-nav navbar-right">
+                        <li><a href="notif-page.php"><i class="fa fa-envelope"></i></a></li>
           <li><a href="ubahpassword.php"><span class="glyphicon glyphicon-user"></span><?php echo $_SESSION['nama_user']; ?> (<?php echo $_SESSION['divisi']; ?>)</a></li>
           <li><a href="logout.php"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
         </ul>
@@ -904,7 +905,7 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
     
     function bpuEksternalNeedVerify() {
       let bodyTable = document.getElementById('data-bpu-need-verifikasi')
-      httpRequestGet('/dev-budget/ajax/ajax-bpu-need-verify.php?action=get-data').then((res) => {
+      httpRequestGet('/ajax/ajax-bpu-need-verify.php?action=get-data').then((res) => {
         if (res.data !== null && res.data.length > 0) {
           titleBpuEksternalVerifikasi.classList.add('text-blink')
 
@@ -923,7 +924,7 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
 
     function bpuUMJatuhTempo() {
       let bodyTable = document.getElementById('data-bpu-jatuh-tempo')
-      httpRequestGet('/dev-budget/ajax/ajax-um-jatuh-tempo.php?action=get-list').then((res) => {
+      httpRequestGet('/ajax/ajax-um-jatuh-tempo.php?action=get-list').then((res) => {
         if (res.data !== null && res.data.length > 0) {
           titleReminderUmJatuhTempo.classList.add('text-blink')
           reminderReminderUmJatuhTempo.innerHTML = `<div class="alert alert-danger" role="alert"><i class='fa fa-bell text-blink'></i>

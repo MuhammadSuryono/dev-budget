@@ -97,7 +97,8 @@ if (!isset($_SESSION['nama_user'])) {
                     $cari = mysqli_query($koneksi, "SELECT * FROM bpu WHERE status ='Belum Di Bayar' AND persetujuan !='Belum Disetujui' AND waktu != 0");
                     $belbyr = mysqli_num_rows($cari);
                     ?>
-                    <ul class="nav navbar-nav navbar-right">
+                   <ul class="nav navbar-nav navbar-right">
+                        <li><a href="notif-page.php"><i class="fa fa-envelope"></i></a></li>
                         <li class="dropdown messages-menu">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-inbox"></i><span class="label label-warning"><?= $belbyr ?></span></a>
                             <ul class="dropdown-menu">
@@ -128,7 +129,8 @@ if (!isset($_SESSION['nama_user'])) {
                     $countPengajuanReq = mysqli_num_rows($queryPengajuanReq);
                     $notif = $belbyr + $bpuyahud + $countPengajuanReq;
                 ?>
-                    <ul class="nav navbar-nav navbar-right">
+                   <ul class="nav navbar-nav navbar-right">
+                        <li><a href="notif-page.php"><i class="fa fa-envelope"></i></a></li>
                         <li class="dropdown messages-menu">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-inbox"></i><span class="label label-warning"><?= $notif ?></span></a>
                             <ul class="dropdown-menu">
