@@ -113,23 +113,25 @@ Jumlah Dibayar     : Rp. " . number_format($jumlahbayar, 0, '', ',') . "";
         return $msg;
     }
 
-    public function messageStatusPembayaranBPUVendorSuplier($penerima, $noInvoice, $tanggalInvoice, $term,$jenisPembayaran, $noRekening, $bank, $jumlahBayar, $dateBayar)
+    public function messageStatusPembayaranBPUVendorSuplier($nnamaProject, $item, $term, $arrPenerima, $pembayar, $tanggalBayar, $nomorvoucher, $arrJumlah, $keterangan, $link)
     {
-        $msg = "Kepada " . $penerima . ", 
-Berikut informasi status pembayaran yang akan Anda terima:
-No.Invoice       : " . $noInvoice . "
-Tgl. Invoice     : " . $tanggalInvoice . "
-Term             : " . $term  . "
-Jenis Pembayaran : " . $jenisPembayaran . "
-No. Rekening Anda : " . $noRekening . "
-Bank             : " . $bank . "
-Nama Penerima    : " . $penerima . "
-Jumlah Dibayarkan : Rp. " . number_format($jumlahBayar, 0, '', '.') . "
-Status           : *Dibayar*,  Tanggal : *" . $dateBayar . "*
-Jika ada pertanyaan lebih lanjut, silahkan email Divisi Finance ke *finance@mri-research-ind.com*.
-Hormat kami,
-Finance Marketing Research Indonesia
+        $msg = "Notifikasi BPU, 
+BPU telah dibayar oleh Finance dengan keterangan sebagai berikut:
+Nama Project       : *" . $nnamaProject . "*
+Item No.           : *$item*
+Term               : *$term*
+Nama Penerima  : *" . implode(', ', $arrPenerima) . "*
+Pembayar           : *$pembayar*
+Tanggal Pembayaran : *$tanggalBayar*
+Nomer Voucher      : *$nomorvoucher*
+Dibayar     : *" . implode(', ', $arrJumlah) . "*
 ";
+if ($keterangan) {
+    $msg .= "
+Keterangan:*$keterangan*";
+}
+$msg .= "Klik $link untuk membuka aplikasi budget.";
+
         return $msg;
     }
 
