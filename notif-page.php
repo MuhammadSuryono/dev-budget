@@ -45,16 +45,16 @@ $setting = mysqli_fetch_assoc($querySetting);
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="home-direksi.php">Budget-Ing</a>
+                <a class="navbar-brand" href="home-finance.php">Budget-Ing</a>
             </div>
             <div class="collapse navbar-collapse" id="myNavbar">
                 <ul class="nav navbar-nav">
                     <?php if ($_SESSION['hak_akses'] == 'HRD') { ?>
-                        <li><a href="home-direksi.php">Home</a></li>
-                        <li><a href="list-direksi.php">List</a></li>
+                        <li><a href="home-finance.php">Home</a></li>
+                        <li><a href="list-finance.php">List</a></li>
                         <li><a href="saldobpu.php">Data User</a></li>
                         <!--<li><a href="summary.php">Summary</a></li>-->
-                        <li><a href="listfinish-direksi.php">Budget Finish</a></li>
+                        <li><a href="listfinish-finance.php">Budget Finish</a></li>
                     <?php } else { ?>
                         <li><a href="home-finance.php">Home</a></li>
                         <?php
