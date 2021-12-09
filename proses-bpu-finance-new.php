@@ -196,14 +196,17 @@ if ($submit == 1) {
                 }
             }
 
-            $queryEmail = mysqli_query($koneksi, "SELECT *,divisi FROM tb_user WHERE nama_user = '$bpu[pengaju]' AND aktif='Y'");
+            $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$bpu[pengaju]' AND aktif='Y'");
             $emailUser = mysqli_fetch_assoc($queryEmail);
             if ($emailUser) {
                 array_push($email, $emailUser['phone_number']);
                 array_push($nama, $emailUser['nama_user']);
+                array_push($dataDivisi, $emailUser['divisi']);
+                array_push($dataLevel, $emailUser['level']);
+                array_push($idUsersNotification, $emailUser['id_user']);
             }
 
-            $queryEmail = mysqli_query($koneksi, "SELECT *,divisi FROM tb_user WHERE nama_user = '$bpu[acknowledged_by]' AND aktif='Y'");
+            $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$bpu[acknowledged_by]' AND aktif='Y'");
             $emailUser = mysqli_fetch_assoc($queryEmail);
             if ($emailUser) {
                 array_push($email, $emailUser['phone_number']);
