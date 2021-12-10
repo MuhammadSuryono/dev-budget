@@ -220,6 +220,21 @@ if ($submit == 1) {
     $email = array_unique($email);
     $nama = array_unique($nama);
 
+    if ($bpu['statusbpu'] == "UM" || $bpu['statusbpu'] == "UM Burek") {
+        if (count($arrPenerima) > 0) {
+            for ($i=0; $i < count($arrPenerima); $i++) { 
+                $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$arrPenerima[$i]' AND aktif='Y'");
+                $emailUser = mysqli_fetch_assoc($queryEmail);
+                if ($emailUser) {
+                    array_push($email, $emailUser['phone_number']);
+                    array_push($nama, $emailUser['nama_user']);
+                    array_push($idUsersNotification, $emailUser['id_user']);
+                    array_push($dataDivisi, $emailUser['divisi']);
+                    array_push($dataLevel, $emailUser['level']);
+                }
+            }
+        }
+    }
 
 
     if ($email) {
@@ -247,25 +262,27 @@ if ($submit == 1) {
         else $notification .= '.';
     }
 
-    $msg = "Notifikasi BPU, <br><br>
-    BPU telah di verifikasi oleh Finance dengan keterangan sebagai berikut:<br><br>
-    Nama Project   : <strong>" . $pengajuan['nama'] . "</strong><br>
-    Item No.       : <strong>$no</strong><br>
-    Term           : <strong>$term</strong><br>
-    Nama Pengaju   : <strong>" . $bpu['pengaju'] . "</strong><br>
-    Nama Penerima  : <strong>" . implode(', ', $arrPenerima) . "</strong><br>
-    Total Diajukan : <strong>" . implode(', ', $arrJumlah) . "</strong><br>
-    ";
-    if ($keterangan) {
-        $msg .= "Keterangan:<strong> $keterangan </strong><br><br>";
-    } else {
-        $msg .= "<br>";
+    if ($bpu['statusbpu'] != "UM" || $bpu['statusbpu'] != "UM Burek") {
+        $msg = "Notifikasi BPU, <br><br>
+        BPU telah di verifikasi oleh Finance dengan keterangan sebagai berikut:<br><br>
+        Nama Project   : <strong>" . $pengajuan['nama'] . "</strong><br>
+        Item No.       : <strong>$no</strong><br>
+        Term           : <strong>$term</strong><br>
+        Nama Pengaju   : <strong>" . $bpu['pengaju'] . "</strong><br>
+        Nama Penerima  : <strong>" . implode(', ', $arrPenerima) . "</strong><br>
+        Total Diajukan : <strong>" . implode(', ', $arrJumlah) . "</strong><br>
+        ";
+        if ($keterangan) {
+            $msg .= "Keterangan:<strong> $keterangan </strong><br><br>";
+        } else {
+            $msg .= "<br>";
+        }
+        $msg .= "Klik <a href='$host'>Disini</a> untuk membuka aplikasi budget.";
+        $subject = "Notifikasi Aplikasi Budget";
+    
+        $emailHelper->sendEmail($msg, $subject, $arremailpenerima, '', 'multiple');
+        $notification .= " Dan telah dikirim pemberitahuan ke penerima via email ke " . implode(",", $arremailpenerima);   
     }
-    $msg .= "Klik <a href='$host'>Disini</a> untuk membuka aplikasi budget.";
-    $subject = "Notifikasi Aplikasi Budget";
-
-    $emailHelper->sendEmail($msg, $subject, $arremailpenerima, '', 'multiple');
-    $notification .= " Dan telah dikirim pemberitahuan ke penerima via email ke " . implode(",", $arremailpenerima);
 
 
 } else if ($submit == 0) {

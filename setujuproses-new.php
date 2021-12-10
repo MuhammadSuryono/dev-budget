@@ -153,6 +153,16 @@ if ($_POST['submit'] == 1) {
             if ($item['emailpenerima']) {
                 $message = $emailHelper->sendEmail($msg, $subject, $item['emailpenerima'], $name = '', $address = "single");
             }
+        } else {
+            $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$item[namapenerima]' AND aktif='Y'");
+            $emailUser = mysqli_fetch_assoc($queryEmail);
+            if ($emailUser) {
+                array_push($email, $emailUser['phone_number']);
+                array_push($nama, $emailUser['nama_user']);
+                array_push($idUsersNotification, $emailUser['id_user']);
+                array_push($dataDivisi, $emailUser['divisi']);
+                array_push($dataLevel, $emailUser['level']);
+            }
         }
 
 
@@ -244,7 +254,6 @@ if ($_POST['submit'] == 1) {
 
         if (count($arremailpenerima) > 0) {
             $notification .= " Dan telah dikirim pemberitahuan ke penerima via email ke " . implode(",", $arremailpenerima);
-            # code...
         }
     }
 } else if ($submit == 0) {
