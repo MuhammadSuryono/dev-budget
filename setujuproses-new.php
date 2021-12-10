@@ -259,7 +259,7 @@ if ($_POST['submit'] == 1) {
         $queryEmail = mysqli_query($koneksi, "SELECT* FROM tb_user WHERE nama_user = '$bpu[pengaju]' AND aktif='Y'");
         $emailUser = mysqli_fetch_assoc($queryEmail);
         if ($emailUser) {
-            array_push($email, $emailUser['email']);
+            array_push($email, $emailUser['phone_number']);
             array_push($nama, $emailUser['nama_user']);
             array_push($idUsersNotification, $emailUser['id_user']);
             array_push($dataDivisi, $emailUser['divisi']);
@@ -269,7 +269,7 @@ if ($_POST['submit'] == 1) {
         $queryEmail = mysqli_query($koneksi, "SELECT* FROM tb_user WHERE nama_user = '$bpu[acknowledged_by]' AND aktif='Y'");
         $emailUser = mysqli_fetch_assoc($queryEmail);
         if ($emailUser) {
-            array_push($email, $emailUser['email']);
+            array_push($email, $emailUser['phone_number']);
             array_push($nama, $emailUser['nama_user']);
             array_push($idUsersNotification, $emailUser['id_user']);
             array_push($dataDivisi, $emailUser['divisi']);
@@ -279,8 +279,8 @@ if ($_POST['submit'] == 1) {
         if ($budget['jenis'] == 'B1' || $budget['jenis'] == 'B2') {
             $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1', '3')");
             while ($e = mysqli_fetch_assoc($queryEmail)) {
-                if ($e['email']) {
-                    array_push($email, $e['email']);
+                if ($e['phone_number']) {
+                    array_push($email, $e['phone_number']);
                     array_push($nama, $e['nama_user']);
                     array_push($idUsersNotification, $e['id_user']);
                     array_push($dataDivisi, $e['divisi']);
@@ -290,8 +290,8 @@ if ($_POST['submit'] == 1) {
         } else {
             $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('2', '3')");
             while ($e = mysqli_fetch_assoc($queryEmail)) {
-                if ($e['email']) {
-                    array_push($email, $e['email']);
+                if ($e['phone_number']) {
+                    array_push($email, $e['phone_number']);
                     array_push($nama, $e['nama_user']);
                     array_push($idUsersNotification, $e['id_user']);
                     array_push($dataDivisi, $e['divisi']);
