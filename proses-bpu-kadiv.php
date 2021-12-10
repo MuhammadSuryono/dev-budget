@@ -49,6 +49,7 @@ $hostProtocol = $hostProtocol . ":" . $port;
 }
 $host = $hostProtocol. '/'. $url[1];
 
+echo $pengajuan['jenis'];
 if ($pengajuan['jenis'] == 'B1' || $pengajuan['jenis'] == 'B2') {
     $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1', '3')");
     while ($e = mysqli_fetch_assoc($queryEmail)) {
@@ -70,6 +71,7 @@ if ($pengajuan['jenis'] == 'B1' || $pengajuan['jenis'] == 'B2') {
     while ($e = mysqli_fetch_assoc($queryEmail)) {
         if (@unserialize($e['hak_button'])) {
             $buttonAkses = unserialize($e['hak_button']);
+            var_dump($buttonAkses);
             if (in_array("verifikasi_bpu", $buttonAkses)) {
                 if ($e['phone_number']) {
                     array_push($email, $e['phone_number']);
@@ -82,6 +84,9 @@ if ($pengajuan['jenis'] == 'B1' || $pengajuan['jenis'] == 'B2') {
         }
     }
 }
+
+var_dump($nama);
+var_dump($$email);
 
 $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$pengajuan[pembuat]' AND aktif='Y'");
 $emailUser = mysqli_fetch_assoc($queryEmail);
@@ -141,7 +146,7 @@ for ($i = 0; $i < count($email); $i++) {
         $msg = $messageHelper->messagePengajuanBPUKadiv($nama[$i], $bpu['pengaju'], $namaProject, $bpu['namapenerima'], $bpu['pengajuan_jumlah'], $keterangan, $url);
         $whatsapp->sendMessage($email[$i], $msg);
 
-        if ($i++ < count($email) - 1) $notification .= ', ';
+        if ($i++ < count($email) - 1) $notification .= $nama[$i].'('.$email[$i].'),';
         else $notification .= '.';
     }
 }

@@ -115,13 +115,11 @@ if ($_POST['no'] && $_POST['waktu']) {
                     <input type="date" class="form-control" name="tglcair">
                 </div>
                 
-                <?php if ($level != "Managemen") {
-                    echo '<div class="form-group form-group-file">
+                <div class="form-group form-group-file">
                     <label class="control-label">Upload File <a href="#" data-toggle="tooltip" title="Upload File Rincian BPU"><i class="fa fa-question-circle"></i></a></label>
                     <input type="file" class="form-control" accept="image/*" name="gambar" id="fileInputEksternal" required>
                     <img class="img-responsive" style="display: block; margin-left: auto;  margin-right: auto; background-repeat: no-repeat; background-size: cover; background-attachment: fixed;" src="" id="imageBpuEksternal">
-                </div>';
-                } ?>
+                </div>
 
                 <!-- <div class="form-group form-group-file">
                     <label class="control-label">Upload File <a href="#" data-toggle="tooltip" title="Upload File Rincian BPU"><i class="fa fa-question-circle"></i></a></label>

@@ -255,7 +255,7 @@ if (!isset($_SESSION['nama_user'])) {
 
                               $jumlbayar           = $bayar['jumlah'];
                               $tglbyr              = $bayar['tglcair'];
-                              // $statusbayar         = $bayar['status'];
+                              $statusbayar         = $bayar['status'];
                               $persetujuan         = $bayar['persetujuan'];
                               $novoucher           = $bayar['novoucher'];
                               $tanggalbayar        = $bayar['tanggalbayar'];
