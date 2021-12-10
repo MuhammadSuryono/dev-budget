@@ -92,7 +92,6 @@ $hostProtocol = $hostProtocol . ":" . $port;
 $host = $hostProtocol. '/'. $url[1];
 
 $queryBpu = mysqli_query($koneksi, "SELECT * FROM bpu WHERE no = '$no' AND waktu = '$waktu' AND term = '$term'");
-$bpuItem = mysqli_fetch_assoc($queryBpu);
 
 if ($_POST['submit'] == 1) {
     while ($item = mysqli_fetch_assoc($queryBpu)) {
@@ -184,7 +183,8 @@ if ($_POST['submit'] == 1) {
             array_push($dataLevel, $emailUser['level']);
         }
     }
-
+    
+$bpuItem = mysqli_fetch_assoc($queryBpu);
     if ($bpuItem['statusbpu'] == 'UM' || $bpuItem['statusbpu'] == 'UM Burek') {
         $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$bpuItem[namapenerima]' AND aktif='Y'");
         $emailUser = mysqli_fetch_assoc($queryEmail);
