@@ -29,6 +29,9 @@ $count = mysqli_fetch_array($countQuery)[0];
 
 $formatId = $date . $count;
 
+$splitDivisi = explode(" ", $_SESSION["divisi"]);
+$typeBudget = count($splitDivisi) > 1 ? $splitDivisi[1] : $splitDivisi[0];
+
 ?>
 
 
@@ -100,8 +103,6 @@ $formatId = $date . $count;
     </p>
 
     <br />
-
-    
 
     <!-- BPU UM -->
     <?php if ($_SESSION['jabatan'] != 'Manager' && $_SESSION['jabatan'] != 'Senior Manager') : ?>
@@ -272,7 +273,7 @@ $formatId = $date . $count;
                   <?php
                   $i = 1;
                   $checkUnique = [];
-                  $sql = mysqli_query($koneksi, "SELECT DISTINCT a.term, a.no, a.waktu, b.nama, b.noid AS budget_noid, c.rincian FROM bpu a JOIN pengajuan b ON b.waktu = a.waktu JOIN selesai c ON c.waktu = a.waktu AND c.no = a.no WHERE status_pengajuan_bpu = 3");
+                  $sql = mysqli_query($koneksi, "SELECT DISTINCT a.term, a.no, a.waktu, b.nama, b.noid AS budget_noid, c.rincian FROM bpu a JOIN pengajuan b ON b.waktu = a.waktu JOIN selesai c ON c.waktu = a.waktu AND c.no = a.no WHERE status_pengajuan_bpu = 3 AND jenis = '$typeBudget'");
                   while ($d = mysqli_fetch_array($sql)) :
                     $unique = $d['waktu'] . $d['nama'] . $d['no'] . $d['rincian'] . $d['term'];
                   ?>
