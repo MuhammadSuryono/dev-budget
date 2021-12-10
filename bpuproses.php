@@ -317,6 +317,18 @@ if (isset($_POST['submit'])) {
       $namaProject = $dataProject['nama'];
 
 
+      $queryUserPenerima = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user='$namapenerima'");
+      $user = mysqli_fetch_assoc($queryUserPenerima);
+      if ($user) {
+        array_push($phoneNumbers, $user['phone_number']);
+        array_push($nama, $user['nama_user']);
+        array_push($dataLevel, $e['level']);
+        array_push($idUsersNotification, $e['id_user']);
+        array_push($dataDivisi, $e['divisi']);
+      }
+
+      $notification .= "BPU telah berahasil dibuat, pemberitahuan dikirim via whatsapp ke " . implode(",", $arremailpenerima);
+
       if (count($phoneNumbers) > 0) {
         $whatsapp = new Whastapp();
         for($i = 0; $i < count($phoneNumbers); $i++) {
@@ -335,23 +347,23 @@ if (isset($_POST['submit'])) {
         }
       }
 
-      $msg = "Notifikasi BPU, <br><br>
-              BPU telah diajukan dengan keterangan sebagai berikut:<br><br>
-              Nama Project      : <strong>$namaProject</strong><br>
-              Nama Pengaju      : <strong>$pengaju</strong><br>
-              Nama Penerima     : <strong>$namapenerima</strong><br>
-              Jumlah Diajukan   : <strong>Rp. " . number_format($jumlah, 0, '', ',') . "</strong><br>
-              ";
-      if ($keterangan) {
-        $msg .= "Keterangan:<strong> $keterangan </strong><br><br>";
-      } else {
-        $msg .= "<br>";
-      }
-      $msg .= "Klik <a href='$host'>Disini</a> untuk membuka aplikasi budget.";
-      $subject = "Notifikasi Aplikasi Budget";
+      // $msg = "Notifikasi BPU, <br><br>
+      //         BPU telah diajukan dengan keterangan sebagai berikut:<br><br>
+      //         Nama Project      : <strong>$namaProject</strong><br>
+      //         Nama Pengaju      : <strong>$pengaju</strong><br>
+      //         Nama Penerima     : <strong>$namapenerima</strong><br>
+      //         Jumlah Diajukan   : <strong>Rp. " . number_format($jumlah, 0, '', ',') . "</strong><br>
+      //         ";
+      // if ($keterangan) {
+      //   $msg .= "Keterangan:<strong> $keterangan </strong><br><br>";
+      // } else {
+      //   $msg .= "<br>";
+      // }
+      // $msg .= "Klik <a href='$host'>Disini</a> untuk membuka aplikasi budget.";
+      // $subject = "Notifikasi Aplikasi Budget";
 
-      $emailHelper->sendEmail($msg, $subject, $arremailpenerima, '', 'multiple');
-      $notification = 'Pembuatan BPU Berhasil. Pemberitahuan via whatsapp sedang dikirimkan ke ';
+      // $emailHelper->sendEmail($msg, $subject, $arremailpenerima, '', 'multiple');
+      // $notification = 'Pembuatan BPU Berhasil. Pemberitahuan via whatsapp sedang dikirimkan ke ';
 
       $i = 0;
 
@@ -361,7 +373,7 @@ if (isset($_POST['submit'])) {
         else $notification .= '.';
       }
 
-      $notification .= " Dan telah dikirim pemberitahuan ke penerima via email ke " . implode(",", $arremailpenerima);
+      // $notification .= " Dan telah dikirim pemberitahuan ke penerima via email ke " . implode(",", $arremailpenerima);
     }
   } else {
     if ($jumlah > $jadinya) {

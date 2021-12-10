@@ -92,6 +92,7 @@ $hostProtocol = $hostProtocol . ":" . $port;
 $host = $hostProtocol. '/'. $url[1];
 
 $queryBpu = mysqli_query($koneksi, "SELECT * FROM bpu WHERE no = '$no' AND waktu = '$waktu' AND term = '$term'");
+$bpuItem = mysqli_fetch_assoc($queryBpu);
 
 if ($_POST['submit'] == 1) {
     while ($item = mysqli_fetch_assoc($queryBpu)) {
@@ -184,6 +185,18 @@ if ($_POST['submit'] == 1) {
         }
     }
 
+    if ($bpuItem['statusbpu'] == 'UM' || $bpuItem['statusbpu'] == 'UM Burek') {
+        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$bpuItem[namapenerima]' AND aktif='Y'");
+        $emailUser = mysqli_fetch_assoc($queryEmail);
+        if ($emailUser['phone_number'] != "") {
+            array_push($email, $emailUser['phone_number']);
+            array_push($nama, $emailUser['nama_user']);
+            array_push($idUsersNotification, $emailUser['id_user']);
+            array_push($dataDivisi, $emailUser['divisi']);
+            array_push($dataLevel, $emailUser['level']);
+        }
+    }
+
     $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$budget[pengaju]' AND aktif='Y'");
     $emailUser = mysqli_fetch_assoc($queryEmail);
     if ($emailUser['phone_number']) {
@@ -230,6 +243,9 @@ if ($_POST['submit'] == 1) {
     $update = mysqli_query($koneksi, "UPDATE bpu SET status_pengajuan_bpu =0, persetujuan = '$persetujuan', tanggalbayar = '$tanggalbayar', urgent = '$urgent', approveby = '$userSetuju', tglapprove = '$time'
                                WHERE no='$no' AND waktu='$waktu' AND persetujuan='Belum Disetujui' AND term=$term");
 
+    
+// var_dump($nama);
+// var_dump($email);
     if ($update) {
         $notification = 'BPU Telah Disetujui. Pemberitahuan via whatsapp telah terkirim ke ';
         $i = 0;
@@ -310,31 +326,28 @@ if ($_POST['submit'] == 1) {
         }
     }
 
-    $email = array_unique($email);
-    $nama = array_unique($nama);
+    // $email = array_unique($email);
+    // $nama = array_unique($nama);
 
-    $msg = "Notifikasi BPU, <br><br>
-        BPU telah di tolak oleh $userSetuju dengan keterangan sebagai berikut:<br><br>
-        Nama Project   : <strong>" . $budget['nama'] . "</strong><br>
-        Item No.       : <strong>$no</strong><br>
-        Term           : <strong>$term</strong><br>
-        Nama Pengaju   : <strong>" . $bpu['pengaju'] . "</strong><br>
-        Nama Penerima  : <strong>" . implode(', ', $arrPenerima) . "</strong><br>
-        Total Diajukan : <strong>" . implode(', ', $arrJumlah) . "</strong><br>
-        ";
-    if ($alasanTolakBpu) {
-        $msg .= "Ditolak dengan alasan <strong> $alasanTolakBpu </strong>.<br><br>";
-    } else {
-        $msg .= "Ditolak tanpa alasan.<br><br>";
+    if ($bpuItem['status'] == "UM" || $bpuItem['status'] == "UM Burek") {
+        if (count($arrPenerima) > 0) {
+            for ($i=0; $i < count($arrPenerima); $i++) { 
+                $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$arrPenerima[$i]' AND aktif='Y'");
+                $emailUser = mysqli_fetch_assoc($queryEmail);
+                echo $emailUser['nama_user'];
+                if ($emailUser) {
+                    array_push($email, $emailUser['phone_number']);
+                    array_push($nama, $emailUser['nama_user']);
+                    array_push($idUsersNotification, $emailUser['id_user']);
+                    array_push($dataDivisi, $emailUser['divisi']);
+                    array_push($dataLevel, $emailUser['level']);
+                }
+            }
+        }
     }
-    $msg .= "Klik <a href='$host'>Disini</a> untuk membuka aplikasi budget.";
-    $subject = "Notifikasi Aplikasi Budget";
+    
 
-    if ($arremailpenerima) {
-        $message = $emailHelper->sendEmail($msg, $subject, $arremailpenerima, $name, $address = "multiple");
-    }
-
-    $notification = 'BPU Telah Disetujui. Pemberitahuan via whatsapp telah terkirim ke ';
+    $notification = 'BPU Telah Di Tolak. Pemberitahuan via whatsapp telah terkirim ke ';
     $i = 0;
     for($i = 0; $i < count($email); $i++) {
         $path = '/views.php';
@@ -355,9 +368,32 @@ if ($_POST['submit'] == 1) {
         else $notification .= '.';
     }
 
-    if (count($arremailpenerima) > 0) {
-        $notification .= " Dan telah dikirim pemberitahuan ke penerima via email ke " . implode(",", $arremailpenerima);
-        # code...
+    if ($bpuItem['status'] != "UM" && $bpuItem['status'] != "UM Burek") {
+        $msg = "Notifikasi BPU, <br><br>
+        BPU telah di tolak oleh $userSetuju dengan keterangan sebagai berikut:<br><br>
+        Nama Project   : <strong>" . $budget['nama'] . "</strong><br>
+        Item No.       : <strong>$no</strong><br>
+        Term           : <strong>$term</strong><br>
+        Nama Pengaju   : <strong>" . $bpu['pengaju'] . "</strong><br>
+        Nama Penerima  : <strong>" . implode(', ', $arrPenerima) . "</strong><br>
+        Total Diajukan : <strong>" . implode(', ', $arrJumlah) . "</strong><br>
+        ";
+        if ($alasanTolakBpu) {
+            $msg .= "Ditolak dengan alasan <strong> $alasanTolakBpu </strong>.<br><br>";
+        } else {
+            $msg .= "Ditolak tanpa alasan.<br><br>";
+        }
+        $msg .= "Klik <a href='$host'>Disini</a> untuk membuka aplikasi budget.";
+        $subject = "Notifikasi Aplikasi Budget";
+
+        if ($arremailpenerima) {
+            $message = $emailHelper->sendEmail($msg, $subject, $arremailpenerima, $name, $address = "multiple");
+        }
+
+        if (count($arremailpenerima) > 0) {
+            $notification .= " Dan telah dikirim pemberitahuan ke penerima via email ke " . implode(",", $arremailpenerima);
+            # code...
+        }
     }
     
 }

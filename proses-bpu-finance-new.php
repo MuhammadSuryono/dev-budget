@@ -217,8 +217,6 @@ if ($submit == 1) {
             }
         }
     }
-    $email = array_unique($email);
-    $nama = array_unique($nama);
 
     if ($bpu['statusbpu'] == "UM" || $bpu['statusbpu'] == "UM Burek") {
         if (count($arrPenerima) > 0) {
@@ -235,7 +233,6 @@ if ($submit == 1) {
             }
         }
     }
-
 
     if ($email) {
         for($i = 0; $i < count($email); $i++) {
@@ -262,7 +259,7 @@ if ($submit == 1) {
         else $notification .= '.';
     }
 
-    if ($bpu['statusbpu'] != "UM" || $bpu['statusbpu'] != "UM Burek") {
+    if ($bpu['statusbpu'] != "UM" && $bpu['statusbpu'] != "UM Burek") {
         $msg = "Notifikasi BPU, <br><br>
         BPU telah di verifikasi oleh Finance dengan keterangan sebagai berikut:<br><br>
         Nama Project   : <strong>" . $pengajuan['nama'] . "</strong><br>
