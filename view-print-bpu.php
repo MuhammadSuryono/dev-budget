@@ -11,7 +11,7 @@ $no = $_GET['no'];
 $waktu = $_GET['waktu'];
 $term = $_GET['term'];
 
-$queryAllBpu = mysqli_query($koneksi, "SELECT a.*, b.* FROM bpu a LEFT JOIN bank b ON a.namabank = b.kodebank WHERE a.no='$no' AND a.waktu = '$waktu' AND a.term = '$term'");
+$queryAllBpu = mysqli_query($koneksi, "SELECT a.*, b.* FROM bpu a LEFT JOIN bank b ON a.namabank = b.kodebank WHERE a.no='$no' AND a.waktu = '$waktu' AND a.term = '$term' group by b.kodebank");
 
 $queryBpu = mysqli_query($koneksi, "SELECT * FROM bpu WHERE no='$no' AND waktu = '$waktu' AND term = '$term'");
 $bpu = mysqli_fetch_assoc($queryBpu);
