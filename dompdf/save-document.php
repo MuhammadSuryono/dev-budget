@@ -9,8 +9,7 @@ function saveDoc($koneksi, $id, $name)
     $i = 1;
     $sql = mysqli_query($koneksi, "SELECT * FROM selesai_request WHERE id_pengajuan_request = '$id' ORDER BY urutan ASC");
 
-    $html = "<!DOCTYPE html>
-    <html>
+    $html = "<html>
     <head>
         <style>
             /** 
@@ -19,10 +18,6 @@ function saveDoc($koneksi, $id, $name)
              **/
             @page {
                 margin: 0cm 0cm;
-            }
-
-            table {
-                border-collapse: collapse;
             }
     
             /** Define now the real margins of every page in the PDF **/
@@ -137,7 +132,7 @@ function saveDoc($koneksi, $id, $name)
         <div class="col-xs-3">Total Keseluruhan : <b class="totalElement">Rp. ' . number_format($d['totalbudget'], 0, '', ',') . '</b></div>
     </div>
     </body>
-    </html>';
+    </html';
 
     $dompdf = new DOMPDF();
     $dompdf->load_html($html);
@@ -156,8 +151,7 @@ function saveDocApproved($koneksi, $id, $name)
 
     $i = 1;
     $sql = mysqli_query($koneksi, "SELECT * FROM selesai WHERE waktu = '$waktu'");
-    $html = "<!DOCTYPE html>
-    <html>
+    $html = "<html>
 <head>
     <style>
         /** 
@@ -167,10 +161,6 @@ function saveDocApproved($koneksi, $id, $name)
         @page {
             margin: 0cm 0cm;
         }
-
-        table {
-            border-collapse: collapse;
-        }	
 
         /** Define now the real margins of every page in the PDF **/
         body {
@@ -278,7 +268,7 @@ function saveDocApproved($koneksi, $id, $name)
 </div>
 <footer> Data ini dibuat melalui Aplikasi Budget dan telah disetujui oleh ' . $d['penyetuju'] . ' pada ' . $d['date_approved'] . '</footer>
 </body>
-</html>';
+</html';
 
     $dompdf = new DOMPDF();
     $dompdf->load_html($html);
@@ -297,8 +287,7 @@ function saveDocBudget($koneksi, $id, $name)
 
     $i = 1;
     $sql = mysqli_query($koneksi, "SELECT * FROM selesai WHERE waktu = '$waktu'");
-    $html = "<!DOCTYPE html>
-    <html>
+    $html = "<html>
 <head>
     <style>
         /** 
@@ -307,10 +296,6 @@ function saveDocBudget($koneksi, $id, $name)
          **/
         @page {
             margin: 0cm 0cm;
-        }
-
-        table {
-            border-collapse: collapse;
         }
 
         /** Define now the real margins of every page in the PDF **/
