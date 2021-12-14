@@ -130,11 +130,6 @@ if (isset($_POST['submit'])) {
   $row2 = mysqli_fetch_array($result2);
   $totalUm = $row2['sumi'];
 
-  // $query3 = "SELECT sum(realisasi) AS sumreal FROM bpu WHERE namapenerima='$namapenerima' AND statusbpu='UM Burek'";
-  // $result3 = mysqli_query($koneksi, $query3);
-  // $row3 = mysqli_fetch_array($result3);
-  // $totalBurek = $row3['sumreal'];
-
   $saldosisa = $saldobpu - $totalUm;
 
   $carium = "SELECT * FROM bpu WHERE namapenerima='$namapenerima' AND status='Telah Di Bayar' AND statusbpu='UM'";
@@ -243,39 +238,54 @@ if (isset($_POST['submit'])) {
         $idBpu = mysqli_insert_id($koneksi);
         
         $insert = mysqli_query($koneksi, "INSERT INTO tb_jatuh_tempo (id_bpu, tanggal_jatuh_tempo) VALUES ('$idBpu', '$tanggalJatuhTempo')") or die(mysqli_error($koneksi));
-        if ($uc['jenis'] == 'B1' || $uc['jenis'] == 'B2') {
-          $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1', '3')");
-          while ($e = mysqli_fetch_assoc($queryEmail)) {
-            if (@unserialize($e['hak_button'])) {
-              $buttonAkses = unserialize($e['hak_button']);
-              if (in_array("verifikasi_bpu", $buttonAkses)) {
-                if ($e['phone_number']) {
-                  array_push($phoneNumbers, $e['phone_number']);
-                  array_push($nama, $e['nama_user']);
-                  array_push($idUsersNotification, $e['id_user']);
-                  array_push($dataLevel, $e['level']);
-                  array_push($dataDivisi, $e['divisi']);
-                }
-              }
-            }
-          }
-        } else {
-          $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1', '3')");
-          while ($e = mysqli_fetch_assoc($queryEmail)) {
-            if (@unserialize($e['hak_button'])) {
-              $buttonAkses = unserialize($e['hak_button']);
-              if (in_array("verifikasi_bpu", $buttonAkses)) {
-                if ($e['phone_number']) {
-                  array_push($phoneNumbers, $e['phone_number']);
-                  array_push($nama, $e['nama_user']);
-                  array_push($idUsersNotification, $e['id_user']);
-                  array_push($dataLevel, $e['level']);
-                  array_push($dataDivisi, $e['divisi']);
-                }
+        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1','2', '3')");
+        while ($e = mysqli_fetch_assoc($queryEmail)) {
+          if (@unserialize($e['hak_button'])) {
+            $buttonAkses = unserialize($e['hak_button']);
+            if (in_array("verifikasi_bpu", $buttonAkses)) {
+              if ($e['phone_number']) {
+                array_push($phoneNumbers, $e['phone_number']);
+                array_push($nama, $e['nama_user']);
+                array_push($idUsersNotification, $e['id_user']);
+                array_push($dataLevel, $e['level']);
+                array_push($dataDivisi, $e['divisi']);
               }
             }
           }
         }
+        // if ($uc['jenis'] == 'B1' || $uc['jenis'] == 'B2') {
+        //   $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1', '3')");
+        //   while ($e = mysqli_fetch_assoc($queryEmail)) {
+        //     if (@unserialize($e['hak_button'])) {
+        //       $buttonAkses = unserialize($e['hak_button']);
+        //       if (in_array("verifikasi_bpu", $buttonAkses)) {
+        //         if ($e['phone_number']) {
+        //           array_push($phoneNumbers, $e['phone_number']);
+        //           array_push($nama, $e['nama_user']);
+        //           array_push($idUsersNotification, $e['id_user']);
+        //           array_push($dataLevel, $e['level']);
+        //           array_push($dataDivisi, $e['divisi']);
+        //         }
+        //       }
+        //     }
+        //   }
+        // } else {
+        //   $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1', '3')");
+        //   while ($e = mysqli_fetch_assoc($queryEmail)) {
+        //     if (@unserialize($e['hak_button'])) {
+        //       $buttonAkses = unserialize($e['hak_button']);
+        //       if (in_array("verifikasi_bpu", $buttonAkses)) {
+        //         if ($e['phone_number']) {
+        //           array_push($phoneNumbers, $e['phone_number']);
+        //           array_push($nama, $e['nama_user']);
+        //           array_push($idUsersNotification, $e['id_user']);
+        //           array_push($dataLevel, $e['level']);
+        //           array_push($dataDivisi, $e['divisi']);
+        //         }
+        //       }
+        //     }
+        //   }
+        // }
 
         $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$uc[pembuat]' AND aktif='Y'");
         $emailUser = mysqli_fetch_assoc($queryEmail);
@@ -291,6 +301,22 @@ if (isset($_POST['submit'])) {
                                                 ('$no','$jumlah','$namabank','$norek','$namapenerima','$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar', '3', '$tanggalBatasBayar', '$emailpenerima', '$id_rekening', '$tanggal_bayar' ,'$time')") or die(mysqli_error($koneksi));
         $idBpu = mysqli_insert_id($koneksi);
         $insert = mysqli_query($koneksi, "INSERT INTO tb_jatuh_tempo (id_bpu, tanggal_jatuh_tempo) VALUES ('$idBpu', '$tanggalJatuhTempo')") or die(mysqli_error($koneksi));
+
+        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1','2', '3')");
+        while ($e = mysqli_fetch_assoc($queryEmail)) {
+          if (@unserialize($e['hak_button'])) {
+            $buttonAkses = unserialize($e['hak_button']);
+            if (in_array("verifikasi_bpu", $buttonAkses)) {
+              if ($e['phone_number']) {
+                array_push($phoneNumbers, $e['phone_number']);
+                array_push($nama, $e['nama_user']);
+                array_push($idUsersNotification, $e['id_user']);
+                array_push($dataLevel, $e['level']);
+                array_push($dataDivisi, $e['divisi']);
+              }
+            }
+          }
+        }
 
         $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$pengaju' AND aktif='Y'");
         $emailUser = mysqli_fetch_assoc($queryEmail);
@@ -327,7 +353,7 @@ if (isset($_POST['submit'])) {
         array_push($dataDivisi, $e['divisi']);
       }
 
-      $notification .= "BPU telah berahasil dibuat, pemberitahuan dikirim via whatsapp ke " . implode(",", $arremailpenerima);
+      $notification .= "BPU UM telah berahasil dibuat, pemberitahuan dikirim via whatsapp ke " . implode(",", $arremailpenerima);
 
       if (count($phoneNumbers) > 0) {
         $whatsapp = new Whastapp();
@@ -411,43 +437,57 @@ if (isset($_POST['submit'])) {
       if ($divisi == 'FINANCE') {
         $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,namabank,norek,namapenerima,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload, status_pengajuan_bpu, batas_tanggal_bayar,emailpenerima, rekening_id, created_at) VALUES
       ('$no','$jumlah','$namabank','$norek','$namapenerima','$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar', '1', '$tanggalBatasBayar', '$emailpenerima', '$id_rekening' ,'$time')") or die(mysqli_error($koneksi));
-      $idBpu = mysqli_insert_id($koneksi);
+        $idBpu = mysqli_insert_id($koneksi);
       
-      $insert = mysqli_query($koneksi, "INSERT INTO tb_jatuh_tempo (id_bpu, tanggal_jatuh_tempo) VALUES ('$idBpu', '$tanggalJatuhTempo')") or die(mysqli_error($koneksi));
-
-        if ($uc['jenis'] == 'B1' || $uc['jenis'] == 'B2') {
-          $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1', '3')");
-          while ($e = mysqli_fetch_assoc($queryEmail)) {
-            if (@unserialize($e['hak_button'])) {
-              $buttonAkses = unserialize($e['hak_button']);
-              if (in_array("verifikasi_bpu", $buttonAkses)) {
-                if ($e['phone_number']) {
-                  array_push($phoneNumbers, $e['phone_number']);
-                  array_push($nama, $e['nama_user']);
-                  array_push($dataLevel, $e['level']);
-                  array_push($idUsersNotification, $e['id_user']);
-                  array_push($dataDivisi, $e['divisi']);
-                }
-              }
-            }
-          }
-        } else {
-          $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('2', '3')");
-          while ($e = mysqli_fetch_assoc($queryEmail)) {
-            if (@unserialize($e['hak_button'])) {
-              $buttonAkses = unserialize($e['hak_button']);
-              if (in_array("verifikasi_bpu", $buttonAkses)) {
-                if ($e['phone_number']) {
-                  array_push($phoneNumbers, $e['phone_number']);
-                  array_push($nama, $e['nama_user']);
-                  array_push($dataLevel, $e['level']);
-                  array_push($idUsersNotification, $e['id_user']);
-                  array_push($dataDivisi, $e['divisi']);
-                }
+        $insert = mysqli_query($koneksi, "INSERT INTO tb_jatuh_tempo (id_bpu, tanggal_jatuh_tempo) VALUES ('$idBpu', '$tanggalJatuhTempo')") or die(mysqli_error($koneksi));
+        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1', '3')");
+        while ($e = mysqli_fetch_assoc($queryEmail)) {
+          if (@unserialize($e['hak_button'])) {
+            $buttonAkses = unserialize($e['hak_button']);
+            if (in_array("verifikasi_bpu", $buttonAkses)) {
+              if ($e['phone_number']) {
+                array_push($phoneNumbers, $e['phone_number']);
+                array_push($nama, $e['nama_user']);
+                array_push($dataLevel, $e['level']);
+                array_push($idUsersNotification, $e['id_user']);
+                array_push($dataDivisi, $e['divisi']);
               }
             }
           }
         }
+        // if ($uc['jenis'] == 'B1' || $uc['jenis'] == 'B2') {
+        //   $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1', '3')");
+        //   while ($e = mysqli_fetch_assoc($queryEmail)) {
+        //     if (@unserialize($e['hak_button'])) {
+        //       $buttonAkses = unserialize($e['hak_button']);
+        //       if (in_array("verifikasi_bpu", $buttonAkses)) {
+        //         if ($e['phone_number']) {
+        //           array_push($phoneNumbers, $e['phone_number']);
+        //           array_push($nama, $e['nama_user']);
+        //           array_push($dataLevel, $e['level']);
+        //           array_push($idUsersNotification, $e['id_user']);
+        //           array_push($dataDivisi, $e['divisi']);
+        //         }
+        //       }
+        //     }
+        //   }
+        // } else {
+        //   $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('2', '3')");
+        //   while ($e = mysqli_fetch_assoc($queryEmail)) {
+        //     if (@unserialize($e['hak_button'])) {
+        //       $buttonAkses = unserialize($e['hak_button']);
+        //       if (in_array("verifikasi_bpu", $buttonAkses)) {
+        //         if ($e['phone_number']) {
+        //           array_push($phoneNumbers, $e['phone_number']);
+        //           array_push($nama, $e['nama_user']);
+        //           array_push($dataLevel, $e['level']);
+        //           array_push($idUsersNotification, $e['id_user']);
+        //           array_push($dataDivisi, $e['divisi']);
+        //         }
+        //       }
+        //     }
+        //   }
+        // }
 
         $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$uc[pembuat]' AND aktif='Y'");
         $emailUser = mysqli_fetch_assoc($queryEmail);
