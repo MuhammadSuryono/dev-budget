@@ -75,7 +75,7 @@ if ($_POST['iduser']) {
 
       <div class="form-group">
         <label for="tglcair" class="control-label">Tanggal Jatuh Tempo :</label>
-        <input type="date" class="form-control" name="jatuhtempo">
+        <input type="date" class="form-control" name="jatuhtempo" required>
       </div>
 
       <!-- <div class="form-group">
