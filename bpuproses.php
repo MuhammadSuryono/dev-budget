@@ -355,7 +355,7 @@ if (isset($_POST['submit'])) {
         array_push($dataDivisi, $e['divisi']);
       }
 
-      $notification .= "BPU telah berahasil dibuat, pemberitahuan dikirim via whatsapp ke " . implode(",", $arremailpenerima);
+      $notification .= "BPU telah berahasil dibuat, pemberitahuan dikirim via whatsapp ke " ;
 
       if (count($phoneNumbers) > 0) {
         $whatsapp = new Whastapp();
@@ -396,9 +396,11 @@ if (isset($_POST['submit'])) {
       $i = 0;
 
       for ($i = 0; $i < count($phoneNumbers); $i++) {
-        $notification .= ($nama[$i] . ' (' . $phoneNumbers[$i] . ')');
-        if ($i < count($phoneNumbers) - 1) $notification .= ', ';
-        else $notification .= '.';
+        if ($phoneNumbers[$i] != "") {
+          $notification .= ($nama[$i] . ' (' . $phoneNumbers[$i] . ')');
+          if ($i < count($phoneNumbers) - 1) $notification .= ', ';
+          else $notification .= '.';
+        }
       }
 
       // $notification .= " Dan telah dikirim pemberitahuan ke penerima via email ke " . implode(",", $arremailpenerima);
