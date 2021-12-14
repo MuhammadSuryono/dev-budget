@@ -323,19 +323,21 @@ if (isset($_POST['submit'])) {
         if ($emailUser) {
           array_push($phoneNumbers, $emailUser['phone_number']);
           array_push($nama, $emailUser['nama_user']);
-          array_push($idUsersNotification, $e['id_user']);
-          array_push($dataLevel, $e['level']);
-          array_push($dataDivisi, $e['divisi']);
+          array_push($idUsersNotification, $emailUser['id_user']);
+          array_push($dataLevel, $emailUser['level']);
+          array_push($dataDivisi, $emailUser['divisi']);
         }
 
         $queryUserByDivisi = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi = '$emailUser[divisi]' AND (level = 'Manager' OR level = 'Senior Manager') AND aktif='Y'");
-        $user = mysqli_fetch_assoc($queryUserByDivisi);
-        if ($user) {
-          array_push($phoneNumbers, $user['phone_number']);
-          array_push($nama, $user['nama_user']);
-          array_push($dataLevel, $e['level']);
-          array_push($idUsersNotification, $e['id_user']);
-          array_push($dataDivisi, $e['divisi']);
+        $user = mysqli_fetch_array($queryUserByDivisi);
+        if (count($user) > 0) {
+          foreach($user as $usr) {
+            array_push($phoneNumbers, $usr['phone_number']);
+            array_push($nama, $usr['nama_user']);
+            array_push($dataLevel, $usr['level']);
+            array_push($idUsersNotification, $usr['id_user']);
+            array_push($dataDivisi, $usr['divisi']);
+          }
         }
       }
       $queryProject = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE waktu='$waktu'");
