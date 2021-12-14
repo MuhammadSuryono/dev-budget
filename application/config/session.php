@@ -43,7 +43,8 @@ class Session {
                 "hak_akses" => $dataUser["hak_akses"],
                 "id_user" => $dataUser["id_user"],
                 "hak_page" => $dataUser["hak_page"],
-                "is_session" => true
+                "is_session" => true,
+                "level" => $dataUser["level"]
             ];
             
             if($dataUser["aktif"] == "Y") {
