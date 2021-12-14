@@ -225,10 +225,10 @@ Jumlah Yang Diajukan    : *Rp. " . number_format($totalPengajuan, 0, '', ',') . 
 if ($keterangan != "") {
     $msg .= "Keterangan: *$keterangan*";
 }
-$msg .= 
-"
-Lihat selengkapnya dibawah ini:".
-    $urlPengajuan;
+    $msg .= 
+    "
+    Lihat selengkapnya dibawah ini:
+        $urlPengajuan";
 
 return $msg;
     }
