@@ -1,55 +1,72 @@
-<!DOCTYPE HTML>
-<html>
+<!doctype html>
+<html lang="en">
+  <head>
+  	<title>Login || Budget Application</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-<head>
-  <title>Login || MRI Budget Application</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta name="keywords" content="Modern Responsive web template, Bootstrap Web Templates, Flat Web Templates, Andriod Compatible web template,
-Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyErricsson, Motorola web design" />
-  <script type="application/x-javascript">
-    addEventListener("load", function() {
-      setTimeout(hideURLbar, 0);
-    }, false);
+	<link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
 
-    function hideURLbar() {
-      window.scrollTo(0, 1);
-    }
-  </script>
-  <!-- Bootstrap Core CSS -->
-  <link href="bootstrap/css/bootstrap.min.css" rel='stylesheet' type='text/css' />
-  <!-- Custom CSS -->
-  <link href="bootstrap/css/style.css" rel='stylesheet' type='text/css' />
-  <link href="css/font-awesome.css" rel="stylesheet">
-  <!-- jQuery -->
-  <script src="js/jquery.min.js"></script>
-  <!----webfonts--->
-  <link href='http://fonts.googleapis.com/css?family=Roboto:400,100,300,500,700,900' rel='stylesheet' type='text/css'>
-  <!---//webfonts--->
-  <!-- Bootstrap Core JavaScript -->
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	
+	<link rel="stylesheet" href="assets/login/css/style.css">
+    <link rel="icon" href="images/logomri.png" type="image/icon type">
+
+	</head>
+	<body>
+	<section class="ftco-section">
+		<div class="container">
+			<div class="row justify-content-center">
+				<div class="col-md-6 text-center mb-5">
+					<h2 class="heading-section">BUDGET APPLICATION</h2>
+				</div>
+			</div>
+			<div class="row justify-content-center">
+				<div class="col-md-12 col-lg-10">
+					<div class="wrap d-md-flex">
+						<div class="img" style="background-image: url(images/logomri.png);">
+			            </div>
+						<div class="login-wrap p-4 p-md-5">
+			      	<div class="d-flex">
+			      		<div class="w-100">
+			      			<h3 class="mb-4">Masuk Applikasi</h3>
+                            <?php
+                            $isError = isset($_GET["error"]) ? $_GET["error"] : false;
+                            if ($isError) {
+                                echo '<div class="alert alert-danger" role="alert">
+                                Username atau password tidak sesuai
+                            </div>';
+                            } 
+                            ?>
+			      		</div>
+                          
+			      	</div>
+					<form action="ceklogin.php?op=in" method="POST" class="signin-form">
+                        <div class="form-group mb-3">
+                            <label class="label" for="name">Username</label>
+                            <input type="text" class="form-control" name="username" placeholder="Username" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="label" for="password">Password</label>
+                            <input type="password" class="form-control" name="password" placeholder="Password" required>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="form-control btn btn-primary rounded submit px-3">Sign In</button>
+                        </div>
+		            </div>
+		          </form>
+		        </div>
+		      </div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<script src="js/jquery.min.js"></script>
+  <script src="js/popper.js"></script>
   <script src="js/bootstrap.min.js"></script>
-</head>
+  <script src="js/main.js"></script>
 
-<body id="login">
-  <div class="login-logo">
-    <a href="login.php">
-      <h1>Budget Application</h1>
-    </a>
-  </div>
-  <h2 class="form-heading">login</h2>
-  <div class="app-cam">
-    <form action="ceklogin.php?op=in" method="POST">
-      <input type="text" class="text" name="id_user" placeholder="username" required>
-
-      <input type="password" name="password" placeholder="password" required>
-
-      <div class="submit"><input type="submit" onclick="myFunction()" name="submit" value="Login"></div>
-
-    </form>
-  </div>
-  <div class="copy_layout login">
-    <p>Copyright &copy; 2018 MRI Budget - Ing</p>
-  </div>
-</body>
-
+	</body>
 </html>
+

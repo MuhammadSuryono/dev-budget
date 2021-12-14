@@ -7,8 +7,12 @@ class Session {
     // Value on seconds
     protected $timeOut = 8640;
 
-    public function __construct()
+    public function __construct($setNewSession = false)
     {
+        if (!$this->alreadySetSession() && !$setNewSession) {
+            header("location: login.php", true, 301);
+            exit();
+        } 
     }
 
     public function setSession($data = [])
@@ -24,8 +28,12 @@ class Session {
     {
         $con = new Database();
         $dataSession = [];
-        $sql = mysqli_query($con->connect(), "SELECT * FROM tb_user WHERE id_user='$idUser'");
+        $queryLogin = "SELECT * FROM tb_user WHERE id_user='$idUser'";
+        if ($password != "") {
+            $queryLogin .= " AND password = '$password'";
+        }
 
+        $sql = mysqli_query($con->connect(), $queryLogin);
         if (mysqli_num_rows($sql) == 1) {
             $dataUser = mysqli_fetch_assoc($sql);
             $dataSession = [
@@ -34,14 +42,18 @@ class Session {
                 "jabatan" => $dataUser["jabatan"],
                 "hak_akses" => $dataUser["hak_akses"],
                 "id_user" => $dataUser["id_user"],
-                "hak_page" => $dataUser["hak_page"]
+                "hak_page" => $dataUser["hak_page"],
+                "is_session" => true
             ];
-
-
-
+            
             if($dataUser["aktif"] == "Y") {
                 $this->setSession($dataSession);
+                return true;
+            } else {
+                return false;
             }
+        } else {
+            return false;
         }
     }
 
@@ -90,5 +102,17 @@ class Session {
 
         $newUrl = $explodePath[0] . "?" . $newQuery;
         return $newUrl;
+    }
+
+    public function getSession() {
+        return $_SESSION;
+    }
+
+    public function alreadySetSession() {
+        if (isset($_SESSION['is_session']) && $_SESSION['is_session'] == true) {
+            return true;
+        } else {
+            false;
+        }
     }
 }
