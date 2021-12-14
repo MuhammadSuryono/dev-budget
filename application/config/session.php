@@ -39,7 +39,7 @@ class Session {
             $dataSession = [
                 "nama_user" => $dataUser["nama_user"],
                 "divisi" => $dataUser["divisi"],
-                "jabatan" => $dataUser["jabatan"],
+                "jabatan" => $dataUser["level"],
                 "hak_akses" => $dataUser["hak_akses"],
                 "id_user" => $dataUser["id_user"],
                 "hak_page" => $dataUser["hak_page"],
