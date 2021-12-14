@@ -85,8 +85,6 @@ if ($pengajuan['jenis'] == 'B1' || $pengajuan['jenis'] == 'B2') {
     }
 }
 
-var_dump($nama);
-var_dump($$email);
 
 $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$pengajuan[pembuat]' AND aktif='Y'");
 $emailUser = mysqli_fetch_assoc($queryEmail);

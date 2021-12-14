@@ -259,27 +259,27 @@ if ($submit == 1) {
         else $notification .= '.';
     }
 
-    if ($bpu['statusbpu'] != "UM" && $bpu['statusbpu'] != "UM Burek") {
-        $msg = "Notifikasi BPU, <br><br>
-        BPU telah di verifikasi oleh Finance dengan keterangan sebagai berikut:<br><br>
-        Nama Project   : <strong>" . $pengajuan['nama'] . "</strong><br>
-        Item No.       : <strong>$no</strong><br>
-        Term           : <strong>$term</strong><br>
-        Nama Pengaju   : <strong>" . $bpu['pengaju'] . "</strong><br>
-        Nama Penerima  : <strong>" . implode(', ', $arrPenerima) . "</strong><br>
-        Total Diajukan : <strong>" . implode(', ', $arrJumlah) . "</strong><br>
-        ";
-        if ($keterangan) {
-            $msg .= "Keterangan:<strong> $keterangan </strong><br><br>";
-        } else {
-            $msg .= "<br>";
-        }
-        $msg .= "Klik <a href='$host'>Disini</a> untuk membuka aplikasi budget.";
-        $subject = "Notifikasi Aplikasi Budget";
+    // if ($bpu['statusbpu'] != "UM" && $bpu['statusbpu'] != "UM Burek") {
+    //     $msg = "Notifikasi BPU, <br><br>
+    //     BPU telah di verifikasi oleh Finance dengan keterangan sebagai berikut:<br><br>
+    //     Nama Project   : <strong>" . $pengajuan['nama'] . "</strong><br>
+    //     Item No.       : <strong>$no</strong><br>
+    //     Term           : <strong>$term</strong><br>
+    //     Nama Pengaju   : <strong>" . $bpu['pengaju'] . "</strong><br>
+    //     Nama Penerima  : <strong>" . implode(', ', $arrPenerima) . "</strong><br>
+    //     Total Diajukan : <strong>" . implode(', ', $arrJumlah) . "</strong><br>
+    //     ";
+    //     if ($keterangan) {
+    //         $msg .= "Keterangan:<strong> $keterangan </strong><br><br>";
+    //     } else {
+    //         $msg .= "<br>";
+    //     }
+    //     $msg .= "<br></br>Terimkasih";
+    //     $subject = "Notifikasi Aplikasi Budget";
     
-        $emailHelper->sendEmail($msg, $subject, $arremailpenerima, '', 'multiple');
-        $notification .= " Dan telah dikirim pemberitahuan ke penerima via email ke " . implode(",", $arremailpenerima);   
-    }
+    //     $emailHelper->sendEmail($msg, $subject, $arremailpenerima, '', 'multiple');
+    //     $notification .= " Dan telah dikirim pemberitahuan ke penerima via email ke " . implode(",", $arremailpenerima);   
+    // }
 
 
 } else if ($submit == 0) {
@@ -362,25 +362,25 @@ if ($submit == 1) {
         else $notification .= '.';
     }
 
-        $msg = "Notifikasi BPU, <br><br>
-        BPU telah di tolak oleh Finance dengan keterangan sebagai berikut:<br><br>
-        Nama Project   : <strong>" . $pengajuan['nama'] . "</strong><br>
-        Item No.       : <strong>$no</strong><br>
-        Term           : <strong>$term</strong><br>
-        Nama Pengaju   : <strong>" . $bpu['pengaju'] . "</strong><br>
-        Nama Penerima  : <strong>" . implode(', ', $arrPenerima) . "</strong><br>
-        Total Diajukan : <strong>" . implode(', ', $arrJumlah) . "</strong><br>
-        ";
-    if ($alasanTolakBpu) {
-        $msg .= "Ditolak dengan alasan <strong> $alasanTolakBpu </strong>.<br><br>";
-    } else {
-        $msg .= "Ditolak tanpa alasan.<br><br>";
-    }
-    $msg .= "Klik <a href='$host'>Disini</a> untuk membuka aplikasi budget.";
-    $subject = "Notifikasi Aplikasi Budget";
+    //     $msg = "Notifikasi BPU, <br><br>
+    //     BPU telah di tolak oleh Finance dengan keterangan sebagai berikut:<br><br>
+    //     Nama Project   : <strong>" . $pengajuan['nama'] . "</strong><br>
+    //     Item No.       : <strong>$no</strong><br>
+    //     Term           : <strong>$term</strong><br>
+    //     Nama Pengaju   : <strong>" . $bpu['pengaju'] . "</strong><br>
+    //     Nama Penerima  : <strong>" . implode(', ', $arrPenerima) . "</strong><br>
+    //     Total Diajukan : <strong>" . implode(', ', $arrJumlah) . "</strong><br>
+    //     ";
+    // if ($alasanTolakBpu) {
+    //     $msg .= "Ditolak dengan alasan <strong> $alasanTolakBpu </strong>.<br><br>";
+    // } else {
+    //     $msg .= "Ditolak tanpa alasan.<br><br>";
+    // }
+    // $msg .= "Klik <a href='$host'>Disini</a> untuk membuka aplikasi budget.";
+    // $subject = "Notifikasi Aplikasi Budget";
 
-    $emailHelper->sendEmail($msg, $subject, $arremailpenerima, '', 'multiple');
-    $notification .= " Dan telah dikirim pemberitahuan ke penerima via email ke " . implode(",", $arremailpenerima);
+    // $emailHelper->sendEmail($msg, $subject, $arremailpenerima, '', 'multiple');
+    // $notification .= " Dan telah dikirim pemberitahuan ke penerima via email ke " . implode(",", $arremailpenerima);
 }
 
 if ($update) {
