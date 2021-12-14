@@ -228,7 +228,7 @@ if ($keterangan != "") {
 $msg .= 
 "
 Lihat selengkapnya dibawah ini:".
-    $urlPengajuan;";
+    $urlPengajuan;
 
 return $msg;
     }
