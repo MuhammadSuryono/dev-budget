@@ -159,27 +159,55 @@ if ($submit == 1) {
 
             if ($pengajuan_jumlah[$i] <= $setting['plafon']) {
                 if ($pengajuan['jenis'] == 'B1' || $pengajuan['jenis'] == 'B2') {
-                    $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1', '3') AND hak_akses='Manager'");
-                    while ($e = mysqli_fetch_assoc($queryEmail)) {
-                        if ($e['phone_number']) {
-                            array_push($email, $e['phone_number']);
-                            array_push($nama, $e['nama_user']);
-                            array_push($idUsersNotification, $e['id_user']);
-                            array_push($dataDivisi, $e['divisi']);
-                            array_push($dataLevel, $e['level']);
+                    if ($bpu['pengajuan_jumlah'] > 1000000) {
+                        $queryEmail = mysqli_query($koneksi, "SELECT id_user,phone_number,nama_user FROM tb_user WHERE divisi='Direksi' AND aktif='Y'");
+                        while ($e = mysqli_fetch_assoc($queryEmail)) {
+                            if ($e['phone_number']) {
+                                array_push($email, $e['phone_number']);
+                                array_push($nama, $e['nama_user']);
+                                array_push($idUsersNotification, $e['id_user']);
+                                array_push($dataDivisi, $e['divisi']);
+                                array_push($dataLevel, $e['level']);
+                            }
+                        }
+                    } else {
+                        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1', '3') AND hak_akses='Manager'");
+                        while ($e = mysqli_fetch_assoc($queryEmail)) {
+                            if ($e['phone_number']) {
+                                array_push($email, $e['phone_number']);
+                                array_push($nama, $e['nama_user']);
+                                array_push($idUsersNotification, $e['id_user']);
+                                array_push($dataDivisi, $e['divisi']);
+                                array_push($dataLevel, $e['level']);
+                            }
                         }
                     }
+                    
                 } else {
-                    $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('2', '3') AND hak_akses='Manager'");
-                    while ($e = mysqli_fetch_assoc($queryEmail)) {
-                        if ($e['phone_number']) {
-                            array_push($email, $e['phone_number']);
-                            array_push($nama, $e['nama_user']);
-                            array_push($idUsersNotification, $e['id_user']);
-                            array_push($dataDivisi, $e['divisi']);
-                            array_push($dataLevel, $e['level']);
+                    if ($bpu['pengajuan_jumlah'] > 1000000) {
+                        $queryEmail = mysqli_query($koneksi, "SELECT id_user,phone_number,nama_user FROM tb_user WHERE divisi='Direksi' AND aktif='Y'");
+                        while ($e = mysqli_fetch_assoc($queryEmail)) {
+                            if ($e['phone_number']) {
+                                array_push($email, $e['phone_number']);
+                                array_push($nama, $e['nama_user']);
+                                array_push($idUsersNotification, $e['id_user']);
+                                array_push($dataDivisi, $e['divisi']);
+                                array_push($dataLevel, $e['level']);
+                            }
+                        }
+                    } else {
+                        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('2', '3') AND hak_akses='Manager'");
+                        while ($e = mysqli_fetch_assoc($queryEmail)) {
+                            if ($e['phone_number']) {
+                                array_push($email, $e['phone_number']);
+                                array_push($nama, $e['nama_user']);
+                                array_push($idUsersNotification, $e['id_user']);
+                                array_push($dataDivisi, $e['divisi']);
+                                array_push($dataLevel, $e['level']);
+                            }
                         }
                     }
+                    
                 }
             } else {
                 if ($pengajuan['jenis'] != 'Rutin') {
@@ -232,7 +260,23 @@ if ($submit == 1) {
                 }
             }
         }
+        if ($bpu['pengajuan_jumlah'] > 1000000) {
+            $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('2', '3')");
+            while ($e = mysqli_fetch_assoc($queryEmail)) {
+                if ($e['phone_number']) {
+                    array_push($email, $e['phone_number']);
+                    array_push($nama, $e['nama_user']);
+                    array_push($idUsersNotification, $e['id_user']);
+                    array_push($dataDivisi, $e['divisi']);
+                    array_push($dataLevel, $e['level']);
+                }
+            }
+        }        
+        
     }
+
+    array_unique($nama);
+    array_unique($email);
 
     if ($email) {
         for($i = 0; $i < count($email); $i++) {

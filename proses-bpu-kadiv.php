@@ -54,9 +54,11 @@ if ($pengajuan['jenis'] == 'B1' || $pengajuan['jenis'] == 'B2') {
         $queryEmail = mysqli_query($koneksi, "SELECT id_user,phone_number,nama_user FROM tb_user WHERE divisi='Direksi' AND aktif='Y'");
         while ($e = mysqli_fetch_assoc($queryEmail)) {
             if ($e['phone_number']) {
-                array_push($phoneNumbers, $e['phone_number']);
+                array_push($email, $e['phone_number']);
                 array_push($nama, $e['nama_user']);
                 array_push($idUsersNotification, $e['id_user']);
+                array_push($dataDivisi, $e['divisi']);
+                array_push($dataLevel, $e['level']);
             }
         }
     } else {
@@ -82,9 +84,11 @@ if ($pengajuan['jenis'] == 'B1' || $pengajuan['jenis'] == 'B2') {
         $queryEmail = mysqli_query($koneksi, "SELECT id_user,phone_number,nama_user FROM tb_user WHERE divisi='Direksi' AND aktif='Y'");
         while ($e = mysqli_fetch_assoc($queryEmail)) {
             if ($e['phone_number']) {
-                array_push($phoneNumbers, $e['phone_number']);
+                array_push($email, $e['phone_number']);
                 array_push($nama, $e['nama_user']);
                 array_push($idUsersNotification, $e['id_user']);
+                array_push($dataDivisi, $e['divisi']);
+                array_push($dataLevel, $e['level']);
             }
         }
     } else {
@@ -119,7 +123,7 @@ if ($emailUser) {
         array_push($dataLevel, $emailUser['level']);
     }
 }
-echo $bpu['pengaju'];
+
 $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$bpu[pengaju]' AND aktif='Y'");
 $emailUser = mysqli_fetch_assoc($queryEmail);
 if ($emailUser) {
