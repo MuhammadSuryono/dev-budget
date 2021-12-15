@@ -49,53 +49,77 @@ $hostProtocol = $hostProtocol . ":" . $port;
 }
 $host = $hostProtocol. '/'. $url[1];
 
-echo $pengajuan['jenis'];
 if ($pengajuan['jenis'] == 'B1' || $pengajuan['jenis'] == 'B2') {
-    $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1', '3')");
-    while ($e = mysqli_fetch_assoc($queryEmail)) {
-        if (@unserialize($e['hak_button'])) {
-            $buttonAkses = unserialize($e['hak_button']);
-            if (in_array("verifikasi_bpu", $buttonAkses)) {
-                if ($e['phone_number']) {
-                    array_push($email, $e['phone_number']);
-                    array_push($nama, $e['nama_user']);
-                    array_push($idUsersNotification, $e['id_user']);
-                    array_push($dataDivisi, $e['divisi']);
-                    array_push($dataLevel, $e['level']);
+    if ($bpu['pengajuan_jumlah'] > 1000000) {
+        $queryEmail = mysqli_query($koneksi, "SELECT id_user,phone_number,nama_user FROM tb_user WHERE divisi='Direksi' AND aktif='Y'");
+        while ($e = mysqli_fetch_assoc($queryEmail)) {
+            if ($e['phone_number']) {
+                array_push($phoneNumbers, $e['phone_number']);
+                array_push($nama, $e['nama_user']);
+                array_push($idUsersNotification, $e['id_user']);
+            }
+        }
+    } else {
+        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1', '3')");
+        while ($e = mysqli_fetch_assoc($queryEmail)) {
+            if (@unserialize($e['hak_button'])) {
+                $buttonAkses = unserialize($e['hak_button']);
+                if (in_array("verifikasi_bpu", $buttonAkses)) {
+                    if ($e['phone_number']) {
+                        array_push($email, $e['phone_number']);
+                        array_push($nama, $e['nama_user']);
+                        array_push($idUsersNotification, $e['id_user']);
+                        array_push($dataDivisi, $e['divisi']);
+                        array_push($dataLevel, $e['level']);
+                    }
                 }
             }
         }
     }
+    
 } else {
-    $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('2', '3')");
-    while ($e = mysqli_fetch_assoc($queryEmail)) {
-        if (@unserialize($e['hak_button'])) {
-            $buttonAkses = unserialize($e['hak_button']);
-            var_dump($buttonAkses);
-            if (in_array("verifikasi_bpu", $buttonAkses)) {
-                if ($e['phone_number']) {
-                    array_push($email, $e['phone_number']);
-                    array_push($nama, $e['nama_user']);
-                    array_push($idUsersNotification, $e['id_user']);
-                    array_push($dataDivisi, $e['divisi']);
-                    array_push($dataLevel, $e['level']);
+    if ($bpu['pengajuan_jumlah'] > 1000000) {
+        $queryEmail = mysqli_query($koneksi, "SELECT id_user,phone_number,nama_user FROM tb_user WHERE divisi='Direksi' AND aktif='Y'");
+        while ($e = mysqli_fetch_assoc($queryEmail)) {
+            if ($e['phone_number']) {
+                array_push($phoneNumbers, $e['phone_number']);
+                array_push($nama, $e['nama_user']);
+                array_push($idUsersNotification, $e['id_user']);
+            }
+        }
+    } else {
+        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('2', '3')");
+        while ($e = mysqli_fetch_assoc($queryEmail)) {
+            if (@unserialize($e['hak_button'])) {
+                $buttonAkses = unserialize($e['hak_button']);
+                if (in_array("verifikasi_bpu", $buttonAkses)) {
+                    if ($e['phone_number']) {
+                        array_push($email, $e['phone_number']);
+                        array_push($nama, $e['nama_user']);
+                        array_push($idUsersNotification, $e['id_user']);
+                        array_push($dataDivisi, $e['divisi']);
+                        array_push($dataLevel, $e['level']);
+                    }
                 }
             }
         }
     }
+    
 }
 
 
 $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$pengajuan[pembuat]' AND aktif='Y'");
 $emailUser = mysqli_fetch_assoc($queryEmail);
 if ($emailUser) {
-    array_push($email, $emailUser['phone_number']);
-    array_push($nama, $emailUser['nama_user']);
-    array_push($idUsersNotification, $emailUser['id_user']);
-    array_push($dataDivisi, $emailUser['divisi']);
-    array_push($dataLevel, $emailUser['level']);
+    if ($emailUser['divisi'] != 'FINANCE' && ($emailUser['level'] != "Manager" || $emailUser['level'] != "Senior Manager")) {
+        array_push($email, $emailUser['phone_number']);
+        array_push($nama, $emailUser['nama_user']);
+        array_push($idUsersNotification, $emailUser['id_user']);
+        array_push($dataDivisi, $emailUser['divisi']);
+        array_push($dataLevel, $emailUser['level']);
+    }
 }
-
+echo $bpu['pengaju'];
 $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$bpu[pengaju]' AND aktif='Y'");
 $emailUser = mysqli_fetch_assoc($queryEmail);
 if ($emailUser) {
@@ -106,9 +130,8 @@ if ($emailUser) {
     array_push($dataLevel, $emailUser['level']);
 }
 
-$queryProject = mysqli_query($koneksi, "SELECT nama FROM pengajuan WHERE waktu='$waktu'");
-$namaProject = mysqli_fetch_array($queryProject)[0];
-
+// $queryProject = mysqli_query($koneksi, "SELECT nama FROM pengajuan WHERE waktu='$waktu'");
+// $namaProject = mysqli_fetch_array($queryProject)[0];
 
 // $msg = "Notifikasi BPU, <br><br>
 //   BPU telah diajukan dengan keterangan sebagai berikut:<br><br>
@@ -118,11 +141,11 @@ $namaProject = mysqli_fetch_array($queryProject)[0];
 //   Jumlah Diajukan   : <strong>Rp. " . number_format($bpu['pengajuan_jumlah'], 0, '', ',') . "</strong><br>
 //   ";
 // if ($keterangan) {
-//     $msg .= "Keterangan:<strong> $keterangan </strong><br><br>";
-// } else {
-//     $msg .= "<br>";
-// }
-// $msg .= "Klik <a href='$url'>Disini</a> untuk membuka aplikasi budget.";
+    //     $msg .= "Keterangan:<strong> $keterangan </strong><br><br>";
+    // } else {
+        //     $msg .= "<br>";
+        // }
+        // $msg .= "Klik <a href='$url'>Disini</a> untuk membuka aplikasi budget.";
 $subject = "Notifikasi Aplikasi Budget";
 
 array_unique($email);
