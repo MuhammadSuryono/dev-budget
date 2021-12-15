@@ -116,7 +116,7 @@ if ($_POST['submit'] == 1) {
         $queryBank = mysqli_query($koneksi, "SELECT * FROM bank WHERE kodebank = '$item[namabank]'");
         $bank = mysqli_fetch_assoc($queryBank);
         if ($itemBudget['status'] == 'Vendor/Supplier' || $itemBudget['status'] == 'Honor Eksternal') {
-            $explodeString = explode('.', $bpu['ket_pembayaran']);
+            $explodeString = explode('.', $item['ket_pembayaran']);
             array_push($arremailpenerima, $item['emailpenerima']);
             if ($itemBudget['status'] == 'Vendor/Supplier') {
                 $msg = "Kepada " . $item['namapenerima'] . ", <br><br>
@@ -164,14 +164,6 @@ if ($_POST['submit'] == 1) {
                 array_push($dataLevel, $emailUser['level']);
             }
         }
-
-
-        // $queryEmail = mysqli_query($koneksi, "SELECT phone_number,nama_user FROM tb_user WHERE nama_user = '$item[pengaju]' AND aktif='Y'");
-        // $emailUser = mysqli_fetch_assoc($queryEmail);
-        // if ($emailUser['phone_number'] != "") {
-        //     array_push($email, $emailUser['phone_number']);
-        //     array_push($nama, $emailUser['nama_user']);
-        // }
 
         $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$item[acknowledged_by]' AND aktif='Y'");
         $emailUser = mysqli_fetch_assoc($queryEmail);
