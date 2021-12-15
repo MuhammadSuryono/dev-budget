@@ -125,6 +125,8 @@ $namaProject = mysqli_fetch_array($queryProject)[0];
 // $msg .= "Klik <a href='$url'>Disini</a> untuk membuka aplikasi budget.";
 $subject = "Notifikasi Aplikasi Budget";
 
+array_unique($email);
+array_unique($nama);
 
 
 $notification = 'Persetujuan BPU Sukses. Pemberitahuan via whatsapp sedang dikirimkan ke ';
