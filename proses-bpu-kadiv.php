@@ -51,7 +51,7 @@ $host = $hostProtocol. '/'. $url[1];
 
 if ($pengajuan['jenis'] == 'B1' || $pengajuan['jenis'] == 'B2') {
     if ($bpu['pengajuan_jumlah'] > 1000000) {
-        $queryEmail = mysqli_query($koneksi, "SELECT id_user,phone_number,nama_user FROM tb_user WHERE divisi='Direksi' AND aktif='Y'");
+        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='Direksi' AND aktif='Y'");
         while ($e = mysqli_fetch_assoc($queryEmail)) {
             if ($e['phone_number']) {
                 array_push($email, $e['phone_number']);
@@ -81,7 +81,7 @@ if ($pengajuan['jenis'] == 'B1' || $pengajuan['jenis'] == 'B2') {
     
 } else {
     if ($bpu['pengajuan_jumlah'] > 1000000) {
-        $queryEmail = mysqli_query($koneksi, "SELECT id_user,phone_number,nama_user FROM tb_user WHERE divisi='Direksi' AND aktif='Y'");
+        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='Direksi' AND aktif='Y'");
         while ($e = mysqli_fetch_assoc($queryEmail)) {
             if ($e['phone_number']) {
                 array_push($email, $e['phone_number']);

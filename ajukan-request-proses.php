@@ -131,7 +131,7 @@ $nama = [];
 $idUsersNotification = [];
 
 if ($totalbudget > 1000000) {
-    $queryEmail = mysqli_query($koneksi, "SELECT id_user,phone_number,nama_user FROM tb_user WHERE divisi='Direksi' AND aktif='Y'");
+    $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='Direksi' AND aktif='Y'");
     while ($e = mysqli_fetch_assoc($queryEmail)) {
         if ($e['phone_number']) {
             array_push($phoneNumbers, $e['phone_number']);
@@ -151,7 +151,7 @@ if ($totalbudget > 1000000) {
     if ($getEmail["divisi"] != "Finance") {
         $getDataUserFinance = false;
         foreach ($struktural as $struktur) {
-            $queryEmail = mysqli_query($koneksi, "SELECT id_user,phone_number,nama_user FROM tb_user WHERE divisi='Finance' AND level = '$struktur' AND aktif='Y'");
+            $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='Finance' AND level = '$struktur' AND aktif='Y'");
             $e = mysqli_fetch_assoc($queryEmail);
            
             if (!$cuti->checkStatusCutiUser($e["nama_user"])) {
@@ -167,7 +167,7 @@ if ($totalbudget > 1000000) {
         }
 
     } else if ($getEmail["divisi"] == "Finance" && ($getEmail["level"] != "Manager" || $getEmail["level"] != "Senior Manager") && $cuti->checkStatusCutiUser($getEmail["nama_user"])) {
-        $queryEmail = mysqli_query($koneksi, "SELECT id_user,phone_number,nama_user FROM tb_user WHERE divisi='Finance' AND aktif='Y'");
+        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='Finance' AND aktif='Y'");
         $e = mysqli_fetch_assoc($queryEmail);
         if (!$cuti->checkStatusCutiUser($e["nama_user"])) {
             $getDataUserFinance = true;
@@ -180,7 +180,7 @@ if ($totalbudget > 1000000) {
             }
         }
     } else if ($getEmail["divisi"] == "Finance" && ($getEmail["level"] == "Manager" || $getEmail["level"] == "Senior Manager") && $cuti->checkStatusCutiUser($getEmail["nama_user"])) {
-        $queryEmail = mysqli_query($koneksi, "SELECT id_user,phone_number,nama_user FROM tb_user WHERE divisi='Direksi' AND aktif='Y'");
+        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='Direksi' AND aktif='Y'");
         while ($e = mysqli_fetch_assoc($queryEmail)) {
             if ($e['phone_number']) {
                 array_push($phoneNumbers, $e['phone_number']);
