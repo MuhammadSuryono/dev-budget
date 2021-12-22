@@ -120,6 +120,13 @@ while($row = mysqli_fetch_assoc($queryBpuVerify)) {
     $dataVerify = $row;
 }
 
+$queryBpu = mysqli_query($koneksi, "SELECT * FROM bpu WHERE no='$no' AND waktu='$waktu' AND term='$termterm'");
+$bpu = mysqli_fetch_assoc($queryBpu);
+
+if ($statusbpu == "") {
+    $statusbpu = $bpu["statusbpu"];
+}
+
 //periksa apakah udah submit
 if (isset($_POST['submit'])) {
 
@@ -210,9 +217,6 @@ if (isset($_POST['submit'])) {
         } else {
             $tglcairnya = null;
         }
-
-        $queryBpu = mysqli_query($koneksi, "SELECT * FROM bpu WHERE no='$no' AND waktu='$waktu' AND term='$termterm'");
-        $bpu = mysqli_fetch_assoc($queryBpu);
 
         if (is_array($_POST['jumlah'])) {
             $jumlahDiterima = "0";
