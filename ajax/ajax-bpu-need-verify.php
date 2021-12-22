@@ -2,23 +2,49 @@
 session_start();
 include_once '../application/config/database.php';
 require_once '../application/config/email.php';
-// include_once "../vendor/email/send-email.php";
+require_once '../application/config/whatsapp.php';
+require_once '../application/config/message.php';
 
 $emailHelper = new Email();
 
 $db = new Database();
 $koneksi = $db->connect();
 
+$message = new Message();
+$wa = new Whastapp();
 
 $db->set_name_db(DB_MRI_TRANSFER);
 $db->init_connection();
 $koneksiMriTransfer = $db->connect();
 
+$namaInternal = [];
+$emailInternal = [];
+$idUserInternal = [];
+$dataDivisi = [];
+$dataLevel = [];
 
 $action = $_GET['action'];
 
+$url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+$port = $_SERVER['SERVER_PORT'];
+$url = explode('/', $url);
+$hostProtocol = $url[0];
+if ($port != "") {
+$hostProtocol = $hostProtocol . ":" . $port;
+}
+$host = $hostProtocol. '/'. $url[1];
+
 if ($action == 'get-data') {
-    $query = mysqli_query($koneksi, "SELECT a.id, a.id_bpu, b.no as no_urut, c.nama, c.jenis, b.term FROM bpu_verify a LEFT JOIN bpu b ON a.id_bpu = b.noid LEFT JOIN pengajuan c ON c.waktu = b.waktu where a.is_verified = '0' AND a.is_need_approved = '0' ORDER BY a.id asc");
+    $query = mysqli_query($koneksi, "SELECT a.id, a.id_bpu, b.no as no_urut, c.nama, c.jenis, b.term FROM bpu_verify a LEFT JOIN bpu b ON a.id_bpu = b.noid LEFT JOIN pengajuan c ON c.waktu = b.waktu where a.is_need_approved = '0' && a.is_approved = '0' ORDER BY a.id asc");
+    $data = [];
+    while ($row = $query->fetch_assoc()) {
+        $data[] = $row;
+    }
+    echo json_encode(["data" => $data]);
+}
+
+if ($action == 'get-data-validasi') {
+    $query = mysqli_query($koneksi, "SELECT a.id, a.id_bpu, b.no as no_urut, c.nama, c.jenis, b.term FROM bpu_verify a LEFT JOIN bpu b ON a.id_bpu = b.noid LEFT JOIN pengajuan c ON c.waktu = b.waktu where a.is_verified = '1' AND a.is_need_approved = '1' AND a.is_approved = '0' ORDER BY a.id asc");
     $data = [];
     while ($row = $query->fetch_assoc()) {
         $data[] = $row;
@@ -30,7 +56,7 @@ if ($action == 'get-data-single') {
     $id = $_GET['id'];
     $bpu = $_GET['id-bpu'];
 
-    $query = mysqli_query($koneksi, "SELECT a.is_verified, b.tglcheck, b.checkby, a.id, a.id_bpu, b.no as no_urut, c.nama, c.jenis, b.term, b.pengajuan_jumlah FROM bpu_verify a LEFT JOIN bpu b ON a.id_bpu = b.noid LEFT JOIN pengajuan c ON c.waktu = b.waktu where a.id = '$id' AND a.id_bpu = '$bpu' ORDER BY a.id asc");
+    $query = mysqli_query($koneksi, "SELECT a.is_verified, a.is_need_approved, b.tglcheck, b.checkby, a.id, a.id_bpu, b.no as no_urut, c.nama, c.jenis, b.term, b.pengajuan_jumlah FROM bpu_verify a LEFT JOIN bpu b ON a.id_bpu = b.noid LEFT JOIN pengajuan c ON c.waktu = b.waktu where a.id = '$id' AND a.id_bpu = '$bpu' ORDER BY a.id asc");
     $data = [];
     while ($row = $query->fetch_assoc()) {
         $data[] = $row;
@@ -58,35 +84,11 @@ if ($action == 'simpan-verifikasi') {
         $metode_pembayaran = "MRI PAL";
     }
 
-    $update = mysqli_query($koneksi, "UPDATE bpu_verify SET created_by = '$_SESSION[id_user]', is_verified = '1', is_need_approved = '1', total_verify = '$nominal', document = '$upload[filename]' WHERE id = '$id'");
-    $update = mysqli_query($koneksi, "UPDATE bpu SET metode_pembayaran = '$metode_pembayaran', jumlah = '$nominal', status_pengajuan_bpu = '0', fileupload = '$upload[filename]', checkby='$_SESSION[nama_user]', tglcheck = '$today' WHERE noid = '$bpu'");
-    
-    
+    $update = mysqli_query($koneksi, "UPDATE bpu_verify SET created_by = '$_SESSION[id_user]', is_verified = '1', total_verify = '$nominal', document = '$upload[filename]' WHERE id = '$id'");
+    $update = mysqli_query($koneksi, "UPDATE bpu SET metode_pembayaran = '$metode_pembayaran', status_pengajuan_bpu = '0', fileupload = '$upload[filename]' WHERE noid = '$bpu'");
 
     if ($upload['error'] == null) {
         $upload['is_success'] = true;
-        $query = mysqli_query($koneksi, "SELECT a.*, b.* FROM bpu a LEFT JOIN pengajuan b ON a.waktu = b.waktu where a.noid = '$bpu'");
-        $dataBpu = [];
-        while ($row = $query->fetch_assoc()) {
-            $data[] = $row;
-        }
-        
-        if (count($dataBpu)) {
-            $dataBpu = $dataBpu[0];
-            $msg = "Notifikasi BPU, <br><br>
-            BPU telah di verifikasi oleh Finance dengan keterangan sebagai berikut:<br><br>
-            Nama Project   : <strong>" . $dataBpu['nama'] . "</strong><br>
-            Item No.       : <strong>".$dataBpu['no']."</strong><br>
-            Term           : <strong>".$dataBpu['term']."</strong><br>
-            Nama Pengaju   : <strong>".$dataBpu['pengaju']."</strong><br>
-            Nama Penerima  : <strong>".$dataBpu['namapenerima']."</strong><br>
-            Total Diajukan : <strong>".$dataBpu['pengaju']."</strong><br>
-            ";
-
-            $subject = "Notifikasi Aplikasi Budget";
-            $emailHelper->sendEmail($msg, $subject, $dataBpu['emailpenerima']);
-        }
-
         echo json_encode($upload);
     } else {
         $upload['is_success'] = false;
@@ -96,10 +98,47 @@ if ($action == 'simpan-verifikasi') {
 
 if ($action == 'approval') {
     $id = $_GET['id'];
+    $bpuId = $_GET['bpu'];
     $verify = $_GET['approval'];
+    $dateNow = date("Y-m-d H:m:s");
 
-    $update = mysqli_query($koneksi, "UPDATE bpu_verify SET is_approved = '$verify', is_need_approved = '0' WHERE id = '$id'");
+    $update = mysqli_query($koneksi, "UPDATE bpu_verify SET is_approved = '1', is_need_approved = '0', status_approved = '$verify' WHERE id = '$id'");
+    $update = mysqli_query($koneksi, "UPDATE bpu SET tglapprove='$dateNow', approveby='$_SESSION[nama_user]' where noid = '$bpuId'");
+
+    // $queryBpu = mysqli_query($koneksi, "SELECT * from bpu where noid = '$bpuId'");
+    // $dataBpu = [];
+    // while($row = mysqli_fetch_assoc($queryBpu))
+    // {
+    //     $dataBpu = $row;
+    // }
+
+    // $queryPengajuan = mysqli_query($koneksi, "SELECT nama from bpu where noid = '$bpuId'");
+    // $dataPengajuan = [];
+    // while($row = mysqli_fetch_assoc($queryPengajuan))
+    // {
+    //     $dataPengajuan = $row;
+    // }
     
+    // $queryUser = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi = 'FINANCE' AND status_penerima_email_id = '3'");
+    // while ($e = mysqli_fetch_assoc($queryUser)) {
+    //     if ($e['phone_number']) {
+    //         array_push($emailInternal, $e['phone_number']);
+    //         array_push($namaInternal, $e['nama_user']);
+    //         array_push($idUserInternal, $e['id_user']);
+    //         array_push($dataDivisi, $e['divisi']);
+    //         array_push($dataLevel, $e['level']);
+    //     }
+    // }
+
+    // for ($i=0; $i < count($emailInternal); $i++) { 
+    //     $url =  $host. 'view-bpu-verify.php?id='.$id.'&bpu='.$bpuId.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
+    //     $msg = $message->messagerequestProcessBPUFinance($namaInternal[$i], $dataBpu['no'], $dataBpu['pengaju'], $queryPengajuan['nama'], [$dataBpu['namapenerima']], [$dataBpu['jumlah']], "", $url);
+    //     if ($emailInternal[$i] != "") {
+    //         $wa->sendMessage($emailInternal[$i], $msg);
+    //     }
+    // }
+
+
     $upload['is_success'] = true;
     echo json_encode($upload);
 }
@@ -123,9 +162,4 @@ function uploadFile($files)
     }else{
         return ["error" => "Ekstensi file tidak didukung", "filename" => $nama];
     }
-}
-
-function sendEmailPemeritahuan($koneksi, $idBpu) {
-    
-
 }

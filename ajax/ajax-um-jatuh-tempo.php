@@ -12,14 +12,22 @@ if ($action == 'get-list') {
     $query = mysqli_query($koneksi, 'SELECT a.id, a.id_bpu, a.tanggal_jatuh_tempo, b.no as no_urut, b.term, c.nama, c.jenis FROM tb_jatuh_tempo a LEFT JOIN bpu b ON a.id_bpu = b.noid LEFT JOIN pengajuan c ON b.waktu = c.waktu
     WHERE a.tanggal_jatuh_tempo BETWEEN DATE_SUB(NOW(), INTERVAL 4 DAY) AND NOW() AND b.statusbpu LIKE "UM%" AND a.is_long_term = "0" AND b.status = "Telah Di Bayar" ORDER BY a.tanggal_jatuh_tempo desc');
 
-    echo json_encode(["data" => $query->fetch_all(MYSQLI_ASSOC)]);
+    $data = [];
+    while ($row = $query->fetch_assoc()) {
+        $data[] = $row;
+    }
+    echo json_encode(["data" => $data]);
 }
 
 if ($action == 'direksi-get-list') {
     $query = mysqli_query($koneksi, 'SELECT a.id, a.id_bpu, a.tanggal_jatuh_tempo, a.tanggal_perpanjangan, b.no as no_urut, b.term, c.nama, c.jenis FROM tb_jatuh_tempo a LEFT JOIN bpu b ON a.id_bpu = b.noid LEFT JOIN pengajuan c ON b.waktu = c.waktu
     WHERE a.is_approval_long_term = "0" AND a.tanggal_perpanjangan <> "null" AND a.is_long_term = "1" AND a.is_disapprove_long_term = "0" ORDER BY a.tanggal_jatuh_tempo desc;');
 
-    echo json_encode(["data" => $query->fetch_all(MYSQLI_ASSOC)]);
+    $data = [];
+    while ($row = $query->fetch_assoc()) {
+        $data[] = $row;
+    }
+    echo json_encode(["data" => $data]);
 }
 
 if ($action == 'update-jatuh-tempo') {
