@@ -65,12 +65,12 @@ $bpuNo = $dataBpu["no"];
 $waktu = $dataBpu["waktu"];
 $term = $dataBpu["term"];
 
-if (!$dataVerify["is_approved"] && $dataVerify["is_need_approved"] && $_SESSION["hak_akses"] == "Manager" && $dataBpu["checkby"] == "") { ?>
-    <button class="btn btn-success btn-flat" onclick="verifikasiBpu('<?=$bpuNo?>', '<?=$waktu?>', '<?=$term?>')">Verifikasi BPU</button>
-<?php
-}
+// if (!$dataVerify["is_approved"] && $dataVerify["is_need_approved"] && $_SESSION["hak_akses"] == "Manager" && $dataBpu["checkby"] == "") { ?>
+//     <button class="btn btn-success btn-flat" onclick="verifikasiBpu('<?=$bpuNo?>', '<?=$waktu?>', '<?=$term?>')">Verifikasi BPU</button>
+// <?php
+// }
 
-if (!$dataVerify["is_approved"] && $dataVerify["is_need_approved"] && $_SESSION["hak_akses"] == "Manager" && $dataBpu["checkby"] != "") { ?>
+if (!$dataVerify["is_approved"] && $dataVerify["is_need_approved"] && $_SESSION["hak_akses"] == "Manager") { ?>
     <button class="btn btn-success btn-flat" onclick="setujuiBpu('<?=$bpuNo?>', '<?=$waktu?>', '<?=$term?>')">Setujui</button>
 <?php }
 ?>
