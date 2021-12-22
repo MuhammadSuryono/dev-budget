@@ -34,10 +34,16 @@ $url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
 $port = $_SERVER['SERVER_PORT'];
 $url = explode('/', $url);
 $hostProtocol = $url[0];
+
 if ($port != "") {
 $hostProtocol = $hostProtocol . ":" . $port;
 }
-$host = $hostProtocol. '/'. $url[1];
+
+$host = $hostProtocol;
+if ($port == "" || $port == "80") {
+  $host = $hostProtocol. '/'. $url[1];
+}
+
 
 ?>
 
@@ -142,7 +148,7 @@ $host = $hostProtocol. '/'. $url[1];
 
         if ($dataVerify["is_approved"] && !$dataVerify["is_need_approved"] && $dataVerify["is_verified"] && $dataVerify["status_approved"]) {
           echo '<div class="alert alert-success" role="alert">
-            Data bpu DI SETUJUI oleh '.$dataBpu["approveby"].'
+            Data bpu DI PERIKSA oleh '.$dataBpu["checkby"].'
           </div>';
         }
       } ?>
@@ -261,9 +267,7 @@ $host = $hostProtocol. '/'. $url[1];
       document.getElementById("btn-submit").disabled = true;
       document.getElementById('btn-submit').value = "Memverifikasi"
       uploadFile(file, nominal, idBpuVerify, idBpu).then((res) => {
-        if (res.is_success) {
-          window.location.reload()
-        }
+        window.location.reload()
       })
     }
   }

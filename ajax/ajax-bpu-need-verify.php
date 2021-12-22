@@ -84,8 +84,10 @@ if ($action == 'simpan-verifikasi') {
         $metode_pembayaran = "MRI PAL";
     }
 
+    $time = date("Y-m-d H:i:s");
+
     $update = mysqli_query($koneksi, "UPDATE bpu_verify SET created_by = '$_SESSION[id_user]', is_verified = '1', total_verify = '$nominal', document = '$upload[filename]' WHERE id = '$id'");
-    $update = mysqli_query($koneksi, "UPDATE bpu SET metode_pembayaran = '$metode_pembayaran', status_pengajuan_bpu = '0', fileupload = '$upload[filename]' WHERE noid = '$bpu'");
+    $update = mysqli_query($koneksi, "UPDATE bpu SET pengaju = '$_SESSION[nama_user]', divisi = '$_SESSION[divisi]', metode_pembayaran = '$metode_pembayaran', status_pengajuan_bpu = '0', fileupload = '$upload[filename]' WHERE noid = '$bpu'");
 
     if ($upload['error'] == null) {
         $upload['is_success'] = true;
@@ -131,7 +133,7 @@ if ($action == 'approval') {
     // }
 
     // for ($i=0; $i < count($emailInternal); $i++) { 
-    //     $url =  $host. 'view-bpu-verify.php?id='.$id.'&bpu='.$bpuId.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
+    //     $url =  $host. '/view-bpu-verify.php?id='.$id.'&bpu='.$bpuId.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
     //     $msg = $message->messagerequestProcessBPUFinance($namaInternal[$i], $dataBpu['no'], $dataBpu['pengaju'], $queryPengajuan['nama'], [$dataBpu['namapenerima']], [$dataBpu['jumlah']], "", $url);
     //     if ($emailInternal[$i] != "") {
     //         $wa->sendMessage($emailInternal[$i], $msg);
@@ -146,7 +148,7 @@ if ($action == 'approval') {
 
 function uploadFile($files)
 {
-    $ekstensi_diperbolehkan	= array('png','jpg','jpeg','gif');
+    $ekstensi_diperbolehkan	= array('png','jpg','jpeg','gif', 'pdf', 'doc', 'docx', 'xls', 'xlsx');
     $nama = $files['file']['name'];
     $x = explode('.', $nama);
     $ekstensi = strtolower(end($x));

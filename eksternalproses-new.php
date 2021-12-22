@@ -379,10 +379,10 @@ if (isset($_POST['submit'])) {
                     ");
                     $insert = mysqli_query($koneksi, "UPDATE bpu_verify SET is_need_approved = '1' WHERE id = '$idVerify'");
                 } else {
-                    $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,tanggalbayar,pengajuan_jumlah,tglcair,namabank,norek,namapenerima,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,transfer_req_id,status_pengajuan_bpu,emailpenerima,ket_pembayaran,created_at) VALUES
-                                                    ('$no','$_POST[tgl]','$jumlah','$tglcair','$namabank','$norek','$namapenerima','$pengaju','$divisi','$waktu','Belum Di Bayar','Disetujui (Direksi)','$termfinal','$statusbpu','$transferid', 1, '$emailpenerima', '$keterangan_pembayaran', '$time')");
-                $idBpu = mysqli_insert_id($koneksi);
-                $insertDataNeedVerifikasi = mysqli_query($koneksi, "INSERT INTO bpu_verify (id_bpu) VALUES ('$idBpu')");
+                    $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,tanggalbayar,pengajuan_jumlah,tglcair,namabank,norek,namapenerima,divisi,waktu,status,persetujuan,term,statusbpu,transfer_req_id,status_pengajuan_bpu,emailpenerima,ket_pembayaran,created_at, approveby, tglapprove) VALUES
+                                                    ('$no','$_POST[tgl]','$jumlah','$tglcair','$namabank','$norek','$namapenerima','$divisi','$waktu','Belum Di Bayar','Disetujui (Direksi)','$termfinal','$statusbpu','$transferid', 1, '$emailpenerima', '$keterangan_pembayaran', '$time', '$_SESSION[nama_user]', '$time')");
+                    $idBpu = mysqli_insert_id($koneksi);
+                    $insertDataNeedVerifikasi = mysqli_query($koneksi, "INSERT INTO bpu_verify (id_bpu) VALUES ('$idBpu')");
                 }
 
                 $queryBpuVerify = mysqli_query($koneksi, "SELECT * FROM bpu_verify WHERE id_bpu = '$idBpu'");
