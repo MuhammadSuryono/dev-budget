@@ -182,9 +182,32 @@ Keterangan:* $keterangan *";
     }
     $msg .="
 
- Lihat selengkapnya dibawah ini:
+Lihat selengkapnya dibawah ini:
  ".
- $link;
+$link;
+        return $msg;
+    }
+
+    public function messagerequestProcessBPUFinance($namaProject, $item, $term, $pengaju, $arrPenerima, $arrJumlah, $keterangan = "", $link)
+    {
+        $msg = "Notifikasi BPU, 
+BPU telah di *verifikasi* oleh Finance dengan keterangan sebagai berikut:
+Nama Project   : *" . $namaProject . "*
+Item No.       : *$item*
+Term           : *$term*
+Nama Pengaju   : *" . $pengaju . "*
+Nama Penerima  : *" . implode(', ', $arrPenerima) . "*
+Total Diajukan : *" . implode(', ', $arrJumlah) . "*
+        ";
+    if ($keterangan != "") {
+        $msg .= "
+Keterangan:* $keterangan *";
+    }
+    $msg .="
+
+Lihat selengkapnya dibawah ini:
+ ".
+$link;
         return $msg;
     }
 
@@ -227,8 +250,9 @@ if ($keterangan != "") {
 }
     $msg .= 
     "
-    Lihat selengkapnya dibawah ini:
-        $urlPengajuan";
+Lihat selengkapnya dibawah ini:
+
+$urlPengajuan";
 
 return $msg;
     }
@@ -251,8 +275,9 @@ Total Diajukan : *" . implode(', ', $arrJumlah) . "*
         } 
         $msg .="
 
-Lihat selengkapnya dibawah ini:".
-    $link;
+Lihat selengkapnya dibawah ini:
+".
+$link;
         return $msg;
     }
 

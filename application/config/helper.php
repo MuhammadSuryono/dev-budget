@@ -3,9 +3,9 @@ require "session.php";
 
 class Helper {
     protected $sess;
-    public function __construct()
+    public function __construct($setNewSession = false)
     {
-        $this->sess = new Session();
+        $this->sess = new Session($setNewSession);
         $this->getSession();
     }
 
