@@ -249,7 +249,7 @@ if ($_POST['submit'] == 1) {
             $isEksternalProcess = $statusbpu == 'Vendor/Supplier' || $statusbpu == 'Honor Eksternal' || $statusbpu == 'Honor Area Head' || $statusbpu == 'STKB OPS' || $statusbpu == 'STKB TRK Luar Kota' || $statusbpu == 'Honor Luar Kota' || $statusbpu == 'Honor Jakarta' || $statusbpu == 'STKB TRK Jakarta' ? true : false;
             
             if ($isEksternalProcess) {
-                $path = 'view-bpu-verify.php?id='.$bpuVerify["id"].'&bpu='.$bpuItem["noid"];
+                $path = '/view-bpu-verify.php?id='.$bpuVerify["id"].'&bpu='.$bpuItem["noid"];
             } else {
                 if ($dataDivisi[$i] == 'FINANCE') {
                     $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $budget['jenis'] == 'B1' ? '/view-finance-manager-b1.php' : '/view-finance-manager.php';
@@ -358,7 +358,7 @@ if ($_POST['submit'] == 1) {
         $isEksternalProcess = $statusbpu == 'Vendor/Supplier' || $statusbpu == 'Honor Eksternal' || $statusbpu == 'Honor Area Head' || $statusbpu == 'STKB OPS' || $statusbpu == 'STKB TRK Luar Kota' || $statusbpu == 'Honor Luar Kota' || $statusbpu == 'Honor Jakarta' || $statusbpu == 'STKB TRK Jakarta' ? true : false;
         
         if ($isEksternalProcess) {
-            $path = 'view-bpu-verify.php?id='.$bpuVerify["id"].'&bpu='.$bpuItem["noid"];
+            $path = '/view-bpu-verify.php?id='.$bpuVerify["id"].'&bpu='.$bpuItem["noid"];
         } else {
             if ($dataDivisi[$i] == 'FINANCE') {
                 $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $budget['jenis'] == 'B1' ? '/view-finance-manager-b1.php' : '/view-finance-manager.php';

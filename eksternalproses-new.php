@@ -347,7 +347,7 @@ if (isset($_POST['submit'])) {
                 $isEksternalProcess = $statusbpu == 'Vendor/Supplier' || $statusbpu == 'Honor Eksternal' || $statusbpu == 'Honor Area Head' || $statusbpu == 'STKB OPS' || $statusbpu == 'STKB TRK Luar Kota' || $statusbpu == 'Honor Luar Kota' || $statusbpu == 'Honor Jakarta' || $statusbpu == 'STKB TRK Jakarta' ? true : false;
 
                 if ($isEksternalProcess) {
-                    $path = 'view-bpu-verify.php?id='.$dataVerify["id"].'&bpu='.$dataVerify["id_bpu"];
+                    $path = '/view-bpu-verify.php?id='.$dataVerify["id"].'&bpu='.$dataVerify["id_bpu"];
                 } else {
                     if ($dataDivisi[$i] == 'FINANCE') {
                         $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $jenis == 'B1' ? '/view-finance-manager-b1.php?code='.$numb.'' : '/view-finance-manager.php?code='.$numb.'';
@@ -449,7 +449,7 @@ if (isset($_POST['submit'])) {
                     $isEksternalProcess = $statusbpu == 'Vendor/Supplier' || $statusbpu == 'Honor Eksternal' || $statusbpu == 'Honor Area Head' || $statusbpu == 'STKB OPS' || $statusbpu == 'STKB TRK Luar Kota' || $statusbpu == 'Honor Luar Kota' || $statusbpu == 'Honor Jakarta' || $statusbpu == 'STKB TRK Jakarta' ? true : false;
 
                     if ($isEksternalProcess) {
-                        $path = 'view-bpu-verify.php?id='.$dataVerify["id"].'&bpu='.$dataVerify["id_bpu"];
+                        $path = '/view-bpu-verify.php?id='.$dataVerify["id"].'&bpu='.$dataVerify["id_bpu"];
                     } else {
                         if ($dataDivisi[$i] == 'FINANCE') {
                             $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $jenis == 'B1' ? '/view-finance-manager-b1.php?code='.$numb.'' : '/view-finance-manager.php?code='.$numb.'';
@@ -485,7 +485,7 @@ if (isset($_POST['submit'])) {
                 echo "<script language='javascript'>";
                 echo "alert('$notification')";
                 echo "</script>";
-                echo "<script> document.location.href='view-bpu-verify.php?id=".$idVerify."&bpu=".$idBpu."&status=success'; </script>";
+                echo "<script> document.location.href='/view-bpu-verify.php?id=".$idVerify."&bpu=".$idBpu."&status=success'; </script>";
             } else {
                 if ($_SESSION['hak_akses'] == 'Manager') {
                     echo "<script language='javascript'>";
