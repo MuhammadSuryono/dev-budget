@@ -424,6 +424,8 @@ else if ($submit == 0) {
 }
 
 if ($update) {
+    
+    $q = explode('/', $path);
     if (!$isEksternalProcess) {
         if ($divisi == 'FINANCE') {
             if ($_SESSION['hak_akses'] == 'Manager') {
@@ -452,7 +454,7 @@ if ($update) {
         echo "<script language='javascript'>";
         echo "alert('$notification')";
         echo "</script>";
-        echo "<script> document.location.href='".$path."'; </script>";
+        echo "<script> document.location.href='".$q[1]."'; </script>";
     }
 } else {
     if (!$isEksternalProcess) {
@@ -483,6 +485,6 @@ if ($update) {
         echo "<script language='javascript'>";
         echo "alert('Gagal')";
         echo "</script>";
-        echo "<script> document.location.href='".$path."'; </script>";
+        echo "<script> document.location.href='".$q[1]."'; </script>";
     }
 }
