@@ -192,7 +192,13 @@ while ($row = mysqli_fetch_assoc($query)) {
             
           </div>
           <div class="col-lg-6 text-center">
-            <img id="content-image" style="max-width: 720px;" src="<?= $dataVerify['document'] != '' ? 'fileupload/'.$dataVerify['document']:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMGwPo04v2vaxbXlOkSuBK1aDQs1ntPnFM9_5P7BhEULVguY4tv4EZMuF88SaA7HZ8a1o&usqp=CAU' ?>" />
+          <iframe id="inlineFrameExample" id="content-image"
+              title="Inline Frame Example"
+              width="900"
+              height="800"
+              src="<?= $dataVerify['document'] != '' ? 'fileupload/'.$dataVerify['document']:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMGwPo04v2vaxbXlOkSuBK1aDQs1ntPnFM9_5P7BhEULVguY4tv4EZMuF88SaA7HZ8a1o&usqp=CAU' ?>">
+          </iframe>
+            <!-- <img id="content-image" style="max-width: 720px;" src="<?= $dataVerify['document'] != '' ? 'fileupload/'.$dataVerify['document']:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMGwPo04v2vaxbXlOkSuBK1aDQs1ntPnFM9_5P7BhEULVguY4tv4EZMuF88SaA7HZ8a1o&usqp=CAU' ?>" /> -->
           </div>
         </div>
       </div>
