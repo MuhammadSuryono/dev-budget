@@ -40,7 +40,7 @@ $hostProtocol = $hostProtocol . ":" . $port;
 }
 
 $host = $hostProtocol;
-if ($port == "" || $port == "80") {
+if ($port == "" || $port == "80" || $port == "7793") {
   $host = $hostProtocol. '/'. $url[1];
 }
 
