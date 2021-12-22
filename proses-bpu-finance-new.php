@@ -509,7 +509,7 @@ if ($update) {
         }
     } else {
         echo "<script language='javascript'>";
-        echo "alert('$notification')";
+        echo "alert('Verifikasi BPU Gagal!')";
         echo "</script>";
         echo "<script> document.location.href='".$path."'; </script>";
     }
