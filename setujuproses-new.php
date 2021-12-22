@@ -407,52 +407,69 @@ if ($_POST['submit'] == 1) {
     
 }
 
+$isEksternalProcess = $statusbpu == 'Vendor/Supplier' || $statusbpu == 'Honor Eksternal' || $statusbpu == 'Honor Area Head' || $statusbpu == 'STKB OPS' || $statusbpu == 'STKB TRK Luar Kota' || $statusbpu == 'Honor Luar Kota' || $statusbpu == 'Honor Jakarta' || $statusbpu == 'STKB TRK Jakarta' ? true : false;
+$path = '/view-bpu-verify.php?id='.$bpuVerify["id"].'&bpu='.$bpuItem["noid"];
+
 if ($update) {
-    if ($divisi == 'FINANCE') {
-        if ($_SESSION['hak_akses'] == 'Manager') {
+    if (!$isEksternalProcess) {
+        if ($divisi == 'FINANCE') {
+            if ($_SESSION['hak_akses'] == 'Manager') {
+                echo "<script language='javascript'>";
+                echo "alert('$notification')";
+                echo "</script>";
+                echo "<script> document.location.href='view-finance" . $isNonRutin  . "-manager.php?code=" . $idBudget . "'; </script>";
+            } else {
+                echo "<script language='javascript'>";
+                echo "alert('$notification')";
+                echo "</script>";
+                echo "<script> document.location.href='view-finance" . $isNonRutin  . ".php?code=" . $idBudget . "'; </script>";
+            }
+        } else if ($aksesSes == 'HRD') {
             echo "<script language='javascript'>";
             echo "alert('$notification')";
             echo "</script>";
-            echo "<script> document.location.href='view-finance" . $isNonRutin  . "-manager.php?code=" . $idBudget . "'; </script>";
+            echo "<script> document.location.href='views-direksi.php?code=" . $idBudget . "'; </script>";
         } else {
             echo "<script language='javascript'>";
             echo "alert('$notification')";
             echo "</script>";
-            echo "<script> document.location.href='view-finance" . $isNonRutin  . ".php?code=" . $idBudget . "'; </script>";
+            echo "<script> document.location.href='views.php?code=" . $idBudget . "'; </script>";
         }
-    } else if ($aksesSes == 'HRD') {
-        echo "<script language='javascript'>";
-        echo "alert('$notification')";
-        echo "</script>";
-        echo "<script> document.location.href='views-direksi.php?code=" . $idBudget . "'; </script>";
     } else {
         echo "<script language='javascript'>";
         echo "alert('$notification')";
         echo "</script>";
-        echo "<script> document.location.href='views.php?code=" . $idBudget . "'; </script>";
+        echo "<script> document.location.href='".$path."'; </script>";
     }
 } else {
-    if ($divisi == 'FINANCE') {
-        if ($_SESSION['hak_akses'] == 'Manager') {
+    if (!$isEksternalProcess) {
+        if ($divisi == 'FINANCE') {
+            if ($_SESSION['hak_akses'] == 'Manager') {
+                echo "<script language='javascript'>";
+                echo "alert('Gagal')";
+                echo "</script>";
+                echo "<script> document.location.href='view-finance" . $isNonRutin  . "-manager.php?code=" . $idBudget . "'; </script>";
+            } else {
+                echo "<script language='javascript'>";
+                echo "alert('Gagal')";
+                echo "</script>";
+                echo "<script> document.location.href='view-finance" . $isNonRutin  . ".php?code=" . $idBudget . "'; </script>";
+            }
+        } else if ($aksesSes == 'HRD') {
             echo "<script language='javascript'>";
             echo "alert('Gagal')";
             echo "</script>";
-            echo "<script> document.location.href='view-finance" . $isNonRutin  . "-manager.php?code=" . $idBudget . "'; </script>";
+            echo "<script> document.location.href='views-direksi.php?code=" . $idBudget . "'; </script>";
         } else {
             echo "<script language='javascript'>";
             echo "alert('Gagal')";
             echo "</script>";
-            echo "<script> document.location.href='view-finance" . $isNonRutin  . ".php?code=" . $idBudget . "'; </script>";
+            echo "<script> document.location.href='views.php?code=" . $idBudget . "'; </script>";
         }
-    } else if ($aksesSes == 'HRD') {
-        echo "<script language='javascript'>";
-        echo "alert('Gagal')";
-        echo "</script>";
-        echo "<script> document.location.href='views-direksi.php?code=" . $idBudget . "'; </script>";
     } else {
         echo "<script language='javascript'>";
         echo "alert('Gagal')";
         echo "</script>";
-        echo "<script> document.location.href='views.php?code=" . $idBudget . "'; </script>";
+        echo "<script> document.location.href='".$path."'; </script>";
     }
 }

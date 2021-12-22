@@ -472,31 +472,48 @@ if ($submit == 1) {
     // $emailHelper->sendEmail($msg, $subject, $arremailpenerima, '', 'multiple');
     // $notification .= " Dan telah dikirim pemberitahuan ke penerima via email ke " . implode(",", $arremailpenerima);
 }
+$isEksternalProcess = $statusbpu == 'Vendor/Supplier' || $statusbpu == 'Honor Eksternal' || $statusbpu == 'Honor Area Head' || $statusbpu == 'STKB OPS' || $statusbpu == 'STKB TRK Luar Kota' || $statusbpu == 'Honor Luar Kota' || $statusbpu == 'Honor Jakarta' || $statusbpu == 'STKB TRK Jakarta' ? true : false;
 
+$path = '/view-bpu-verify.php?id='.$dataVerify["id"].'&bpu='.$dataVerify["id_bpu"];
 if ($update) {
-    if ($_SESSION['hak_akses'] == 'Manager') {
-        echo "<script language='javascript'>";
-        echo "alert('$notification')";
-        echo "</script>";
-        echo "<script> document.location.href='view-finance" . $isNonRutin  . "-manager" . $isB1 . ".php?code=" . $kode . "'; </script>";
+    if (!$isEksternalProcess) {
+        if ($_SESSION['hak_akses'] == 'Manager') {
+            echo "<script language='javascript'>";
+            echo "alert('$notification')";
+            echo "</script>";
+            echo "<script> document.location.href='view-finance" . $isNonRutin  . "-manager" . $isB1 . ".php?code=" . $kode . "'; </script>";
+        } else {
+            echo "<script language='javascript'>";
+            echo "alert('$notification')";
+            echo "</script>";
+            echo "<script> document.location.href='view-finance" . $isNonRutin  . ".php?code=" . $kode . "'; </script>";
+        }
     } else {
         echo "<script language='javascript'>";
         echo "alert('$notification')";
         echo "</script>";
-        echo "<script> document.location.href='view-finance" . $isNonRutin  . ".php?code=" . $kode . "'; </script>";
+        echo "<script> document.location.href='".$path."'; </script>";
     }
 } else {
-    if ($_SESSION['hak_akses'] == 'Manager') {
-        echo "<script language='javascript'>";
-        echo "alert('Verifikasi BPU Gagal!')";
-        echo "</script>";
-        echo "<script> document.location.href='view-finance" . $isNonRutin  . "-manager" . $isB1 . ".php?code=" . $kode . "'; </script>";
+    if (!$isEksternalProcess) {
+        if ($_SESSION['hak_akses'] == 'Manager') {
+            echo "<script language='javascript'>";
+            echo "alert('Verifikasi BPU Gagal!')";
+            echo "</script>";
+            echo "<script> document.location.href='view-finance" . $isNonRutin  . "-manager" . $isB1 . ".php?code=" . $kode . "'; </script>";
+        } else {
+            echo "<script language='javascript'>";
+            echo "alert('Verifikasi BPU Gagal!')";
+            echo "</script>";
+            echo "<script> document.location.href='view-finance" . $isNonRutin  . ".php?code=" . $kode . "'; </script>";
+        }
     } else {
         echo "<script language='javascript'>";
-        echo "alert('Verifikasi BPU Gagal!')";
+        echo "alert('$notification')";
         echo "</script>";
-        echo "<script> document.location.href='view-finance" . $isNonRutin  . ".php?code=" . $kode . "'; </script>";
+        echo "<script> document.location.href='".$path."'; </script>";
     }
+    
 }
 
 // function random_bytes($length = 6)

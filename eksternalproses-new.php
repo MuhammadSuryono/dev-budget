@@ -483,32 +483,40 @@ if (isset($_POST['submit'])) {
     }
 
     if ($insert) {
-
-        if ($_SESSION['divisi'] == 'FINANCE') {
-            if ($actionProcess = "update") {
-                echo "<script language='javascript'>";
-                echo "alert('$notification')";
-                echo "</script>";
-                echo "<script> document.location.href='/view-bpu-verify.php?id=".$idVerify."&bpu=".$idBpu."&status=success'; </script>";
-            } else {
-                if ($_SESSION['hak_akses'] == 'Manager') {
+        $isEksternalProcess = $statusbpu == 'Vendor/Supplier' || $statusbpu == 'Honor Eksternal' || $statusbpu == 'Honor Area Head' || $statusbpu == 'STKB OPS' || $statusbpu == 'STKB TRK Luar Kota' || $statusbpu == 'Honor Luar Kota' || $statusbpu == 'Honor Jakarta' || $statusbpu == 'STKB TRK Jakarta' ? true : false;
+        if (!$isEksternalProcess) {
+            if ($_SESSION['divisi'] == 'FINANCE') {
+                if ($actionProcess = "update") {
                     echo "<script language='javascript'>";
                     echo "alert('$notification')";
                     echo "</script>";
-                    echo "<script> document.location.href='view-finance" . $isNonRutin  . "-manager.php?code=" . $numb . "'; </script>";
+                    echo "<script> document.location.href='view-bpu-verify.php?id=".$idVerify."&bpu=".$idBpu."&status=success'; </script>";
                 } else {
-                    echo "<script language='javascript'>";
-                    echo "alert('$notification')";
-                    echo "</script>";
-                    echo "<script> document.location.href='view-finance" . $isNonRutin  . ".php?code=" . $numb . "'; </script>";
+                    if ($_SESSION['hak_akses'] == 'Manager') {
+                        echo "<script language='javascript'>";
+                        echo "alert('$notification')";
+                        echo "</script>";
+                        echo "<script> document.location.href='view-finance" . $isNonRutin  . "-manager.php?code=" . $numb . "'; </script>";
+                    } else {
+                        echo "<script language='javascript'>";
+                        echo "alert('$notification')";
+                        echo "</script>";
+                        echo "<script> document.location.href='view-finance" . $isNonRutin  . ".php?code=" . $numb . "'; </script>";
+                    }
                 }
+                
+            } else {
+                echo "<script language='javascript'>";
+                echo "alert('$notification!!')";
+                echo "</script>";
+                echo "<script> document.location.href='views-direksi.php?code=" . $numb . "'; </script>";
             }
-            
         } else {
+            $path = '/view-bpu-verify.php?id='.$dataVerify["id"].'&bpu='.$dataVerify["id_bpu"];
             echo "<script language='javascript'>";
-            echo "alert('$notification!!')";
+            echo "alert('$notification')";
             echo "</script>";
-            echo "<script> document.location.href='views-direksi.php?code=" . $numb . "'; </script>";
+            echo "<script> document.location.href='".$path."'; </script>";
         }
     } else {
         echo "Pembuatan Budget External Gagal";
