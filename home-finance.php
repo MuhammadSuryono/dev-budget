@@ -15,7 +15,6 @@ require "vendor/email/send-email.php";
 
 if (!isset($_SESSION['nama_user'])) {
   header("location:login.php");
-  // die('location:login.php');//jika belum login jangan lanjut
 }
 
 $url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
@@ -134,7 +133,7 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
           ?>
             <li><a href="list-finance.php">List</a></li>
           <?php } ?>
-          <li><a href="saldobpu.php">Data User</a></li>
+          <li><a href="saldobpu.php">Saldo BPU</a></li>
           <li><a href="history-finance.php">History</a></li>
           <li><a href="list.php">Personal</a></li>
           <li><a href="summary-finance.php">Summary</a></li>
@@ -423,6 +422,37 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
                 </table>
             </div>
           </div>
+          <div class="list-group-item border" id="bpu-eksternal-need-verifikasi" style="border: 1px solid black !important;">
+          <div id="expander" data-target="#bpu-content-eksternal-need-verifikasi" data-toggle="collapse" data-group-id="grandparent<?= $i ?>" data-role="expander">
+
+            <ul class="list-inline row border">
+              <li class="col-lg-11" id="title-text-bpu-eksternal"><?= $j++ ?>. BPU Eksternal Perlu di Validasi <span class="text-danger">(*)</span></li>
+              <li class="col-lg-1">
+                <span id="grandparentIcon1" style="cursor: pointer; margin: 0 10px;" class="col-lg-1"><a><i class="fas fa-eye" title="View Rincian"></i></a></span>
+              </li>
+            </ul>
+          </div>
+          <div class="collapse" id="bpu-content-eksternal-need-verifikasi" aria-expanded="true">
+            <table class="table table-striped">
+              <table class="table table-striped">
+                <thead>
+                  <tr class="warning">
+                    <th>No</th>
+                    <th>Nama Project</th>
+                    <th>Nomor Item Budget</th>
+                    <th>Jenis Item Budget</th>
+                    <th>Term BPU</th>
+                    <th>Action</th>
+                    <!-- <th>Pengajuan Request</th> -->
+                  </tr>
+                </thead>
+
+                <tbody id="data-bpu-need-validasi">
+                  
+                </tbody>
+              </table>
+          </div>
+        </div>
         <?php endif; ?>
         <div class="list-group-item border" id="grandparent3" style="border: 1px solid black !important;">
           <div id="expander" data-target="#grandparentContent3" data-toggle="collapse" data-group-id="grandparent<?= $i ?>" data-role="expander">
@@ -778,6 +808,7 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
 
       setTimeout(() => {
         bpuEksternalNeedVerify()
+        bpuEksternalNeedValidation()
       }, 1000)
 
       setTimeout(() => {
@@ -905,7 +936,26 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
     
     function bpuEksternalNeedVerify() {
       let bodyTable = document.getElementById('data-bpu-need-verifikasi')
-      httpRequestGet('/dev-budget/ajax/ajax-bpu-need-verify.php?action=get-data').then((res) => {
+      httpRequestGet('ajax/ajax-bpu-need-verify.php?action=get-data').then((res) => {
+        if (res.data !== null && res.data.length > 0) {
+          titleBpuEksternalVerifikasi.classList.add('text-blink')
+
+          let htmlBody = '';
+          let data = res.data
+
+          data.forEach((element, i) => {
+            htmlBody += `<tr><td>${i + 1}</td><td>${element.nama}</td><td>${element.no_urut}</td><td>${element.jenis}</td><td>${element.term}</td><td><a href="view-bpu-verify.php?id=${element.id}&bpu=${element.id_bpu}"><i class="fas fa-external-link-alt" title="View Verify"></i></a></td></tr>`
+          });
+
+          bodyTable.innerHTML = htmlBody
+          
+        }
+      })
+    }
+
+    function bpuEksternalNeedValidation() {
+      let bodyTable = document.getElementById('data-bpu-need-validasi')
+      httpRequestGet('ajax/ajax-bpu-need-verify.php?action=get-data-validasi').then((res) => {
         if (res.data !== null && res.data.length > 0) {
           titleBpuEksternalVerifikasi.classList.add('text-blink')
 
@@ -924,7 +974,7 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
 
     function bpuUMJatuhTempo() {
       let bodyTable = document.getElementById('data-bpu-jatuh-tempo')
-      httpRequestGet('/dev-budget/ajax/ajax-um-jatuh-tempo.php?action=get-list').then((res) => {
+      httpRequestGet('ajax/ajax-um-jatuh-tempo.php?action=get-list').then((res) => {
         if (res.data !== null && res.data.length > 0) {
           titleReminderUmJatuhTempo.classList.add('text-blink')
           reminderReminderUmJatuhTempo.innerHTML = `<div class="alert alert-danger" role="alert"><i class='fa fa-bell text-blink'></i>

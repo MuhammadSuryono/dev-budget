@@ -7,7 +7,7 @@ require_once "application/config/whatsapp.php";
 require_once "application/config/message.php";
 require_once "application/config/helper.php";
 
-$helper = new Helper();
+$helper = new Helper(true);
 
 $con = new Database();
 $koneksi = $con->connect();
@@ -15,43 +15,20 @@ $koneksi = $con->connect();
 $helperMessage = new Message();
 $whatsapp = new Whastapp();
 
-$url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
-$url = explode('/', $url);
-$url = $url[0] . '/' . $url[1] . '/' . 'login.php';
+$idVerify = $_GET['id'];
+$idBpu = $_GET['bpu'];
 
-$idUser = $_SESSION['id_user'];
-$queryUser = mysqli_query($koneksi, "SELECT email, e_sign, phone_number FROM tb_user WHERE id_user = '$idUser'");
-$user = mysqli_fetch_assoc($queryUser);
-$emailUser = $user['email'];
-$signUser = $user['e_sign'];
-$phoneNumber = $user['phone_number'];
-
-$queryRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE stat = 'MRI'");
-
-$querySetting = mysqli_query($koneksi, "SELECT * FROM setting_budget WHERE keterangan = 'approval_bpu'") or die(mysqli_error($koneksi));
-$setting = mysqli_fetch_assoc($querySetting);
-
-$oneWeek = date('Y-m-d', strtotime('+7 days'));
-
-$email = [];
-$queryEmailFinance = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('2', '3')");
-while ($item = mysqli_fetch_assoc($queryEmailFinance)) {
-  array_push($email, $item['phone_number']);
+$query = mysqli_query($koneksi, "SELECT * FROM bpu_verify WHERE id = '$idVerify'");
+$dataVerify = [];
+while ($row = mysqli_fetch_assoc($query)) {
+    $dataVerify = $row;
 }
 
-$queryReminderPembayaran = mysqli_query($koneksi, "SELECT a.*, b.nama AS nama_project, c.rincian FROM reminder_tanggal_bayar a JOIN pengajuan b ON b.waktu = a.selesai_waktu JOIN selesai c ON c.waktu = a.selesai_waktu AND c.no = a.selesai_no WHERE a.tanggal <= '$oneWeek' AND (has_send_email = 0 OR has_send_email IS NULL)");
-while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
-
-
-  if (count($email) > 0) {
-    foreach($email  as $phone) {
-      $whatsapp->sendMessage($phone, $helperMessage->messageReminderPembayaran($item['nama_project'], $item['rincian'], date('d-m-Y', strtotime($item['tanggal'])), $url));
-    }
-  }
-
-  mysqli_query($koneksi, "UPDATE reminder_tanggal_bayar SET has_send_email = 1 WHERE id = $item[id]");
+$query = mysqli_query($koneksi, "SELECT * FROM bpu WHERE noid = '$idBpu'");
+$dataBpu = [];
+while ($row = mysqli_fetch_assoc($query)) {
+    $dataBpu = $row;
 }
-
 
 ?>
 
@@ -98,7 +75,7 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
           ?>
             <li><a href="list-finance.php">List</a></li>
           <?php } ?>
-          <li><a href="saldobpu.php">Data User</a></li>
+          <li><a href="saldobpu.php">Saldo BPU</a></li>
           <li><a href="history-finance.php">History</a></li>
           <li><a href="list.php">Personal</a></li>
           <li><a href="summary-finance.php">Summary</a></li>
@@ -139,12 +116,32 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
     </div>
   </nav>
 
-  <div class="container">
-    <div id="alert-error-already-verify"></div>
+  <div class="container-fluid">
+    <div id="alert-error-already-verify">
+      <?php if (isset($_GET['status']) || $dataVerify["is_verified"]) {
+        if ($_GET['status'] == "success" && $dataVerify["is_need_approved"]) {
+          echo '<div class="alert alert-success" role="alert">
+            Data berhasil disimpan dan menunggu persetujuan oleh Manager Finance
+          </div>';
+        }
+
+        if ($dataVerify["is_approved"] && !$dataVerify["is_need_approved"] && $dataVerify["is_verified"] && !$dataVerify["status_approved"]) {
+          echo '<div class="alert alert-danger" role="alert">
+            Data bpu DITOLAK oleh '.$dataBpu["approveby"].'
+          </div>';
+        }
+
+        if ($dataVerify["is_approved"] && !$dataVerify["is_need_approved"] && $dataVerify["is_verified"] && $dataVerify["status_approved"]) {
+          echo '<div class="alert alert-success" role="alert">
+            Data bpu DI SETUJUI oleh '.$dataBpu["approveby"].'
+          </div>';
+        }
+      } ?>
+    </div>
     <div class="panel panel-warning" data-widget="{&quot;draggable&quot;: &quot;false&quot;}" data-widget-static="">
       <div class="panel-body no-padding">
         <div class="row">
-          <div class="col-lg-4">
+          <div class="col-lg-6">
             <h5><i class="fa fa-check"></i><b> VERIFY DATA BPU</b></h5>
             <hr/>
             <div id="notification-error-nominal"></div>
@@ -152,17 +149,50 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
             <form>
               <div class="form-group">
                 <label>Verifikasi Nominal:</label>
-                <input type="number" class="form-control" min="100" id="nominal-verify" required/>
+                <input type="number" class="form-control" min="100" id="nominal-verify" value="<?= isset($dataVerify["total_verify"]) ? $dataVerify["total_verify"]:"" ?>" <?= $dataVerify["is_verified"] ? "disabled":"" ?> required/>
               </div>
-              <div class="form-group">
-                <label>File Pendukung:</label>
-                <input type="file" class="form-control" accept="image/*" id="inputImage" required/>
-              </div>
+              <?php 
+              if (isset($dataVerify["is_verified"])) {
+                if (!$dataVerify["is_verified"]) {
+                  echo '<div class="form-group">
+                  <label>File Pendukung:</label>
+                  <input type="file" class="form-control" accept="image/*" id="inputImage" required/>
+                </div>';
+                }
+              }
+                
+              ?>
+
             </form>
-            <button class="btn btn-primary btn-flat btn-block" id="btn-submit" onclick="submit()"><i class="fa fa-check"></i> Verifikasi</button>
+            <?php 
+              if (isset($dataVerify["is_verified"])) {
+                if (!$dataVerify["is_verified"]) {
+                  echo '<button class="btn btn-primary btn-flat btn-block" id="btn-submit" onclick="submit()"><i class="fa fa-check"></i> Verifikasi</button>';
+                }
+              }
+                
+              ?>
+
+            <?php
+              if (isset($dataBpu["statusbpu"]) && $dataVerify["is_verified"]) {
+                $statusbpu = $dataBpu["statusbpu"];
+                $isEksternalNonVendor =  $statusbpu == 'Honor Eksternal' || $statusbpu == 'Honor Area Head' || $statusbpu == 'STKB OPS' || $statusbpu == 'STKB TRK Luar Kota' || $statusbpu == 'Honor Luar Kota' || $statusbpu == 'Honor Jakarta' || $statusbpu == 'STKB TRK Jakarta';
+                
+                if ($isEksternalNonVendor && !$dataVerify["is_need_approved"] && !$dataVerify["is_approved"]) {
+                  include 'form/verify-eksternal-non-vendor.php';
+                } else if (!$dataVerify["is_need_approved"] && !$dataVerify["is_approved"]) {
+                  include 'form/verify-eksternal-vendor.php';
+                }
+
+                if ($dataVerify["is_need_approved"] && $dataVerify["is_verified"] || ($dataVerify["is_verified"] && $dataBpu["namapenerima"] != "")) {
+                  include 'form/verify-eksternal-info.php';
+                }
+              }
+            ?>
+            
           </div>
-          <div class="col-lg-8 text-center">
-            <img id="content-image" style="max-width: 720px;" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMGwPo04v2vaxbXlOkSuBK1aDQs1ntPnFM9_5P7BhEULVguY4tv4EZMuF88SaA7HZ8a1o&usqp=CAU" />
+          <div class="col-lg-6 text-center">
+            <img id="content-image" style="max-width: 720px;" src="<?= $dataVerify['document'] != '' ? 'fileupload/'.$dataVerify['document']:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMGwPo04v2vaxbXlOkSuBK1aDQs1ntPnFM9_5P7BhEULVguY4tv4EZMuF88SaA7HZ8a1o&usqp=CAU' ?>" />
           </div>
         </div>
       </div>
@@ -251,15 +281,15 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
   }
 
   function getDataBpu(id, idBpu) {
-    httpRequestGet(`/dev-budget/ajax/ajax-bpu-need-verify.php?action=get-data-single&id=${id}&id-bpu=${idBpu}`).then((res) => {
+    httpRequestGet(`ajax/ajax-bpu-need-verify.php?action=get-data-single&id=${id}&id-bpu=${idBpu}`).then((res) => {
       if (res.data.length > 0 && res.data !== null) {
         let data = res.data
         data = data[0]
         window.localStorage.setItem('stateNominal', data.pengajuan_jumlah)
 
         if (data.is_verified === '1' && data.is_need_approved === '1') {
-          document.getElementById("btn-submit").disabled = true;
-          notifAlreadyVerify.innerHTML = alertError('success', `Data BPU sudah di <b>VERIFIKASI</b> oleh <b>${data.checkby}</b> pada <b>${data.tglcheck}</b> `)
+          // document.getElementById("btn-submit").disabled = true;
+          // notifAlreadyVerify.innerHTML = alertError('success', `Data BPU sudah di <b>VERIFIKASI</b> oleh <b>${data.checkby}</b> pada <b>${data.tglcheck}</b> `)
         }
       }
     })
@@ -274,7 +304,7 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
   function uploadFile(file, nominal, id, idBpu) {
 		const fd = new FormData();
 		fd.append('file', file);
-		let url = `/dev-budget/ajax/ajax-bpu-need-verify.php?action=simpan-verifikasi&id=${id}&id-bpu=${idBpu}&nominal=${nominal}`
+		let url = `ajax/ajax-bpu-need-verify.php?action=simpan-verifikasi&id=${id}&id-bpu=${idBpu}&nominal=${nominal}`
 
 		return fetch(url, {
 			method: 'POST',

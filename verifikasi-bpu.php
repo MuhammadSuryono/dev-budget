@@ -25,12 +25,11 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
     $waktu = $_POST['waktu'];
     $term = $_POST['term'];
 
-
     // mengambil data berdasarkan id
     // dan menampilkan data ke dalam form modal bootstrap
     $sql = "SELECT a.*, b.jenis FROM bpu a JOIN pengajuan b ON a.waktu = b.waktu WHERE a.no = '$id' AND a.waktu = '$waktu' AND a.term = '$term' GROUP BY a.noid";
+  
     $result = $koneksi->query($sql); ?>
-
     <table class="table table-bordered">
         <thead>
             <th>Nama Penerima</th>
@@ -239,7 +238,7 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
     <script>
         var ketPembayaran = '<?= $ketPembayaran ?>';
         var jenis = '<?= $jenis ?>';
-        var maxTransfer = '<?= $result["max_transfer"] ?>';
+        var maxTransfer = '100000';
 
         $('.umo_biaya_kode_id').select2();
 

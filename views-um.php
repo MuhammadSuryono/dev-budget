@@ -12,24 +12,7 @@ if (!isset($_SESSION['nama_user'])) {
 
 $code = $_GET['code'];
 
-// $query = mysqli_query($koneksi, "SELECT c.nama, SUM(a.jumlah) AS jumlah, c.noid
-//                                     FROM bpu a
-//                                     JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no
-//                                     JOIN pengajuan c ON c.waktu = a.waktu
-//                                     WHERE a.namapenerima = '$code' AND b.status = 'UM'
-//                                     GROUP BY c.nama") or die(mysqli_error($koneksi));
-
 $query = mysqli_query($koneksi, "SELECT nama, waktu, noid, jenis FROM pengajuan GROUP BY nama");
-
-// $query = mysqli_query($koneksi, "SELECT *
-//                                     FROM (
-//                                         SELECT  noid, 
-//                                                 nama, 
-//                                                 waktu
-//                                                 ROW_NUMBER() OVER(PARTITION BY nama ORDER BY nama DESC) rn
-//                                             FROM pengajuan
-//                                                 ) a
-//                                     WHERE rn = 1");
 $queryUser = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$code'");
 $tb_user = mysqli_fetch_assoc($queryUser);
 
@@ -73,7 +56,7 @@ $totalOut = mysqli_fetch_assoc($queryTotalOut);
                     <?php if ($_SESSION['hak_akses'] == 'HRD') { ?>
                         <li class="active"><a href="home-direksi.php">Home</a></li>
                         <li><a href="list-direksi.php">List</a></li>
-                        <li><a href="saldobpu.php">Data User</a></li>
+                        <li><a href="saldobpu.php">Saldo BPU</a></li>
                         <!--<li><a href="summary.php">Summary</a></li>-->
                         <li><a href="listfinish-direksi.php">Budget Finish</a></li>
                     <?php } else { ?>
@@ -91,7 +74,7 @@ $totalOut = mysqli_fetch_assoc($queryTotalOut);
                         ?>
                             <li><a href="list-finance.php">List</a></li>
                         <?php } ?>
-                        <li><a href="saldobpu.php">Data User</a></li>
+                        <li><a href="saldobpu.php">Saldo BPU</a></li>
                         <li><a href="history-finance.php">History</a></li>
                         <li><a href="list.php">Personal</a></li>
                         <li><a href="summary-finance.php">Summary</a></li>
@@ -115,89 +98,12 @@ $totalOut = mysqli_fetch_assoc($queryTotalOut);
                         </ul>
                     </li>
                 </ul>
-
-                <?php if ($_SESSION['hak_akses'] != 'HRD') { ?>
-                    <?php
-                    $cari = mysqli_query($koneksi, "SELECT * FROM bpu WHERE status ='Belum Di Bayar' AND persetujuan !='Belum Disetujui' AND waktu != 0");
-                    $belbyr = mysqli_num_rows($cari);
-                    ?>
                    <ul class="nav navbar-nav navbar-right">
                         <li><a href="notif-page.php"><i class="fa fa-envelope"></i></a></li>
-                        <li class="dropdown messages-menu">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-inbox"></i><span class="label label-warning"><?= $belbyr ?></span></a>
-                            <ul class="dropdown-menu">
-                                <?php
-                                while ($wkt = mysqli_fetch_array($cari)) {
-                                    $wktulang = $wkt['waktu'];
-                                    $selectnoid = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE waktu='$wktulang'");
-                                    $noid = mysqli_fetch_assoc($selectnoid);
-                                    $kode = $noid['noid'];
-                                    $project = $noid['nama'];
-                                ?>
-                                    <li class="header"><a href="view-finance.php?code=<?= $kode ?>">Project <b><?= $project ?></b> BPU Belum Dibayar</a></li>
-                                <?php
-                                }
-                                ?>
-                            </ul>
-                        </li>
-                        <li><a href="ubahpassword.php"><span class="glyphicon glyphicon-user"></span><?php echo $_SESSION['nama_user']; ?> (<?php echo $_SESSION['divisi']; ?>)</a></li>
-                        <li><a href="logout.php"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
-                    </ul>
-                <?php } else {
-                    $cari = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE status='Pending'");
-                    $belbyr = mysqli_num_rows($cari);
-                    $caribpu = mysqli_query($koneksi, "SELECT * FROM bpu WHERE persetujuan='Belum Disetujui'");
-                    $bpuyahud = mysqli_num_rows($caribpu);
-                    $queryPengajuanReq = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE status_request = 'Di Ajukan' AND waktu != 0");
-                    $countPengajuanReq = mysqli_num_rows($queryPengajuanReq);
-                    $notif = $belbyr + $bpuyahud + $countPengajuanReq;
-                ?>
-                   <ul class="nav navbar-nav navbar-right">
-                        <li><a href="notif-page.php"><i class="fa fa-envelope"></i></a></li>
-                        <li class="dropdown messages-menu">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-inbox"></i><span class="label label-warning"><?= $notif ?></span></a>
-                            <ul class="dropdown-menu">
-                                <?php
-                                while ($wkt = mysqli_fetch_array($cari)) {
-                                    $wktulang = $wkt['waktu'];
-                                    $selectnoid = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE waktu='$wktulang'");
-                                    $noid = mysqli_fetch_assoc($selectnoid);
-                                    $kode = $noid['noid'];
-                                    $project = $noid['nama'];
-                                ?>
-                                    <li class="header"><a href="view-direksi.php?code=<?= $kode ?>">Project <b><?= $project ?></b> status masih Pending</a></li>
-                                    <?php
-                                    while ($wktbpu = mysqli_fetch_array($caribpu)) {
-                                        $bpulagi = $wktbpu['waktu'];
-                                        $selectnoid2 = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE waktu='$bpulagi'");
-                                        $noid2 = mysqli_fetch_assoc($selectnoid2);
-                                        $kode2 = $noid2['noid'];
-                                        $project2 = $noid2['nama'];
-                                    ?>
-                                        <li class="header"><a href="views-direksi.php?code=<?= $kode2 ?>">Project <b><?= $project2 ?></b> ada BPU yang belum di setujui</a></li>
-                                <?php
-                                    }
-                                }
-                                ?>
-                                <?php
-                                while ($qpr = mysqli_fetch_array($queryPengajuanReq)) {
-                                    $time = $qpr['waktu'];
-                                    $selectnoid3 = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE waktu='$time'");
-                                    $noid3 = mysqli_fetch_assoc($selectnoid3);
-                                    $kode3 = $noid3['id'];
-                                    $project3 = $noid3['nama'];
-                                ?>
-                                    <li class="header"><a href="view-request.php?id=<?= $kode3 ?>">Pengajuan Budget <b><?= $project3 ?></b> telah diajukan </a></li>
-                                <?php
-                                }
-                                ?>
-                            </ul>
-                        </li>
 
                         <li><a href="ubahpassword.php"><span class="glyphicon glyphicon-user"></span><?php echo $_SESSION['nama_user']; ?> (<?php echo $_SESSION['divisi']; ?>)</a></li>
                         <li><a href="logout.php"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
                     </ul>
-                <?php } ?>
             </div>
         </div>
     </nav>
@@ -207,7 +113,7 @@ $totalOut = mysqli_fetch_assoc($queryTotalOut);
         <h2>Status Uang Muka <?php echo $code; ?></h2>
     </center>
 
-    <div class="container">
+    <div class="container-fluid">
         <div class="row">
             <div class="col-xs-1">Limit </div>
             <div class="col-xs-3">: Rp. <?= number_format($tb_user['saldo']) ?></b></div>
@@ -221,39 +127,48 @@ $totalOut = mysqli_fetch_assoc($queryTotalOut);
             <div class="panel-body no-padding">
 
                 <ul class="list-inline row ml-3">
-                    <li class="col-lg-5" style="padding-left: 30px;"><strong> Nama Project</strong></li>
+                    <li class="col-lg-3" style="padding-left: 30px;"><strong> Nama Project</strong></li>
                     <li class="col-lg-2"><strong>Total Saldo Awal Outstanding</strong></li>
                     <li class="col-lg-2"><strong>Total Pengajuan</strong></li>
+		            <li class="col-lg-2"><strong>Total Realisasi</strong></li>
                     <li class="col-lg-2"><strong>Total Saldo Akhir Outstanding</strong></li>
-                    <li class="col-lg-1">
-                    </li>
+                    <li class="col-lg-1"></li>
                 </ul>
                 <?php
                 $i = 0;
                 $total = 0;
                 $totalTerbayar = 0;
                 $totalBelumTerbayar = 0;
+                $totalRealisasi = 0;
                 while ($item = mysqli_fetch_assoc($query)) :
                     $queryBpu = mysqli_query($koneksi, "SELECT SUM(a.jumlah) AS total_pengajuan FROM bpu a JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no WHERE b.status IN ('UM', 'UM Burek') AND a.namapenerima = '$code' AND a.waktu = '$item[waktu]' AND a.status IN ('Telah Di Bayar', 'Belum Di Bayar')") or die(mysqli_error($koneksi));
                     $pengajuan = mysqli_fetch_assoc($queryBpu);
-
+                    
                     $queryBpuTerbayar = mysqli_query($koneksi, "SELECT SUM(a.jumlah) AS total_pengajuan FROM bpu a JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no WHERE b.status IN ('UM', 'UM Burek') AND a.namapenerima = '$code' AND a.waktu = '$item[waktu]' AND a.status = 'Telah Di Bayar'") or die(mysqli_error($koneksi));
                     $pengajuanTerbayar = mysqli_fetch_assoc($queryBpuTerbayar);
-
+                    
                     $queryBpuBelumTerbayar = mysqli_query($koneksi, "SELECT SUM(a.jumlah) AS total_pengajuan FROM bpu a JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no WHERE b.status IN ('UM', 'UM Burek') AND a.namapenerima = '$code' AND a.waktu = '$item[waktu]' AND a.status = 'Belum Di Bayar'") or die(mysqli_error($koneksi));
                     $pengajuanBelumTerbayar = mysqli_fetch_assoc($queryBpuBelumTerbayar);
+                    
+			        $queryBpuRealisasi = mysqli_query($koneksi, "SELECT SUM(a.realisasi) AS total_realisasi FROM bpu a JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no WHERE b.status IN ('UM', 'UM Burek') AND a.namapenerima = '$code' AND a.waktu = '$item[waktu]' AND a.status IN ('Telah Di Bayar','Realisasi (Direksi)')") or die(mysqli_error($koneksi));
+                    $pengajuanRealisasi = mysqli_fetch_assoc($queryBpuRealisasi);
+
                     if ($pengajuan['total_pengajuan'] != null) :
                         $i++;
                         $total += $pengajuan['total_pengajuan'];
+                        $totalRealisasi += $pengajuanRealisasi['total_realisasi'];
+                        $totalTerbayar += $pengajuanTerbayar['total_pengajuan'];
+                        $totalSaldoOutstanding = ($pengajuanTerbayar['total_pengajuan'] + $pengajuanBelumTerbayar['total_pengajuan']) -  $pengajuanRealisasi['total_realisasi'];
                 ?>
                         <div class="list-group-item" id="grandparent<?= $i ?>" style="border: 1px solid black !important;">
                             <div id="expander" data-target="#grandparentContent<?= $i ?>" data-toggle="collapse" data-group-id="grandparent<?= $i ?>" data-role="expander">
 
                                 <ul class="list-inline row border">
-                                    <li class="col-lg-5"><?= $i . '. ' .  $item['nama'] ?></li>
+                                    <li class="col-lg-3"><?= $i . '. ' .  $item['nama'] ?></li>
                                     <li class="col-lg-2">Rp. <?= number_format($pengajuanTerbayar['total_pengajuan']) ?></li>
                                     <li class="col-lg-2">Rp. <?= number_format($pengajuanBelumTerbayar['total_pengajuan']) ?></li>
-                                    <li class="col-lg-2">Rp. <?= number_format($pengajuan['total_pengajuan']) ?></li>
+                		            <li class="col-lg-2">Rp. <?= number_format($pengajuanRealisasi['total_realisasi']) ?> </li>
+		                            <li class="col-lg-2">Rp. <?= number_format($totalSaldoOutstanding) ?></li>
                                     <li class="col-lg-1">
                                         <?php
                                         $aksesSes = $_SESSION['hak_akses'];
@@ -290,27 +205,45 @@ $totalOut = mysqli_fetch_assoc($queryTotalOut);
                                             <th>Nomor Item Budget</th>
                                             <th>Rincian Item Budget</th>
                                             <th>Term Bpu</th>
-                                            <th>Jumlah</th>
+                                            <th>Terbayarkan</th>
+                                            <th>Belum Terbayar</th>
+                                            <th>Realisasi</th>
+                                            <th>Sisa Realisasi</th>
+                                            <th>Total Pengajuan</th>
                                             <th>Tanggal Bayar</th>
+                                            <th>Tanggal Realisasi</th>
                                         </tr>
                                     </thead>
 
                                     <tbody>
                                         <?php
                                         $j = 1;
-                                        $queryDetailBpu = mysqli_query($koneksi, "SELECT a.*, b.rincian FROM bpu a JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no WHERE b.status IN ('UM', 'UM Burek') AND a.namapenerima = '$code' AND a.waktu = '$item[waktu]' AND a.status = 'Telah Di Bayar'") or die(mysqli_error($koneksi));
+                                        $queryDetailBpu = mysqli_query($koneksi, "SELECT a.*, b.rincian FROM bpu a JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no WHERE b.status IN ('UM', 'UM Burek') AND a.namapenerima = '$code' AND a.waktu = '$item[waktu]' AND a.status = 'Telah Di Bayar' AND a.jumlah - a.realisasi != '0'") or die(mysqli_error($koneksi));
+
                                         if (mysqli_num_rows($queryDetailBpu)) {
                                             while ($item2 = mysqli_fetch_assoc($queryDetailBpu)) :
+                                                $queryBpuTerbayar = mysqli_query($koneksi, "SELECT SUM(a.jumlah) AS total_pengajuan FROM bpu a where a.noid = '$item2[noid]' AND a.status = 'Telah Di Bayar'") or die(mysqli_error($koneksi));
+                                                $pengajuanTerbayar = mysqli_fetch_assoc($queryBpuTerbayar);
+                                                
+                                                $queryBpuBelumTerbayar = mysqli_query($koneksi, "SELECT SUM(a.jumlah) AS total_pengajuan FROM bpu a where a.noid = '$item2[noid]' AND a.status = 'Belum Di Bayar'") or die(mysqli_error($koneksi));
+                                                $pengajuanBelumTerbayar = mysqli_fetch_assoc($queryBpuBelumTerbayar);
+                                                
+                                                $queryBpuRealisasi = mysqli_query($koneksi, "SELECT SUM(a.realisasi) AS total_realisasi FROM bpu a where a.noid = '$item2[noid]' AND a.status IN ('Telah Di Bayar','Realisasi (Direksi)')") or die(mysqli_error($koneksi));
+                                                $pengajuanRealisasi = mysqli_fetch_assoc($queryBpuRealisasi);
 
-                                                $totalTerbayar += $item2['jumlah'];
                                         ?>
                                                 <tr data-toggle="collapse" data-target=".child1">
                                                     <td><?= $j++ ?></td>
                                                     <td><?= $item2['no'] ?></td>
                                                     <td><?= $item2['rincian'] ?></td>
                                                     <td><?= $item2['term'] ?></td>
-                                                    <td>Rp.<?= number_format($item2['jumlah']) ?></td>
+                                                    <td>Rp. <?= number_format($pengajuanTerbayar['total_pengajuan']) ?></td>
+                                                    <td>Rp. <?= number_format($pengajuanBelumTerbayar['total_pengajuan']) ?></td>
+                                                    <td>Rp. <?= number_format($pengajuanRealisasi['total_realisasi']) ?></td>
+                                                    <td>Rp. <?= number_format($item2['realisasi'] == 0 ? 0 : $item2['jumlah'] - $item2['realisasi'])  ?></td>
+                                                    <td>Rp. <?= number_format($item2['jumlah'])  ?></td>
                                                     <td><?= $item2['tanggalbayar'] ?></td>
+                                                    <td><?= $item2['tanggalrealisasi'] ?></td>
                                                 </tr>
                                             <?php endwhile; ?>
                                         <?php } else { ?>
@@ -363,10 +296,11 @@ $totalOut = mysqli_fetch_assoc($queryTotalOut);
                 <?php endwhile; ?>
                 <br>
                 <ul class="list-inline row ml-3">
-                    <li class="col-lg-5" style="padding-left: 30px;"><strong>Total </strong></li>
+                    <li class="col-lg-3" style="padding-left: 30px;"><strong>Total </strong></li>
                     <li class="col-lg-2"><strong>Rp. <?= number_format($totalTerbayar) ?></strong></li>
                     <li class="col-lg-2"><strong>Rp. <?= number_format($totalBelumTerbayar) ?></strong></li>
-                    <li class="col-lg-2"><strong>Rp. <?= number_format($total) ?></strong></li>
+                    <li class="col-lg-2"><strong>Rp. <?= number_format($totalRealisasi) ?></strong></li>
+                    <li class="col-lg-2"><strong>Rp. <?= number_format(($totalTerbayar + $totalBelumTerbayar) - $totalRealisasi) ?></strong></li>
                     <li class="col-lg-1">
                     </li>
                 </ul>

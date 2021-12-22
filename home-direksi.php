@@ -79,7 +79,7 @@ $setting = mysqli_fetch_assoc($querySetting);
         <ul class="nav navbar-nav">
           <li class="active"><a href="home-direksi.php">Home</a></li>
           <li><a href="list-direksi.php">List</a></li>
-          <li><a href="saldobpu.php">Data User</a></li>
+          <li><a href="saldobpu.php">Saldo BPU</a></li>
           <!--<li><a href="summary.php">Summary</a></li>-->
           <!-- <li><a href="hak-akses.php">Hak Akses</a></li> -->
           <li><a href="listfinish-direksi.php">Budget Finish</a></li>
@@ -692,7 +692,7 @@ $setting = mysqli_fetch_assoc($querySetting);
 
     function bpuUMJatuhTempo() {
       let bodyTable = document.getElementById('data-bpu-jatuh-tempo')
-      httpRequestGet('/dev-budget/ajax/ajax-um-jatuh-tempo.php?action=direksi-get-list').then((res) => {
+      httpRequestGet('ajax/ajax-um-jatuh-tempo.php?action=direksi-get-list').then((res) => {
         if (res.data !== null && res.data.length > 0) {
           titleReminderUmJatuhTempo.classList.add('text-blink')
           reminderReminderUmJatuhTempo.innerHTML = `<div class="alert alert-danger" role="alert"><i class='fa fa-bell text-blink'></i>

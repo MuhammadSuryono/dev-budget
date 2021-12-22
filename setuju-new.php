@@ -21,7 +21,7 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
 
     $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE stat = 'MRI'");
 
-    $sql = "SELECT DISTINCT t1.*, t2.berita_transfer, t4.nama AS nama_rekening, t3.label_kas, t3.bank AS kas_bank FROM bpu t1 LEFT JOIN bridgetransfer.data_transfer t2 ON t1.noid = t2.noid_bpu LEFT JOIN develop.kas t3 ON t1.rekening_sumber = t3.rekening LEFT JOIN rekening t4 ON t4.no = t1.rekening_id WHERE t1.no = '$id' AND t1.waktu = '$waktu' AND t1.term='$term' AND t1.persetujuan='Belum Disetujui'";
+    $sql = "SELECT t1.*, t2.berita_transfer, t4.nama AS nama_rekening, t3.label_kas, t3.bank AS kas_bank FROM bpu t1 LEFT JOIN bridgetransfer.data_transfer t2 ON t1.noid = t2.noid_bpu LEFT JOIN develop.kas t3 ON t1.rekening_sumber = t3.rekening LEFT JOIN rekening t4 ON t4.no = t1.rekening_id WHERE t1.no = '$id' AND t1.waktu = '$waktu' AND t1.term='$term' AND t1.persetujuan IN ('Belum Disetujui','Disetujui (Direksi)') GROUP BY t1.noid";
     $result = $koneksi->query($sql); ?>
 
     <table class="table table-bordered">

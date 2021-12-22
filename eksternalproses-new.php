@@ -42,6 +42,7 @@ if (is_array($_POST['jumlah'])) {
     $emailpenerima = $_POST['email'];
 }
 
+
 $no           = $_POST['no'];
 $waktu        = $_POST['waktu'];
 
@@ -78,9 +79,16 @@ while ($e = mysqli_fetch_assoc($queryUser)) {
     }
 }
 
-
-$queryBpu = mysqli_query($koneksi, "SELECT * FROM bpu WHERE no='$no' AND waktu='$waktu' AND term='$term'");
-$bpu = mysqli_fetch_assoc($queryBpu);
+$queryUser = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi = 'FINANCE' AND status_penerima_email_id = '3'");
+while ($e = mysqli_fetch_assoc($queryUser)) {
+    if ($e['phone_number']) {
+        array_push($emailInternal, $e['phone_number']);
+        array_push($namaInternal, $e['nama_user']);
+        array_push($idUserInternal, $e['id_user']);
+        array_push($dataDivisi, $e['divisi']);
+        array_push($dataLevel, $e['level']);
+    }
+}
 
 if ($statusbpu == 'Vendor/Supplier') {
     $invoice = str_replace('.', '', $_POST['invoice']);
@@ -101,6 +109,16 @@ if ($port != "") {
 $hostProtocol = $hostProtocol . ":" . $port;
 }
 $host = $hostProtocol. '/'. $url[1];
+
+$actionProcess = $_GET['action'];
+$idBpu = $_GET['id-bpu'];
+$idVerify = $_GET['id-verify'];
+
+$queryBpuVerify = mysqli_query($koneksi, "SELECT * FROM bpu_verify WHERE id = '$idVerify'");
+$dataVerify = [];
+while($row = mysqli_fetch_assoc($queryBpuVerify)) {
+    $dataVerify = $row;
+}
 
 //periksa apakah udah submit
 if (isset($_POST['submit'])) {
@@ -140,9 +158,9 @@ if (isset($_POST['submit'])) {
     $result2 = mysqli_query($koneksi, $query2);
     $row2 = mysqli_fetch_array($result2);
     $total2 = $row2[0];
-
+    
     $jadinya = $hargaah - $total + $total2;
-
+    
     $caribayar = mysqli_query($koneksi, "SELECT status FROM bpu WHERE waktu='$waktu' AND no='$no' AND status='Belum Di Bayar'");
 
     if ($jumlah > $jadinya) {
@@ -193,6 +211,9 @@ if (isset($_POST['submit'])) {
             $tglcairnya = null;
         }
 
+        $queryBpu = mysqli_query($koneksi, "SELECT * FROM bpu WHERE no='$no' AND waktu='$waktu' AND term='$termterm'");
+        $bpu = mysqli_fetch_assoc($queryBpu);
+
         if (is_array($_POST['jumlah'])) {
             $jumlahDiterima = "0";
             for ($i = 0; $i < count($arrjumlah); $i++) {
@@ -200,7 +221,7 @@ if (isset($_POST['submit'])) {
                 if ($aw['status'] == 'Vendor/Supplier' || $aw['status'] == 'Honor Eksternal' || $aw['status'] == 'Honor Area Head') {
                     $queryBank = mysqli_query($koneksi, "SELECT * FROM bank WHERE kodebank = '$arrnamabank[$i]'");
                     $bank = mysqli_fetch_assoc($queryBank);
-                    if ($aw['status'] == 'Vendor/Supplier') {
+                    if ($aw['status'] == 'Vendor/Supplier' && $_SESSION['divisi'] != 'Direksi') {
                         $msg = "Kepada $arrnamapenerima[$i], <br><br>
                         Berikut informasi status pembayaran Anda:<br><br>
                         No.Invoice       : <strong>$invoice</strong><br>
@@ -215,7 +236,7 @@ if (isset($_POST['submit'])) {
                         Informasi update status pembayaran akan kami kirimkan kembali melalui email. Jika ada pertanyaan lebih lanjut, silahkan email Divisi Finance ke finance@mri-research-ind.com.<br><br>
                         Hormat kami,<br>
                         Finance Marketing Research Indonesia";
-                    } else {
+                    } else if ($_SESSION['divisi'] != 'Direksi') {
                         $msg = "Kepada $arrnamapenerima[$i], <br><br>
                         Berikut informasi status pembayaran Anda:<br><br>
                         Nama Pembayaran  : <strong>$keterangan_pembayaran</strong><br>
@@ -229,22 +250,79 @@ if (isset($_POST['submit'])) {
                         Finance Marketing Research Indonesia
                         ";
                     }
-                    if ($arremailpenerima[$i]) {
+
+                    if ($arremailpenerima[$i] && $_SESSION['divisi'] != 'Direksi') {
                         $message = $emailHelper->sendEmail($msg, $subject, $arremailpenerima[$i], $name = '', $address = "single");
                     }
                 }
+
+
                 if ($_SESSION['divisi'] == 'Direksi') {
-                    $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,tglcair,namabank,norek,namapenerima,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,transfer_req_id,status_pengajuan_bpu,emailpenerima,ket_pembayaran,created_at) VALUES
-                                                        ('$no','$arrjumlah[$i]','$tglcair','$arrnamabank[$i]','$arrnorek[$i]','$arrnamapenerima[$i]','$pengaju','$divisi','$waktu','Belum Di Bayar','Disetujui (Direksi)','$termfinal','$statusbpu','$transferid', 1, '$arremailpenerima[$i]', '$keterangan_pembayaran', '$time')");
+                    if ($actionProcess != "update") {
+                        
+                        // echo "INSERT NOT UPDATE IF";
+                        $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,tanggalbayar,pengajuan_jumlah,tglcair,namabank,norek,namapenerima,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,transfer_req_id,status_pengajuan_bpu,emailpenerima,ket_pembayaran,created_at) VALUES
+                                                        ('$no','$_POST[tgl]','$arrjumlah[$i]','$tglcair','$arrnamabank[$i]','$arrnorek[$i]','$arrnamapenerima[$i]','$pengaju','$divisi','$waktu','Belum Di Bayar','Disetujui (Direksi)','$termfinal','$statusbpu','$transferid', 1, '$arremailpenerima[$i]', '$keterangan_pembayaran', '$time')");
+                        
+                        $idBpu = mysqli_insert_id($koneksi);
+                        $insertDataNeedVerifikasi = mysqli_query($koneksi, "INSERT INTO bpu_verify (id_bpu) VALUES ('$idBpu')");
+                        $queryBpuVerify = mysqli_query($koneksi, "SELECT * FROM bpu_verify WHERE id_bpu = '$idBpu'");
+                        $dataVerify = [];
+                        while($row = mysqli_fetch_assoc($queryBpuVerify)) {
+                            $dataVerify = $row;
+                        }
+                    }
+
+                    if ($actionProcess == "update" && $i == 0) {
+                        
+                        // echo "INSERT UPDATE IF";
+                        $insert = mysqli_query($koneksi, "UPDATE bpu SET tanggalbayar = '$_POST[tgl]', pengajuan_jumlah='$arrjumlah[$i]', tglcair = '$tglcair', namabank= '$arrnamabank[$i]', norek = '$arrnorek[$i]', namapenerima = '$arrnamapenerima[$i]', ket_pembayaran = '$keterangan_pembayaran', emailpenerima = '$arremailpenerima[$i]' WHERE noid = '$idBpu';
+                        ");
+                        
+                        $insert = mysqli_query($koneksi, "UPDATE bpu_verify SET is_need_approved = '1' WHERE id = '$idVerify'");
+                    } else if ($actionProcess == "update" && $i != 0) {
+                        // echo "INSERT UPDATE ELSE IF";
+                        $insert = mysqli_query($koneksi, "INSERT INTO bpu (no, status_pengajuan_bpu, metode_pembayaran,pengajuan_jumlah,tglcair,namabank,norek,namapenerima,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload,transfer_req_id, status_pengajuan_bpu,emailpenerima,ket_pembayaran,created_at) VALUES
+                        ('$no','$bpu[status_pengajuan_bpu]','$bpu[metode_pembayaran]','$arrjumlah[$i]','$tglcair','$arrnamabank[$i]','$arrnorek[$i]','$arrnamapenerima[$i]','$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$bpu[term]','$bpu[statusbpu]','$bpu[fileuploaf]','$transferid', 1, '$arremailpenerima[$i]', '$keterangan_pembayaran', '$time')");
                                                         // $idBpu = mysqli_insert_id($koneksi);
-                                                        // $insertDataNeedVerifikasi = mysqli_query($koneksi, "INSERT INTO bpu_verify (id_bpu) VALUES ('$idBpu')");
+                    }
+                    
                 } else {
-                    $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,tglcair,namabank,norek,namapenerima,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload,transfer_req_id, status_pengajuan_bpu,emailpenerima,ket_pembayaran,created_at) VALUES
-                                                        ('$no','$arrjumlah[$i]','$tglcair','$arrnamabank[$i]','$arrnorek[$i]','$arrnamapenerima[$i]','$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar','$transferid', 1, '$arremailpenerima[$i]', '$keterangan_pembayaran', '$time')");
+                    
+                    if ($actionProcess == "update" && $i == 0) {
+                        $insert = mysqli_query($koneksi, "UPDATE bpu SET tanggalbayar = '$_POST[tgl]', pengajuan_jumlah='$arrjumlah[$i]', tglcair = '$tglcair', namabank= '$arrnamabank[$i]', norek = '$arrnorek[$i]', namapenerima = '$arrnamapenerima[$i]', ket_pembayaran = '$keterangan_pembayaran', emailpenerima = '$arremailpenerima[$i]' WHERE noid = '$idBpu';
+                        ");
+                        
+                        // echo "INSERT UPDATE";
+                        
+                        $insert = mysqli_query($koneksi, "UPDATE bpu_verify SET is_need_approved = '1' WHERE id = '$idVerify'");
+                    } 
+                    
+                    if ($actionProcess == "update" && $i != 0) {
+                        $insert = mysqli_query($koneksi, "INSERT INTO bpu (no, status_pengajuan_bpu, metode_pembayaran,pengajuan_jumlah,tglcair,namabank,norek,namapenerima,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload,transfer_req_id, emailpenerima,ket_pembayaran,created_at) VALUES
+                        ('$no','$bpu[status_pengajuan_bpu]','$bpu[metode_pembayaran]','$arrjumlah[$i]','$tglcair','$arrnamabank[$i]','$arrnorek[$i]','$arrnamapenerima[$i]','$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$bpu[term]','$bpu[statusbpu]','$bpu[fileupload]','$transferid', '$arremailpenerima[$i]', '$keterangan_pembayaran', '$time')");
+                        //                                 // $idBpu = mysqli_insert_id($koneksi);
+                    } else if ($actionProcess != "update") {
+                        $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,tglcair,namabank,norek,namapenerima,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload,transfer_req_id, status_pengajuan_bpu,emailpenerima,ket_pembayaran,created_at) VALUES
+                        ('$no','$arrjumlah[$i]','$tglcair','$arrnamabank[$i]','$arrnorek[$i]','$arrnamapenerima[$i]','$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar','$transferid', 1, '$arremailpenerima[$i]', '$keterangan_pembayaran', '$time')");
+
+                        $idBpu = mysqli_insert_id($koneksi);
+                        $insertDataNeedVerifikasi = mysqli_query($koneksi, "INSERT INTO bpu_verify (id_bpu) VALUES ('$idBpu')");
+                        $queryBpuVerify = mysqli_query($koneksi, "SELECT * FROM bpu_verify WHERE id_bpu = '$idBpu'");
+                        $dataVerify = [];
+                        while($row = mysqli_fetch_assoc($queryBpuVerify)) {
+                            $dataVerify = $row;
+                        }
+                    }
                 }
             }
 
-            $notification = 'Pembuatan BPU Eksternal Berhasil. Pemberitahuan via email telah terkirim ke ';
+            if ($_SESSION['divisi'] != 'Direksi') {
+                $notification = 'Pembuatan BPU Eksternal Berhasil. Pemberitahuan via email telah terkirim ke ';
+            } else {
+                $notification = '';
+            }
+
             $i = 0;
 
             $namaPenerima = "";
@@ -254,19 +332,35 @@ if (isset($_POST['submit'])) {
                 if ($i < count($arremailpenerima) - 1) $notification .= ', ';
                 else $notification .= '.';
             }
-            $notification .= 'dan Pembuatan BPU Eksternal Berhasil. Pemberitahuan via whatsapp telah terkirim ke ';
+            if ($_SESSION['divisi'] != 'Direksi') {
+                $notification = ' Dan Pemberitahuan via whatsapp telah terkirim ke ';
+            } else {
+                $notification = 'Pembuatan BPU Eksternal Berhasil. Pemberitahuan via whatsapp telah terkirim ke';
+            }
+
+            array_unique($emailInternal);
+            array_unique($namaInternal);
 
             for($i = 0; $i < count($emailInternal); $i++) {
                 $path = '/views.php';
-                if ($dataDivisi[$i] == 'FINANCE') {
-                    $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $jenis == 'B1' ? '/view-finance-manager-b1.php' : '/view-finance-manager.php';
-                    $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $jenis == 'Non Rutin' ? '/view-finance-nonrutin-manager.php' : '/view-finance-manager.php';
-                    $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $jenis == 'Non Rutin' ? '/view-finance-nonrutin.php' : '/view-finance.php';
-                    $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
-                } else if ($dataDivisi[$i] == 'Direksi') {
-                    $path = '/views-direksi.php';
+                
+                $isEksternalProcess = $statusbpu == 'Vendor/Supplier' || $statusbpu == 'Honor Eksternal' || $statusbpu == 'Honor Area Head' || $statusbpu == 'STKB OPS' || $statusbpu == 'STKB TRK Luar Kota' || $statusbpu == 'Honor Luar Kota' || $statusbpu == 'Honor Jakarta' || $statusbpu == 'STKB TRK Jakarta' ? true : false;
+
+                if ($isEksternalProcess) {
+                    $path = 'view-bpu-verify.php?id='.$dataVerify["id"].'&bpu='.$dataVerify["id_bpu"];
+                } else {
+                    if ($dataDivisi[$i] == 'FINANCE') {
+                        $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $jenis == 'B1' ? '/view-finance-manager-b1.php?code='.$numb.'' : '/view-finance-manager.php?code='.$numb.'';
+                        $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $jenis == 'Non Rutin' ? '/view-finance-nonrutin-manager.php?code='.$numb.'' : '/view-finance-manager.php?code='.$numb.'';
+                        $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $jenis == 'Non Rutin' ? '/view-finance-nonrutin.php' : '/view-finance.php';
+                        $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
+                        $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
+                    } else if ($dataDivisi[$i] == 'Direksi') {
+                        $path = '/views-direksi.php?code='.$numb.'';
+                    }
                 }
-              $url =  $host. $path.'?code='.$numb.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
+
+              $url =  $host. $path.'&session='.base64_encode(json_encode(["id_user" => $idUserInternal[$i], "timeout" => time()]));
               $msg = $messageHelper->messagePengajuanBPU($namaInternal[$i], $pengaju, $namaProject, $namaPenerima, $jumlahDiterima, "", $url);
               if($emailInternal[$i] != "") $wa->sendMessage($emailInternal[$i], $msg);
 
@@ -275,10 +369,47 @@ if (isset($_POST['submit'])) {
                 else $notification .= '.';
             }
         } else {
+            if ($_SESSION['divisi'] == 'Direksi') {
+                if ($actionProcess == "update") {
+                    $insert = mysqli_query($koneksi, "UPDATE bpu SET pengajuan_jumlah='$dataVerify[total_verify]', tglcair = '$tglcair', namabank= '$namabank', norek = '$norek', namapenerima = '$namapenerima', ket_pembayaran = '$keterangan_pembayaran', emailpenerima = '$emailpenerima' WHERE noid = '$idBpu';
+                    ");
+                    $insert = mysqli_query($koneksi, "UPDATE bpu_verify SET is_need_approved = '1' WHERE id = '$idVerify'");
+                } else {
+                    $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,tanggalbayar,pengajuan_jumlah,tglcair,namabank,norek,namapenerima,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,transfer_req_id,status_pengajuan_bpu,emailpenerima,ket_pembayaran,created_at) VALUES
+                                                    ('$no','$_POST[tgl]','$jumlah','$tglcair','$namabank','$norek','$namapenerima','$pengaju','$divisi','$waktu','Belum Di Bayar','Disetujui (Direksi)','$termfinal','$statusbpu','$transferid', 1, '$emailpenerima', '$keterangan_pembayaran', '$time')");
+                $idBpu = mysqli_insert_id($koneksi);
+                $insertDataNeedVerifikasi = mysqli_query($koneksi, "INSERT INTO bpu_verify (id_bpu) VALUES ('$idBpu')");
+                }
+
+                $queryBpuVerify = mysqli_query($koneksi, "SELECT * FROM bpu_verify WHERE id_bpu = '$idBpu'");
+                $dataVerify = [];
+                while($row = mysqli_fetch_assoc($queryBpuVerify)) {
+                    $dataVerify = $row;
+                }
+                
+            } else {
+                if ($actionProcess == "update") {
+                    $insert = mysqli_query($koneksi, "UPDATE bpu SET pengajuan_jumlah='$dataVerify[total_verify]', tglcair = '$tglcair', namabank= '$namabank', norek = '$norek', namapenerima = '$namapenerima', ket_pembayaran = '$keterangan_pembayaran', emailpenerima = '$emailpenerima' WHERE noid = '$idBpu';
+                    ");
+                    $insert = mysqli_query($koneksi, "UPDATE bpu_verify SET is_need_approved = '1' WHERE id = '$idVerify'");
+                } else {
+                    $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,tglcair,namabank,norek,namapenerima,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload,transfer_req_id, status_pengajuan_bpu,emailpenerima,ket_pembayaran,created_at) VALUES
+                    ('$no','$jumlah','$tglcair','$namabank','$norek','$namapenerima','$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar','$transferid', 1, '$emailpenerima', '$keterangan_pembayaran', '$time')");
+
+                    $idBpu = mysqli_insert_id($koneksi);
+                    $insertDataNeedVerifikasi = mysqli_query($koneksi, "INSERT INTO bpu_verify (id_bpu) VALUES ('$idBpu')");
+                    $queryBpuVerify = mysqli_query($koneksi, "SELECT * FROM bpu_verify WHERE id_bpu = '$idBpu'");
+                    $dataVerify = [];
+                    while($row = mysqli_fetch_assoc($queryBpuVerify)) {
+                        $dataVerify = $row;
+                    }
+                }
+                
+            }
             if ($aw['status'] == 'Vendor/Supplier' || $aw['status'] == 'Honor Eksternal') {
                 $queryBank = mysqli_query($koneksi, "SELECT * FROM bank WHERE kodebank = '$namabank'");
                 $bank = mysqli_fetch_assoc($queryBank);
-                if ($aw['status'] == 'Vendor/Supplier') {
+                if ($aw['status'] == 'Vendor/Supplier' && $_SESSION['divisi'] != 'Direksi') {
                     $msg = "Kepada $namapenerima, <br><br>
                         Berikut informasi status pembayaran Anda:<br><br>
                         No.Invoice       : <strong>$invoice</strong><br>
@@ -292,9 +423,8 @@ if (isset($_POST['submit'])) {
                         Status           : <strong>Sedang Diproses</strong><br><br>
                         Informasi update status pembayaran akan kami kirimkan kembali melalui email. Jika ada pertanyaan lebih lanjut, silahkan email Divisi Finance ke finance@mri-research-ind.com.<br><br>
                         Hormat kami,<br>
-                        Finance Marketing Research Indonesia
-            ";
-                } else {
+                        Finance Marketing Research Indonesia ";
+                } else if ($_SESSION['divisi'] != 'Direksi') {
                     $msg = "Kepada $namapenerima, <br><br>
                     Berikut informasi status pembayaran Anda:<br><br>
                     Nama Pembayaran  : <strong>$keterangan_pembayaran</strong><br>
@@ -310,21 +440,28 @@ if (isset($_POST['submit'])) {
                 }
                 $subject = "Informasi Pembayaran";
 
-                if ($emailpenerima) {
+                if ($emailpenerima && $_SESSION['divisi'] != 'Direksi') {
                     $message = $emailHelper->sendEmail($msg, $subject, $emailpenerima, $name = '', $address = "single");
                 }
                 $notification = 'Pembuatan BPU Eksternal Berhasil. Pemberitahuan via whatsapp telah terkirim ke ';
                 for($i = 0; $i < count($emailInternal); $i++) {
                     $path = '/views.php';
-                    if ($dataDivisi[$i] == 'FINANCE') {
-                        $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $jenis == 'B1' ? '/view-finance-manager-b1.php' : '/view-finance-manager.php';
-                        $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $jenis == 'Non Rutin' ? '/view-finance-nonrutin-manager.php' : '/view-finance-manager.php';
-                        $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $jenis == 'Non Rutin' ? '/view-finance-nonrutin.php' : '/view-finance.php';
-                        $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
-                    } else if ($dataDivisi[$i] == 'Direksi') {
-                        $path = '/views-direksi.php';
+                    $isEksternalProcess = $statusbpu == 'Vendor/Supplier' || $statusbpu == 'Honor Eksternal' || $statusbpu == 'Honor Area Head' || $statusbpu == 'STKB OPS' || $statusbpu == 'STKB TRK Luar Kota' || $statusbpu == 'Honor Luar Kota' || $statusbpu == 'Honor Jakarta' || $statusbpu == 'STKB TRK Jakarta' ? true : false;
+
+                    if ($isEksternalProcess) {
+                        $path = 'view-bpu-verify.php?id='.$dataVerify["id"].'&bpu='.$dataVerify["id_bpu"];
+                    } else {
+                        if ($dataDivisi[$i] == 'FINANCE') {
+                            $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $jenis == 'B1' ? '/view-finance-manager-b1.php?code='.$numb.'' : '/view-finance-manager.php?code='.$numb.'';
+                            $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $jenis == 'Non Rutin' ? '/view-finance-nonrutin-manager.php?code='.$numb.'' : '/view-finance-manager.php?code='.$numb.'';
+                            $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $jenis == 'Non Rutin' ? '/view-finance-nonrutin.php' : '/view-finance.php?code='.$numb.'';
+                            $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
+                            $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
+                        } else if ($dataDivisi[$i] == 'Direksi') {
+                            $path = '/views-direksi.php?code='.$numb.'';
+                        }
                     }
-                  $url =  $host. $path.'?code='.$numb.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
+                  $url =  $host. $path.'&session='.base64_encode(json_encode(["id_user" => $idUserInternal[$i], "timeout" => time()]));
                   $msg = $messageHelper->messagePengajuanBPU($namaInternal[$i], $pengaju, $namaProject, $namapenerima, $jumlah, "", $url);
                   if($emailInternal[$i] != "") $wa->sendMessage($emailInternal[$i], $msg);
 
@@ -333,35 +470,36 @@ if (isset($_POST['submit'])) {
                     else $notification .= '.';
                 }
             }
-            if ($_SESSION['divisi'] == 'Direksi') {
-                $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,tglcair,namabank,norek,namapenerima,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,transfer_req_id,status_pengajuan_bpu,emailpenerima,ket_pembayaran,created_at) VALUES
-                                                    ('$no','$jumlah','$tglcair','$namabank','$norek','$namapenerima','$pengaju','$divisi','$waktu','Belum Di Bayar','Disetujui (Direksi)','$termfinal','$statusbpu','$transferid', 1, '$emailpenerima', '$keterangan_pembayaran', '$time')");
-                // $idBpu = mysqli_insert_id($koneksi);
-                // $insertDataNeedVerifikasi = mysqli_query($koneksi, "INSERT INTO bpu_verify (id_bpu) VALUES ('$idBpu')");
-            } else {
-                $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,tglcair,namabank,norek,namapenerima,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload,transfer_req_id, status_pengajuan_bpu,emailpenerima,ket_pembayaran,created_at) VALUES
-                                                    ('$no','$jumlah','$tglcair','$namabank','$norek','$namapenerima','$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar','$transferid', 1, '$emailpenerima', '$keterangan_pembayaran', '$time')");
-            }
 
             
-            $notification .= "dan Pemberitahuan via email telah terkirim ke - $namapenerima ($emailpenerima)";
+            if ($_SESSION['divisi'] != 'Direksi') {
+                $notification .= " dan Pemberitahuan via email telah terkirim ke - $namapenerima ($emailpenerima)";
+            }
         }
     }
 
     if ($insert) {
 
         if ($_SESSION['divisi'] == 'FINANCE') {
-            if ($_SESSION['hak_akses'] == 'Manager') {
+            if ($actionProcess = "update") {
                 echo "<script language='javascript'>";
                 echo "alert('$notification')";
                 echo "</script>";
-                echo "<script> document.location.href='view-finance" . $isNonRutin  . "-manager.php?code=" . $numb . "'; </script>";
+                echo "<script> document.location.href='view-bpu-verify.php?id=".$idVerify."&bpu=".$idBpu."&status=success'; </script>";
             } else {
-                echo "<script language='javascript'>";
-                echo "alert('$notification')";
-                echo "</script>";
-                echo "<script> document.location.href='view-finance" . $isNonRutin  . ".php?code=" . $numb . "'; </script>";
+                if ($_SESSION['hak_akses'] == 'Manager') {
+                    echo "<script language='javascript'>";
+                    echo "alert('$notification')";
+                    echo "</script>";
+                    echo "<script> document.location.href='view-finance" . $isNonRutin  . "-manager.php?code=" . $numb . "'; </script>";
+                } else {
+                    echo "<script language='javascript'>";
+                    echo "alert('$notification')";
+                    echo "</script>";
+                    echo "<script> document.location.href='view-finance" . $isNonRutin  . ".php?code=" . $numb . "'; </script>";
+                }
             }
+            
         } else {
             echo "<script language='javascript'>";
             echo "alert('$notification!!')";
