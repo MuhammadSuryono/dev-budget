@@ -30,6 +30,15 @@ while ($row = mysqli_fetch_assoc($query)) {
     $dataBpu = $row;
 }
 
+$url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+$port = $_SERVER['SERVER_PORT'];
+$url = explode('/', $url);
+$hostProtocol = $url[0];
+if ($port != "") {
+$hostProtocol = $hostProtocol . ":" . $port;
+}
+$host = $hostProtocol. '/'. $url[1];
+
 ?>
 
 <!DOCTYPE html>
@@ -196,7 +205,7 @@ while ($row = mysqli_fetch_assoc($query)) {
               title="Inline Frame Example"
               width="900"
               height="800"
-              src="<?= $dataVerify['document'] != '' ? $_SERVER['SERVER_NAME'].'fileupload/'.$dataVerify['document']:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMGwPo04v2vaxbXlOkSuBK1aDQs1ntPnFM9_5P7BhEULVguY4tv4EZMuF88SaA7HZ8a1o&usqp=CAU' ?>">
+              src="<?= $dataVerify['document'] != '' ? $host.'/fileupload/'.$dataVerify['document']:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMGwPo04v2vaxbXlOkSuBK1aDQs1ntPnFM9_5P7BhEULVguY4tv4EZMuF88SaA7HZ8a1o&usqp=CAU' ?>">
           </iframe>
             <!-- <img id="content-image" style="max-width: 720px;" src="<?= $dataVerify['document'] != '' ? 'fileupload/'.$dataVerify['document']:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMGwPo04v2vaxbXlOkSuBK1aDQs1ntPnFM9_5P7BhEULVguY4tv4EZMuF88SaA7HZ8a1o&usqp=CAU' ?>" /> -->
           </div>
