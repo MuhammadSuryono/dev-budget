@@ -128,6 +128,9 @@ if ($statusbpu == "") {
     $statusbpu = $bpu["statusbpu"];
 }
 
+$isEksternalProcess = $bpu["statusbpu"] == 'Vendor/Supplier';
+$path = '/view-bpu-verify.php?id='.$bpuVerify["id"].'&bpu='.$bpuVerify["id_bpu"];
+
 //periksa apakah udah submit
 if (isset($_POST['submit'])) {
 
@@ -349,7 +352,6 @@ if (isset($_POST['submit'])) {
             for($i = 0; $i < count($emailInternal); $i++) {
                 $path = '/views.php';
                 
-                $isEksternalProcess = $statusbpu == 'Vendor/Supplier' || $statusbpu == 'Honor Eksternal' || $statusbpu == 'Honor Area Head' || $statusbpu == 'STKB OPS' || $statusbpu == 'STKB TRK Luar Kota' || $statusbpu == 'Honor Luar Kota' || $statusbpu == 'Honor Jakarta' || $statusbpu == 'STKB TRK Jakarta' ? true : false;
 
                 if ($isEksternalProcess && $_SESSION["divisi"] != "Direksi") {
                     $path = '/view-bpu-verify.php?id='.$dataVerify["id"].'&bpu='.$dataVerify["id_bpu"];
@@ -451,7 +453,6 @@ if (isset($_POST['submit'])) {
                 $notification = 'Pembuatan BPU Eksternal Berhasil. Pemberitahuan via whatsapp telah terkirim ke ';
                 for($i = 0; $i < count($emailInternal); $i++) {
                     $path = '/views.php';
-                    $isEksternalProcess = $statusbpu == 'Vendor/Supplier' || $statusbpu == 'Honor Eksternal' || $statusbpu == 'Honor Area Head' || $statusbpu == 'STKB OPS' || $statusbpu == 'STKB TRK Luar Kota' || $statusbpu == 'Honor Luar Kota' || $statusbpu == 'Honor Jakarta' || $statusbpu == 'STKB TRK Jakarta' ? true : false;
 
                     if ($isEksternalProcess && $_SESSION["divisi"] != "Direksi") {
                         $path = '/view-bpu-verify.php?id='.$dataVerify["id"].'&bpu='.$dataVerify["id_bpu"];
@@ -484,8 +485,8 @@ if (isset($_POST['submit'])) {
     }
 
     if ($insert) {
-        $isEksternalProcess = $statusbpu == 'Vendor/Supplier' || $statusbpu == 'Honor Eksternal' || $statusbpu == 'Honor Area Head' || $statusbpu == 'STKB OPS' || $statusbpu == 'STKB TRK Luar Kota' || $statusbpu == 'Honor Luar Kota' || $statusbpu == 'Honor Jakarta' || $statusbpu == 'STKB TRK Jakarta' ? true : false;
-        
+
+        $q = explode('/', $path);
         if ($_SESSION["divisi"] == "Direksi") {
             echo "<script language='javascript'>";
             echo "alert('$notification!!')";
@@ -525,7 +526,7 @@ if (isset($_POST['submit'])) {
             echo "<script language='javascript'>";
             echo "alert('$notification')";
             echo "</script>";
-            echo "<script> document.location.href='".$path."'; </script>";
+            echo "<script> document.location.href='".$q[1]."'; </script>";
         }
     } else {
         echo "Pembuatan Budget External Gagal";
