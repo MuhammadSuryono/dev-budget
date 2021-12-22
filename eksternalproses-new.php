@@ -484,7 +484,15 @@ if (isset($_POST['submit'])) {
 
     if ($insert) {
         $isEksternalProcess = $statusbpu == 'Vendor/Supplier' || $statusbpu == 'Honor Eksternal' || $statusbpu == 'Honor Area Head' || $statusbpu == 'STKB OPS' || $statusbpu == 'STKB TRK Luar Kota' || $statusbpu == 'Honor Luar Kota' || $statusbpu == 'Honor Jakarta' || $statusbpu == 'STKB TRK Jakarta' ? true : false;
-        if (!$isEksternalProcess) {
+        
+        if ($_SESSION["divisi"] == "Direksi") {
+            echo "<script language='javascript'>";
+            echo "alert('$notification!!')";
+            echo "</script>";
+            echo "<script> document.location.href='views-direksi.php?code=" . $numb . "'; </script>";
+        }
+        
+        if (!$isEksternalProcess && $_SESSION["divisi"] != "Direksi") {
             if ($_SESSION['divisi'] == 'FINANCE') {
                 if ($actionProcess = "update") {
                     echo "<script language='javascript'>";
