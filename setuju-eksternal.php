@@ -1,4 +1,5 @@
 <?php
+error_reporting(0);
 require "application/config/database.php";
 
 $con = new Database();
