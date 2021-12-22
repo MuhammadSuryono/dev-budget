@@ -82,6 +82,7 @@ $hostProtocol = $hostProtocol . ":" . $port;
 $host = $hostProtocol. '/'. $url[1];
 
 if ($submit == 1) {
+    var_dump($noid);
     for ($i = 0; $i < count($noid); $i++) {
         $queryBpu = mysqli_query($koneksi, "SELECT * FROM bpu WHERE noid='$noid[$i]'");
         $bpu = mysqli_fetch_assoc($queryBpu);
@@ -473,7 +474,7 @@ if ($submit == 1) {
     // $notification .= " Dan telah dikirim pemberitahuan ke penerima via email ke " . implode(",", $arremailpenerima);
 }
 $isEksternalProcess = $statusbpu == 'Vendor/Supplier' || $statusbpu == 'Honor Eksternal' || $statusbpu == 'Honor Area Head' || $statusbpu == 'STKB OPS' || $statusbpu == 'STKB TRK Luar Kota' || $statusbpu == 'Honor Luar Kota' || $statusbpu == 'Honor Jakarta' || $statusbpu == 'STKB TRK Jakarta' ? true : false;
-
+var_dump($statusbpu);
 $path = '/view-bpu-verify.php?id='.$dataVerify["id"].'&bpu='.$dataVerify["id_bpu"];
 if ($update) {
     if (!$isEksternalProcess) {
