@@ -139,6 +139,62 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
 
     </div>
 
+    <?php if (in_array("1", $arrCode) || in_array("2", $arrCode)) : ?>
+        <div class="form-group form-rekening-sumber-pal">
+            <label for="rekening_sumber" class="control-label">Rekening Sumber MRI PAL:</label>
+            <select class="form-control" name="rekening_sumber_mri_pal">
+                <?php if (in_array("1", $arrCode)) : ?>
+                    <?php $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'Kas Uang Muka'"); ?>
+                <?php else : ?>
+                    <?php if ($jenis == 'B1' || $jenis == 'B2') : ?>
+                        <?php $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'Kas Project'"); ?>
+                    <?php else : ?>
+                        <?php $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'Kas Umum'"); ?>
+                    <?php endif; ?>
+                <?php endif; ?>
+                <?php while ($item = mysqli_fetch_assoc($getRekening)) : ?>
+                    <option value="<?= $item['rekening'] ?>"><?= $item['rekening'] ?> - <?= $item['label_kas'] ?></option>
+                <?php endwhile; ?>
+            </select>
+        </div>
+    <?php endif; ?>
+
+    <?php if (in_array("2", $arrCode)) : ?>
+        <!-- <div class="form-group form-rekening-sumber-pal">
+            <label for="rekening_sumber" class="control-label">Rekening Sumber MRI PAL: <span data-toggle="tooltip" title="Abaikan apabila tidak ada pembayaran menggunakan MRI PAL"><i class="fa fa-question-circle"></i></span></label>
+            <select class="form-control" name="rekening_sumber_mri_pal">
+                <?php if ($jenis == 'B1' || $jenis == 'B2') : ?>
+                    <?php $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'Kas Project'"); ?>
+                <?php else : ?>
+                    <?php $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'Kas Umum'"); ?>
+                <?php endif; ?>
+                <?php while ($item = mysqli_fetch_assoc($getRekening)) : ?>
+                    <option value="<?= $item['rekening'] ?>"><?= $item['rekening'] ?> - <?= $item['label_kas'] ?></option>
+                <?php endwhile; ?>
+            </select>
+        </div> -->
+    <?php endif; ?>
+
+    <?php if (in_array("3", $arrCode) || in_array("4", $arrCode)) : ?>
+        <div class="form-group form-rekening-sumber-kas">
+            <label for="rekening_sumber" class="control-label">Rekening Sumber MRI Kas: <span data-toggle="tooltip" title="Abaikan apabila tidak ada pembayaran menggunakan MRI Kas"><i class="fa fa-question-circle"></i></span></label>
+            <select class="form-control" name="rekening_sumber_mri_kas">
+                <?php if (in_array("3", $arrCode)) : ?>
+                    <?php $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'KAS 3'"); ?>
+                <?php else : ?>
+                    <?php if ($jenis == 'B1' || $jenis == 'B2') : ?>
+                        <?php $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'KAS 1'"); ?>
+                    <?php else : ?>
+                        <?php $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'KAS 2'"); ?>
+                    <?php endif; ?>
+                <?php endif; ?>
+                <?php while ($item = mysqli_fetch_assoc($getRekening)) : ?>
+                    <option value="<?= $item['rekening'] ?>"><?= $item['rekening'] ?> - <?= $item['label_kas']  . ' (' . $item['keterangan'] . ')' ?></option>
+                <?php endwhile; ?>
+            </select>
+        </div>
+    <?php endif; ?>
+
     <ul class="list-group">
         <li class="list-group-item">Pengaju : <b><?= $pengaju ?></b></li>
         <li class="list-group-item">Berita Transfer : <b><?= $ket_pembayaran ?></b></li>

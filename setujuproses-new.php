@@ -17,6 +17,10 @@ $con->set_name_db(DB_TRANSFER);
 $con->init_connection();
 $koneksiTransfer = $con->connect();
 
+$con->set_name_db(DB_MRI_TRANSFER);
+$con->init_connection();
+$koneksiMriTransfer = $con->connect();
+
 
 require "vendor/email/send-email.php";
 
@@ -44,6 +48,8 @@ $urgent       = $_POST['urgent'];
 $term       = $_POST['term'];
 $tanggalbayar = $_POST['tanggalbayar'];
 $alasanTolakBpu = $_POST['alasanTolakBpu'];
+$rekening_sumber_mri_pal = $_POST['rekening_sumber_mri_pal'];
+$rekening_sumber_mri_kas = $_POST['rekening_sumber_mri_kas'];
 
 $arrPengajuanJumlah = $_POST['pengajuan_jumlah'];
 $arrNoid = $_POST['noid'];
@@ -124,7 +130,7 @@ if ($_POST['submit'] == 1) {
 
         $pengaju = $item['pengaju'];
 
-        if ($item['metode_pembayaran'] == 'MRI PAL') {
+        if (!$isEksternalProcess && $item['metode_pembayaran'] == 'MRI PAL') {
             $update = mysqli_query($koneksiTransfer, "UPDATE data_transfer SET jadwal_transfer ='$tanggalbayar', nm_otorisasi = '$userSetuju' WHERE noid_bpu = '$item[noid]'") or die(mysqli_error($koneksiTransfer));
 
             if (!$update) {
@@ -203,6 +209,33 @@ if ($_POST['submit'] == 1) {
             array_push($dataDivisi, $emailUser['divisi']);
             array_push($dataLevel, $emailUser['level']);
         }
+
+
+        if ($isEksternalProcess && $item['metode_pembayaran'] == 'MRI PAL') {
+            $rekening_sumber = $rekening_sumber_mri_pal;
+            $date = date('my');
+            $countQuery = mysqli_query($koneksiTransfer, "SELECT transfer_req_id FROM data_transfer WHERE transfer_req_id LIKE '$date%' ORDER BY transfer_req_id DESC LIMIT 1");
+            $count = mysqli_fetch_assoc($countQuery);
+            $count = (int)substr($count['transfer_req_id'], -4);
+
+            $queryBank = mysqli_query($koneksi, "SELECT * FROM bank WHERE kodebank = '$item[namabank]'");
+            $bank = mysqli_fetch_assoc($queryBank);
+
+            $formatId = $date . sprintf('%04d', $count + 1);
+
+            if ($bank['kodebank'] == "CENAIDJA") {
+                $biayaTrf = 0;
+            } else {
+                $biayaTrf = 2900;
+            }
+
+            $nm_project = '"' . $budget['nama'] . '", "item ke ' . $item['no'] . '", "BPU ke ' . $item['term'] . '"';
+
+            $queryJenisPembayaran = mysqli_query($koneksiMriTransfer, "SELECT * FROM jenis_pembayaran WHERE jenispembayaran = '$item[statusbpu]'");
+            $jenisPembayaran = mysqli_fetch_assoc($queryJenisPembayaran);
+            $insert = mysqli_query($koneksiTransfer, "INSERT INTO data_transfer (transfer_req_id, transfer_type, jenis_pembayaran_id, keterangan, waktu_request, norek, pemilik_rekening, bank, kode_bank, berita_transfer, jumlah, terotorisasi, hasil_transfer, ket_transfer, nm_pembuat, nm_validasi, nm_manual, jenis_project, nm_project, noid_bpu, biaya_trf, rekening_sumber, email_pemilik_rekening) 
+                    VALUES ('$formatId', '3', '$jenisPembayaran[jenispembayaranid]', '$item[statusitem]', '$waktu', '$item[norek]', '$item[namapenerima]','$bank[namabank]', '$bank[kodebank]', '$berita_transfer','$arrPengajuanJumlah[0]', '2', '1', 'Antri', '$item[pengaju]', '$_SESSION[nama_user]', '', '$budget[jenis]', '$nm_project', '$item[noid]', $biayaTrf, '$rekening_sumber', '$item[emailpenerima]')") or die(mysqli_error($koneksiTransfer));
+        }
     }
 
     if ($bpuItem['statusbpu'] == 'UM' || $bpuItem['statusbpu'] == 'UM Burek') {
@@ -265,6 +298,9 @@ if ($_POST['submit'] == 1) {
         $update = mysqli_query($koneksi, "UPDATE bpu SET status_pengajuan_bpu =0, tanggalbayar = '$tanggalbayar', urgent = '$urgent', checkby = '$userSetuju', tglcheck = '$time'
                                WHERE no='$no' AND waktu='$waktu' AND persetujuan='Belum Disetujui' AND term=$term");
         $update = mysqli_query($koneksi, "UPDATE bpu_verify SET is_need_approved = '0', status_approved = '1', is_approved = '1' WHERE id = '$bpuVerify[id]'");
+
+        
+
     } else {
         $update = mysqli_query($koneksi, "UPDATE bpu SET status_pengajuan_bpu =0, persetujuan = '$persetujuan', tanggalbayar = '$tanggalbayar', urgent = '$urgent', approveby = '$userSetuju', tglapprove = '$time'
                                WHERE no='$no' AND waktu='$waktu' AND persetujuan='Belum Disetujui' AND term=$term");
