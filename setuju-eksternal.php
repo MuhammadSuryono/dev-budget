@@ -195,6 +195,24 @@ $koneksi->close();
         console.log('here');
     })
 
+    function convertToRupiah(number) {
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IND' }).format(number)
+    }
+
+    function countPph(valPph, totalData) {
+        let dpp = 1.1
+        let pph = valPph
+        let ppn = 0.1
+
+        let resDpp = totalData / dpp
+        let resPPh = resDpp * pph
+        let resPpn = resDpp * ppn
+
+        let totalAfterPph = Math.round((resDpp - resPPh) + resPpn)
+
+        return Math.round(totalData - totalAfterPph)
+    }
+
     $('input[name=pajak]').change(function() {
             let tdPengajuan = $('.td-pengajuan');
             let tdActual = $('.td-aktual');
@@ -273,9 +291,12 @@ $koneksi->close();
                 }
             } else if ($(this).val() == 'pph232') {
                 if ($(this).prop('checked')) {
-                    // result = Math.round(parseInt(actual) - (0.1 * bpu));
+                    
                     for (let i = 0; i < tdPengajuan.length; i++) {
-                        result = Math.round(parseInt(tdActual[i].textContent) - (0.02 * parseInt(tdPengajuan[i].textContent)));
+                        let totalData = parseInt(tdPengajuan[i].textContent)
+                        let selisih = result = countPph(0.02, totalData)
+                        result = Math.round(parseInt(tdActual[i].textContent) - selisih);
+                        
                         tdActual[i].innerText = result
                         inputPengajuan[i].value = result
 
@@ -288,9 +309,11 @@ $koneksi->close();
                         }
                     }
                 } else {
-                    // result = Math.round(parseInt(actual) + (0.1 * bpu));
                     for (let i = 0; i < tdPengajuan.length; i++) {
-                        result = Math.round(parseInt(tdActual[i].textContent) + (0.02 * parseInt(tdPengajuan[i].textContent)));
+                        
+                        let totalData = parseInt(tdPengajuan[i].textContent)
+                        let selisih = result = countPph(0.02, totalData)
+                        result = Math.round(parseInt(tdActual[i].textContent) + selisih);
                         tdActual[i].innerText = result
                         inputPengajuan[i].value = result
 
@@ -307,7 +330,10 @@ $koneksi->close();
                 if ($(this).prop('checked')) {
                     // result = Math.round(parseInt(actual) - (0.1 * bpu));
                     for (let i = 0; i < tdPengajuan.length; i++) {
-                        result = Math.round(parseInt(tdActual[i].textContent) - (0.04 * parseInt(tdPengajuan[i].textContent)));
+                        
+                        let totalData = parseInt(tdPengajuan[i].textContent)
+                        let selisih = result = countPph(0.04, totalData)
+                        result = Math.round(parseInt(tdActual[i].textContent) - selisih);
                         tdActual[i].innerText = result
                         inputPengajuan[i].value = result
 
@@ -322,7 +348,10 @@ $koneksi->close();
                 } else {
                     // result = Math.round(parseInt(actual) + (0.1 * bpu));
                     for (let i = 0; i < tdPengajuan.length; i++) {
-                        result = Math.round(parseInt(tdActual[i].textContent) + (0.04 * parseInt(tdPengajuan[i].textContent)));
+                        
+                        let totalData = parseInt(tdPengajuan[i].textContent)
+                        let selisih = result = countPph(0.04, totalData)
+                        result = Math.round(parseInt(tdActual[i].textContent) + selisih);
                         tdActual[i].innerText = result
                         inputPengajuan[i].value = result
 

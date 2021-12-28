@@ -6,6 +6,7 @@ $path = "eksternalproses-new.php?action=update&id-bpu=".$idBpu."&id-verify=".$id
     <input type="hidden" name="divisi" value="<?= $dataBpu['divisi'] ?>" />
     <input type="hidden" name="pengaju" value="<?= $dataBpu['pengaju'] ?>" />
     <input type="hidden" name="waktu" value="<?= $dataBpu['waktu'] ?>" />
+    <input type="hidden" name="statusbpu" value="<?= $dataBpu['statusbpu'] ?>" />
     <div class="form-group">
         <label for="namapenerima" class="control-label">Nama Penerima: </label>
         <input type="text" class="form-control" name="namapenerima" required>

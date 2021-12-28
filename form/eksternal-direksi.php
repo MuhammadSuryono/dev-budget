@@ -16,5 +16,5 @@ session_start();
 </div>
 <div class="form-group">
     <label for="tgl" class="control-label">Nama Vendor:</label>
-    <input type="text" class="form-control" id="nama_vendor" name="namaa_vendor">
+    <input type="text" class="form-control" id="nama_vendor" name="nama_vendor">
 </div>

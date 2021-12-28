@@ -1,5 +1,5 @@
 <?php
-//error_reporting(0);
+error_reporting(0);
 require_once "application/config/database.php";
 require_once "application/config/message.php";
 require_once "application/config/whatsapp.php";
@@ -44,6 +44,10 @@ $urgent       = $_POST['urgent'];
 $term       = $_POST['term'];
 $tanggalbayar = $_POST['tanggalbayar'];
 $alasanTolakBpu = $_POST['alasanTolakBpu'];
+
+$arrPengajuanJumlah = $_POST['pengajuan_jumlah'];
+$arrNoid = $_POST['noid'];
+$arrMetodePembayaran = $_POST['metode_pembayaran'];
 
 $dt = new DateTime($tanggalbayar);
 
@@ -97,6 +101,7 @@ if ($port == "" || $port == "80") {
 }
 
 $queryBpu = mysqli_query($koneksi, "SELECT * FROM bpu WHERE no = '$no' AND waktu = '$waktu' AND term = '$term'");
+$queryBpuItem = mysqli_query($koneksi, "SELECT * FROM bpu WHERE no = '$no' AND waktu = '$waktu' AND term = '$term'");
 
 $bpuItem = mysqli_fetch_assoc($queryBpu);
 $queryBpuVerify = mysqli_query($koneksi, "SELECT * FROM bpu_verify WHERE id_bpu = '$bpuItem[noid]'");
@@ -107,11 +112,16 @@ $statusBpu = $bpuItem["statusbpu"];
 $isEksternalProcess = $bpuItem["statusbpu"] == 'Vendor/Supplier';
 $path = '/view-bpu-verify.php?id='.$bpuVerify["id"].'&bpu='.$bpuItem["noid"];
 
+
 if ($_POST['submit'] == 1) {
-    while ($item = mysqli_fetch_assoc($queryBpu)) {
+    
+    while ($item = mysqli_fetch_assoc($queryBpuItem)) {
         array_push($arrPembayaran, $item['metode_pembayaran']);
         array_push($arrPenerima, $item['namapenerima']);
-        array_push($arrJumlah, "Rp. " . number_format($item['jumlah'], 0, ",", "."));
+        if ($item['jumlah'] != 0) {
+            array_push($arrJumlah, "Rp. " . number_format($item['jumlah'], 0, ",", "."));
+        }
+
         $pengaju = $item['pengaju'];
 
         if ($item['metode_pembayaran'] == 'MRI PAL') {
@@ -125,6 +135,11 @@ if ($_POST['submit'] == 1) {
                 if ($aksesSes == 'Manager') echo "<script> document.location.href='views-finance-manager.php?code=" . $idBudget . "'; </script>";
                 else echo "<script> document.location.href='views.php?code=" . $idBudget . "'; </script>";
             }
+        }
+
+        if ($isEksternalProcess) {
+            $update = mysqli_query($koneksi, "UPDATE bpu SET jumlah = '$arrPengajuanJumlah[0]', checkby = '$userSetuju', tglcheck='$time' WHERE noid = '$arrNoid[0]'");
+            $item['jumlah'] = $arrPengajuanJumlah[0];
         }
 
         $queryBank = mysqli_query($koneksi, "SELECT * FROM bank WHERE kodebank = '$item[namabank]'");
@@ -246,7 +261,6 @@ if ($_POST['submit'] == 1) {
     }
 
 
-
     if ($isEksternalProcess) {
         $update = mysqli_query($koneksi, "UPDATE bpu SET status_pengajuan_bpu =0, tanggalbayar = '$tanggalbayar', urgent = '$urgent', checkby = '$userSetuju', tglcheck = '$time'
                                WHERE no='$no' AND waktu='$waktu' AND persetujuan='Belum Disetujui' AND term=$term");
@@ -258,7 +272,7 @@ if ($_POST['submit'] == 1) {
     }
 
     
-    if (true) {
+    if ($update) {
         $notification = 'BPU Telah Disetujui. Pemberitahuan via whatsapp telah terkirim ke ';
         $i = 0;
         for($i = 0; $i < count($email); $i++) {
