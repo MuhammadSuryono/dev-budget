@@ -170,12 +170,11 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
         <input type="text" class="form-control" name="alasanTolakBpu" id="alasanTolakBpu">
     </div>
 
-<?php
-}
-$koneksi->close();
-?>
+
 <script>
-    var maxTransfer = '100000';
+    var ketPembayaran = '<?= $ketPembayaran ?>';
+    var jenis = '<?= $jenis ?>';
+    var maxTransfer = '<?= $result["max_transfer"] ?>';
     const picker = document.getElementById('tglbayar');
     picker.addEventListener('input', function(e) {
         var day = new Date(this.value).getUTCDay();
@@ -392,3 +391,7 @@ $koneksi->close();
             // }
         })
 </script>
+<?php
+}
+$koneksi->close();
+?>

@@ -16,7 +16,6 @@ error_reporting(0);
 session_start();
 if (!isset($_SESSION['nama_user'])) {
     header("location:login.php");
-    // die('location:login.php');//jika belum login jangan lanjut
 }
 $arrCode = [];
 
@@ -238,7 +237,7 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
     <script>
         var ketPembayaran = '<?= $ketPembayaran ?>';
         var jenis = '<?= $jenis ?>';
-        var maxTransfer = '100000';
+        var maxTransfer = '<?= $result["max_transfer"] ?>';
 
         $('.umo_biaya_kode_id').select2();
 
