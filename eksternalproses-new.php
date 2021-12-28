@@ -354,7 +354,6 @@ if (isset($_POST['submit'])) {
 
             for($i = 0; $i < count($emailInternal); $i++) {
                 $path = '/views.php';
-                
 
                 if ($isEksternalProcess && $dataDivisi[$i] != "Direksi") {
                     $path = '/view-bpu-verify.php?id='.$dataVerify["id"].'&bpu='.$dataVerify["id_bpu"];
