@@ -73,10 +73,12 @@ if ($action == 'simpan-verifikasi') {
     $bpu = $_GET['id-bpu'];
     $today = date("Y-m-d H:i:s");
 
+    $queryBpu = mysqli_query($koneksi, "SELECT * FROM bpu where noid = '$bpu'");
+    $dataBpu = mysqli_fetch_assoc($queryBpu);
     
     $upload = uploadFile($_FILES);
 
-    $query = mysqli_query($koneksiMriTransfer, "SELECT * FROM jenis_pembayaran WHERE jenispembayaran = '$statusBpu'") or die(mysqli_error($koneksiMriTransfer));
+    $query = mysqli_query($koneksiMriTransfer, "SELECT * FROM jenis_pembayaran WHERE jenispembayaran = '$dataBpu[statusBpu]'") or die(mysqli_error($koneksiMriTransfer));
     $result = mysqli_fetch_assoc($query);
 
     $metode_pembayaran = "MRI Kas";
