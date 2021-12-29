@@ -9,6 +9,8 @@ defined("DB_PORT") OR define("DB_PORT", "3306");
 // Define other const value here
 defined("DB_JAY") OR define("DB_JAY", "jay2");
 defined("DB_DIGITAL_MARKET") OR define("DB_DIGITAL_MARKET", "digitalisasimarketing");
+defined("DB_USER_DIGITAL_MARKET") OR define("DB_USER_DIGITAL_MARKET", "adam");
+defined("DB_PASS_DIGITAK_MARKET") OR define("DB_PASS_DIGITAK_MARKET", "Ad@mMR1db");
 defined("DB_TRANSFER") OR define("DB_TRANSFER", "bridgetransfer");
 defined("DB_MRI_TRANSFER") OR define("DB_MRI_TRANSFER", "mritransferapi");
 defined("DB_CUTI") OR define("DB_CUTI", "db_cuti");
