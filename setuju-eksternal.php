@@ -28,7 +28,8 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
     $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE stat = 'MRI'");
 
     $sql = "SELECT a.*, b.jenis FROM bpu a JOIN pengajuan b ON a.waktu = b.waktu WHERE a.no = '$id' AND a.waktu = '$waktu' AND a.term = '$term' GROUP BY a.noid";
-  
+    $dataBpuQuery = mysqli_query($koneksi, $sql);
+    $dataBpu = mysqli_fetch_assoc($dataBpuQuery);
     $result = $koneksi->query($sql); ?>
     <table class="table table-bordered">
         <thead>
@@ -51,9 +52,9 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                 $ket_pembayaran = $baris['ket_pembayaran'];
 
                 $query = mysqli_query($koneksiMriTransfer, "SELECT * FROM jenis_pembayaran WHERE jenispembayaran = '$statusBpu'") or die(mysqli_error($koneksiMriTransfer));
-                $result = mysqli_fetch_assoc($query);
+                $resultJenisPembayaran = mysqli_fetch_assoc($query);
 
-                if ($baris['pengajuan_jumlah'] < $result['max_transfer']) {
+                if ($baris['pengajuan_jumlah'] < $resultJenisPembayaran['max_transfer']) {
                     $metode_pembayaran = "MRI PAL";
                 } else {
                     $metode_pembayaran = "MRI Kas";
@@ -78,7 +79,7 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                 3 -> MRI Kas (UM)
                 4 -> MRI Kas (Project/Umum)
             */
-                if ($baris['pengajuan_jumlah'] < $result['max_transfer']) {
+                if ($baris['pengajuan_jumlah'] < $resultJenisPembayaran['max_transfer']) {
                     if ($statusBpu == 'UM' || $statusBpu == 'UM Burek') {
                         array_push($arrCode, '1');
                         // $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'Kas Uang Muka'");
@@ -139,62 +140,6 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
 
     </div>
 
-    <?php if (in_array("1", $arrCode) || in_array("2", $arrCode)) : ?>
-        <div class="form-group form-rekening-sumber-pal">
-            <label for="rekening_sumber" class="control-label">Rekening Sumber MRI PAL:</label>
-            <select class="form-control" name="rekening_sumber_mri_pal">
-                <?php if (in_array("1", $arrCode)) : ?>
-                    <?php $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'Kas Uang Muka'"); ?>
-                <?php else : ?>
-                    <?php if ($jenis == 'B1' || $jenis == 'B2') : ?>
-                        <?php $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'Kas Project'"); ?>
-                    <?php else : ?>
-                        <?php $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'Kas Umum'"); ?>
-                    <?php endif; ?>
-                <?php endif; ?>
-                <?php while ($item = mysqli_fetch_assoc($getRekening)) : ?>
-                    <option value="<?= $item['rekening'] ?>"><?= $item['rekening'] ?> - <?= $item['label_kas'] ?></option>
-                <?php endwhile; ?>
-            </select>
-        </div>
-    <?php endif; ?>
-
-    <?php if (in_array("2", $arrCode)) : ?>
-        <!-- <div class="form-group form-rekening-sumber-pal">
-            <label for="rekening_sumber" class="control-label">Rekening Sumber MRI PAL: <span data-toggle="tooltip" title="Abaikan apabila tidak ada pembayaran menggunakan MRI PAL"><i class="fa fa-question-circle"></i></span></label>
-            <select class="form-control" name="rekening_sumber_mri_pal">
-                <?php if ($jenis == 'B1' || $jenis == 'B2') : ?>
-                    <?php $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'Kas Project'"); ?>
-                <?php else : ?>
-                    <?php $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'Kas Umum'"); ?>
-                <?php endif; ?>
-                <?php while ($item = mysqli_fetch_assoc($getRekening)) : ?>
-                    <option value="<?= $item['rekening'] ?>"><?= $item['rekening'] ?> - <?= $item['label_kas'] ?></option>
-                <?php endwhile; ?>
-            </select>
-        </div> -->
-    <?php endif; ?>
-
-    <?php if (in_array("3", $arrCode) || in_array("4", $arrCode)) : ?>
-        <div class="form-group form-rekening-sumber-kas">
-            <label for="rekening_sumber" class="control-label">Rekening Sumber MRI Kas: <span data-toggle="tooltip" title="Abaikan apabila tidak ada pembayaran menggunakan MRI Kas"><i class="fa fa-question-circle"></i></span></label>
-            <select class="form-control" name="rekening_sumber_mri_kas">
-                <?php if (in_array("3", $arrCode)) : ?>
-                    <?php $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'KAS 3'"); ?>
-                <?php else : ?>
-                    <?php if ($jenis == 'B1' || $jenis == 'B2') : ?>
-                        <?php $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'KAS 1'"); ?>
-                    <?php else : ?>
-                        <?php $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'KAS 2'"); ?>
-                    <?php endif; ?>
-                <?php endif; ?>
-                <?php while ($item = mysqli_fetch_assoc($getRekening)) : ?>
-                    <option value="<?= $item['rekening'] ?>"><?= $item['rekening'] ?> - <?= $item['label_kas']  . ' (' . $item['keterangan'] . ')' ?></option>
-                <?php endwhile; ?>
-            </select>
-        </div>
-    <?php endif; ?>
-
     <ul class="list-group">
         <li class="list-group-item">Pengaju : <b><?= $pengaju ?></b></li>
         <li class="list-group-item">Berita Transfer : <b><?= $ket_pembayaran ?></b></li>
@@ -209,8 +154,8 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
     <p>Apakah anda ingin menyetujui <b>BPU</b> di Nomor <b><?= $baris['no']; ?></b>?</p>
 
     <div class="form-group">
-        <label for="tglbayar" class="control-label">Tanggal Pembayaran :</label>
-        <input type="date" class="form-control" id="tglbayar" name="tanggalbayar" min="<?= date('Y-m-d', strtotime($Date . ' + 2 days')) ?>" required>
+        <label for="tglbayar" class="control-label">Tanggal Pembayaran :</label> 
+        <input type="date" class="form-control" id="tglbayar" name="tanggalbayar" value="<?= $dataBpu['tanggalbayar'] ?>" min="<?= date('Y-m-d', strtotime($Date . ' + 2 days')) ?>" required>
     </div>
 
     <div class="form-group">
@@ -230,7 +175,7 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
 <script>
     var ketPembayaran = '<?= $ketPembayaran ?>';
     var jenis = '<?= $jenis ?>';
-    var maxTransfer = '<?= $result["max_transfer"] ?>';
+    var maxTransfer = '<?= $resultJenisPembayaran["max_transfer"] ?>';
     const picker = document.getElementById('tglbayar');
     picker.addEventListener('input', function(e) {
         var day = new Date(this.value).getUTCDay();
