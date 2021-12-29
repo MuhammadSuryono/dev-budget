@@ -21,6 +21,10 @@ $con->set_name_db(DB_MRI_TRANSFER);
 $con->init_connection();
 $koneksiMriTransfer = $con->connect();
 
+$con->set_name_db(DB_DEVELOP);
+$con->init_connection();
+$koneksiDevelop = $con->connect();
+
 
 require "vendor/email/send-email.php";
 
@@ -215,6 +219,7 @@ if ($_POST['submit'] == 1) {
             $rekening_sumber = $rekening_sumber_mri_pal;
             $date = date('my');
             $countQuery = mysqli_query($koneksiTransfer, "SELECT transfer_req_id FROM data_transfer WHERE transfer_req_id LIKE '$date%' ORDER BY transfer_req_id DESC LIMIT 1");
+
             $count = mysqli_fetch_assoc($countQuery);
             $count = (int)substr($count['transfer_req_id'], -4);
 
@@ -233,8 +238,8 @@ if ($_POST['submit'] == 1) {
 
             $queryJenisPembayaran = mysqli_query($koneksiMriTransfer, "SELECT * FROM jenis_pembayaran WHERE jenispembayaran = '$item[statusbpu]'");
             $jenisPembayaran = mysqli_fetch_assoc($queryJenisPembayaran);
-            $insert = mysqli_query($koneksiTransfer, "INSERT INTO data_transfer (transfer_req_id, transfer_type, jenis_pembayaran_id, keterangan, waktu_request, norek, pemilik_rekening, bank, kode_bank, berita_transfer, jumlah, terotorisasi, hasil_transfer, ket_transfer, nm_pembuat, nm_validasi, nm_manual, jenis_project, nm_project, noid_bpu, biaya_trf, rekening_sumber, email_pemilik_rekening) 
-                    VALUES ('$formatId', '3', '$jenisPembayaran[jenispembayaranid]', '$item[statusitem]', '$waktu', '$item[norek]', '$item[namapenerima]','$bank[namabank]', '$bank[kodebank]', '$berita_transfer','$arrPengajuanJumlah[0]', '2', '1', 'Antri', '$item[pengaju]', '$_SESSION[nama_user]', '', '$budget[jenis]', '$nm_project', '$item[noid]', $biayaTrf, '$rekening_sumber', '$item[emailpenerima]')") or die(mysqli_error($koneksiTransfer));
+            $insert = mysqli_query($koneksiTransfer, "INSERT INTO data_transfer (transfer_req_id, transfer_type, jenis_pembayaran_id, keterangan, waktu_request, norek, pemilik_rekening, bank, kode_bank, berita_transfer, jumlah, terotorisasi, hasil_transfer, ket_transfer, nm_pembuat, nm_otorisasi, nm_validasi, nm_manual, jenis_project, nm_project, noid_bpu, biaya_trf, rekening_sumber, email_pemilik_rekening, jadwal_transfer) 
+                    VALUES ('$formatId', '3', '$jenisPembayaran[jenispembayaranid]', '$item[statusbpu]', '$waktu', '$item[norek]', '$item[namapenerima]','$bank[namabank]', '$bank[kodebank]', '$berita_transfer','$arrPengajuanJumlah[0]', '2', '1', 'Antri', '$item[pengaju]', '$_SESSION[nama_user]', '$_SESSION[nama_user]','', '$budget[jenis]', '$nm_project', '$item[noid]', $biayaTrf, '0613005878', '$item[emailpenerima]', '$tanggalbayar')") or die(mysqli_error($koneksiTransfer));
         }
     }
 
@@ -314,7 +319,6 @@ if ($_POST['submit'] == 1) {
         for($i = 0; $i < count($email); $i++) {
             $path = '/views.php';
 
-            echo $isEksternalProcess;
             if ($isEksternalProcess) {
                 $path = '/view-bpu-verify.php?id='.$bpuVerify["id"].'&bpu='.$bpuItem["noid"];
             } else {
