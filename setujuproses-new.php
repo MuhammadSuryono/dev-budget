@@ -132,6 +132,12 @@ if ($_POST['submit'] == 1) {
             array_push($arrJumlah, "Rp. " . number_format($item['jumlah'], 0, ",", "."));
         }
 
+        if (isset($arrPengajuanJumlah[0])) {
+            if ($arrPengajuanJumlah[0] != "") {
+                array_push($arrJumlah, "Rp. " . number_format($arrPengajuanJumlah[0], 0, ",", "."));
+            }
+        }
+
         $pengaju = $item['pengaju'];
 
         if (!$isEksternalProcess && $item['metode_pembayaran'] == 'MRI PAL') {
@@ -312,7 +318,9 @@ if ($_POST['submit'] == 1) {
         $update = mysqli_query($koneksi, "UPDATE bpu_verify SET is_need_approved = '0', status_approved = '1', is_approved = '1' WHERE id = '$bpuVerify[id]'");
     }
 
-    
+    array_unique($arrJumlah);
+    array_unique($nama);
+    array_unique($email);
     if ($update) {
         $notification = 'BPU Telah Disetujui. Pemberitahuan via whatsapp telah terkirim ke ';
         $i = 0;

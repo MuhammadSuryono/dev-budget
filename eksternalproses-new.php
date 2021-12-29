@@ -127,6 +127,10 @@ $queryBpu = mysqli_query($koneksi, "SELECT * FROM bpu WHERE no='$no' AND waktu='
 // $queryBpuStatus = mysqli_query($koneksi, "SELECT * FROM bpu WHERE no='$no' AND waktu='$waktu' AND term='$termterm'");
 $bpu = mysqli_fetch_assoc($queryBpu);
 
+if ($jumlah == 0 || $jumlah == "") {
+    $jumlah = $dataVerify['total_verify'];
+}
+
 if ($statusbpu == "") {
     $statusbpu = $bpu["statusbpu"];
 }
