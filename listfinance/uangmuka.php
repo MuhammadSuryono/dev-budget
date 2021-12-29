@@ -27,7 +27,7 @@ $koneksi = $con->connect();
       <tbody>
         <?php
         $i = 1;
-        $sql = mysqli_query($koneksi, "SELECT a.namapenerima, SUM(a.jumlah) AS total_pengajuan FROM bpu a JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no JOIN pengajuan d ON d.waktu = a.waktu WHERE b.status IN ('UM', 'UM Burek') AND a.status IN ('Telah Di Bayar', 'Belum Di Bayar') GROUP BY a.namapenerima") or die(mysqli_error($koneksi));
+        $sql = mysqli_query($koneksi, "SELECT a.namapenerima, SUM(a.jumlah) AS total_pengajuan FROM bpu a JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no JOIN pengajuan d ON d.waktu = a.waktu JOIN pengajuan e ON e.waktu = a.waktu WHERE b.status IN ('UM', 'UM Burek') AND a.status IN ('Telah Di Bayar', 'Belum Di Bayar') GROUP BY a.namapenerima") or die(mysqli_error($koneksi));
         while ($d = mysqli_fetch_array($sql)) {
             $queryUser = mysqli_query($koneksi, "SELECT saldo FROM tb_user WHERE nama_user = '$d[namapenerima]' AND aktif = 'Y'");
             if (mysqli_num_rows($queryUser) > 0) {
@@ -41,7 +41,7 @@ $koneksi = $con->connect();
                 // $sisaRealisasi = mysqli_fetch_assoc($qSisaRealisasi);
 
 
-                $queryBpuRealisasi = mysqli_query($koneksi, "SELECT SUM(a.realisasi) AS total_realisasi FROM bpu a JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no WHERE b.status IN ('UM', 'UM Burek') AND a.namapenerima = '$d[namapenerima]' AND a.status IN ('Telah Di Bayar','Realisasi (Direksi)')") or die(mysqli_error($koneksi));
+                $queryBpuRealisasi = mysqli_query($koneksi, "SELECT SUM(a.realisasi) AS total_realisasi FROM bpu a JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no JOIN pengajuan c ON a.waktu = c.waktu WHERE b.status IN ('UM', 'UM Burek') AND a.namapenerima = '$d[namapenerima]' AND a.realisasi + a.uangkembali != a.jumlah AND a.status IN ('Telah Di Bayar','Realisasi (Direksi)')") or die(mysqli_error($koneksi));
                 $pengajuanRealisasi = mysqli_fetch_assoc($queryBpuRealisasi);
 
                 $totalSaldoOutstanding = ($terbayar['total_pengajuan'] + $belumTerbayar['total_pengajuan']) - $pengajuanRealisasi['total_realisasi'];

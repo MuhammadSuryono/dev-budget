@@ -78,7 +78,7 @@ $typeBudget = count($splitDivisi) > 1 ? $splitDivisi[1] : $splitDivisi[0];
   </nav>
 
   <br />
-  <div class="container">
+  <div class="container-fluid">
 
     <p>
     <h4> Sisa Plafon :
@@ -222,11 +222,12 @@ $typeBudget = count($splitDivisi) > 1 ? $splitDivisi[1] : $splitDivisi[0];
         <div class="panel-body no-padding">
           <ul class="list-inline row border">
             <li class="col-lg-1">Nama User</li>
-            <li class="col-lg-2">Limit</li>
+            <li class="col-lg-1">Limit</li>
             <li class="col-lg-2">Saldo Awal Outstanding</li>
             <li class="col-lg-2">Pengajuan</li>
+            <li class="col-lg-2">Realisasi</li>
             <li class="col-lg-2">Saldo Akhir Outstanding</li>
-            <li class="col-lg-2">Sisa Limit</li>
+            <li class="col-lg-1">Sisa Limit</li>
             <li class="col-lg-1">
               Action
             </li>

@@ -28,7 +28,8 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
     $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE stat = 'MRI'");
 
     $sql = "SELECT a.*, b.jenis FROM bpu a JOIN pengajuan b ON a.waktu = b.waktu WHERE a.no = '$id' AND a.waktu = '$waktu' AND a.term = '$term' GROUP BY a.noid";
-  
+    $dataBpuQuery = mysqli_query($koneksi, $sql);
+    $dataBpu = mysqli_fetch_assoc($dataBpuQuery);
     $result = $koneksi->query($sql); ?>
     <table class="table table-bordered">
         <thead>
@@ -51,9 +52,9 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                 $ket_pembayaran = $baris['ket_pembayaran'];
 
                 $query = mysqli_query($koneksiMriTransfer, "SELECT * FROM jenis_pembayaran WHERE jenispembayaran = '$statusBpu'") or die(mysqli_error($koneksiMriTransfer));
-                $result = mysqli_fetch_assoc($query);
+                $resultJenisPembayaran = mysqli_fetch_assoc($query);
 
-                if ($baris['pengajuan_jumlah'] < $result['max_transfer']) {
+                if ($baris['pengajuan_jumlah'] < $resultJenisPembayaran['max_transfer']) {
                     $metode_pembayaran = "MRI PAL";
                 } else {
                     $metode_pembayaran = "MRI Kas";
@@ -78,7 +79,7 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                 3 -> MRI Kas (UM)
                 4 -> MRI Kas (Project/Umum)
             */
-                if ($baris['pengajuan_jumlah'] < $result['max_transfer']) {
+                if ($baris['pengajuan_jumlah'] < $resultJenisPembayaran['max_transfer']) {
                     if ($statusBpu == 'UM' || $statusBpu == 'UM Burek') {
                         array_push($arrCode, '1');
                         // $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'Kas Uang Muka'");
@@ -153,8 +154,8 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
     <p>Apakah anda ingin menyetujui <b>BPU</b> di Nomor <b><?= $baris['no']; ?></b>?</p>
 
     <div class="form-group">
-        <label for="tglbayar" class="control-label">Tanggal Pembayaran :</label>
-        <input type="date" class="form-control" id="tglbayar" name="tanggalbayar" min="<?= date('Y-m-d', strtotime($Date . ' + 2 days')) ?>" required>
+        <label for="tglbayar" class="control-label">Tanggal Pembayaran :</label> 
+        <input type="date" class="form-control" id="tglbayar" name="tanggalbayar" value="<?= $dataBpu['tanggalbayar'] ?>" min="<?= date('Y-m-d', strtotime($Date . ' + 2 days')) ?>" required>
     </div>
 
     <div class="form-group">
@@ -170,12 +171,11 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
         <input type="text" class="form-control" name="alasanTolakBpu" id="alasanTolakBpu">
     </div>
 
-<?php
-}
-$koneksi->close();
-?>
+
 <script>
-    var maxTransfer = '100000';
+    var ketPembayaran = '<?= $ketPembayaran ?>';
+    var jenis = '<?= $jenis ?>';
+    var maxTransfer = '<?= $resultJenisPembayaran["max_transfer"] ?>';
     const picker = document.getElementById('tglbayar');
     picker.addEventListener('input', function(e) {
         var day = new Date(this.value).getUTCDay();
@@ -194,6 +194,24 @@ $koneksi->close();
         }
         console.log('here');
     })
+
+    function convertToRupiah(number) {
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IND' }).format(number)
+    }
+
+    function countPph(valPph, totalData) {
+        let dpp = 1.1
+        let pph = valPph
+        let ppn = 0.1
+
+        let resDpp = totalData / dpp
+        let resPPh = resDpp * pph
+        let resPpn = resDpp * ppn
+
+        let totalAfterPph = Math.round((resDpp - resPPh) + resPpn)
+
+        return Math.round(totalData - totalAfterPph)
+    }
 
     $('input[name=pajak]').change(function() {
             let tdPengajuan = $('.td-pengajuan');
@@ -273,9 +291,12 @@ $koneksi->close();
                 }
             } else if ($(this).val() == 'pph232') {
                 if ($(this).prop('checked')) {
-                    // result = Math.round(parseInt(actual) - (0.1 * bpu));
+                    
                     for (let i = 0; i < tdPengajuan.length; i++) {
-                        result = Math.round(parseInt(tdActual[i].textContent) - (0.02 * parseInt(tdPengajuan[i].textContent)));
+                        let totalData = parseInt(tdPengajuan[i].textContent)
+                        let selisih = result = countPph(0.02, totalData)
+                        result = Math.round(parseInt(tdActual[i].textContent) - selisih);
+                        
                         tdActual[i].innerText = result
                         inputPengajuan[i].value = result
 
@@ -288,9 +309,11 @@ $koneksi->close();
                         }
                     }
                 } else {
-                    // result = Math.round(parseInt(actual) + (0.1 * bpu));
                     for (let i = 0; i < tdPengajuan.length; i++) {
-                        result = Math.round(parseInt(tdActual[i].textContent) + (0.02 * parseInt(tdPengajuan[i].textContent)));
+                        
+                        let totalData = parseInt(tdPengajuan[i].textContent)
+                        let selisih = result = countPph(0.02, totalData)
+                        result = Math.round(parseInt(tdActual[i].textContent) + selisih);
                         tdActual[i].innerText = result
                         inputPengajuan[i].value = result
 
@@ -307,7 +330,10 @@ $koneksi->close();
                 if ($(this).prop('checked')) {
                     // result = Math.round(parseInt(actual) - (0.1 * bpu));
                     for (let i = 0; i < tdPengajuan.length; i++) {
-                        result = Math.round(parseInt(tdActual[i].textContent) - (0.04 * parseInt(tdPengajuan[i].textContent)));
+                        
+                        let totalData = parseInt(tdPengajuan[i].textContent)
+                        let selisih = result = countPph(0.04, totalData)
+                        result = Math.round(parseInt(tdActual[i].textContent) - selisih);
                         tdActual[i].innerText = result
                         inputPengajuan[i].value = result
 
@@ -322,7 +348,10 @@ $koneksi->close();
                 } else {
                     // result = Math.round(parseInt(actual) + (0.1 * bpu));
                     for (let i = 0; i < tdPengajuan.length; i++) {
-                        result = Math.round(parseInt(tdActual[i].textContent) + (0.04 * parseInt(tdPengajuan[i].textContent)));
+                        
+                        let totalData = parseInt(tdPengajuan[i].textContent)
+                        let selisih = result = countPph(0.04, totalData)
+                        result = Math.round(parseInt(tdActual[i].textContent) + selisih);
                         tdActual[i].innerText = result
                         inputPengajuan[i].value = result
 
@@ -363,3 +392,7 @@ $koneksi->close();
             // }
         })
 </script>
+<?php
+}
+$koneksi->close();
+?>

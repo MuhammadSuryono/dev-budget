@@ -111,7 +111,7 @@ $buttonAkses = unserialize($user['hak_button']);
                         <a class="nav-link" aria-current="page" href="list-direksi.php">List</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="saldobpu.php">Data User</a>
+                        <a class="nav-link" aria-current="page" href="saldobpu.php">Saldo BPU</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" aria-current="page" href="listfinish-direksi.php">Budget Finish</a>
@@ -136,7 +136,7 @@ $buttonAkses = unserialize($user['hak_button']);
                         <?php } ?>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="saldobpu.php">Data User</a>
+                        <a class="nav-link" href="saldobpu.php">Saldo BPU</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="history-finance.php">History</a>
@@ -171,37 +171,7 @@ $buttonAkses = unserialize($user['hak_button']);
                 </li>
             </ul>
             <ul class="navbar-nav my-2 my-lg-0" style="margin-right: 3em;">
-                <?php
-                if ($_SESSION['hak_akses'] != 'HRD') {
-                    $cari = mysqli_query($koneksi, "SELECT * FROM bpu WHERE status ='Belum Di Bayar' AND persetujuan !='Belum Disetujui' AND waktu != 0");
-                    $belbyr = mysqli_num_rows($cari);
-                ?>
-
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-
-                            <i class="fas fa-bell"></i>
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                <?= $belbyr ?>
-                            </span>
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown"><?php
-                                                                                    while ($wkt = mysqli_fetch_array($cari)) {
-                                                                                        $wktulang = $wkt['waktu'];
-
-                                                                                        $selectnoid = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE waktu='$wktulang'");
-                                                                                        $noid = mysqli_fetch_assoc($selectnoid);
-                                                                                        $kode = $noid['noid'];
-                                                                                        $project = $noid['nama'];
-                                                                                    ?>
-
-                                <a class="dropdown-item" href="view-finance.php?code=<?= $kode ?>">Project <b><?= $project ?></b> BPU Belum Dibayar</a>
-
-                            <?php
-                                                                                    }
-                            ?>
-                        </div>
-                    </li>
+                
 
                     <li class="nav-item">
                         <a class="nav-link" href="ubahpassword.php"><span class="glyphicon glyphicon-user"></span><?php echo $_SESSION['nama_user']; ?> (<?php echo $_SESSION['divisi']; ?>)</a>
@@ -209,63 +179,6 @@ $buttonAkses = unserialize($user['hak_button']);
                     <li class="nav-item">
                         <a class="nav-link" href="logout.php">Logout</a>
                     </li>
-                <?php } else {
-                    $cari = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE status='Pending'");
-                    $belbyr = mysqli_num_rows($cari);
-                    $caribpu = mysqli_query($koneksi, "SELECT * FROM bpu WHERE persetujuan='Belum Disetujui'");
-                    $bpuyahud = mysqli_num_rows($caribpu);
-                    $queryPengajuanReq = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE status_request = 'Di Ajukan' AND waktu != 0");
-                    $countPengajuanReq = mysqli_num_rows($queryPengajuanReq);
-                    $notif = $belbyr + $bpuyahud + $countPengajuanReq; ?>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-
-                            <i class="fas fa-bell"></i>
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                <?= $notif ?>
-                            </span>
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown"><?php
-                                                                                    while ($wkt = mysqli_fetch_array($cari)) {
-                                                                                        $wktulang = $wkt['waktu'];
-                                                                                        $selectnoid = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE waktu='$wktulang'");
-                                                                                        $noid = mysqli_fetch_assoc($selectnoid);
-                                                                                        $kode = $noid['noid'];
-                                                                                        $project = $noid['nama'];
-                                                                                    ?>
-                                <a class="dropdown-item" href="view-direksi.php?code=<?= $kode ?>">Project <b><?= $project ?></b> status masih Pending</a>
-                                <?php
-                                                                                        while ($wktbpu = mysqli_fetch_array($caribpu)) {
-                                                                                            $bpulagi = $wktbpu['waktu'];
-                                                                                            $selectnoid2 = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE waktu='$bpulagi'");
-                                                                                            $noid2 = mysqli_fetch_assoc($selectnoid2);
-                                                                                            $kode2 = $noid2['noid'];
-                                                                                            $project2 = $noid2['nama'];
-                                ?>
-                                    <a class="dropdown-item" href="views-direksi.php?code=<?= $kode2 ?>">Project <b><?= $project2 ?></b> ada BPU yang belum di setujui</a>
-                                <?php
-                                                                                        }
-                                                                                    }
-                                                                                    while ($qpr = mysqli_fetch_array($queryPengajuanReq)) {
-                                                                                        $time = $qpr['waktu'];
-                                                                                        $selectnoid3 = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE waktu='$time'");
-                                                                                        $noid3 = mysqli_fetch_assoc($selectnoid3);
-                                                                                        $kode3 = $noid3['id'];
-                                                                                        $project3 = $noid3['nama'];
-                                ?>
-
-                                <a class="dropdown-item" href="view-request.php?id=<?= $kode3 ?>">Pengajuan Budget <b><?= $project3 ?></b> telah diajukan</a>
-                            <?php } ?>
-                        </div>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="ubahpassword.php"><span class="glyphicon glyphicon-user"></span><?php echo $_SESSION['nama_user']; ?> (<?php echo $_SESSION['divisi']; ?>)</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="logout.php">Logout</a>
-                    </li>
-                <?php } ?>
             </ul>
         </div>
     </nav>
@@ -275,7 +188,7 @@ $buttonAkses = unserialize($user['hak_button']);
     <br /><br />
 
 
-    <div class="container">
+    <div class="container-fluid">
         <h2>Laporan Transfer MRI PAL</h2>
         <div class="content-wrapper">
             <section class="content">
@@ -358,6 +271,8 @@ $buttonAkses = unserialize($user['hak_button']);
                                                         <th>No.</th>
                                                         <th>Request ID</th>
                                                         <th>Jenis Pembayaran</th>
+                                                        <th>Nomor STKB</th>
+                                                        <th>Term</th>
                                                         <th>Jadwal Transfer</th>
                                                         <th>No. Rekening</th>
                                                         <th>Jumlah</th>
@@ -368,7 +283,7 @@ $buttonAkses = unserialize($user['hak_button']);
                                                 </thead>
                                                 <tbody>
                                                     <?php
-                                                    $getTrfFlap = mysqli_query($koneksiTransfer, "SELECT * FROM data_transfer JOIN mritransfer.jenis_pembayaran AS t2 ON data_transfer.jenis_pembayaran_id = t2.jenispembayaranid " . (($bagianWhere) ? "WHERE " . $bagianWhere : "") .  " AND hasil_transfer NOT IN ('1','4') AND jenis_project IN ('B1', 'B2') AND keterangan NOT IN ('UM', 'UM Burek') ORDER BY data_transfer.transfer_id ASC") or die(mysqli_error($koneksiTransfer));
+                                                    $getTrfFlap = mysqli_query($koneksiTransfer, "SELECT * FROM data_transfer JOIN mritransfer.jenis_pembayaran AS t2 ON data_transfer.jenis_pembayaran_id = t2.jenispembayaranid " . (($bagianWhere) ? "WHERE " . $bagianWhere : "") .  " AND hasil_transfer NOT IN ('1','4') AND jenis_project IN ('B1', 'B2') AND jumlah != '0' AND keterangan NOT IN ('UM', 'UM Burek') ORDER BY data_transfer.transfer_id ASC") or die(mysqli_error($koneksiTransfer));
 
                                                     if (!empty($getTrfFlap)) {
                                                         error_reporting(0);
@@ -380,6 +295,7 @@ $buttonAkses = unserialize($user['hak_button']);
                                                             $jadwal_transfer = ($data['jadwal_transfer']) ? $data['jadwal_transfer'] : '-';
                                                             $norek = $data['norek'];
                                                             $jumlah = $data['jumlah'];
+                                                            $nomorStkb = $data['nomor_stkb'];
                                                             $ket_transfer = $data['ket_transfer'];
                                                             $keterangan = $data['keterangan'];
                                                             $waktu_request = $data['waktu_request'];
@@ -403,10 +319,15 @@ $buttonAkses = unserialize($user['hak_button']);
                                                                 $transfer_type = 'Transfer Auto';
                                                             }
 
+                                                            $bpuQuery = mysqli_query($koneksi, "SELECT term FROM bpu where nomorstkb = '$nomorStkb' LIMIT 1");
+                                                            $bpu = mysqli_fetch_assoc($bpuQuery);
+
                                                             echo "<tr>";
                                                             echo "<td>" . $i++ . "</td>";
                                                             echo "<td>" . $transfer_req_id . "</td>";
                                                             echo "<td>" . $keterangan . "</td>";
+                                                            echo "<td>" . $nomorStkb . "</td>";
+                                                            echo "<td>" . $bpu['term'] . "</td>";
                                                             echo "<td>" . $jadwal_transfer . "</td>";
                                                             echo "<td>" . $norek . "</td>";
                                                             echo "<td>" . number_format($jumlah, 0, '', ',') . "</td>";
