@@ -78,7 +78,7 @@ if ($action == 'simpan-verifikasi') {
     
     $upload = uploadFile($_FILES);
 
-    $query = mysqli_query($koneksiMriTransfer, "SELECT * FROM jenis_pembayaran WHERE jenispembayaran = '$dataBpu[statusBpu]'") or die(mysqli_error($koneksiMriTransfer));
+    $query = mysqli_query($koneksiMriTransfer, "SELECT * FROM jenis_pembayaran WHERE jenispembayaran = '$dataBpu[statusbpu]'") or die(mysqli_error($koneksiMriTransfer));
     $result = mysqli_fetch_assoc($query);
 
     $metode_pembayaran = "MRI Kas";
@@ -93,6 +93,11 @@ if ($action == 'simpan-verifikasi') {
 
     if ($upload['error'] == null) {
         $upload['is_success'] = true;
+        $upload['result'] = json_encode($result);
+        $upload['bpu'] = $dataBpu;
+        $upload['metode'] = $metode_pembayaran;
+        $upload['max'] = $result['max_transfer'];
+        $upload['nominal'] = $nominal < $result['max_transfer'];
         echo json_encode($upload);
     } else {
         $upload['is_success'] = false;
