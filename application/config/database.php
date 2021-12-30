@@ -14,6 +14,8 @@ defined("DB_MRI_TRANSFER") OR define("DB_MRI_TRANSFER", "mritransferapi");
 defined("DB_CUTI") OR define("DB_CUTI", "db_cuti");
 defined("DB_DEVELOP") OR define("DB_DEVELOP", "develop");
 defined("DB_HOST_DIGITALISASI_MARKETING") OR define("DB_HOST_DIGITALISASI_MARKETING", MODE_APP == "dev" ? "192.168.8.2" : "192.168.10.240");
+defined("DB_USER_DIGITAL_MARKET") OR define("DB_USER_DIGITAL_MARKET", "adam");
+defined("DB_PASS_DIGITAK_MARKET") OR define("DB_PASS_DIGITAK_MARKET", "Ad@mMR1db");
 
 
 class Database {

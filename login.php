@@ -1,3 +1,20 @@
+<?php
+$url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+$port = $_SERVER['SERVER_PORT'];
+$url = explode('/', $url);
+$hostProtocol = $url[0];
+
+require_once "application/config/constanta.php";
+
+if ($hostProtocol == "180.211.92.131")
+{
+   $host = "http://mkp-operation.com:7793/".$url[1];
+   header("Location: ".$host, true, 301);
+}
+
+?>
+
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -16,9 +33,24 @@
 	<body>
 	<section class="ftco-section">
 		<div class="container">
+			<?php
+
+			if (ENVIRONMENT == "dev" || ENVIRONMENT == "uat") {
+				echo '<div class="alert alert-danger" role="alert">
+				<h4 class="alert-heading"><b>PERHATIAN!!!</b></h4>
+				<p>APLIKASI INI BERJALAN PADA STATUS APLIKASI TAHAP <b>TESTING</b> DENGAN VERSI APLIKASI <i>BETA</i></p>
+			</div>';
+			}
+
+			?>
 			<div class="row justify-content-center">
 				<div class="col-md-6 text-center mb-5">
 					<h2 class="heading-section">BUDGET APPLICATION</h2>
+					<?php
+					if (ENVIRONMENT == "dev" || ENVIRONMENT == "uat") {
+						echo '<img src="assets/login//beta-testing.png" height="80px"/>';
+					}
+					?>
 				</div>
 			</div>
 			<div class="row justify-content-center">
@@ -29,7 +61,7 @@
 						<div class="login-wrap p-4 p-md-5">
 			      	<div class="d-flex">
 			      		<div class="w-100">
-			      			<h3 class="mb-4">Masuk Applikasi</h3>
+			      			<h3 class="mb-4">Masuk Aplikasi</h3>
                             <?php
                             $isError = isset($_GET["error"]) ? $_GET["error"] : false;
                             if ($isError) {
@@ -57,7 +89,6 @@
 		          </form>
 		        </div>
 		      </div>
-				</div>
 			</div>
 		</div>
 	</section>
