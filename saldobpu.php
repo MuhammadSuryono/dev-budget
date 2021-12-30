@@ -43,7 +43,7 @@ if (!isset($_SESSION['nama_user'])) {
           <?php if ($_SESSION['hak_akses'] == 'HRD') { ?>
             <li><a href="home-direksi.php">Home</a></li>
             <li><a href="list-direksi.php">List</a></li>
-            <li class="active"><a href="saldobpu.php">Data User</a></li>
+            <li class="active"><a href="saldobpu.php">Saldo BPU</a></li>
             <!--<li><a href="summary.php">Summary</a></li>-->
             <li><a href="listfinish-direksi.php">Budget Finish</a></li>
           <?php } else { ?>
@@ -61,7 +61,7 @@ if (!isset($_SESSION['nama_user'])) {
             ?>
               <li><a href="list-finance.php">List</a></li>
             <?php } ?>
-            <li class="active"><a href="saldobpu.php">Data User</a></li>
+            <li class="active"><a href="saldobpu.php">Saldo BPU</a></li>
             <li><a href="history-finance.php">History</a></li>
             <li><a href="list.php">Personal</a></li>
             <li><a href="summary-finance.php">Summary</a></li>

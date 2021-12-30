@@ -109,7 +109,7 @@ $subTabUmum = ['Rutin', 'Non-Rutin']
                 <ul class="nav navbar-nav">
                     <li><a href="home-direksi.php">Home</a></li>
                     <li class="active"><a href="list-direksi.php">List</a></li>
-                    <li><a href="saldobpu.php">Data User</a></li>
+                    <li><a href="saldobpu.php">Saldo BPU</a></li>
                     <!--<li><a href="summary.php">Summary</a></li>-->
                     <!-- <li><a href="hak-akses.php">Hak Akses</a></li> -->
                     <li><a href="listfinish-direksi.php">Budget Finish</a></li>

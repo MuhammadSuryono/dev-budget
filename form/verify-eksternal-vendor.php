@@ -62,7 +62,7 @@ $path = "eksternalproses-new.php?action=update&id-bpu=".$idBpu."&id-verify=".$id
     </div>
     <div class="form-group">
         <label for="jenis_pembayaran" class="control-label">Jenis Pembayaran(barang/jasa) :</label>
-        <input type="text" class="form-control" id="jenis_pembayaran" name="jenis_pembayaran">
+        <input type="text" class="form-control" id="jenis_pembayaran" value="<?= $dataBpu['ket_pembayaran'] ?>" name="jenis_pembayaran">
     </div>
     <button class="btn btn-primary" type="submit" name="submit">Simpan</button>
 </form>
