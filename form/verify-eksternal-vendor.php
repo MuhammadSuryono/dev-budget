@@ -6,8 +6,20 @@ $dataPenerima = [];
 while ($row = $queryDataPenerima->fetch_assoc()) {
     $dataPenerima[] = $row;
 }
-
+$nomorInvoce = "";
+$term = 1;
+$endTerm = 1;
+$ket = $dataBpu['ket_pembayaran'];
 $explodeKetPembayaran = explode(".", $dataBpu['ket_pembayaran']);
+if (count($explodeKetPembayaran) > 0) {
+    if ($explodeKetPembayaran[0] == "INV") {
+        $nomorInvoce = $explodeKetPembayaran[1];
+        $term = $explodeKetPembayaran[3][1];
+        $explodeTerm = explode("/", $explodeKetPembayaran[3]);
+        $endTerm = $explodeTerm[1];
+        $ket = $explodeKetPembayaran[count($explodeKetPembayaran) - 1];
+    }
+}
 ?>
 <form action="<?= $path ?>" method="post">
     <input type="hidden" name="no" value="<?= $dataBpu['no'] ?>" />
@@ -54,7 +66,7 @@ $explodeKetPembayaran = explode(".", $dataBpu['ket_pembayaran']);
         <div class="col-lg-4">
             <div class="form-group">
                 <label for="invoice" class="control-label">Nomor Invoice:</label>
-                <input type="text" class="form-control" id="invoice" name="invoice" maxlength="15" placeholder="00000">
+                <input type="text" class="form-control" id="invoice" value="<?= $nomorInvoce ?>" name="invoice" maxlength="15" placeholder="00000">
             </div>
         </div>
         <div class="col-lg-4">
@@ -66,19 +78,19 @@ $explodeKetPembayaran = explode(".", $dataBpu['ket_pembayaran']);
         <div class="col-lg-2">
             <div class="form-group">
                 <label for="term" class="control-label">Term:</label>
-                <input type="text" class="form-control" id="term1" name="term1" maxlength="1" placeholder="1">
+                <input type="text" class="form-control" id="term1" name="term1" value="<?= $term ?>" maxlength="1" placeholder="1">
             </div>
         </div>
         <div class="col-lg-2">
             <div class="form-group">
                 <label for="term" class="control-label">of Term:</label>
-                <input type="text" class="form-control" id="term2" name="term2" maxlength="1" placeholder="1">
+                <input type="text" class="form-control" id="term2" name="term2" value="<?= $endTerm ?>" maxlength="1" placeholder="1">
             </div>
         </div>
     </div>
     <div class="form-group">
         <label for="jenis_pembayaran" class="control-label">Jenis Pembayaran(barang/jasa) :</label>
-        <input type="text" class="form-control" id="jenis_pembayaran" value="<?= $dataBpu['ket_pembayaran'] ?>" name="jenis_pembayaran">
+        <input type="text" class="form-control" id="jenis_pembayaran" value="<?= $ket ?>" name="jenis_pembayaran">
     </div>
     <button class="btn btn-primary" type="submit" name="submit">Simpan</button>
 </form>

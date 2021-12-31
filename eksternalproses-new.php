@@ -42,7 +42,7 @@ if (is_array($_POST['jumlah'])) {
     $emailpenerima = $_POST['email'];
 }
 
-
+$actionProcess = $_GET['action'];
 $no           = $_POST['no'];
 $waktu        = $_POST['waktu'];
 
@@ -92,6 +92,12 @@ while ($e = mysqli_fetch_assoc($queryUser)) {
     }
 }
 
+if ($actionProcess == "update") {
+    $keterangan_pembayaran = "INV." . $invoice . "." . date_format($tgl, 'dmy') . ".T" . $term1 . "/" . $term2 . "." . $jenis_pembayaran;
+} else {
+    $keterangan_pembayaran    = $_POST['keterangan_pembayaran'];
+}
+
 if ($statusbpu == 'Vendor/Supplier') {
     $invoice = str_replace('.', '', $_POST['invoice']);
     $tgl = date_create($_POST['tgl']);
@@ -99,7 +105,6 @@ if ($statusbpu == 'Vendor/Supplier') {
     $term2 = $_POST['term2'];
     $jenis_pembayaran = str_replace('.', '', $_POST['jenis_pembayaran']);
     // $keterangan_pembayaran    = $_POST['keterangan_pembayaran'];
-    $keterangan_pembayaran = "INV." . $invoice . "." . date_format($tgl, 'dmy') . ".T" . $term1 . "/" . $term2 . "." . $jenis_pembayaran;
 } else {
     $keterangan_pembayaran    = $_POST['keterangan_pembayaran'];
 }
@@ -113,7 +118,7 @@ $hostProtocol = $hostProtocol . ":" . $port;
 }
 $host = $hostProtocol. '/'. $url[1];
 
-$actionProcess = $_GET['action'];
+
 $idBpu = $_GET['id-bpu'];
 $idVerify = $_GET['id-verify'];
 

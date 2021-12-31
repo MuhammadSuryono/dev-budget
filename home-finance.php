@@ -246,8 +246,8 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
         </table>
       </div><!-- /.table-responsive -->
     </div>
-
-    <?php $j = 1; ?>
+                
+    <?php $j = 1;?>
     <h5>Daftar BPU yang perlu follow up</h5>
     <div class="panel panel-warning" data-widget="{&quot;draggable&quot;: &quot;false&quot;}" data-widget-static="">
       <div class="panel-body no-padding">
@@ -944,7 +944,7 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
           let data = res.data
 
           data.forEach((element, i) => {
-            htmlBody += `<tr><td>${i + 1}</td><td>${element.nama}</td><td>${element.no_urut}</td><td>${element.jenis}</td><td>${element.term}</td><td><a href="/view-bpu-verify.php?id=${element.id}&bpu=${element.id_bpu}"><i class="fas fa-external-link-alt" title="View Verify"></i></a></td></tr>`
+            htmlBody += `<tr><td>${i + 1}</td><td>${element.nama}</td><td>${element.no_urut}</td><td>${element.jenis}</td><td>${element.term}</td><td><a href="view-bpu-verify.php?id=${element.id}&bpu=${element.id_bpu}"><i class="fas fa-external-link-alt" title="View Verify"></i></a></td></tr>`
           });
 
           bodyTable.innerHTML = htmlBody
@@ -963,7 +963,7 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
           let data = res.data
 
           data.forEach((element, i) => {
-            htmlBody += `<tr><td>${i + 1}</td><td>${element.nama}</td><td>${element.no_urut}</td><td>${element.jenis}</td><td>${element.term}</td><td><a href="/view-bpu-verify.php?id=${element.id}&bpu=${element.id_bpu}"><i class="fas fa-external-link-alt" title="View Verify"></i></a></td></tr>`
+            htmlBody += `<tr><td>${i + 1}</td><td>${element.nama}</td><td>${element.no_urut}</td><td>${element.jenis}</td><td>${element.term}</td><td><a href="view-bpu-verify.php?id=${element.id}&bpu=${element.id_bpu}"><i class="fas fa-external-link-alt" title="View Verify"></i></a></td></tr>`
           });
 
           bodyTable.innerHTML = htmlBody
