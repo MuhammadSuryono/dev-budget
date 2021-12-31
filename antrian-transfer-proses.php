@@ -1,12 +1,14 @@
 <?php
-
+session_start();
 require "application/config/database.php";
 
 $con = new Database();
 $koneksi = $con->connect();
 
 $con->set_name_db(DB_TRANSFER);
+$con->init_connection();
 $koneksiTransfer = $con->connect();
+
 
 $time = date("Y-m-d H:i:s");
 $user = $_SESSION['nama_user'];
@@ -19,7 +21,7 @@ $jadwal_transfer = date('Y-m-d H:i:s', strtotime($_POST['jadwal_transfer']));
 // var_dump($jadwal_transfer);
 // die;
 
-$getData = mysqli_query($koneksiTransfer, "SELECT * FROM data_transfer WHERE transfer_id = $id");
+$getData = mysqli_query($koneksiTransfer, "SELECT * FROM data_transfer WHERE transfer_id = '$id'") or die(mysqli_errno($koneksiTransfer));
 $data = mysqli_fetch_assoc($getData);
 
 if ($button == 'edit') {
