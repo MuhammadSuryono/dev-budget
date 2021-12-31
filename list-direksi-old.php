@@ -59,7 +59,7 @@ $year = (int)date('Y');
         <ul class="nav navbar-nav">
           <li><a href="home-direksi.php">Home</a></li>
           <li class="active"><a href="list-direksi.php">List</a></li>
-          <li><a href="saldobpu.php">Data User</a></li>
+          <li><a href="saldobpu.php">Saldo BPU</a></li>
           <!--<li><a href="summary.php">Summary</a></li>-->
           <!-- <li><a href="hak-akses.php">Hak Akses</a></li> -->
           <li><a href="listfinish-direksi.php">Budget Finish</a></li>
@@ -93,7 +93,8 @@ $year = (int)date('Y');
         $countPengajuanReq = mysqli_num_rows($queryPengajuanReq);
         $notif = $belbyr + $bpuyahud + $countPengajuanReq;
         ?>
-        <ul class="nav navbar-nav navbar-right">
+       <ul class="nav navbar-nav navbar-right">
+                        <li><a href="notif-page.php"><i class="fa fa-envelope"></i></a></li>
           <li class="dropdown messages-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-inbox"></i><span class="label label-warning"><?= $notif ?></span></a>
             <ul class="dropdown-menu">
