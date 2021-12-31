@@ -163,7 +163,7 @@ function uploadFile($files)
     $file_tmp = $files['file']['tmp_name'];	
     if(in_array($ekstensi, $ekstensi_diperbolehkan) === true){
         if($ukuran < 1044070){			
-            move_uploaded_file($file_tmp, '../fileupload/'.$nama);
+            move_uploaded_file($file_tmp, '../document/'.$nama);
             return ["error" => null, "filename" => $nama];
         }else{
             return ["error" => "Ukuran File terlalu besar", "filename" => $nama];
