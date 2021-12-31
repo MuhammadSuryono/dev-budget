@@ -356,7 +356,7 @@ if ($_POST['submit'] == 1) {
 else if ($submit == 0) {
 
     $update = mysqli_query($koneksi, "UPDATE bpu SET jumlah = null, status_pengajuan_bpu = 2, alasan_tolak_bpu = '$alasanTolakBpu' WHERE no='$no' AND waktu='$waktu' AND term='$term'");
-    $update = mysqli_query($koneksi, "UPDATE bpu_verify SET is_need_approved = '0', status_approved = '0', is_approved = '1' WHERE id = '$bpuVerify[id]'");
+    $update = mysqli_query($koneksi, "UPDATE bpu_verify SET is_need_approved = '0', status_approved = '0', is_approved = '0', is_verified = '0' WHERE id = '$bpuVerify[id]'");
 
     $queryBpu = mysqli_query($koneksi, "SELECT * FROM bpu WHERE no='$no' AND waktu='$waktu' AND term='$term'");
     while ($bpu = mysqli_fetch_assoc($queryBpu)) {

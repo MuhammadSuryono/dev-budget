@@ -11,6 +11,7 @@ if (!isset($_SESSION['nama_user'])) {
 }
 
 $level = $_SESSION['level'];
+$divisi = $_SESSION['divisi'];
 
 if ($_POST['no'] && $_POST['waktu']) {
     $id = $_POST['no'];
@@ -22,7 +23,6 @@ if ($_POST['no'] && $_POST['waktu']) {
     $sql = "SELECT * FROM selesai WHERE no = '$id' AND waktu = '$waktu'";
     $result = $koneksi->query($sql);
     foreach ($result as $baris) {
-
 ?>
 
 
@@ -36,13 +36,13 @@ if ($_POST['no'] && $_POST['waktu']) {
             <input type="hidden" name="statusbpu" value="<?php echo $baris['status']; ?>">
 
             <?php if ($baris['status'] == 'Honor Eksternal' || $baris['status'] == 'Honor Area Head') { 
-                if ($level == "Managemen") { 
+                if ($level == "Managemen" || ($divisi == 'FINANCE' && $level == 'Manager')) { 
                     include 'form/eksternal-direksi.php';
                 } else { 
                     include 'form/eksternal-area-head.php';
                 }
             } else { 
-                if ($level == "Managemen") { 
+                if ($level == "Managemen" || ($divisi == 'FINANCE' && $level == 'Manager')) { 
                     include 'form/eksternal-direksi.php';
                 } else { 
                     include 'form/eksternal-vendor.php';

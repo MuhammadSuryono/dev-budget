@@ -137,8 +137,8 @@ if ($statusbpu == "") {
 
 $isEksternalProcess = $statusbpu == 'Vendor/Supplier';
 $path = '/view-bpu-verify.php?id='.$bpuVerify["id"].'&bpu='.$bpuVerify["id_bpu"];
-
 //periksa apakah udah submit
+
 if (isset($_POST['submit'])) {
 
     if ($_SESSION['divisi'] == 'FINANCE') {
@@ -226,7 +226,7 @@ if (isset($_POST['submit'])) {
         } else {
             $tglcairnya = null;
         }
-
+        
         if (is_array($_POST['jumlah'])) {
             $jumlahDiterima = "0";
             for ($i = 0; $i < count($arrjumlah); $i++) {
@@ -270,7 +270,7 @@ if (isset($_POST['submit'])) {
                 }
 
 
-                if ($_SESSION['divisi'] == 'Direksi') {
+                if ($_SESSION['divisi'] == 'Direksi' || ($isEksternalProcess && $_SESSION['divisi'] == 'FINANCE' && $_SESSION['level'] == 'Manager')) {
                     if ($actionProcess != "update") {
                         
                         // echo "INSERT NOT UPDATE IF";
@@ -332,7 +332,7 @@ if (isset($_POST['submit'])) {
                 }
             }
 
-            if ($_SESSION['divisi'] != 'Direksi') {
+            if ($_SESSION['divisi'] != 'Direksi' || ($isEksternalProcess && $_SESSION['divisi'] != 'FINANCE' && $_SESSION['level'] != 'Manager')) {
                 $notification = 'Pembuatan BPU Eksternal Berhasil. Pemberitahuan via email telah terkirim ke ';
             } else {
                 $notification = '';
@@ -347,7 +347,7 @@ if (isset($_POST['submit'])) {
                 if ($i < count($arremailpenerima) - 1) $notification .= ', ';
                 else $notification .= '.';
             }
-            if ($_SESSION['divisi'] != 'Direksi') {
+            if ($_SESSION['divisi'] != 'Direksi' || ($isEksternalProcess && $_SESSION['divisi'] != 'FINANCE' && $_SESSION['level'] != 'Manager')) {
                 $notification = ' Dan Pemberitahuan via whatsapp telah terkirim ke ';
             } else {
                 $notification = 'Pembuatan BPU Eksternal Berhasil. Pemberitahuan via whatsapp telah terkirim ke';
@@ -382,7 +382,7 @@ if (isset($_POST['submit'])) {
                 else $notification .= '.';
             }
         } else {
-            if ($_SESSION['divisi'] == 'Direksi') {
+            if ($_SESSION['divisi'] == 'Direksi' || ($isEksternalProcess && $_SESSION['divisi'] == 'FINANCE' && $_SESSION['level'] == 'Manager')) {
                 if ($actionProcess == "update") {
                     $insert = mysqli_query($koneksi, "UPDATE bpu SET pengajuan_jumlah='$dataVerify[total_verify]', tglcair = '$tglcair', namabank= '$namabank', norek = '$norek', namapenerima = '$namapenerima', ket_pembayaran = '$keterangan_pembayaran', emailpenerima = '$emailpenerima' WHERE noid = '$idBpu';
                     ");
@@ -454,7 +454,7 @@ if (isset($_POST['submit'])) {
                 }
                 $subject = "Informasi Pembayaran";
 
-                if ($emailpenerima && $_SESSION['divisi'] != 'Direksi') {
+                if ($emailpenerima && $_SESSION['divisi'] != 'Direksi'|| ($isEksternalProcess && $_SESSION['divisi'] != 'FINANCE' && $_SESSION['level'] != 'Manager')) {
                     $message = $emailHelper->sendEmail($msg, $subject, $emailpenerima, $name = '', $address = "single");
                 }
                 $notification = 'Pembuatan BPU Eksternal Berhasil. Pemberitahuan via whatsapp telah terkirim ke ';
@@ -485,7 +485,7 @@ if (isset($_POST['submit'])) {
             }
 
             
-            if ($_SESSION['divisi'] != 'Direksi') {
+            if ($_SESSION['divisi'] != 'Direksi' || ($isEksternalProcess && $_SESSION['divisi'] != 'FINANCE' && $_SESSION['level'] != 'Manager')) {
                 $notification .= " dan Pemberitahuan via email telah terkirim ke - $namapenerima ($emailpenerima)";
             }
         }
@@ -500,6 +500,15 @@ if (isset($_POST['submit'])) {
             echo "</script>";
             echo "<script> document.location.href='views-direksi.php?code=" . $numb . "'; </script>";
         }
+
+        if($isEksternalProcess && $_SESSION['divisi'] == 'FINANCE' && $_SESSION['level'] == 'Manager') {
+            
+            echo "<script language='javascript'>";
+            echo "alert('$notification!!')";
+            echo "</script>";
+            echo "<script> document.location.href='".$_SERVER['HTTP_REFERER']."'; </script>";
+        }
+        
         
         if (!$isEksternalProcess && $_SESSION["divisi"] != "Direksi") {
             if ($_SESSION['divisi'] == 'FINANCE') {

@@ -596,13 +596,14 @@ $setting = mysqli_fetch_assoc($querySetting);
                                 echo "<i class='far fa-square'></i> Paid ";
                                 echo "</b><br/>";
                               } else if ($statusPengajuanBpu == 1) {
+                                $statusCheckApproval = $persetujuan == "Disetujui (Direksi)" && $isEksternalProcess ? 'fa-check-square' : 'fa-square';
                                 echo "<i class='far fa-check-square'></i> Diajukan Oleh $pengaju";
                                 echo "</b><br/>";
                                 echo "<i class='far fa-check-square'></i> Mengetahui (" . (!is_null($userMengetahui) ? $userMengetahui : '-') . ")";
                                 echo "</b><br/>";
                                 echo "<i class='far fa-square'></i> Verifikasi ";
                                 echo "</b><br/>";
-                                echo "<i class='far fa-square'></i> Approval ";
+                                echo "<i class='far ".$statusCheckApproval  ."'></i> Approval (" . (!is_null($userApprove) ? $userApprove : '-') . ")";
                                 echo "</b><br/>";
                                 echo "<i class='far fa-square'></i> Paid ";
                                 echo "</b><br/>";
@@ -683,7 +684,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                                 <!-- <button type="button" style="margin-bottom: 5px; margin-top: 10px;" class="btn btn-info" onclick="realisasi('<?php echo $no; ?>','<?php echo $waktu; ?>', '<?= $termm ?>', '<?= $jumlbayar ?>', '<?= $pengajuan_realisasi ?>', '<?= $pengajuan_uangkembali ?>', '<?= $pengajuan_tanggalrealisasi ?>', '<?= $sisarealisasi ?>' , '<?= $fileuploadRealisasi ?>')">Verifikasi Realisasi</button> -->
                               <?php
                               }
-                              if ($statusPengajuanBpu == 1 && in_array("verifikasi_bpu", $buttonAkses)) : ?>
+                              if ($statusPengajuanBpu == 1 && in_array("verifikasi_bpu", $buttonAkses) && !$isEksternalProcess) : ?>
                                 <br>
                                 <button type="button" style="margin-bottom: 5px; margin-top: 10px;" class="btn btn-info" onclick="verifikasiBpu('<?php echo $no; ?>','<?php echo $waktu; ?>', '<?= $term ?>')">Verifikasi BPU</button>
                                 <?php
