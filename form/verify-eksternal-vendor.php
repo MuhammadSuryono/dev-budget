@@ -17,6 +17,7 @@ if (count($explodeKetPembayaran) > 0) {
         $term = $explodeKetPembayaran[3][1];
         $explodeTerm = explode("/", $explodeKetPembayaran[3]);
         $endTerm = $explodeTerm[1];
+        $ket = $explodeKetPembayaran[count($explodeKetPembayaran) - 1];
     }
 }
 ?>
