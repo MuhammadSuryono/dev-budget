@@ -500,13 +500,14 @@ $setting = mysqli_fetch_assoc($querySetting);
                                 echo "<i class='far fa-square'></i> Paid ";
                                 echo "</b><br/>";
                               } else if ($statusPengajuanBpu == 1) {
+                                $statusCheckApproval = $persetujuan == "Disetujui (Direksi)" && $isEksternalProcess ? 'fa-check-square' : 'fa-square';
                                 echo "<i class='far fa-check-square'></i> Diajukan Oleh $pengaju";
                                 echo "</b><br/>";
                                 echo "<i class='far fa-check-square'></i> Mengetahui (" . (!is_null($userMengetahui) ? $userMengetahui : '-') . ")";
                                 echo "</b><br/>";
                                 echo "<i class='far fa-square'></i> Verifikasi ";
                                 echo "</b><br/>";
-                                echo "<i class='far fa-square'></i> Approval ";
+                                echo "<i class='far ".$statusCheckApproval  ."'></i> Approval (" . (!is_null($userApprove) ? $userApprove : '-') . ")";
                                 echo "</b><br/>";
                                 echo "<i class='far fa-square'></i> Paid ";
                                 echo "</b><br/>";

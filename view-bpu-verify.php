@@ -199,7 +199,7 @@ if ($port == "" || $port == "80" || $port == "7793") {
                   include 'form/verify-eksternal-vendor.php';
                 }
 
-                if ($dataVerify["is_need_approved"] && $dataVerify["is_verified"] || ($dataVerify["is_verified"] && $dataBpu["namapenerima"] != "")) {
+                if ($dataVerify["is_need_approved"] && $dataVerify["is_verified"] || ($dataVerify["is_verified"] && $dataVerify["is_approved"])) {
                   include 'form/verify-eksternal-info.php';
                 }
               }

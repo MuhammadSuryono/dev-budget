@@ -17,7 +17,6 @@ $koneksiMriTransfer = $con->connect();
 session_start();
 if (!isset($_SESSION['nama_user'])) {
     header("location:login.php");
-    // die('location:login.php');//jika belum login jangan lanjut
 }
 
 if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
@@ -73,38 +72,6 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                     <td class="td-metode-pembayaran"><?= $metode_pembayaran ?></td>
                 </tr>
             <?php
-                /*
-                1 -> MRI PAL (UM)
-                2 -> MRI PAL (Project/Umum)
-                3 -> MRI Kas (UM)
-                4 -> MRI Kas (Project/Umum)
-            */
-                if ($baris['pengajuan_jumlah'] < $resultJenisPembayaran['max_transfer']) {
-                    if ($statusBpu == 'UM' || $statusBpu == 'UM Burek') {
-                        array_push($arrCode, '1');
-                        // $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'Kas Uang Muka'");
-                    } else {
-                        array_push($arrCode, '2');
-                        if ($jenis == 'B1' || $jenis == 'B2') {
-                            // $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'Kas Project'");
-                        } else {
-                            // $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'Kas Umum'");
-                        }
-                    }
-                } else {
-                    if ($statusBpu == 'UM' || $statusBpu == 'UM Burek') {
-                        array_push($arrCode, '3');
-                        // $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'Kas Uang Muka'");
-                    } else {
-                        array_push($arrCode, '4');
-                        if ($jenis == 'B1' || $jenis == 'B2') {
-                            // $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'Kas Project'");
-                        } else {
-                            // $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'Kas Umum'");
-                        }
-                    }
-                    // $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas");
-                }
 
             endforeach;
             ?>
@@ -128,13 +95,6 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                 <label for="pph232"> PPH 23 (2%)</label><br>
                 <input type="checkbox" id="pph234" name="pajak" value="pph234">
                 <label for="pph234"> PPH 23 (4%)</label><br>
-
-                <!-- <input type="checkbox" id="pph23" name="pajak" value="pph23">
-                <label for="pph23"> PPH 23</label><br>
-                <select name="pph23value" id="pph23value" style="display: none;">
-                    <option value="0.02">2%</option>
-                    <option value="0.04">4%</option>
-                </select> -->
             </div>
         </div>
 
@@ -155,7 +115,7 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
 
     <div class="form-group">
         <label for="tglbayar" class="control-label">Tanggal Pembayaran :</label> 
-        <input type="date" class="form-control" id="tglbayar" name="tanggalbayar" value="<?= $dataBpu['tanggalbayar'] ?>" min="<?= date('Y-m-d', strtotime($Date . ' + 2 days')) ?>" required>
+        <input type="date" class="form-control" id="tglbayar" name="tanggalbayar" value="<?= $dataBpu['tanggalbayar'] ?>" min="<?= $dataBpu['tanggalbayar'] == '' ? date('Y-m-d', strtotime($Date . ' + 2 days')) : $dataBpu['tanggalbayar'] ?>">
     </div>
 
     <div class="form-group">
@@ -220,8 +180,6 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
             let inputPengajuan = $("input[name='pengajuan_jumlah[]']");
             let inputMetodePembayaran = $("input[name='metode_pembayaran[]']");
             // let inputMetodePembayaran = $('input[name=metode_pembayaran[]]');
-
-            console.log(inputPengajuan)
 
             let result = 0;
             if ($(this).val() == 'pph21') {
@@ -365,31 +323,6 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                     }
                 }
             }
-            // else if ($(this).val() == 'pph23') {
-            //     if ($(this).prop('checked')) {
-            //         $('#pph23value').show();
-            //         // result = Math.round(parseInt(actual) - ($('#pph23value').val() * bpu));
-
-            //         for (let i = 0; i < tdPengajuan.length; i++) {
-            //             result = Math.round(parseInt(tdActual[i].textContent) + ($('#pph23value').val() * parseInt(tdPengajuan[i].textContent)));
-            //             tdActual[i].innerText = result
-            //         }
-            //         $('#pph23value').change(function() {
-            //             // result = Math.round(parseInt(actual) - ($(this).val() * bpu));
-            //             for (let i = 0; i < tdPengajuan.length; i++) {
-            //                 result = Math.round(parseInt(tdActual[i].textContent) + ($(this).val() * parseInt(tdPengajuan[i].textContent)));
-            //                 tdActual[i].innerText = result
-            //             }
-            //         })
-            //     } else {
-            //         $('#pph23value').hide();
-            //         // result = Math.round(parseInt(actual) + ($('#pph23value').val() * bpu));
-            //         for (let i = 0; i < tdPengajuan.length; i++) {
-            //             result = Math.round(parseInt(tdActual[i].textContent) + ($('#pph23value').val() * parseInt(tdPengajuan[i].textContent)));
-            //             tdActual[i].innerText = result
-            //         }
-            //     }
-            // }
         })
 </script>
 <?php
