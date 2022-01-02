@@ -244,8 +244,16 @@ if ($_POST['submit'] == 1) {
 
             $queryJenisPembayaran = mysqli_query($koneksiMriTransfer, "SELECT * FROM jenis_pembayaran WHERE jenispembayaran = '$item[statusbpu]'");
             $jenisPembayaran = mysqli_fetch_assoc($queryJenisPembayaran);
-            $insert = mysqli_query($koneksiTransfer, "INSERT INTO data_transfer (transfer_req_id, transfer_type, jenis_pembayaran_id, keterangan, waktu_request, norek, pemilik_rekening, bank, kode_bank, berita_transfer, jumlah, terotorisasi, hasil_transfer, ket_transfer, nm_pembuat, nm_otorisasi, nm_validasi, nm_manual, jenis_project, nm_project, noid_bpu, biaya_trf, rekening_sumber, email_pemilik_rekening, jadwal_transfer) 
-                    VALUES ('$formatId', '3', '$jenisPembayaran[jenispembayaranid]', '$item[statusbpu]', '$waktu', '$item[norek]', '$item[namapenerima]','$bank[namabank]', '$bank[kodebank]', '$berita_transfer','$arrPengajuanJumlah[0]', '2', '1', 'Antri', '$item[pengaju]', '$_SESSION[nama_user]', '$_SESSION[nama_user]','', '$budget[jenis]', '$nm_project', '$item[noid]', $biayaTrf, '0613005878', '$item[emailpenerima]', '$tanggalbayar')") or die(mysqli_error($koneksiTransfer));
+
+            $typeKas = typeKas($item['statusbpu']);
+            $queryKas = mysqli_query($koneksiDevelop, "SELECT rekening FROM kas WHERE label_kas = '$typeKas'");
+            $kas = mysqli_fetch_assoc($queryKas);
+            if ($typeKas == U_UNDEFINED_VARIABLE) {
+                $kas['rekening'] = U_UNDEFINED_VARIABLE;
+            }
+
+            $insert = mysqli_query($koneksiTransfer, "INSERT INTO data_transfer (transfer_req_id, transfer_type, jenis_pembayaran_id, keterangan, waktu_request, norek, pemilik_rekening, bank, kode_bank, berita_transfer, jumlah, terotorisasi, hasil_transfer, ket_transfer, nm_pembuat, nm_otorisasi, nm_validasi, nm_manual, jenis_project, nm_project, noid_bpu, biaya_trf, rekening_sumber, email_pemilik_rekening, bank_account_name, jadwal_transfer) 
+                    VALUES ('$formatId', '3', '$jenisPembayaran[jenispembayaranid]', '$item[statusbpu]', '$waktu', '$item[norek]', '$item[namapenerima]','$bank[namabank]', '$bank[kodebank]', '$berita_transfer','$arrPengajuanJumlah[0]', '2', '1', 'Antri', '$item[pengaju]', '$_SESSION[nama_user]', '$_SESSION[nama_user]','', '$budget[jenis]', '$nm_project', '$item[noid]', $biayaTrf, '$kas[rekening]', '$item[emailpenerima]', '$item[bank_account_name]', '$tanggalbayar')") or die(mysqli_error($koneksiTransfer));
         }
     }
 
@@ -549,4 +557,21 @@ if ($update) {
         echo "</script>";
         echo "<script> document.location.href='".$q[1]."'; </script>";
     }
+}
+
+function typeKas($statusBpu = "") {
+    $project = ["Vendor/Supplier", "Honor Area Head", "Honor Eksternal"];
+    $uangMuka = ["UM", "UM Burek"];
+    $umum = [];
+
+    if (in_array($statusBpu, $project)) {
+        return "Kas Project";
+    } else if (in_array($statusBpu, $uangMuka)) {
+        return "Kas Uang Muka";
+    } else if (in_array($statusBpu, $umum)) {
+        return "Kas Umum";
+    }
+
+    return U_UNDEFINED_VARIABLE;
+
 }
