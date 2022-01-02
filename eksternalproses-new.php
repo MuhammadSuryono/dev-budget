@@ -93,21 +93,18 @@ while ($e = mysqli_fetch_assoc($queryUser)) {
     }
 }
 
-if ($actionProcess == "update") {
+if ($actionProcess == "update" && $statusbpu == 'Vendor/Supplier') {
+    $invoice = str_replace('.', '', $_POST['invoice']);
+    $tgl = date_create($_POST['tgl']);
+    $term1 = $_POST['term1'];
+    $term2 = $_POST['term2'];
     $keterangan_pembayaran = "INV." . $invoice . "." . date_format($tgl, 'dmy') . ".T" . $term1 . "/" . $term2 . "." . $jenis_pembayaran;
 } else {
     $keterangan_pembayaran    = $_POST['keterangan_pembayaran'];
 }
 
 if ($statusbpu == 'Vendor/Supplier') {
-    $invoice = str_replace('.', '', $_POST['invoice']);
-    $tgl = date_create($_POST['tgl']);
-    $term1 = $_POST['term1'];
-    $term2 = $_POST['term2'];
     $jenis_pembayaran = str_replace('.', '', $_POST['jenis_pembayaran']);
-    // $keterangan_pembayaran    = $_POST['keterangan_pembayaran'];
-} else {
-    $keterangan_pembayaran    = $_POST['keterangan_pembayaran'];
 }
 
 $url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
