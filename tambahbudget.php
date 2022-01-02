@@ -4,7 +4,6 @@ require_once "application/config/database.php";
 $con = new Database();
 $koneksi = $con->connect();
 
-
 $con->set_name_db(DB_JAY);
 $con->init_connection();
 $koneksiJay = $con->connect();
@@ -88,11 +87,13 @@ $koneksiJay = $con->connect();
     <select class="form-control" id="kate" name="katnon">
       <option value="" selected>Pilih Kategori</option>
       <?php
-      $carikatnon = $koneksi->query("SELECT * FROM kategori_nonrutin WHERE kode !='012' ORDER BY kategori");
-      while ($ckn = mysqli_fetch_array($carikatnon)) {
-        $kodekat = $ckn['kode'];
-        $namakat = $ckn['kategori'];
-        echo "<option value='$kodekat'>$namakat</option>";
+      $con->load_database($koneksi);
+      $kategoryNonRutin = $con->select()->from('kategori_nonrutin')->where('kode', '!=', '012')->order_by('kategori')->get();
+      foreach ($kategoryNonRutin as $ckn)
+      {
+          $kodekat = $ckn['kode'];
+          $namakat = $ckn['kategori'];
+          echo "<option value='$kodekat'>$namakat</option>";
       }
       ?>
       <option value="012">Lain - lain</option>
@@ -109,7 +110,8 @@ $koneksiJay = $con->connect();
     <select class="custom-select form-control" id="kodeproject" name="kodepro[]" multiple>
       <option selected disabled>Pilih Project</option>
       <?php
-      $kode = mysqli_query($koneksiJay, "SELECT * FROM project WHERE visible='y' ORDER BY nama");
+      $con->load_database($koneksiJay);
+      $kode = $con->select()->from('project')->where('visible', '=', 'Y')->order_by('nama')->get();
       foreach ($kode as $rc) {
         $kodepro = $rc['kode'];
         $nampro  = $rc['nama'];
@@ -137,7 +139,8 @@ $koneksiJay = $con->connect();
     <select class="form-control" id="picNonRut" name="idUser">
       <option disabled selected>Pilih PIC Budget</option>
       <?php
-      $pic = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE resign is NULL ORDER BY nama_user");
+      $con->load_database($koneksi);
+      $pic = $con->select()->from('tb_user')->where('resign', 'is', NULL)->order_by('nama_user')->get();
       foreach ($pic as $p) {
       ?>
         <option value="<?php echo $p['id_user']; ?>"><?php echo $p['nama_user']; ?> - (<?php echo $p['divisi']; ?>)</option>

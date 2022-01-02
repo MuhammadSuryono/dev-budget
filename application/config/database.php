@@ -18,7 +18,9 @@ defined("DB_USER_DIGITAL_MARKET") OR define("DB_USER_DIGITAL_MARKET", "adam");
 defined("DB_PASS_DIGITAK_MARKET") OR define("DB_PASS_DIGITAK_MARKET", "Ad@mMR1db");
 
 
-class Database {
+require_once 'ModelBudget.php';
+
+class Database extends ModelBudget {
     private $conn;
     private $dbUser = DB_USER;
     private $dbPass = DB_PASS;
@@ -26,7 +28,7 @@ class Database {
     private $dbPort = DB_PORT;
     private $dbHost = DB_HOST;
 
-    public function __construct()  {
+    public function __construct($fromInit = true)  {
         $this->init_connection();
     }
 
@@ -41,6 +43,7 @@ class Database {
         if (!$this->conn) {
             die("Connection error: " . mysqli_connect_error());
         }
+
     }
 
     public function connect()

@@ -434,7 +434,7 @@ if (isset($_POST['submit'])) {
             for($i = 0; $i < count($emailInternal); $i++) {
                 $path = '/views.php';
 
-                if (!$cuti->checkStatusCutiUser($namaInternal[$i])) {
+                if (!$cuti->checkStatusCutiUser($namaInternal[$i]) || $_SESSION['nama_user'] != $namaInternal[$i]) {
                     if ($isEksternalProcess && $dataDivisi[$i] != "Direksi") {
                         $path = '/view-bpu-verify.php?id='.$dataVerify["id"].'&bpu='.$dataVerify["id_bpu"];
                     } else {
@@ -538,7 +538,7 @@ if (isset($_POST['submit'])) {
                 for($i = 0; $i < count($emailInternal); $i++) {
                     $path = '/views.php';
 
-                    if (!$cuti->checkStatusCutiUser($namaInternal[$i])) {
+                    if (!$cuti->checkStatusCutiUser($namaInternal[$i]) || $_SESSION['nama_user'] != $namaInternal[$i]) {
                         if ($isEksternalProcess && $dataDivisi[$i] != "Direksi") {
                             $path = '/view-bpu-verify.php?id='.$dataVerify["id"].'&bpu='.$dataVerify["id_bpu"];
                         } else {
