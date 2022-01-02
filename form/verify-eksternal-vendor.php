@@ -23,7 +23,7 @@ if (count($explodeKetPembayaran) > 0) {
         $day = $dateFormat[0].$dateFormat[1];
         $month = $dateFormat[2].$dateFormat[3];
         $year = "20".$dateFormat[4].$dateFormat[5];
-        $dateInvoice = $day . "-" . $month . "-" . $year;
+        $dateInvoice = $year . "-" . $month . "-" . $day;
 
         $explodeTerm = explode("/", $explodeKetPembayaran[3]);
         $endTerm = $explodeTerm[1]; // [END TERM PEMBAYARAN]
