@@ -1,5 +1,5 @@
 <?php
-error_reporting(0);
+// error_reporting(0);
 require_once "application/config/database.php";
 require_once "application/config/message.php";
 require_once "application/config/whatsapp.php";
@@ -252,8 +252,8 @@ if ($_POST['submit'] == 1) {
                 $kas['rekening'] = U_UNDEFINED_VARIABLE;
             }
 
-            $insert = mysqli_query($koneksiTransfer, "INSERT INTO data_transfer (transfer_req_id, transfer_type, jenis_pembayaran_id, keterangan, waktu_request, norek, pemilik_rekening, bank, kode_bank, berita_transfer, jumlah, terotorisasi, hasil_transfer, ket_transfer, nm_pembuat, nm_otorisasi, nm_validasi, nm_manual, jenis_project, nm_project, noid_bpu, biaya_trf, rekening_sumber, email_pemilik_rekening, bank_account_name, jadwal_transfer) 
-                    VALUES ('$formatId', '3', '$jenisPembayaran[jenispembayaranid]', '$item[statusbpu]', '$waktu', '$item[norek]', '$item[namapenerima]','$bank[namabank]', '$bank[kodebank]', '$berita_transfer','$arrPengajuanJumlah[0]', '2', '1', 'Antri', '$item[pengaju]', '$_SESSION[nama_user]', '$_SESSION[nama_user]','', '$budget[jenis]', '$nm_project', '$item[noid]', $biayaTrf, '$kas[rekening]', '$item[emailpenerima]', '$item[bank_account_name]', '$tanggalbayar')") or die(mysqli_error($koneksiTransfer));
+            $insert = mysqli_query($koneksiTransfer, "INSERT INTO data_transfer (transfer_req_id, transfer_type, jenis_pembayaran_id, keterangan, waktu_request, norek, pemilik_rekening, bank, kode_bank, berita_transfer, jumlah, terotorisasi, hasil_transfer, ket_transfer, nm_pembuat, nm_otorisasi, nm_validasi, nm_manual, jenis_project, nm_project, noid_bpu, biaya_trf, rekening_sumber, email_pemilik_rekening, jadwal_transfer) 
+                    VALUES ('$formatId', '3', '$jenisPembayaran[jenispembayaranid]', '$item[statusbpu]', '$waktu', '$item[norek]', '$item[bank_account_name]','$bank[namabank]', '$bank[kodebank]', '$berita_transfer','$arrPengajuanJumlah[0]', '2', '1', 'Antri', '$item[pengaju]', '$_SESSION[nama_user]', '$_SESSION[nama_user]','', '$budget[jenis]', '$nm_project', '$item[noid]', $biayaTrf, '$kas[rekening]', '$item[emailpenerima]', '$tanggalbayar')") or die(mysqli_error($koneksiTransfer));
         }
     }
 
