@@ -114,7 +114,7 @@ if ($submit == 1) {
             $queryJenisPembayaran = mysqli_query($koneksiMriTransfer, "SELECT * FROM jenis_pembayaran WHERE jenispembayaran = '$bpu[statusbpu]'");
             $jenisPembayaran = mysqli_fetch_assoc($queryJenisPembayaran);
             $insert = mysqli_query($koneksiTransfer, "INSERT INTO data_transfer (transfer_req_id, transfer_type, jenis_pembayaran_id, keterangan, waktu_request, norek, pemilik_rekening, bank, kode_bank, berita_transfer, jumlah, terotorisasi, hasil_transfer, ket_transfer, nm_pembuat, nm_validasi, nm_manual, jenis_project, nm_project, noid_bpu, biaya_trf, rekening_sumber, email_pemilik_rekening) 
-                    VALUES ('$formatId', '3', '$jenisPembayaran[jenispembayaranid]', '$bpu[statusbpu]', '$waktu', '$bpu[norek]', '$bpu[namapenerima]','$bank[namabank]', '$bank[kodebank]', '$berita_transfer','$pengajuan_jumlah[$i]', '2', '1', 'Antri', '$bpu[pengaju]', '$user', '', '$pengajuan[jenis]', '$nm_project', '$bpu[noid]', $biayaTrf, '$rekening_sumber', '$bpu[emailpenerima]')") or die(mysqli_error($koneksiTransfer));
+                    VALUES ('$formatId', '3', '$jenisPembayaran[jenispembayaranid]', '$bpu[statusbpu]', '$waktu', '$bpu[norek]', '$bpu[bank_account_name]','$bank[namabank]', '$bank[kodebank]', '$berita_transfer','$pengajuan_jumlah[$i]', '2', '1', 'Antri', '$bpu[pengaju]', '$user', '', '$pengajuan[jenis]', '$nm_project', '$bpu[noid]', $biayaTrf, '$rekening_sumber', '$bpu[emailpenerima]')") or die(mysqli_error($koneksiTransfer));
 
             if (!$insert) {
                 if ($_SESSION['hak_akses'] == 'Manager') {

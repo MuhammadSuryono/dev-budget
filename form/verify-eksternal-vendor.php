@@ -10,14 +10,24 @@ $nomorInvoce = "";
 $term = 1;
 $endTerm = 1;
 $ket = $dataBpu['ket_pembayaran'];
+$dateInvoice = "";
 $explodeKetPembayaran = explode(".", $dataBpu['ket_pembayaran']);
 if (count($explodeKetPembayaran) > 0) {
+    // INV.87990.301221.T1/1.Keterangan Pembayarn
+    // INV.[NOMOR_INVOICE].[DATE(dd-mm-y)].T[START_TERM]/[END_TERM].[KETERANGAN]
     if ($explodeKetPembayaran[0] == "INV") {
-        $nomorInvoce = $explodeKetPembayaran[1];
-        $term = $explodeKetPembayaran[3][1];
+        $nomorInvoce = $explodeKetPembayaran[1]; // NUMBER INVOICE
+        $term = $explodeKetPembayaran[3][1]; // [START TERM PEMBAYARAN]
+        
+        $dateFormat = $explodeKetPembayaran[2]; // [DATE]
+        $day = $dateFormat[0].$dateFormat[1];
+        $month = $dateFormat[2].$dateFormat[3];
+        $year = "20".$dateFormat[4].$dateFormat[5];
+        $dateInvoice = $year . "-" . $month . "-" . $day;
+
         $explodeTerm = explode("/", $explodeKetPembayaran[3]);
-        $endTerm = $explodeTerm[1];
-        $ket = $explodeKetPembayaran[count($explodeKetPembayaran) - 1];
+        $endTerm = $explodeTerm[1]; // [END TERM PEMBAYARAN]
+        $ket = $explodeKetPembayaran[count($explodeKetPembayaran) - 1]; // [KETERANGAN]
     }
 }
 ?>
@@ -57,7 +67,11 @@ if (count($explodeKetPembayaran) > 0) {
                 <?php endwhile; ?>
             </select>
         </div>
-
+        <div class="form-group">
+            <label for="bank_account_name" class="control-label">Nama Rekening Bank:</label>
+            <input type="text" class="form-control" name="bank_account_name" id="bank_account_name" value="<?= $dataBpu['bank_account_name'] ?>" required>
+            <small>Nama harus sesuai dengan yang terdaftar pada bank Penerima. <b  class="text-danger">KESALAHAN PADA NAMA DAPAT MENYEBABKAN DANA TIDAK DAPAT DI TRANSFER UNTUK METODE PEMBAYARAN MRI PAL</b></small>
+        </div>
         <div class="form-group">
             <label for="norek" class="control-label">Nomor Rekening :</label>
             <input type="number" class="form-control" name="norek" id="norek" value="<?= $dataBpu['norek'] ?>" required>
@@ -72,7 +86,7 @@ if (count($explodeKetPembayaran) > 0) {
         <div class="col-lg-4">
             <div class="form-group">
                 <label for="tgl" class="control-label">Tanggal:</label>
-                <input type="date" class="form-control" id="tgl" name="tgl">
+                <input type="date" class="form-control" value="<?= $dateInvoice ?>" id="tgl" name="tgl">
             </div>
         </div>
         <div class="col-lg-2">

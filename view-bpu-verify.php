@@ -59,9 +59,41 @@ if ($port == "" || $port == "80" || $port == "7793") {
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
-
+  
 </head>
 <body>
+  <style>
+    input[list]:focus {
+      outline: none;
+    }
+    input[list] + div[list] {
+      display: none;
+      position: absolute;
+      width: 100%;
+      max-height: 164px;
+      overflow-y: auto;
+      max-width: 330px;
+      background: #FFF;
+      border: var(--border);
+      border-top: none;
+      border-radius: 0 0 5px 5px;
+      box-shadow: 0 3px 3px -3px #333;
+      z-index: 100;
+    }
+    input[list] + div[list] span {
+      display: block;
+      padding: 7px 5px 7px 20px;
+      color: #069;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    input[list] + div[list] span:not(:last-child) {
+      border-bottom: 1px solid #EEE;
+    }
+    input[list] + div[list] span:hover {
+      background: rgba(100, 120, 140, .2);
+    }
+  </style>
 
   <nav class="navbar navbar-inverse">
     <div class="container-fluid">
