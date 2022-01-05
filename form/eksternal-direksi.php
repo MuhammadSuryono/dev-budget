@@ -6,6 +6,8 @@ $data = [];
 while ($row = $mysqlQuery->fetch_assoc()) {
     $data[] = $row;
 }
+$no = $_POST['no'];
+$waktu = $_POST['waktu'];
 
 $queryBpu = "SELECT max(term) as last_term, SUM(jumlah) as total FROM bpu WHERE no = '$no' AND waktu = '$waktu'";
 $mysqlQuery = mysqli_query($koneksi, $queryBpu);
@@ -27,7 +29,6 @@ if ($total == NULL) {
 
 $totalPengajuan = $baris['total'];
 $sisaPembayaran = $totalPengajuan - $total;
-
 ?>
 
 <div class="form-group">
@@ -44,7 +45,7 @@ $sisaPembayaran = $totalPengajuan - $total;
         <?php
             for ($i=0; $i < $lastTerm + 1; $i++) { 
                 $option = $i + 1;
-                $disabled = $i + 1 != 1 && $lastTerm == $i + 1 ? "disabled" : "";
+                $disabled = $lastTerm == $i + 1 ? "disabled" : "";
                 echo '<option value="'.$option.'" '.$disabled.'>'.$option.'</option>';
             }
         ?>
