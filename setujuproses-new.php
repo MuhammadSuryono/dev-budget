@@ -118,13 +118,14 @@ $queryBpuVerify = mysqli_query($koneksi, "SELECT * FROM bpu_verify WHERE id_bpu 
 $bpuVerify = mysqli_fetch_assoc($queryBpuVerify);
 
 $statusBpu = $bpuItem["statusbpu"];
-
-$isEksternalProcess = $bpuItem["statusbpu"] == 'Vendor/Supplier';
+$eksternal = ['Honor Eksternal','Honor Area Head','STKB OPS', 'STKB TRK Luar Kota', 'Honor Luar Kota', 'Honor Jakarta', 'STKB TRK Jakarta', 'Vendor/Supplier'];
+$isEksternalProcess = in_array($bpuItem["statusbpu"], $eksternal);
 $path = '/view-bpu-verify.php?id='.$bpuVerify["id"].'&bpu='.$bpuItem["noid"];
 
 
 if ($_POST['submit'] == 1) {
     
+    $index = 0;
     while ($item = mysqli_fetch_assoc($queryBpuItem)) {
         array_push($arrPembayaran, $item['metode_pembayaran']);
         array_push($arrPenerima, $item['namapenerima']);
@@ -132,9 +133,9 @@ if ($_POST['submit'] == 1) {
             array_push($arrJumlah, "Rp. " . number_format($item['jumlah'], 0, ",", "."));
         }
 
-        if (isset($arrPengajuanJumlah[0])) {
-            if ($arrPengajuanJumlah[0] != "") {
-                array_push($arrJumlah, "Rp. " . number_format($arrPengajuanJumlah[0], 0, ",", "."));
+        if (isset($arrPengajuanJumlah[$index])) {
+            if ($arrPengajuanJumlah[$index] != "") {
+                array_push($arrJumlah, "Rp. " . number_format($arrPengajuanJumlah[$index], 0, ",", "."));
             }
         }
 
@@ -154,8 +155,8 @@ if ($_POST['submit'] == 1) {
         }
 
         if ($isEksternalProcess) {
-            $update = mysqli_query($koneksi, "UPDATE bpu SET jumlah = '$arrPengajuanJumlah[0]', checkby = '$userSetuju', tglcheck='$time' WHERE noid = '$arrNoid[0]'");
-            $item['jumlah'] = $arrPengajuanJumlah[0];
+            $update = mysqli_query($koneksi, "UPDATE bpu SET jumlah = '$arrPengajuanJumlah[$index]', checkby = '$userSetuju', tglcheck='$time' WHERE noid = '$arrNoid[$index]'");
+            $item['jumlah'] = $arrPengajuanJumlah[$index];
         }
 
         $queryBank = mysqli_query($koneksi, "SELECT * FROM bank WHERE kodebank = '$item[namabank]'");
@@ -252,9 +253,12 @@ if ($_POST['submit'] == 1) {
                 $kas['rekening'] = U_UNDEFINED_VARIABLE;
             }
 
+            $updateBpu = mysqli_query($koneksi, "UPDATE bpu SET rekening_sumber = '$kas[rekening]', rekening_id = '$formatId' WHERE noid = '$item[noid]'");
+
             $insert = mysqli_query($koneksiTransfer, "INSERT INTO data_transfer (transfer_req_id, transfer_type, jenis_pembayaran_id, keterangan, waktu_request, norek, pemilik_rekening, bank, kode_bank, berita_transfer, jumlah, terotorisasi, hasil_transfer, ket_transfer, nm_pembuat, nm_otorisasi, nm_validasi, nm_manual, jenis_project, nm_project, noid_bpu, biaya_trf, rekening_sumber, email_pemilik_rekening, jadwal_transfer) 
-                    VALUES ('$formatId', '3', '$jenisPembayaran[jenispembayaranid]', '$item[statusbpu]', '$waktu', '$item[norek]', '$item[bank_account_name]','$bank[namabank]', '$bank[kodebank]', '$berita_transfer','$arrPengajuanJumlah[0]', '2', '1', 'Antri', '$item[pengaju]', '$_SESSION[nama_user]', '$_SESSION[nama_user]','', '$budget[jenis]', '$nm_project', '$item[noid]', $biayaTrf, '$kas[rekening]', '$item[emailpenerima]', '$tanggalbayar')") or die(mysqli_error($koneksiTransfer));
+                    VALUES ('$formatId', '3', '$jenisPembayaran[jenispembayaranid]', '$item[statusbpu]', '$waktu', '$item[norek]', '$item[bank_account_name]','$bank[namabank]', '$bank[kodebank]', '$berita_transfer','$arrPengajuanJumlah[$index]', '2', '1', 'Antri', '$item[pengaju]', '$_SESSION[nama_user]', '$_SESSION[nama_user]','', '$budget[jenis]', '$nm_project', '$item[noid]', $biayaTrf, '$kas[rekening]', '$item[emailpenerima]', '$tanggalbayar')") or die(mysqli_error($koneksiTransfer));
         }
+        $index++;
     }
 
     if ($isEksternalProcess) {

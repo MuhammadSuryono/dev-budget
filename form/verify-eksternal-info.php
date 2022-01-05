@@ -9,30 +9,40 @@ while($row = mysqli_fetch_assoc($query)) {
     <div class="col=lg-12">
 
     </div>
-    <div class="col-lg-6">
-        <dl>
-            <dt>Nama Penerima</dt>
-            <dd><?=$dataBpu["namapenerima"]?></dd>
-        </dl>
-        <dl>
-            <dt>Email Penerima</dt>
-            <dd><?=$dataBpu["emailpenerima"]?></dd>
-        </dl>
-        <dl>
-            <dt>Bank Penerima</dt>
-            <dd><?=$dataBank["namabank"]?></dd>
-        </dl>
-        <dl>
-            <dt>Nomor Rekening Penerima</dt>
-            <dd><?=$dataBpu["norek"]?></dd>
-        </dl>
+    <div class="col-lg-12">
+        <table class="table table-bordered">
+            <thead>
+                <th>No</th>
+                <th>Nama Penerima</th>
+                <th>Email Penerima</th>
+                <th>Nama Rekening</th>
+                <th>Nomor Rekening</th>
+                <th>Jumlah</th>
+            </thead>
+            <tbody>
+                <?php
+                    $queryListPenerima = mysqli_query($koneksi, "SELECT * FROM bpu WHERE no = '$dataBpu[no]' AND term = '$dataBpu[term]' AND waktu = '$dataBpu[waktu]' ");
+                    $no = 1;
+                    while($row = mysqli_fetch_assoc($queryListPenerima)) {
+                ?>
+                <tr>
+                    <td><?= $no ?></td>
+                    <td><?= $row['namapenerima'] ?></td>
+                    <td><?= $row['emailpenerima'] ?></td>
+                    <td><?= $row['bank_account_name'] ?></td>
+                    <td><?= $row['norek'] ?></td>
+                    <td>Rp. <?= number_format($row['jumlah']) ?></td>
+                </tr>
+                <?php $no++; } ?>
+            </tbody>
+        </table>
         <dl>
             <dt>Di Ajukan Oleh</dt>
             <dd><?=$dataBpu["pengaju"]?></dd>
         </dl>
         <dl>
             <dt>Waktu Pengajuan</dt>
-            <dd><?=$dataBpu["waktu"]?></dd>
+            <dd><?=$dataBpu["created_at"]?></dd>
         </dl>
         <dl>
             <dt>Term Pengajuan</dt>
