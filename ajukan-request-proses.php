@@ -154,7 +154,7 @@ if ($totalbudget > 1000000) {
             $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='Finance' AND level = '$struktur' AND aktif='Y'");
             $e = mysqli_fetch_assoc($queryEmail);
            
-            if (!$cuti->checkStatusCutiUser($e["nama_user"])) {
+            if (false) {
                 $getDataUserFinance = true;
                 while ($e) {
                     if ($e['phone_number']) {
@@ -169,7 +169,7 @@ if ($totalbudget > 1000000) {
     } else if ($getEmail["divisi"] == "Finance" && ($getEmail["level"] != "Manager" || $getEmail["level"] != "Senior Manager") && $cuti->checkStatusCutiUser($getEmail["nama_user"])) {
         $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='Finance' AND aktif='Y'");
         $e = mysqli_fetch_assoc($queryEmail);
-        if (!$cuti->checkStatusCutiUser($e["nama_user"])) {
+        if (false) {
             $getDataUserFinance = true;
             while ($e) {
                 if ($e['phone_number']) {
