@@ -127,7 +127,7 @@ if (@unserialize($data['document'])) {
 }
 
 $phoneNumbers = [];
-$nama = [];
+$namaUser = [];
 $idUsersNotification = [];
 
 if ($totalbudget > 1000000) {
@@ -135,7 +135,7 @@ if ($totalbudget > 1000000) {
     while ($e = mysqli_fetch_assoc($queryEmail)) {
         if ($e['phone_number']) {
             array_push($phoneNumbers, $e['phone_number']);
-            array_push($nama, $e['nama_user']);
+            array_push($namaUser, $e['nama_user']);
             array_push($idUsersNotification, $e['id_user']);
         }
     }
@@ -143,7 +143,7 @@ if ($totalbudget > 1000000) {
     $queryGetEmail = mysqli_query($koneksi, "SELECT id_user, email,nama_user, phone_number, divisi, level from tb_user WHERE nama_user='$pembuatG' AND aktif='Y'");
     $getEmail =  mysqli_fetch_assoc($queryGetEmail);
     array_push($phoneNumbers, $getEmail['phone_number']);
-    array_push($nama, $getEmail['nama_user']);
+    array_push($namaUser, $getEmail['nama_user']);
     array_push($idUsersNotification, $getEmail['id_user']);
 
     $cuti = new Cuti();
@@ -159,7 +159,7 @@ if ($totalbudget > 1000000) {
                 while ($e) {
                     if ($e['phone_number']) {
                         array_push($phoneNumbers, $e['phone_number']);
-                        array_push($nama, $e['nama_user']);
+                        array_push($namaUser, $e['nama_user']);
                         array_push($idUsersNotification, $getEmail['id_user']);
                     }
                 }
@@ -174,7 +174,7 @@ if ($totalbudget > 1000000) {
             while ($e) {
                 if ($e['phone_number']) {
                     array_push($phoneNumbers, $e['phone_number']);
-                    array_push($nama, $e['nama_user']);
+                    array_push($namaUser, $e['nama_user']);
                     array_push($idUsersNotification, $getEmail['id_user']);
                 }
             }
@@ -184,15 +184,14 @@ if ($totalbudget > 1000000) {
         while ($e = mysqli_fetch_assoc($queryEmail)) {
             if ($e['phone_number']) {
                 array_push($phoneNumbers, $e['phone_number']);
-                array_push($nama, $e['nama_user']);
+                array_push($namaUser, $e['nama_user']);
                 array_push($idUsersNotification, $getEmail['id_user']);
             }
         }
     }
 }
 
-// var_dump($nama);
-
+// var_dump($namaUser);
 $updatePengajuanRequest = mysqli_query($koneksi, "UPDATE pengajuan_request SET status_request='Di Ajukan', waktu='$waktu', submission_note='$keterangan', document='$document' WHERE waktu='$waktu'") or die(mysqli_error($koneksi));
 $queryGetAllId = mysqli_query($koneksi, "SELECT id FROM pengajuan_request WHERE waktu='$waktu'");
 saveDoc($koneksi, $id, $name);
@@ -219,7 +218,7 @@ if ($updatePengajuanRequest) {
         for($i = 0; $i < count($phoneNumbers); $i++) {
             if ($phoneNumbers[$i] != "") {
                 $url =  $host. '/view-request.php?id='.$id.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
-                $msg = $messageHelper->messageAjukanBudget($nama[$i], $pengaju, $namaProject, $divisi, $totalbudget, $keterangan, $url);
+                $msg = $messageHelper->messageAjukanBudget($namaUser[$i], $pengaju, $namaProject, $divisi, $totalbudget, $keterangan, $url);
                 $wa->sendMessage($phoneNumbers[$i], $msg);
                 if ($name != "") {
                     $wa->sendDocumentMessage($phone, $msg, getPathFile($host, $name));
@@ -231,7 +230,7 @@ if ($updatePengajuanRequest) {
     $notification = "Data Berhasil Diajukan. Pemberitahuan via whatsapp sedang dikirimkan ke ";
     for ($i = 0; $i < count($phoneNumbers); $i++) {
         if ($phoneNumbers[$i] != "") {
-          $notification .= ($nama[$i] . ' (' . $phoneNumbers[$i] . ')');
+          $notification .= ($namaUser[$i] . ' (' . $phoneNumbers[$i] . ')');
           if ($i < count($phoneNumbers) - 1) $notification .= ', ';
           else $notification .= '.';
         }
