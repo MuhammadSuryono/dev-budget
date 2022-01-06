@@ -204,6 +204,7 @@ if ($port == "" || $port == "80" || $port == "7793") {
                   echo '<div class="form-group">
                   <label>File Pendukung:</label>
                   <input type="file" class="form-control" accept="image/*" id="inputImage" required/>
+                  <small>Maksimal size upload file 100kb. File yang didukung <i>(.png,.jpg,.jpeg,.pdf,.doc,.docx)</i></small>
                 </div>';
                 }
               }

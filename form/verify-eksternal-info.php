@@ -31,11 +31,23 @@ while($row = mysqli_fetch_assoc($query)) {
                     <td><?= $row['emailpenerima'] ?></td>
                     <td><?= $row['bank_account_name'] ?></td>
                     <td><?= $row['norek'] ?></td>
-                    <td>Rp. <?= number_format($row['jumlah']) ?></td>
+                    <td>Rp. <?= number_format($row['jumlah'] == '0' ? $row['pengajuan_jumlah'] : $row['jumlah']) ?></td>
                 </tr>
                 <?php $no++; } ?>
             </tbody>
         </table>
+        <?php
+        if ($dataBpu['statusbpu'] == 'Vendor/Supplier') { ?>
+            <dl>
+                <dt>Nama Vendor</dt>
+                <dd><?=$dataBpu["nama_vendor"]?></dd>
+            </dl>
+            <dl>
+                <dt>Jenis Vendor</dt>
+                <dd><?=strtoupper($dataBpu["vendor_type"])?></dd>
+            </dl>
+        <?php }
+        ?>
         <dl>
             <dt>Di Ajukan Oleh</dt>
             <dd><?=$dataBpu["pengaju"]?></dd>
@@ -61,8 +73,8 @@ while($row = mysqli_fetch_assoc($query)) {
             <dd><?=$dataBpu["statusbpu"]?></dd>
         </dl>
         <dl>
-            <dt>Di Check Oleh</dt>
-            <dd><?=$dataBpu["checkby"]?></dd>
+            <dt>Di Periksa Oleh</dt>
+            <dd><?=$dataBpu["checkby"] == '' ? 'Belum Di Periksa' : $dataBpu["checkby"]?></dd>
         </dl>
         <dl>
             <dt>Keterangan Pembayaran</dt>

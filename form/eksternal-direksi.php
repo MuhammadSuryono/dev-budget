@@ -27,13 +27,24 @@ if ($total == NULL) {
     $total = 0;
 }
 
+$totalTerm = 1;
+if ($lastTerm > 0) {
+    $queryLastBpu = mysqli_query($koneksi, "SELECT ket_pembayaran FROM bpu WHERE no = '$no' AND waktu = '$waktu' AND term = '$lastTerm'");
+    $dataLastBpu = mysqli_fetch_assoc($queryLastBpu);
+    $explodeLastInvoice = explode(".", $dataLastBpu['ket_pembayaran']);
+    $explodeLastTerm = explode("/", $explodeLastInvoice[3]);
+    
+    $totalTerm = $explodeLastTerm[1];
+}
+
 $totalPengajuan = $baris['total'];
 $sisaPembayaran = $totalPengajuan - $total;
 ?>
 
+<div id="alert-more-than"></div>
 <div class="form-group">
     <label for="rincian" class="control-label">Total BPU (IDR) :</label>
-    <input class="form-control" name="jumlah" id="jumlah" type="number">
+    <input class="form-control" name="jumlah" id="jumlah" value="<?= $sisaPembayaran ?>" type="number">
 </div>
 <div class="form-group">
     <label for="berita-transfer" class="control-label">Keterangan Pembayaran/Berita Transfer :</label>
@@ -41,15 +52,19 @@ $sisaPembayaran = $totalPengajuan - $total;
 </div>
 <div class="form-group">
     <label class="control-label">Term</label>
-    <select class="form-control" name="term" id="term">
+    <select class="form-control" name="term1" id="term">
         <?php
             for ($i=0; $i < $lastTerm + 1; $i++) { 
                 $option = $i + 1;
-                $disabled = $lastTerm == $i + 1 ? "disabled" : "";
+                $disabled =  $i + 1 <= $lastTerm ? "disabled" : "";
                 echo '<option value="'.$option.'" '.$disabled.'>'.$option.'</option>';
             }
         ?>
     </select>
+</div>
+<div class="form-group">
+    <label class="control-label">Total Term</label>
+    <input type="text" class="form-control" id="total-term" name="total-term">
 </div>
 <div class="form-group">
     <label for="tgl" class="control-label">Tanggal Pembayaran:</label>
@@ -67,27 +82,41 @@ $sisaPembayaran = $totalPengajuan - $total;
     </datalist>
 </div>
 
-<!-- <script>
-    // let sisaPembayaran = '<?= $sisaPembayaran ?>';
-    // let totalBpu = '<?= $total ?>';
-    // let lastTerm = '<?= $lastTerm ?>';
+<script>
+    let sisaPembayaran = '<?= $sisaPembayaran ?>';
+    let lastTerm = '<?= $lastTerm ?>';
+    let totalTerm = '<?= $totalTerm ?>';
+    
+    sisaPembayaran = parseInt(sisaPembayaran)
+    lastTerm = parseInt(lastTerm)
 
-    // let inputJumlah = document.getElementById("jumlah")
-    // let optionTerms = document.getElementById("term")
-    // inputJumlah.addEventListener('change', (e) => {
-    //     let value = e.target.value
-    //     let options = ""
-    //     value = parseInt(value)
-    //     sisaPembayaran = parseInt(sisaPembayaran)
-    //     lastTerm = parseInt(lastTerm)
+    let inputJumlah = document.getElementById("jumlah")
+    let totalTermInput = document.getElementById("total-term")
+    let alertError = document.getElementById("alert-more-than")
 
-    //     if (lastTerm == 0 && value == sisaPembayaran) {
-    //         return
-    //     }
-    //     // for (i=0; i < lastTerm + 1; i++) { 
-    //     //     let option = i + 1;
-    //     //     let disabled = i + 1 != 1 && lastTerm == i + 1 ? "disabled" : "";
-    //     //     // echo '<option value="'.option.'" '.disabled.'>'.option.'</option>';
-    //     // }
-    // })
-</script> -->
+    if (lastTerm == 0) {
+        totalTermInput.value = 1
+    }
+    totalTermInput.value = totalTerm
+    inputJumlah.addEventListener('change', (e) => {
+        let value = e.target.value
+        value = parseInt(value)
+
+        if (lastTerm == 0 && value < sisaPembayaran) {
+            totalTermInput.value = 2
+        }
+
+        if (lastTerm == 0 && value == sisaPembayaran) {
+            totalTerm.value = 1
+        }
+
+        if (value > sisaPembayaran) {
+            inputJumlah.value = sisaPembayaran
+            alertError.innerHTML = `<div class="alert alert-warning" role="alert">
+                Total melebihi sisa pembayaran, total otomatis di atur sama dengan sisa pembayaran 
+            </div>`;
+        } else {
+            alertError.innerHTML = ''
+        }
+    })
+</script>
