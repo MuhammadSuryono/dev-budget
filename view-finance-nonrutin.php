@@ -92,7 +92,7 @@ $helper = new Helper();
         <?php if ($_SESSION['hak_akses'] != 'HRD') { ?>
           
          <ul class="nav navbar-nav navbar-right">
-                        <li><a href="notif-page.php"><i class="fa fa-envelope"></i></a></li>
+                        <li><a href="/log-notifikasi-aplikasi/index.html" target="_blank"><i class="fa fa-envelope"></i></a></li>
             
             <li><a href="ubahpassword.php"><span class="glyphicon glyphicon-user"></span><?php echo $_SESSION['nama_user']; ?> (<?php echo $_SESSION['divisi']; ?>)</a></li>
             <li><a href="logout.php"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
@@ -108,7 +108,7 @@ $helper = new Helper();
           $notif = $belbyr + $bpuyahud + $countPengajuanReq;
         ?>
          <ul class="nav navbar-nav navbar-right">
-                        <li><a href="notif-page.php"><i class="fa fa-envelope"></i></a></li>
+                        <li><a href="/log-notifikasi-aplikasi/index.html" target="_blank"><i class="fa fa-envelope"></i></a></li>
             <li class="dropdown messages-menu">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-inbox"></i><span class="label label-warning"><?= $notif ?></span></a>
               <ul class="dropdown-menu">
@@ -343,7 +343,8 @@ $helper = new Helper();
                               <!-- <button type="button" class="btn btn-default btn-small" onclick="edit_budget('<?php echo $no; ?>','<?php echo $waktu; ?>')">Bayar</button> -->
                               <?php
                             } else {
-                              if (in_array("eksternal_bpu", $buttonAkses)) :
+                              $isFinanceManager = $_SESSION['divisi'] == "FINANCE" && $_SESSION['level'] == "Manager";
+                              if (in_array("eksternal_bpu", $buttonAkses) && ($isFinanceManager || $_SESSION['divisi'] == 'Direksi')) :
                               ?>
                                 <!-- <button type="button" class="btn btn-default btn-small" onclick="eksternal_finance('<?php echo $no; ?>','<?php echo $waktu; ?>')">Bayar</button> -->
                                 <br>
