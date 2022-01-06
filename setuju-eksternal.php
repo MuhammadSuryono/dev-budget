@@ -29,6 +29,9 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
     $sql = "SELECT a.*, b.jenis FROM bpu a JOIN pengajuan b ON a.waktu = b.waktu WHERE a.no = '$id' AND a.waktu = '$waktu' AND a.term = '$term' GROUP BY a.noid";
     $dataBpuQuery = mysqli_query($koneksi, $sql);
     $dataBpu = mysqli_fetch_assoc($dataBpuQuery);
+    $statusBpu = $dataBpu['statusbpu'];
+    $namaVendor = $dataBpu['nama_vendor'];
+    $typeVendor = $dataBpu['vendor_type'];
     $result = $koneksi->query($sql); ?>
     <table class="table table-bordered">
         <thead>
@@ -86,21 +89,31 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
 
                     <input type="checkbox" id="pph4" name="pajak" value="pph4">
                     <label for="pph4"> PPH 4 ayat 2</label><br>
+                    <?php if($statusBpu == 'Vendor/Supplier' && $typeVendor == 'perorangan') { ?>
                     <input type="checkbox" id="pph21" name="pajak" value="pph21">
-                    <label for="pph21"> PPH 21</label><br>
+                    <label for="pph21"> PPH 21 (2.5%)</label><br>
+                    <input type="checkbox" id="pph213" name="pajak" value="pph213">
+                    <label for="pph213"> PPH 21 (3%)</label><br>
+                    <?php } ?>
                 </div>
             </div>
             <div class="col-lg-3">
+                <?php if($statusBpu == 'Vendor/Supplier' && $typeVendor == 'perseroan') { ?>
                 <input type="checkbox" id="pph232" name="pajak" value="pph232">
                 <label for="pph232"> PPH 23 (2%)</label><br>
                 <input type="checkbox" id="pph234" name="pajak" value="pph234">
                 <label for="pph234"> PPH 23 (4%)</label><br>
+                <?php } ?>
             </div>
         </div>
 
     </div>
 
     <ul class="list-group">
+    <?php if($statusBpu == 'Vendor/Supplier') { ?>
+        <li class="list-group-item">Nama Vendor : <b><?= $namaVendor ?></b></li>
+        <li class="list-group-item">Jenis Vendor : <b><?= strtoupper($typeVendor) ?></b></li>
+    <?php } ?>
         <li class="list-group-item">Pengaju : <b><?= $pengaju ?></b></li>
         <li class="list-group-item">Berita Transfer : <b><?= $ket_pembayaran ?></b></li>
     </ul>
@@ -135,6 +148,7 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
 <script>
     var ketPembayaran = '<?= $ketPembayaran ?>';
     var jenis = '<?= $jenis ?>';
+    var typeVendor = '<?= $typeVendor ?>';
     var maxTransfer = '<?= $resultJenisPembayaran["max_transfer"] ?>';
     const picker = document.getElementById('tglbayar');
     picker.addEventListener('input', function(e) {
@@ -152,7 +166,6 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
             $('.form-rekening-sumber').hide();
 
         }
-        console.log('here');
     })
 
     function convertToRupiah(number) {
@@ -166,7 +179,7 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
 
         let resDpp = totalData / dpp
         let resPPh = resDpp * pph
-        let resPpn = resDpp * ppn
+        let resPpn = typeVendor == 'perseroan' ? resDpp * ppn : 0
 
         let totalAfterPph = Math.round((resDpp - resPPh) + resPpn)
 
@@ -202,6 +215,39 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                     // result = Math.round(parseInt(actual) + (0.05 * 0.5 * bpu));
                     for (let i = 0; i < tdPengajuan.length; i++) {
                         result = Math.round(parseInt(tdActual[i].textContent) + (0.05 * 0.5 * parseInt(tdPengajuan[i].textContent)));
+                        tdActual[i].innerText = result
+
+                        inputPengajuan[i].value = result
+
+                        if (result < maxTransfer) {
+                            inputMetodePembayaran[i].value = 'MRI PAL';
+                            tdMetodePembayaran[i].innerText = 'MRI PAL';
+                        } else {
+                            inputMetodePembayaran[i].value = 'MRI Kas';
+                            tdMetodePembayaran[i].innerText = 'MRI Kas';
+                        }
+                    }
+                }
+            } else if ($(this).val() == 'pph213') {
+                if ($(this).prop('checked')) {
+                    for (let i = 0; i < tdPengajuan.length; i++) {
+                        result = Math.round(parseInt(tdActual[i].textContent) - (0.03 * parseInt(tdPengajuan[i].textContent)));
+                        tdActual[i].innerText = result
+
+                        inputPengajuan[i].value = result
+
+                        if (result < maxTransfer) {
+                            inputMetodePembayaran[i].value = 'MRI PAL';
+                            tdMetodePembayaran[i].innerText = 'MRI PAL';
+                        } else {
+                            inputMetodePembayaran[i].value = 'MRI Kas';
+                            tdMetodePembayaran[i].innerText = 'MRI Kas';
+                        }
+                    }
+                } else {
+                    // result = Math.round(parseInt(actual) + (0.05 * 0.5 * bpu));
+                    for (let i = 0; i < tdPengajuan.length; i++) {
+                        result = Math.round(parseInt(tdActual[i].textContent) + (0.03 * parseInt(tdPengajuan[i].textContent)));
                         tdActual[i].innerText = result
 
                         inputPengajuan[i].value = result

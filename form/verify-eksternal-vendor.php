@@ -1,7 +1,7 @@
 <?php 
 $path = "eksternalproses-new.php?action=update&id-bpu=".$idBpu."&id-verify=".$idVerify;
 
-$queryDataPenerima = mysqli_query($koneksi, "SELECT namapenerima, emailpenerima, norek, namabank FROM bpu WHERE namapenerima NOT IN ('TLF', '') GROUP BY namapenerima");
+$queryDataPenerima = mysqli_query($koneksi, "SELECT namapenerima, emailpenerima, norek, namabank, bank_account_name, vendor_type FROM bpu WHERE namapenerima NOT IN ('TLF', '') GROUP BY namapenerima");
 $dataPenerima = [];
 while ($row = $queryDataPenerima->fetch_assoc()) {
     $dataPenerima[] = $row;
@@ -30,6 +30,11 @@ if (count($explodeKetPembayaran) > 0) {
         $ket = $explodeKetPembayaran[count($explodeKetPembayaran) - 1]; // [KETERANGAN]
     }
 }
+
+$penerima = $dataBpu['namapenerima'];
+if ($penerima == "") {
+    $penerima = $dataBpu['nama_vendor'];
+}
 ?>
 <form action="<?= $path ?>" method="post">
     <input type="hidden" name="no" value="<?= $dataBpu['no'] ?>" />
@@ -39,21 +44,28 @@ if (count($explodeKetPembayaran) > 0) {
     <input type="hidden" name="statusbpu" value="<?= $dataBpu['statusbpu'] ?>" />
     <div class="form-group">
         <label for="namapenerima" class="control-label">Nama Penerima: </label>
-        <input type="text" list="brow" class="form-control" name="namapenerima" value="<?= $dataBpu['namapenerima'] ?>" onchange="onChangePenerima(this)" required>
+        <input type="text" list="brow" class="form-control" name="namapenerima" id="nama-penerima" value="<?= $penerima ?>" onchange="onChangePenerima(this)" required readonly>
         <datalist id="brow">
         <?php
             foreach ($dataPenerima as $value) {
-                echo '<option email="'.$value['emailpenerima'].'" norek="'.$value['norek'].'" bank="'.$value['namabank'].'" value="'.$value['namapenerima'].'">';
+                echo '<option email="'.$value['emailpenerima'].'" norek="'.$value['norek'].'" bank="'.$value['namabank'].'" bank_account="'.$value['bank_account_name'].'" value="'.$value['namapenerima'].'" vendor_type="'.$value['vendor_type'].'">';
             }
         ?>
         </datalist>
+        </div>
+        <div class="form-group">
+            <label for="vendor_type" class="control-label">Jenis Perusahaan :</label>
+            <select class="form-control" name="vendor_type" id="vendor_type" required>
+                <option value="" selected disabled>Pilih Jenis Perusahaan</option>
+                <option value="perseroan" <?= $dataBpu['vendor_type'] == 'perseroan' ? 'selected' : '' ?>>Perseroan</option>
+                <option value="perorangan" <?= $dataBpu['vendor_type'] == 'perorangan' ? 'selected' : '' ?>>Perorangan</option>
+            </select>
         </div>
 
         <div class="form-group">
             <label for="email" class="control-label">Email :</label>
             <input type="email" class="form-control" name="email" value="<?= $dataBpu['emailpenerima'] ?>"  id="email" required>
         </div>
-
         <div class="form-group">
             <label for="namabank" class="control-label">Nama Bank :</label>
             <select class="form-control" name="namabank" id="bank" onchange="" required>
@@ -92,13 +104,13 @@ if (count($explodeKetPembayaran) > 0) {
         <div class="col-lg-2">
             <div class="form-group">
                 <label for="term" class="control-label">Term:</label>
-                <input type="text" class="form-control" id="term1" name="term1" value="<?= $term ?>" maxlength="1" placeholder="1">
+                <input type="text" class="form-control" id="term1" name="term1" value="<?= $term ?>" maxlength="1" placeholder="1" readonly>
             </div>
         </div>
         <div class="col-lg-2">
             <div class="form-group">
                 <label for="term" class="control-label">of Term:</label>
-                <input type="text" class="form-control" id="term2" name="term2" value="<?= $endTerm ?>" maxlength="1" placeholder="1">
+                <input type="text" class="form-control" id="term2" name="term2" value="<?= $endTerm ?>" maxlength="1" placeholder="1" readonly>
             </div>
         </div>
     </div>
@@ -110,16 +122,21 @@ if (count($explodeKetPembayaran) > 0) {
 </form>
 <script>
     let optionBank = document.getElementById('bank')
+    let optionVendorType = document.getElementById('vendor_type')
     let dataListSelected = document.getElementById('brow')
     let emailInput = document.getElementById('email')
     let norekInput = document.getElementById('norek')
+    let inputPenerima = document.getElementById('nama-penerima')
+    let inputNamarekening = document.getElementById('bank_account_name')
+
+    onChangePenerima({value: inputPenerima.value})
 
     function onChangePenerima(elem) {
         for (let i = 0; i < dataListSelected.childElementCount; i++) {
-            console.log(dataListSelected.children[i].attributes.value.value == elem.value, dataListSelected.children[i].attributes.value.value, elem.value)
             if (dataListSelected.children[i].attributes.value.value == elem.value) {
                 emailInput.value = dataListSelected.children[i].attributes.email.value
                 norekInput.value = dataListSelected.children[i].attributes.norek.value
+                inputNamarekening.value = dataListSelected.children[i].attributes.bank_account.value
 
                 if (dataListSelected.children[i].attributes.bank.value !== "") {
                     for (let j = 0; j < optionBank.childElementCount; j++) {
@@ -127,7 +144,16 @@ if (count($explodeKetPembayaran) > 0) {
                         
                         if (element.value == dataListSelected.children[i].attributes.bank.value) {
                             element.selected = true
-                            options += `<option value="${element.value}">${element.value}</option>`
+                        }
+                    }
+                }
+
+                if (dataListSelected.children[i].attributes.vendor_type.value !== "") {
+                    for (let k = 0; k < optionVendorType.childElementCount; k++) {
+                        const element = optionVendorType[k];
+
+                        if (element.value == dataListSelected.children[i].attributes.vendor_type.value) {
+                            element.selected = true
                         }
                     }
                 }

@@ -35,7 +35,13 @@ $hostProtocol = $hostProtocol . ":" . $port;
 $host = $hostProtocol. '/'. $url[1];
 
 if ($action == 'get-data') {
-    $query = mysqli_query($koneksi, "SELECT a.id, a.id_bpu, b.no as no_urut, c.nama, c.jenis, b.term FROM bpu_verify a LEFT JOIN bpu b ON a.id_bpu = b.noid LEFT JOIN pengajuan c ON c.waktu = b.waktu where a.is_need_approved = '0' && a.is_approved = '0' ORDER BY a.id asc");
+
+    $where = '';
+    if ($_SESSION['hak_akses'] == 'Level 2' && $_SESSION['jabatan'] == 'Koordinator') {
+        $where = " AND c.jenis = 'Rutin'";
+    }
+
+    $query = mysqli_query($koneksi, "SELECT a.id, a.id_bpu, b.no as no_urut, c.nama, c.jenis, b.term FROM bpu_verify a LEFT JOIN bpu b ON a.id_bpu = b.noid LEFT JOIN pengajuan c ON c.waktu = b.waktu where a.is_need_approved = '0' && a.is_approved = '0' $where ORDER BY a.id asc");
     $data = [];
     while ($row = $query->fetch_assoc()) {
         $data[] = $row;
