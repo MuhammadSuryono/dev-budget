@@ -4,6 +4,9 @@ $dataBank = [];
 while($row = mysqli_fetch_assoc($query)) {
     $dataBank = $row;
 }
+
+$pengajuanQuery = mysqli_query($koneksi, "SELECT jenis FROM pengajuan WHERE waktu = '$dataBpu[waktu]'");
+$dataPengajuan = mysqli_fetch_assoc($pengajuanQuery);
 ?>
 <div class="row">
     <div class="col=lg-12">
@@ -87,7 +90,7 @@ $bpuNo = $dataBpu["no"];
 $waktu = $dataBpu["waktu"];
 $term = $dataBpu["term"];
 
-if (!$dataVerify["is_approved"] && $dataVerify["is_need_approved"] && $_SESSION["hak_akses"] == "Manager") { ?>
+if (!$dataVerify["is_approved"] && $dataVerify["is_need_approved"] && ($_SESSION["hak_akses"] == "Manager" || ($dataPengajuan['jenis'] == 'Rutin' && $_SESSION['hak_akses'] == 'Pegawai2' && $_SESSION['level'] == 'Koordinator'))) { ?>
     <button class="btn btn-success btn-flat" onclick="setujuiBpu('<?=$bpuNo?>', '<?=$waktu?>', '<?=$term?>')">Setujui</button>
 <?php }
 ?>
