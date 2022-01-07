@@ -54,10 +54,17 @@ if ($action == 'get-data-validasi') {
     if ($_SESSION['hak_akses'] == 'Pegawai2' && $_SESSION['level'] == 'Koordinator') {
         $where = " AND c.jenis = 'Rutin'";
     }
-    $query = mysqli_query($koneksi, "SELECT a.id, a.id_bpu, b.no as no_urut, c.nama, c.jenis, b.term FROM bpu_verify a LEFT JOIN bpu b ON a.id_bpu = b.noid LEFT JOIN pengajuan c ON c.waktu = b.waktu where a.is_verified = '1' AND a.is_need_approved = '1' AND a.is_approved = '0' $where ORDER BY a.id asc");
+
+    $query = mysqli_query($koneksi, "SELECT a.id, a.id_bpu, b.no as no_urut, c.nama, c.jenis, b.term, d.rincian FROM bpu_verify a LEFT JOIN bpu b ON a.id_bpu = b.noid LEFT JOIN pengajuan c ON c.waktu = b.waktu LEFT JOIN selesai d ON b.no = d.no AND b.waktu = d.waktu where a.is_verified = '1' AND a.is_need_approved = '1' AND a.is_approved = '0' $where ORDER BY a.id asc");
     $data = [];
     while ($row = $query->fetch_assoc()) {
-        $data[] = $row;
+        if ($_SESSION['hak_akses'] == 'Level 2' && $_SESSION['level'] == 'Manager') {
+            if (strpos(strtolower($row['rincian']), 'kas negara') !== false || strpos(strtolower($row['rincian']), 'penerimaan negara') !== false) {
+                $data[] = $row;
+            }
+        } else {
+            $data[] = $row; 
+        }
     }
     echo json_encode(["data" => $data]);
 }
