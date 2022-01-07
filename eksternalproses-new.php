@@ -61,6 +61,25 @@ $dataDivisi = [];
 $dataLevel = [];
 $idPengajuan = [];
 $duplicatePhoneNumber = [];
+
+$queryItemBpu = mysqli_query($koneksi, "SELECT rincian FROM selesai where no = '$no' AND waktu = '$waktu'");
+$dataItemBpu = mysqli_fetch_assoc($queryItemBpu);
+
+if ($actionProcess == "update" && (strpos(strtolower($dataItemBpu['rincian']), 'kas negara') !== false || strpos(strtolower($dataItemBpu['rincian']), 'penerimaan negara') !== false)) {
+    $queryUser = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi = 'FINANCE' AND hak_akses = 'Level 2' AND level = 'Manager'");
+    while ($e = mysqli_fetch_assoc($queryUser)) {
+        if ($e['phone_number'] && !in_array($e['phone_number'], $duplicatePhoneNumber)) {
+            array_push($emailInternal, $e['phone_number']);
+            array_push($namaInternal, $e['nama_user']);
+            array_push($idUserInternal, $e['id_user']);
+            array_push($dataDivisi, $e['divisi']);
+            array_push($dataLevel, $e['level']);
+            array_push($duplicatePhoneNumber, $e['phone_number']);
+        }
+    }
+}
+
+
 $queryUser = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$pengaju'");
 while ($e = mysqli_fetch_assoc($queryUser)) {
     if ($e['phone_number'] && !in_array($e['phone_number'], $duplicatePhoneNumber)) {
@@ -141,12 +160,21 @@ while($row = mysqli_fetch_assoc($queryBpuVerify)) {
     $dataVerify = $row;
 }
 
+$termterm = $_POST['term'];
 $queryBpu = mysqli_query($koneksi, "SELECT * FROM bpu WHERE no='$no' AND waktu='$waktu' AND term='$termterm'");
 // $queryBpuStatus = mysqli_query($koneksi, "SELECT * FROM bpu WHERE no='$no' AND waktu='$waktu' AND term='$termterm'");
 $bpu = mysqli_fetch_assoc($queryBpu);
 
 if ($jumlah == 0 || $jumlah == "") {
     $jumlah = $dataVerify['total_verify'];
+}
+
+
+//periksa apakah udah submit
+
+if ($actionProcess == "update") {
+    $queryBpuNew = mysqli_query($koneksi, "SELECT * FROM bpu WHERE noid='$idBpu'");
+    $bpu = mysqli_fetch_assoc($queryBpuNew);
 }
 
 if ($statusbpu == "") {
@@ -156,12 +184,6 @@ if ($statusbpu == "") {
 $eksternal = ['Honor Eksternal','Honor Area Head','STKB OPS', 'STKB TRK Luar Kota', 'Honor Luar Kota', 'Honor Jakarta', 'STKB TRK Jakarta', 'Vendor/Supplier'];
 $isEksternalProcess = in_array($statusbpu, $eksternal);
 $path = '/view-bpu-verify.php?id='.$bpuVerify["id"].'&bpu='.$bpuVerify["id_bpu"];
-//periksa apakah udah submit
-
-if ($actionProcess == "update") {
-    $queryBpuNew = mysqli_query($koneksi, "SELECT * FROM bpu WHERE noid='$idBpu'");
-    $bpu = mysqli_fetch_assoc($queryBpuNew);
-}
 
 if (isset($_POST['submit'])) {
 

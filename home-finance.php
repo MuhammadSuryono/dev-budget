@@ -456,6 +456,39 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
           </div>
         </div>
         <?php } ?>
+        <?php if ($_SESSION['hak_akses'] == 'Level 2' && $_SESSION['level'] == 'Manager') { ?>
+          <div class="list-group-item border" id="bpu-eksternal-need-validasi" style="border: 1px solid black !important;">
+          <div id="expander" data-target="#bpu-content-eksternal-need-validasi" data-toggle="collapse" data-group-id="grandparent<?= $i ?>" data-role="expander">
+
+            <ul class="list-inline row border">
+              <li class="col-lg-11" id="title-text-bpu-eksternal"><?= $j++ ?>. BPU Eksternal Perlu di Validasi <span class="text-danger">(*)</span></li>
+              <li class="col-lg-1">
+                <span id="grandparentIcon1" style="cursor: pointer; margin: 0 10px;" class="col-lg-1"><a><i class="fas fa-eye" title="View Rincian"></i></a></span>
+              </li>
+            </ul>
+          </div>
+          <div class="collapse" id="bpu-content-eksternal-need-validasi" aria-expanded="true">
+            <table class="table table-striped">
+              <table class="table table-striped">
+                <thead>
+                  <tr class="warning">
+                    <th>No</th>
+                    <th>Nama Project</th>
+                    <th>Nomor Item Budget</th>
+                    <th>Jenis Item Budget</th>
+                    <th>Term BPU</th>
+                    <th>Action</th>
+                    <!-- <th>Pengajuan Request</th> -->
+                  </tr>
+                </thead>
+
+                <tbody id="data-bpu-need-validasi">
+                  
+                </tbody>
+              </table>
+          </div>
+        </div>
+        <?php } ?>
         <div class="list-group-item border" id="grandparent3" style="border: 1px solid black !important;">
           <div id="expander" data-target="#grandparentContent3" data-toggle="collapse" data-group-id="grandparent<?= $i ?>" data-role="expander">
 
