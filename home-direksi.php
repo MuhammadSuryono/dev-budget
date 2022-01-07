@@ -13,7 +13,6 @@ require_once("dompdf/dompdf_config.inc.php");
 
 if (!isset($_SESSION['nama_user'])) {
   header("location:login.php");
-  // die('location:login.php');//jika belum login jangan lanjut
 }
 
 $idUser = $_SESSION['id_user'];
@@ -106,7 +105,7 @@ $setting = mysqli_fetch_assoc($querySetting);
           <!-- <li><a href="history-direksi.php">History</a></li> -->
         </ul>
        <ul class="nav navbar-nav navbar-right">
-                        <li><a href="notif-page.php"><i class="fa fa-envelope"></i></a></li>
+                        <li><a href="/log-notifikasi-aplikasi/index.html" target="_blank"><i class="fa fa-envelope"></i></a></li>
 
           <li><a href="ubahpassword.php"><span class="glyphicon glyphicon-user"></span><?php echo $_SESSION['nama_user']; ?> (<?php echo $_SESSION['divisi']; ?>)</a></li>
           <li><a href="logout.php"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
