@@ -279,8 +279,10 @@ $setting = mysqli_fetch_assoc($querySetting);
                         } else {
                         ?>
                           <td>
+                            <?php if($a['total'] > 1000000) { ?>
                             <button type="button" class="btn btn-success btn-small" onclick="eksternal('<?php echo $no; ?>','<?php echo $waktu; ?>')">Eksternal</button>
                             <br /><br />
+                            <?php } ?>
                             <button type="button" class="btn btn-default btn-small" onclick="edit_row('<?php echo $no; ?>','<?php echo $waktu; ?>')">Edit</button>
                             <br /><br />
                             <button type="button" class="btn btn-danger btn-small" onclick="hapus_row('<?php echo $no; ?>','<?php echo $waktu; ?>')">Hapus</button>

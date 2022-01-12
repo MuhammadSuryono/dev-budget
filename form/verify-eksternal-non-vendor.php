@@ -5,12 +5,14 @@ $tanggalCair = $dataBpu['tglcair'];
 if ($tanggalCair == "0000-00-00") {
     $tanggalCair = $dataBpu['tanggalbayar'];
 }
+
 ?>
 <form action="<?= $path ?>" method="post">
     <input type="hidden" name="no" value="<?= $dataBpu['no'] ?>" />
     <input type="hidden" name="divisi" value="<?= $dataBpu['divisi'] ?>" />
     <input type="hidden" name="pengaju" value="<?= $dataBpu['pengaju'] ?>" />
     <input type="hidden" name="waktu" value="<?= $dataBpu['waktu'] ?>" />
+    <input type="hidden" name="term" value="<?= $dataBpu['term'] ?>" />
 <div style="display: flex; justify-content: end; margin-bottom: 10px;">
         <button type="button" class="btn btn-sm btn-primary btn-tambah-row">Tambah Penerima</button>
     </div>
@@ -80,7 +82,25 @@ if ($tanggalCair == "0000-00-00") {
         <label for="berita-transfer" class="control-label">Keterangan Pembayaran/Berita Transfer :</label>
         <input type="text" class="form-control" id="keterangan_pembayaran" value="<?= $dataBpu['ket_pembayaran'] ?>" name="keterangan_pembayaran">
     </div>
-    <button class="btn btn-primary" type="submit" name="submit">Simpan</button>
+    <?php if ($dataBpu['pengajuan_jumlah'] < 1000000 && $dataPengajuan['jenis'] != 'Rutin') { 
+        if ($_SESSION['hak_akses'] != 'Pegawai2') {
+            echo '<button class="btn btn-primary" type="submit" name="submit">Simpan</button>';
+        }
+
+        if ($_SESSION['hak_akses'] == 'Pegawai2') {
+            if ($_SESSION['level'] != 'Koordinator') {
+                echo '<button class="btn btn-primary" type="submit" name="submit">Simpan</button>';
+            }
+        }
+        
+        ?>
+    <?php } ?>
+    <?php if ($dataPengajuan['jenis'] == 'Rutin' && $_SESSION['hak_akses'] == 'Level 2' && $_SESSION['level'] == 'Koordinator') { ?>
+        <button class="btn btn-primary" type="submit" name="submit">Simpan</button>
+    <?php } ?>
+    <?php if ($dataBpu['pengajuan_jumlah'] >= 1000000 && $dataPengajuan['jenis'] != 'Rutin' && $_SESSION['hak_akses'] == 'Pegawai2' && $_SESSION['level'] == 'Koordinator') { ?>
+        <button class="btn btn-primary" type="submit" name="submit">Simpan</button>
+    <?php } ?>
 </form>
 
 <script>

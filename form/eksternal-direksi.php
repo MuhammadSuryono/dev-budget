@@ -70,6 +70,7 @@ $sisaPembayaran = $totalPengajuan - $total;
     <label for="tgl" class="control-label">Tanggal Pembayaran:</label>
     <input type="date" class="form-control" id="tgl" name="tgl">
 </div>
+<?php if ($baris['status'] == 'Vendor/Supplier') { ?>
 <div class="form-group">
     <label for="tgl" class="control-label">Nama Vendor:</label>
     <input type="text" list="brow" class="form-control" id="nama_vendor" name="nama_vendor">
@@ -81,6 +82,7 @@ $sisaPembayaran = $totalPengajuan - $total;
         ?>
     </datalist>
 </div>
+<?php } ?>
 
 <script>
     let sisaPembayaran = '<?= $sisaPembayaran ?>';
