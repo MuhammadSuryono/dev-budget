@@ -94,6 +94,28 @@ http://$urlPengajuan";
 return $msg;
     }
 
+    public function messagePembuatanBPUEksternal($dear, $pengaju, $namaProject, $penerima, $totalPengajuan = 0, $keterangan = "", $urlPengajuan)
+    {
+        $msg = "*Notifikasi Untuk Pengajuan BPU*
+Dear $dear, 
+BPU telah dibuat dan disetujui oleh:
+Nama Project    : *$namaProject*
+Pengaju         : *$pengaju*
+Penerima          : *$penerima*
+Jumlah Yang Diajukan    : *Rp. " . number_format($totalPengajuan, 0, '', ',') . "*
+
+";
+
+if ($keterangan != "") {
+    $msg .= "Keterangan: *$keterangan*";
+}
+$msg .= "
+Selengkapnya pengajuan anda bisa dilihat dibawah ini.
+http://$urlPengajuan";
+
+return $msg;
+    }
+
     public function messagePembayaranBPU($namaProject, $no, $term, $namapenerima, $pembayar, $tanggalbayar, $nomorvoucher, $jumlahbayar = 0, $keterangan = "")
     {
         $msg = "*Notifikasi BPU*

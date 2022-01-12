@@ -292,7 +292,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                               <br /><br />
                               <?php
                             } else if ($a['status'] == 'Vendor/Supplier' || $a['status'] == 'Honor Eksternal') {
-                              if (in_array("eksternal_bpu", $buttonAkses)) :
+                              if (in_array("eksternal_bpu", $buttonAkses) && $a['total'] < 1000000 && $jadinya > 0) :
                               ?>
                                 <button type="button" class="btn btn-success btn-small" onclick="eksternal('<?php echo $no; ?>','<?php echo $waktu; ?>')">Eksternal</button>
                                 <br /><br />

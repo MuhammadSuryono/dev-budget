@@ -118,7 +118,25 @@ if ($penerima == "") {
         <label for="jenis_pembayaran" class="control-label">Jenis Pembayaran(barang/jasa) :</label>
         <input type="text" class="form-control" id="jenis_pembayaran" value="<?= $ket ?>" name="jenis_pembayaran">
     </div>
-    <button class="btn btn-primary" type="submit" name="submit">Simpan</button>
+    <?php if ($dataBpu['pengajuan_jumlah'] < 1000000 && $dataPengajuan['jenis'] != 'Rutin') { 
+        if ($_SESSION['hak_akses'] != 'Pegawai2') {
+            echo '<button class="btn btn-primary" type="submit" name="submit">Simpan</button>';
+        }
+
+        if ($_SESSION['hak_akses'] == 'Pegawai2') {
+            if ($_SESSION['level'] != 'Koordinator') {
+                echo '<button class="btn btn-primary" type="submit" name="submit">Simpan</button>';
+            }
+        }
+        
+        ?>
+    <?php } ?>
+    <?php if ($dataPengajuan['jenis'] == 'Rutin' && $_SESSION['hak_akses'] == 'Level 2' && $_SESSION['level'] == 'Koordinator') { ?>
+        <button class="btn btn-primary" type="submit" name="submit">Simpan</button>
+    <?php } ?>
+    <?php if ($dataBpu['pengajuan_jumlah'] >= 1000000 && $dataPengajuan['jenis'] != 'Rutin' && $_SESSION['hak_akses'] == 'Pegawai2' && $_SESSION['level'] == 'Koordinator') { ?>
+        <button class="btn btn-primary" type="submit" name="submit">Simpan</button>
+    <?php } ?>
 </form>
 <script>
     let optionBank = document.getElementById('bank')

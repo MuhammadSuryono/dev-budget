@@ -38,7 +38,7 @@ if ($action == 'get-data') {
 
     $where = '';
     if ($_SESSION['hak_akses'] == 'Level 2' && $_SESSION['jabatan'] == 'Koordinator') {
-        $where = " AND c.jenis = 'Rutin'";
+        $where = " AND c.jenis = 'Rutin' OR b.pengajuan_jumlah < 1000000";
     }
 
     $query = mysqli_query($koneksi, "SELECT a.id, a.id_bpu, b.no as no_urut, c.nama, c.jenis, b.term FROM bpu_verify a LEFT JOIN bpu b ON a.id_bpu = b.noid LEFT JOIN pengajuan c ON c.waktu = b.waktu where a.is_need_approved = '0' && a.is_approved = '0' $where ORDER BY a.id asc");
@@ -54,7 +54,7 @@ if ($action == 'get-data') {
 if ($action == 'get-data-validasi') {
     $where = '';
     if ($_SESSION['hak_akses'] == 'Pegawai2' && $_SESSION['level'] == 'Koordinator') {
-        $where = " AND c.jenis = 'Rutin'";
+        $where = " AND c.jenis = 'Rutin' OR b.pengajuan_jumlah < 1000000";
     }
 
     $query = mysqli_query($koneksi, "SELECT a.id, a.id_bpu, b.no as no_urut, c.nama, c.jenis, b.term, d.rincian FROM bpu_verify a LEFT JOIN bpu b ON a.id_bpu = b.noid LEFT JOIN pengajuan c ON c.waktu = b.waktu LEFT JOIN selesai d ON b.no = d.no AND b.waktu = d.waktu where a.is_verified = '1' AND a.is_need_approved = '1' AND a.is_approved = '0' $where ORDER BY a.id asc");
@@ -138,7 +138,7 @@ function uploadFile($files)
     $file_tmp = $files['file']['tmp_name'];	
     if(in_array($ekstensi, $ekstensi_diperbolehkan) === true){
         if($ukuran < 1044070){			
-            move_uploaded_file($file_tmp, '../document/'.$nama);
+            move_uploaded_file($file_tmp, '../uploads/'.$nama);
             return ["error" => null, "filename" => $nama];
         }else{
             return ["error" => "Ukuran File terlalu besar", "filename" => $nama];

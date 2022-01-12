@@ -44,7 +44,8 @@ if ($port == "" || $port == "80" || $port == "7793") {
   $host = $hostProtocol. '/'. $url[1];
 }
 
-
+$pengajuanQuery = mysqli_query($koneksi, "SELECT jenis FROM pengajuan WHERE waktu = '$dataBpu[waktu]'");
+$dataPengajuan = mysqli_fetch_assoc($pengajuanQuery);
 ?>
 
 <!DOCTYPE html>
@@ -204,7 +205,7 @@ if ($port == "" || $port == "80" || $port == "7793") {
                   echo '<div class="form-group">
                   <label>File Pendukung:</label>
                   <input type="file" class="form-control" accept="image/*" id="inputImage" required/>
-                  <small>Maksimal size upload file 100kb. File yang didukung <i>(.png,.jpg,.jpeg,.pdf,.doc,.docx)</i></small>
+                  <small>Maksimal size upload file 1Mb. File yang didukung <i>(.png,.jpg,.jpeg,.pdf,.doc,.docx)</i></small>
                 </div>';
                 }
               }
@@ -244,9 +245,8 @@ if ($port == "" || $port == "80" || $port == "7793") {
               title="Inline Frame Example"
               width="900"
               height="800"
-              src="<?= $dataVerify['document'] != '' ? 'http://'.$host.'/document/'.$dataVerify['document']:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMGwPo04v2vaxbXlOkSuBK1aDQs1ntPnFM9_5P7BhEULVguY4tv4EZMuF88SaA7HZ8a1o&usqp=CAU' ?>">
+              src="<?= $dataVerify['document'] != '' ? 'http://'.$host.'/uploads/'.$dataVerify['document']:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMGwPo04v2vaxbXlOkSuBK1aDQs1ntPnFM9_5P7BhEULVguY4tv4EZMuF88SaA7HZ8a1o&usqp=CAU' ?>">
           </iframe>
-            <!-- <img id="content-image" style="max-width: 720px;" src="<?= $dataVerify['document'] != '' ? 'fileupload/'.$dataVerify['document']:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMGwPo04v2vaxbXlOkSuBK1aDQs1ntPnFM9_5P7BhEULVguY4tv4EZMuF88SaA7HZ8a1o&usqp=CAU' ?>" /> -->
           </div>
         </div>
       </div>
@@ -289,9 +289,17 @@ if ($port == "" || $port == "80" || $port == "7793") {
     const nominal = $('#nominal-verify').val()
     const input = document.getElementById('inputImage');
 		let file = input.files[0];
+
+    if (file !== undefined && file.size > 1000000) {
+      notifErrorForm.innerHTML = alertError("danger", "Ukuran file melebihi maksimal file upload 1Mb")
+      setTimeout(() => {
+        notifErrorForm.innerHTML = ""
+      }, 3000)
+      return
+    }
     
     if ((file === undefined || nominal.length < 3) || stateNominal !== nominal) {
-      notifErrorForm.innerHTML = alertError("danger", "Form tidak boleh kosong")
+      notifErrorForm.innerHTML = alertError("danger", "Periksa kembali data yang akan di verifikasi")
       
       setTimeout(() => {
         notifErrorForm.innerHTML = ""
@@ -303,6 +311,8 @@ if ($port == "" || $port == "80" || $port == "7793") {
         window.location.reload()
       })
     }
+    
+    
   }
 
   function readURLSign(input) {

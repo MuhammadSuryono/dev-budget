@@ -521,7 +521,15 @@ if (isset($_POST['submit'])) {
                         }
                     }
                   $url =  $host. $path.'&session='.base64_encode(json_encode(["id_user" => $idUserInternal[$i], "timeout" => time()]));
-                  $msg = $messageHelper->messagePengajuanBPU($namaInternal[$i], $pengaju, $namaProject, $namapenerima, $jumlah, "", $url);
+                  if ($actionProcess == "update" && $isEksternalProcess) {
+                    $msg = $messageHelper->messagePengajuanBPU($namaInternal[$i], $pengaju, $namaProject, $namapenerima, $jumlah, "", $url);
+                  } else {
+                    $penerima = $vendorName;
+                    if ($penerima == "") {
+                        $penerima = "-";
+                    }
+                    $msg = $messageHelper->messagePembuatanBPUEksternal($namaInternal[$i], $_SESSION['nama_user'], $namaProject, $penerima, $jumlah, "", $url);
+                  }
                   if($emailInternal[$i] != "") $wa->sendMessage($emailInternal[$i], $msg);
 
                   $notification .= ($namaInternal[$i] . ' (' . $emailInternal[$i] . ')');
