@@ -411,7 +411,7 @@ if (isset($_POST['submit'])) {
                     if ($dataDivisi[$i] == 'FINANCE') {
                         $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $jenis == 'B1' ? '/view-finance-manager-b1.php?code='.$numb.'' : '/view-finance-manager.php?code='.$numb.'';
                         $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $jenis == 'Non Rutin' ? '/view-finance-nonrutin-manager.php?code='.$numb.'' : '/view-finance-manager.php?code='.$numb.'';
-                        $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $jenis == 'Non Rutin' ? '/view-finance-nonrutin.php' : '/view-finance.php';
+                        $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $jenis == 'Non Rutin' ? '/view-finance-nonrutin.php?code='.$numb.'' : '/view-finance.php?code='.$numb.'';
                         $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
                         $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
                     } else if ($dataDivisi[$i] == 'Direksi') {
@@ -513,7 +513,7 @@ if (isset($_POST['submit'])) {
                         if ($dataDivisi[$i] == 'FINANCE') {
                             $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $jenis == 'B1' ? '/view-finance-manager-b1.php?code='.$numb.'' : '/view-finance-manager.php?code='.$numb.'';
                             $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $jenis == 'Non Rutin' ? '/view-finance-nonrutin-manager.php?code='.$numb.'' : '/view-finance-manager.php?code='.$numb.'';
-                            $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $jenis == 'Non Rutin' ? '/view-finance-nonrutin.php' : '/view-finance.php?code='.$numb.'';
+                            $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $jenis == 'Non Rutin' ? '/view-finance-nonrutin.php?code='.$numb : '/view-finance.php?code='.$numb.'';
                             $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
                             $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
                         } else if ($dataDivisi[$i] == 'Direksi') {
