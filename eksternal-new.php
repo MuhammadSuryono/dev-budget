@@ -49,7 +49,7 @@ if ($_POST['no'] && $_POST['waktu']) {
                 }
             } ?>
 
-            <button class="btn btn-primary" type="submit" name="submit">OK</button>
+            <button class="btn btn-primary" id="submit-eksternal" type="submit" name="submit">OK</button>
 
         </form>
         <script>
