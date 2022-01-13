@@ -67,8 +67,12 @@ if ($penerima == "") {
             <input type="email" class="form-control" name="email" value="<?= $dataBpu['emailpenerima'] ?>"  id="email" required>
         </div>
         <div class="form-group">
+            <label for="norek" class="control-label">Nomor Rekening :</label>
+            <input type="number" class="form-control" name="norek" id="norek" onchange="onChangeNomorRekening(this)" value="<?= $dataBpu['norek'] ?>" required>
+        </div>
+        <div class="form-group">
             <label for="namabank" class="control-label">Nama Bank :</label>
-            <select class="form-control" name="namabank" id="bank" onchange="" required>
+            <select class="form-control" name="namabank" id="bank" onchange="" required readonly>
                 <option value="" selected disabled>Pilih Kategori</option>
                 <?php
                 $queryDaftarBank = mysqli_query($koneksi, 'SELECT * FROM bank');
@@ -83,10 +87,6 @@ if ($penerima == "") {
             <label for="bank_account_name" class="control-label">Nama Rekening Bank:</label>
             <input type="text" class="form-control" name="bank_account_name" id="bank_account_name" value="<?= $dataBpu['bank_account_name'] ?>" required>
             <small>Nama harus sesuai dengan yang terdaftar pada bank Penerima. <b  class="text-danger">KESALAHAN PADA NAMA DAPAT MENYEBABKAN DANA TIDAK DAPAT DI TRANSFER UNTUK METODE PEMBAYARAN MRI PAL</b></small>
-        </div>
-        <div class="form-group">
-            <label for="norek" class="control-label">Nomor Rekening :</label>
-            <input type="number" class="form-control" name="norek" id="norek" value="<?= $dataBpu['norek'] ?>" required>
         </div>
         <div class="row">
         <div class="col-lg-4">
@@ -176,6 +176,70 @@ if ($penerima == "") {
                     }
                 }
             }
+        }
+    }
+
+    function onChangeNomorRekening(e) {
+        let fifthCharacter = ""
+        let fourthCharacter = ""
+        let secondCharacter = ""
+        let thirdCharacter = ""
+
+        if (e.value.length > 4) {
+            fifthCharacter = e.value.substring(0, 5)
+        }
+
+        if (e.value.length > 3) {
+            fourthCharacter = e.value.substring(0, 4)
+        }
+
+        if (e.value.length > 1) {
+            secondCharacter = e.value.substring(0, 1)
+        }
+
+        if (e.value.length > 2) {
+            thirdCharacter = e.value.substring(0, 3)
+        }
+
+        for (let index = 0; index < optionBank.childElementCount; index++) {
+            const element = optionBank.children[index];
+            
+            if (e.value.length === 13 && element.value === "BMRIIDJA") {
+                element.selected = true
+            }
+
+            if (e.value.length === 16 && fifthCharacter === "88708" && element.value === "BMRIIDJA") {
+                element.selected = true
+            }
+
+            if (e.value.length === 10 && (fourthCharacter === "0427" || secondCharacter === "002") && element.value === "BNINIDJA") {
+                element.selected = true
+            }
+
+            if (e.value.length === 10 && element.value === "CENAIDJA") {
+                element.selected = true
+            }
+
+            if (e.value.length === 15 && fifthCharacter === "88708" && element.value === "BMRIIDJA") {
+                element.selected = true
+            }
+
+            if (e.value.length === 18 && element.value === "BMRIIDJA") {
+                element.selected = true
+            }
+
+            if (e.value.length === 15 && (thirdCharacter === "025" || thirdCharacter === "225" || thirdCharacter === "018") && element.value === "BMRIIDJA") {
+                element.selected = true
+            }
+
+            if (e.value.length === 15 && element.value === "BRINIDJA") {
+                element.selected = true
+            }
+
+            if ((e.value.length !== 13 || e.value.length !== 16 || e.value.length !== 10 || e.value.length !== 15) && element.value === "") {
+                element.selected = true
+            }
+            
         }
     }
 </script>
