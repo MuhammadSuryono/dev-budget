@@ -284,15 +284,15 @@ $setting = mysqli_fetch_assoc($querySetting);
 
                         <td>
                           <!-- Tombol Eksternal -->
-                          <?php
-                          if ($d['jenis'] != 'B1') :
+                          <?php 
+                          if  ($d['jenis'] != 'B1') :
                             if ($a['status'] == 'UM' || $a['status'] == 'Pulsa' || $a['status'] == 'Biaya External' || $a['status'] == 'Biaya' || $a['status'] == 'UM Burek') {
                           ?>
                               <button type="button" class="btn btn-default btn-small" onclick="ajukan_bpu('<?php echo $no; ?>','<?php echo $waktu; ?>')">BPU</button>
                               <br /><br />
                               <?php
                             } else if ($a['status'] == 'Vendor/Supplier' || $a['status'] == 'Honor Eksternal') {
-                              if (in_array("eksternal_bpu", $buttonAkses) && $a['total'] < 1000000 && $jadinya > 0) :
+                              if (in_array("eksternal_bpu", $buttonAkses) && $jadinya > 0) :
                               ?>
                                 <button type="button" class="btn btn-success btn-small" onclick="eksternal('<?php echo $no; ?>','<?php echo $waktu; ?>')">Eksternal</button>
                                 <br /><br />

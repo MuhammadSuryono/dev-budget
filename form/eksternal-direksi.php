@@ -88,6 +88,8 @@ $sisaPembayaran = $totalPengajuan - $total;
     let sisaPembayaran = '<?= $sisaPembayaran ?>';
     let lastTerm = '<?= $lastTerm ?>';
     let totalTerm = '<?= $totalTerm ?>';
+    let jabatan = '<?= $_SESSION["jabatan"]?>';
+    let divisi = '<?= $_SESSION["divisi"]?>';
     
     sisaPembayaran = parseInt(sisaPembayaran)
     lastTerm = parseInt(lastTerm)
@@ -95,6 +97,7 @@ $sisaPembayaran = $totalPengajuan - $total;
     let inputJumlah = document.getElementById("jumlah")
     let totalTermInput = document.getElementById("total-term")
     let alertError = document.getElementById("alert-more-than")
+    let submitBtn = document.getElementById("submit-eksternal")
 
     if (lastTerm == 0) {
         totalTermInput.value = 1
@@ -117,8 +120,15 @@ $sisaPembayaran = $totalPengajuan - $total;
             alertError.innerHTML = `<div class="alert alert-warning" role="alert">
                 Total melebihi sisa pembayaran, total otomatis di atur sama dengan sisa pembayaran 
             </div>`;
+            submitBtn.disabled = false
         } else {
             alertError.innerHTML = ''
+        }
+
+        if (divisi === 'FINANCE' && jabatan === 'Manager' && value > 1000000) {
+            submitBtn.disabled = true
+        } else {
+            submitBtn.disabled = false
         }
     })
 </script>

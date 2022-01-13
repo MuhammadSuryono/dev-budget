@@ -389,7 +389,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                         } else {
                         ?>
                           <td>
-                            <?php if (in_array("eksternal_bpu", $buttonAkses) && $a['total'] < 1000000 && $jadinya > 0) : ?>
+                            <?php if (in_array("eksternal_bpu", $buttonAkses) && $jadinya > 0) : ?>
                               <button type="button" class="btn btn-success btn-small" onclick="eksternal('<?php echo $no; ?>','<?php echo $waktu; ?>')">Eksternal</button>
                               <br /><br />
                             <?php endif; ?>
