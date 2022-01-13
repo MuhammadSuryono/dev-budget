@@ -41,7 +41,7 @@ if (!isset($_SESSION['nama_user'])) {
 $userSetuju = $_SESSION['nama_user'];
 $divisi = $_SESSION['divisi'];
 $aksesSes = $_SESSION['hak_akses'];
-date_default_timezone_set("Asia/Bangkok");
+date_default_timezone_set("Asia/Jakarta");
 
 $time = date('Y-m-d H:i:s');
 $finance      = $_SESSION['divisi'];
@@ -79,7 +79,15 @@ if ($urgent == 'Urgent') {
 } else {
     $d = mktime(8, 15, 0);
     $hour = date("H:i:s", $d);
-    $tanggalbayar = $_POST['tanggalbayar'] . ' ' .  $hour;
+    $dateNow = date("Y-m-d");
+
+    if ($_POST['tanggalbayar'] == $dateNow) {
+        $dateTime = date("H:i:s", time() + 1800);
+        $tanggalbayar = $_POST['tanggalbayar'] . ' ' . $dateTime;
+    } else {
+        $tanggalbayar = $_POST['tanggalbayar'] . ' ' .  $hour;
+    }
+
 }
 
 $dt = new DateTime($tanggalbayar);
