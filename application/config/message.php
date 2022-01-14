@@ -342,6 +342,50 @@ Telah Ditolak oleh *$pembuat* pada *" . date("d/m/Y H:i:s") . "* dengan keterang
 Klik $url untuk membuka aplikasi budget.";
         return $msg;
     }
+
+    public function messageSuccessTransferNonVendor($penerima, $jenisPembayaran, $norek, $job, $bank, $totalTransfer, $tanggal)
+    {
+        $msg = "Kepada $penerima <br><br>
+                Berikut informasi status pembayaran Anda:<br><br>
+                <table>
+                <tr><td>Pembayaran       </td><td>: <strong>$jenisPembayaran</strong></td></tr>
+                <tr><td>No. Rekening Anda       </td><td>: <strong>$norek</strong></td></tr>
+                <tr><td>Nama Job       </td><td>: <strong>$job</strong></td></tr>
+                <tr><td>Bank       </td><td>: <strong>$bank</strong></td></tr>
+                <tr><td>Nama Penerima       </td><td>: <strong>$penerima</strong></td></tr>
+                <tr><td>Jumlah Dibayarkan       </td><td>: <strong>Rp. " . number_format($totalTransfer, 0, '', '.') . "</strong></td></tr>
+                <tr><td>Status       </td><td>: <strong>Terbayar Lunas</strong> Tanggal:  $tanggal</strong></td></tr>
+                </table>
+                Jika ada pertanyaan lebih lanjut, silahkan email Divisi Finance ke finance@mri-research-ind.com<br><br>
+                Hormat kami,<br>
+                Divisi Finance <br>
+                Marketing Research Indonesia";
+        
+        return $msg;
+    }
+
+    public function messageSuccessTransferVendor($penerima, $jenisPembayaran, $norek, $bank, $totalTransfer, $tanggal, $noInvoice, $tanggalInvoice, $startTerm, $endTerm)
+    {
+        $msg = "Kepada $penerima <br><br>
+                Berikut informasi status pembayaran Anda:<br><br>
+                <table>
+                <tr><td>No. Invoice       </td><td>: <strong>$noInvoice</strong></td></tr>
+                <tr><td>Tanggal Invoice       </td><td>: <strong>$tanggalInvoice</strong></td></tr>
+                <tr><td>Term       </td><td>: <strong>$startTerm dari $endTerm</strong></td></tr>
+                <tr><td>Jenis Pembayaran       </td><td>: <strong>$jenisPembayaran</strong></td></tr>
+                <tr><td>No. Rekening Anda       </td><td>: <strong>$norek</strong></td></tr>
+                <tr><td>Bank       </td><td>: <strong>$bank</strong></td></tr>
+                <tr><td>Nama Penerima       </td><td>: <strong>$penerima</strong></td></tr>
+                <tr><td>Jumlah Dibayarkan       </td><td>: <strong>Rp. " . number_format($totalTransfer, 0, '', '.') . "</strong></td></tr>
+                <tr><td>Status       </td><td>: <strong>Terbayar</strong> Tanggal:  $tanggal</strong></td></tr>
+                </table>
+                Jika ada pertanyaan lebih lanjut, silahkan email Divisi Finance ke finance@mri-research-ind.com<br><br>
+                Hormat kami,<br>
+                Divisi Finance <br>
+                Marketing Research Indonesia";
+        
+        return $msg;
+    }
 }
 
     
