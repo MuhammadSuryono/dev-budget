@@ -1,5 +1,4 @@
 <?php
-require_once "../application/config/api.php";
 require_once "../application/config/database.php";
 require_once "../application/config/message.php";
 require_once "../application/config/email.php";
