@@ -9,6 +9,7 @@ class Callback extends Database {
     private $koneksiBridgeTransfer;
     private $dataTransfer;
     private $dataBpu;
+    private $subjectEmail;
     public function __construct()
     {
         $this->set_name_db(DB_APP);
@@ -75,17 +76,19 @@ class Callback extends Database {
             $explodeTerm = explode("/", $explodeInvoice[3]);
             $startTerm = str_replace('T', '', $explodeTerm[0]); // [START TERM]
             $endTerm = $explodeTerm[1]; // [END TERM PEMBAYARAN]
-            $ketPembayaran = $explodeInvoice[count($explodeInvoice) - 1]; // [KETERANGAN]
+            $ketPembayaran = $this->dataBpu['rincian']; // [KETERANGAN]
+            $this->subjectEmail = "Laporan Transaksi Transfer " . $ketPembayaran;
             return $messageHelper->messageSuccessTransferVendor($this->dataBpu['namapenerima'], $ketPembayaran, $this->dataTransfer['norek'], $this->dataTransfer['bank'], $this->dataTransfer['jumlah'], $this->dataInput['response']['TransactionDate'], $numberInvoce, $dateInvoice, $startTerm, $endTerm);
         } else {
-            return $messageHelper->messageSuccessTransferNonVendor($this->dataBpu['namapenerima'], $this->dataBpu['ket_pembayaran'], $this->dataTransfer['norek'], $this->dataBpu['nama'], $this->dataTransfer['bank'], $this->dataTransfer['jumlah'], $this->dataInput['response']['TransactionDate']);
+            $this->subjectEmail = "Laporan Transaksi Transfer " . $this->dataBpu['rincian'];
+            return $messageHelper->messageSuccessTransferNonVendor($this->dataBpu['namapenerima'], $this->dataBpu['rincian'], $this->dataTransfer['norek'], $this->dataBpu['nama'], $this->dataTransfer['bank'], $this->dataTransfer['jumlah'], $this->dataInput['response']['TransactionDate']);
         }
     }
 
     private function get_data_bpu()
     {
         $noid = $this->dataTransfer['noid_bpu'];
-        $query = mysqli_query($this->koneksi, "SELECT a.*, b.nama FROM bpu a LEFT JOIN pengajuan b ON a.waktu = b.waktu WHERE a.noid = '$noid'");
+        $query = mysqli_query($this->koneksi, "SELECT a.*, b.nama, c.rincian FROM bpu a LEFT JOIN pengajuan b ON a.waktu = b.waktu LEFT JOIN selesai c ON a.waktu = c.waktu AND a.no = c.no WHERE a.noid = '$noid'");
         $data = [];
         while ($row = mysqli_fetch_assoc($query)) {
             $data[] = $row;
@@ -98,7 +101,7 @@ class Callback extends Database {
         $emailHelper = new Email();
         $message = $this->message();
 
-        $emailHelper->sendEmail($message, "Laporan Transaksi Transfer", $this->dataTransfer['email_pemilik_rekening']);
+        $emailHelper->sendEmail($message, $this->subjectEmail, $this->dataTransfer['email_pemilik_rekening']);
     }
 }
 
