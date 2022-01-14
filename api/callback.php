@@ -26,9 +26,9 @@ class Callback extends Database {
     {
         $isSuccessTransfer = $this->is_success_process_transfer();
         if ($isSuccessTransfer) {
-            // $this->get_data_transfer();
-            // $this->get_data_bpu();
-            // $this->send_email();
+            $this->get_data_transfer();
+            $this->get_data_bpu();
+            $this->send_email();
         }
     }
 
