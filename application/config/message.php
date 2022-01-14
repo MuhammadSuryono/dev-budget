@@ -377,7 +377,7 @@ Klik $url untuk membuka aplikasi budget.";
                 <tr><td>Bank       </td><td>: <strong>$bank</strong></td></tr>
                 <tr><td>Nama Penerima       </td><td>: <strong>$penerima</strong></td></tr>
                 <tr><td>Jumlah Dibayarkan       </td><td>: <strong>Rp. " . number_format($totalTransfer, 0, '', '.') . "</strong></td></tr>
-                <tr><td>Status       </td><td>: <strong>Terbayar Lunas</strong> Tanggal:  $tanggal</strong></td></tr>
+                <tr><td>Status       </td><td>: <strong>Terbayar</strong> Tanggal:  $tanggal</strong></td></tr>
                 </table>
                 Jika ada pertanyaan lebih lanjut, silahkan email Divisi Finance ke finance@mri-research-ind.com<br><br>
                 Hormat kami,<br>
