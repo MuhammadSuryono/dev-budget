@@ -18,8 +18,8 @@ if (strpos($tab, 'B1') !== false) : ?>
                         <th>Nama Yang Mengajukan</th>
                         <th>Divisi</th>
                         <th>Total</th>
+                        <th>Total Biaya dan Uang Muka</th>
                         <th>Sisa Budget</th>
-                        <th>Total DiBayar</th>
                         <th>View</th>
                         <th>Persetujuan</th>
                         <th>Status</th>
@@ -101,11 +101,11 @@ if (strpos($tab, 'B1') !== false) : ?>
 
                                     <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
                                     <td bgcolor="#fcfaa4">
-                                        <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
-                                        </font>
+                                        <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
                                     </td>
                                     <td bgcolor="#fcfaa4">
-                                        <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
+                                        <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
+                                        </font>
                                     </td>
                                     <td bgcolor="#fcfaa4"><a href="views-direksi.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
                                     <td bgcolor="#fcfaa4">
@@ -154,11 +154,11 @@ if (strpos($tab, 'B1') !== false) : ?>
                                     <td bgcolor="#fea700"><?php echo $d['divisi']; ?></td>
                                     <td bgcolor="#fea700"><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
                                     <td bgcolor="#fea700">
-                                        <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
-                                        </font>
+                                        <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
                                     </td>
                                     <td bgcolor="#fea700">
-                                        <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
+                                        <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
+                                        </font>
                                     </td>
                                     <td bgcolor="#fea700"><a href="view-direksi.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
                                     <td bgcolor="#fea700">
@@ -242,7 +242,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                         <th>Divisi</th>
                         <th>Total</th>
                         <th>Sisa Budget</th>
-                        <th>Total DiBayar</th>
+                        <th>Total Biaya dan Uang Muka</th>
                         <th>View</th>
                         <th>Persetujuan</th>
                         <th>Status</th>
@@ -306,12 +306,13 @@ if (strpos($tab, 'B1') !== false) : ?>
                                 <td bgcolor="#fcfaa4"><?php echo $e['pengaju']; ?></td>
                                 <td bgcolor="#fcfaa4"><?php echo $e['divisi']; ?></td>
                                 <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($e['totalbudget'], 0, '', ','); ?></td>
+                                
+                                <td bgcolor="#fcfaa4">
+                                    <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
+                                </td>
                                 <td bgcolor="#fcfaa4">
                                     <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
                                     </font>
-                                </td>
-                                <td bgcolor="#fcfaa4">
-                                    <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
                                 </td>
                                 <td bgcolor="#fcfaa4"><a href="views-direksi.php?code=<?php echo $e['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
                                 <td bgcolor="#fcfaa4">
@@ -360,11 +361,11 @@ if (strpos($tab, 'B1') !== false) : ?>
                                 <td bgcolor="#ff99a1"><?php echo $e['divisi']; ?></td>
                                 <td bgcolor="#ff99a1"><?php echo 'Rp. ' . number_format($e['totalbudget'], 0, '', ','); ?></td>
                                 <td bgcolor="#ff99a1">
-                                    <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
-                                    </font>
+                                    <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
                                 </td>
                                 <td bgcolor="#ff99a1">
-                                    <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
+                                    <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
+                                    </font>
                                 </td>
                                 <td bgcolor="#ff99a1"><a href="view-direksi.php?code=<?php echo $e['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
                                 <td bgcolor="#ff99a1">
@@ -445,8 +446,8 @@ if (strpos($tab, 'B1') !== false) : ?>
                         <th>Nama Yang Mengajukan</th>
                         <th>Divisi</th>
                         <th>Total</th>
+                        <th>Total Biaya dan Uang Muka</th>
                         <th>Sisa Budget</th>
-                        <th>Total DiBayar</th>
                         <th>View</th>
                         <th>Persetujuan</th>
                         <th>Status</th>
@@ -498,11 +499,11 @@ if (strpos($tab, 'B1') !== false) : ?>
                                 <td bgcolor="#fcfaa4"><?php echo $d['divisi']; ?></td>
                                 <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
                                 <td bgcolor="#fcfaa4">
-                                    <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
-                                    </font>
+                                    <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
                                 </td>
                                 <td bgcolor="#fcfaa4">
-                                    <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
+                                    <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
+                                    </font>
                                 </td>
                                 <td bgcolor="#fcfaa4"><a href="views-direksi.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
                                 <td bgcolor="#fcfaa4">
@@ -546,11 +547,11 @@ if (strpos($tab, 'B1') !== false) : ?>
                                 <td bgcolor="#ff99a1"><?php echo $d['divisi']; ?></td>
                                 <td bgcolor="#ff99a1"><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
                                 <td bgcolor="#ff99a1">
-                                    <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
-                                    </font>
+                                    <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
                                 </td>
                                 <td bgcolor="#ff99a1">
-                                    <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
+                                    <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
+                                    </font>
                                 </td>
                                 <td bgcolor="#ff99a1"><a href="view-direksi.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
                                 <td bgcolor="#ff99a1">
@@ -590,10 +591,10 @@ if (strpos($tab, 'B1') !== false) : ?>
                                 <td><?php echo $d['pengaju']; ?></td>
                                 <td><?php echo $d['divisi']; ?></td>
                                 <td><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
+                                <td><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
+                                </td>
                                 <td><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
                                     </font>
-                                </td>
-                                <td><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
                                 </td>
                                 <td><a href="view-direksi.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
                                 <td>
@@ -629,8 +630,8 @@ if (strpos($tab, 'B1') !== false) : ?>
                         <th>Nama Yang Mengajukan</th>
                         <th>Divisi</th>
                         <th>Total</th>
+                        <th>Total Biaya dan Uang Muka</th>
                         <th>Sisa Budget</th>
-                        <th>Total DiBayar</th>
                         <th>View</th>
                         <th>Persetujuan</th>
                         <th>Status</th>
@@ -683,11 +684,11 @@ if (strpos($tab, 'B1') !== false) : ?>
                                 <td bgcolor="#fcfaa4"><?php echo $d['divisi']; ?></td>
                                 <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
                                 <td bgcolor="#fcfaa4">
-                                    <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
-                                    </font>
+                                    <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
                                 </td>
                                 <td bgcolor="#fcfaa4">
-                                    <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
+                                    <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
+                                    </font>
                                 </td>
                                 <td bgcolor="#fcfaa4"><a href="views-direksi.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
                                 <td bgcolor="#fcfaa4">
@@ -732,11 +733,11 @@ if (strpos($tab, 'B1') !== false) : ?>
                                 <td bgcolor="#ff99a1"><?php echo $d['divisi']; ?></td>
                                 <td bgcolor="#ff99a1"><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
                                 <td bgcolor="#ff99a1">
-                                    <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
-                                    </font>
+                                    <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
                                 </td>
                                 <td bgcolor="#ff99a1">
-                                    <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
+                                    <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
+                                    </font>
                                 </td>
                                 <td bgcolor="#ff99a1"><a href="view-direksi.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
                                 <td bgcolor="#ff99a1">
@@ -777,10 +778,10 @@ if (strpos($tab, 'B1') !== false) : ?>
                                 <td><?php echo $d['pengaju']; ?></td>
                                 <td><?php echo $d['divisi']; ?></td>
                                 <td><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
+                                <td><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
+                                </td>
                                 <td><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
                                     </font>
-                                </td>
-                                <td><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
                                 </td>
                                 <td><a href="view-direksi.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
                                 <td>
