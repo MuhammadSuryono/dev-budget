@@ -370,7 +370,7 @@ if ($_POST['submit'] == 1) {
             if ($isEksternalProcess && $dataDivisi[$i] != 'Direksi') {
                 $path = '/view-bpu-verify.php?id='.$bpuVerify["id"].'&bpu='.$bpuItem["noid"];
             } else if ($isEksternalProcess && $dataDivisi[$i] == 'Direksi') {
-                $path = '/views-direksi.php?code='.$idBudget;
+                $path = '/rekap-finance.php';
             } else {
                 if ($dataDivisi[$i] == 'FINANCE') {
                     $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $budget['jenis'] == 'B1' ? '/view-finance-manager-b1.php?code='.$idBudget : '/view-finance-manager.php?code='.$idBudget ;
@@ -378,7 +378,7 @@ if ($_POST['submit'] == 1) {
                     $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $budget['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin.php?code='.$idBudget  : '/view-finance.php?code='.$idBudget ;
                     $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
                 } else if ($dataDivisi[$i] == 'Direksi') {
-                    $path = '/views-direksi.php?code='.$idBudget;
+                    $path = '/rekap-finance.php';
                 }
             }
 
