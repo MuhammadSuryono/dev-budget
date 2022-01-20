@@ -81,6 +81,11 @@ $setting = mysqli_fetch_assoc($querySetting);
   <br /><br />
 
   <div class="row">
+    <div class="col-sm-2">Nama Projek</div>
+    <div class="col-sm-6">: <b><?php echo $d['nama']; ?></b></div>
+  </div>
+
+  <div class="row">
     <div class="col-sm-2">Nama Yang Mengajukan</div>
     <div class="col-sm-6">: <b><?php echo $d['pengaju']; ?></b></div>
     <div class="col-sm-4"><b>C&nbsp;&nbsp; = <img src="images/coklat.jpg" width="20px" height="15px"> BPU perlu diketahui atasan</b></div>
@@ -153,7 +158,7 @@ $setting = mysqli_fetch_assoc($querySetting);
 
           <div class="panel panel-warning" data-widget="{&quot;draggable&quot;: &quot;false&quot;}" data-widget-static="">
             <div class="panel-body no-padding">
-              <table class="table table-striped table-bordered">
+              <table class="table table-striped table-bordered table-hover">
                 <thead>
                   <tr class="warning">
                     <th>No</th>
@@ -164,6 +169,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                     <th>Harga Satuan (IDR)</th>
                     <th>Quantity</th>
                     <th>Total Harga (IDR)</th>
+                    <th>Total Dibayarkan</th>
                     <th>Sisa Pembayaran</th>
                     <th>Action</th>
 
@@ -194,6 +200,8 @@ $setting = mysqli_fetch_assoc($querySetting);
 
                   while ($a = mysqli_fetch_array($sql)) {
                     if (!in_array($a["rincian"], $checkName)) :
+                      $querySumTotalBayar = mysqli_query($koneksi, "SELECT SUM(jumlahbayar) as total_bayar FROM bpu where no = '$a[no]' AND waktu = '$waktu'");
+                      $totalBayar = mysqli_fetch_assoc($querySumTotalBayar);
                   ?>
                       <tr>
                         <th scope="row"> <?php echo $i++; ?></th>
@@ -204,6 +212,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                         <td><?php echo 'Rp. ' . number_format($a['harga'], 0, '', ','); ?></td>
                         <td><?php echo $a['quantity']; ?></td>
                         <td><?php echo 'Rp. ' . number_format($a['total'], 0, '', ','); ?></td>
+                        <td>Rp. <?= number_format($totalBayar['total_bayar']) ?></td>
 
                         <!-- Sisa Pembayaran -->
                         <?php
@@ -420,11 +429,18 @@ $setting = mysqli_fetch_assoc($querySetting);
                               // }
 
                               echo "<td bgcolor=' $color '>";
-                              echo "No :<b> $term";
+                              // echo "<table>";
+                              // echo "<tr><td>Tanggal Pembuatan</td><td> : <b>". date('Y-m-d', strtotime($waktustempel)) . "</b></td></tr>";
+                              // echo "<tr><td>No. Term</td><td> : <b>$term</b></td></tr>";
+                              // echo "<tr><td>No. STKB</td><td> : <b>$noStkb</b></td></tr>";
+                              // echo "<tr><td>No Term</td><td> : <b>$term</b></td></tr>";
+                              // echo "<tr><td>No Term</td><td> : <b>$term</b></td></tr>";
+                              // echo "</table>";
+                              echo "No Term:<b> $term";
                               echo "</b><br>";
                               echo "No. STKB :<b> $noStkb";
                               echo "</b><br>";
-                              echo ($statusPengajuanBpu != 0) ? "Request BPU : <br><b>Rp. " . number_format($total['jumlah_pengajuan'], 0, '', ',') : "BPU : <br><b>Rp. " . number_format($total['jumlah_total'], 0, '', ',');
+                              echo ($statusPengajuanBpu != 0) ? "Request BPU : <br><b>Rp. " . number_format($total['jumlah_pengajuan'], 0, '', ',') : "Nominal BPU : <br><b>Rp. " . number_format($total['jumlah_total'], 0, '', ',');
                               echo "</b><br>";
                               if ($realisasi != 0 && $statusbayar == 'Telah Di Bayar' && $statusbpu == 'UM') {
                                 echo "Realisasi Biaya : <br><b>Rp. " . number_format($realisasi, 0, '', ',');
@@ -601,7 +617,8 @@ $setting = mysqli_fetch_assoc($querySetting);
 
           <div class="row">
             <div class="col-xs-3">
-              <font color="#1bd34f">Total Biaya dan Uang Muka
+              <font color="#1bd34f">Total Biaya dan Uang Muka </font>
+                <hr />
             </div>
 
             <?php
@@ -623,7 +640,7 @@ $setting = mysqli_fetch_assoc($querySetting);
             $uangkembaliused = $uak['sumused'];
 
 
-            $totlah = $row2['sum'];
+            $totlah = $row2['sum']; // total bayar
             $reallah = $row10['sum'];
             $tysb = $totlah - $reallah;
 
@@ -1188,6 +1205,12 @@ $setting = mysqli_fetch_assoc($querySetting);
       </div>
 
       <script type="text/javascript">
+
+        $("table").on("scroll", function () {
+          console.log($("table").width())
+            $("table > *").width($("table").width() + $("table").scrollLeft());
+        });
+
         $('#id_step2-number_2_btn').click(function() {
           // console.log($(this));
           $('#id_step2-number_2ProsesRealisasi').prop('readonly', false);

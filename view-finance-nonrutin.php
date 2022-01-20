@@ -157,7 +157,7 @@ $helper = new Helper();
     </div>
   </nav>
 
-  <div class="container">
+  <div class="container-fluid">
 
     <?php
     
