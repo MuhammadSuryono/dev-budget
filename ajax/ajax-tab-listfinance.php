@@ -19,7 +19,11 @@ if (strpos($tab, 'B1') !== false) : ?>
                   <th>Tahun</th>
                   <th>Nama Yang Mengajukan</th>
                   <th>Divisi</th>
-                  <th>Action</th>
+                  <th>Total</th>
+                  <th>Total Biaya dan Uang Muka</th>
+                  <th>Sisa Budget</th>
+                  <th>View</th>
+                  <th>Persetujuan</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -38,7 +42,23 @@ if (strpos($tab, 'B1') !== false) : ?>
                   } else {
                     $arrDocument = $document;
                   }
+
                   if (!in_array($d['waktu'], $checkWaktu)) :
+                    $waktu = $d['waktu'];
+                    $query2 = "SELECT sum(jumlahbayar) AS sumasum FROM bpu WHERE waktu='$waktu'";
+                    $result2 = mysqli_query($koneksi, $query2);
+                    $row2 = mysqli_fetch_array($result2);
+  
+                    $query10 = "SELECT sum(uangkembali) AS sum FROM bpu WHERE waktu='$waktu'";
+                    $result10 = mysqli_query($koneksi, $query10);
+                    $row10 = mysqli_fetch_array($result10);
+                    $tysb = $row2['sumasum'] - $row10['sum'];
+  
+                    $aaaa = $d['totalbudget'];
+                    $bbbb = $row2['sumasum'];
+                    $belumbayar = $aaaa - $bbbb;
+
+
                     if ($d['status'] == "Disetujui") {
                 ?>
                       <tr>
@@ -66,6 +86,16 @@ if (strpos($tab, 'B1') !== false) : ?>
                         <td bgcolor="#fcfaa4"><?php echo $d['tahun']; ?></td>
                         <td bgcolor="#fcfaa4"><?php echo $d['pengaju']; ?></td>
                         <td bgcolor="#fcfaa4"><?php echo $d['divisi']; ?></td>
+
+                        <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
+                        <td bgcolor="#fcfaa4">
+                            <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
+                        </td>
+                        <td bgcolor="#fcfaa4">
+                            <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
+                            </font>
+                        </td>
+
                         <td bgcolor="#fcfaa4">
                           <?php
                           if ($aksesSes == 'Manager') {
@@ -81,6 +111,9 @@ if (strpos($tab, 'B1') !== false) : ?>
                             <a href="view-finance.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a>
                           <?php } ?>
                         </td>
+                        <td bgcolor="#fcfaa4">
+                            <center>--</center>
+                        </td>
                         <td bgcolor="#fcfaa4"><?php echo $d['status']; ?></td>
                       </tr>
                     <?php
@@ -91,6 +124,14 @@ if (strpos($tab, 'B1') !== false) : ?>
                         <td><?php echo $d['tahun']; ?></td>
                         <td><?php echo $d['pengaju']; ?></td>
                         <td><?php echo $d['divisi']; ?></td>
+                        <td><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
+                        <td>
+                            <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
+                        </td>
+                        <td>
+                            <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
+                            </font>
+                        </td>
                         <td>--</td>
                         <td><?php echo $d['status']; ?></td>
                       </tr>
@@ -113,7 +154,11 @@ if (strpos($tab, 'B1') !== false) : ?>
                   <th>Tahun</th>
                   <th>Nama Yang Mengajukan</th>
                   <th>Divisi</th>
-                  <th>Action</th>
+                  <th>Total</th>
+                  <th>Total Biaya dan Uang Muka</th>
+                  <th>Sisa Budget</th>
+                  <th>View</th>
+                  <th>Persetujuan</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -133,6 +178,21 @@ if (strpos($tab, 'B1') !== false) : ?>
                     $arrDocument = $document;
                   }
                   if (!in_array($d['waktu'], $checkWaktu)) :
+                    $waktu = $d['waktu'];
+                    $query2 = "SELECT sum(jumlahbayar) AS sumasum FROM bpu WHERE waktu='$waktu'";
+                    $result2 = mysqli_query($koneksi, $query2);
+                    $row2 = mysqli_fetch_array($result2);
+  
+                    $query10 = "SELECT sum(uangkembali) AS sum FROM bpu WHERE waktu='$waktu'";
+                    $result10 = mysqli_query($koneksi, $query10);
+                    $row10 = mysqli_fetch_array($result10);
+                    $tysb = $row2['sumasum'] - $row10['sum'];
+  
+                    $aaaa = $d['totalbudget'];
+                    $bbbb = $row2['sumasum'];
+                    $belumbayar = $aaaa - $bbbb;
+
+
                     if ($d['status'] == "Disetujui") {
                 ?>
                       <tr>
@@ -160,6 +220,14 @@ if (strpos($tab, 'B1') !== false) : ?>
                         <td bgcolor="#fcfaa4"><?php echo $d['tahun']; ?></td>
                         <td bgcolor="#fcfaa4"><?php echo $d['pengaju']; ?></td>
                         <td bgcolor="#fcfaa4"><?php echo $d['divisi']; ?></td>
+                        <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
+                        <td bgcolor="#fcfaa4">
+                            <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
+                        </td>
+                        <td bgcolor="#fcfaa4">
+                            <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
+                            </font>
+                        </td>
                         <td bgcolor="#fcfaa4">
                           <?php
                           if ($aksesSes == 'Manager') {
@@ -175,6 +243,9 @@ if (strpos($tab, 'B1') !== false) : ?>
                             <a href="view-finance.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a>
                           <?php } ?>
                         </td>
+                        <td bgcolor="#fcfaa4">
+                            <center>--</center>
+                        </td>
                         <td bgcolor="#fcfaa4"><?php echo $d['status']; ?></td>
                       </tr>
                     <?php
@@ -185,6 +256,14 @@ if (strpos($tab, 'B1') !== false) : ?>
                         <td><?php echo $d['tahun']; ?></td>
                         <td><?php echo $d['pengaju']; ?></td>
                         <td><?php echo $d['divisi']; ?></td>
+                        <td><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
+                        <td>
+                            <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
+                        </td>
+                        <td>
+                            <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
+                            </font>
+                        </td>
                         <td>--</td>
                         <td><?php echo $d['status']; ?></td>
                       </tr>
