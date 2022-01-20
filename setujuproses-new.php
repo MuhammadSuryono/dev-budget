@@ -114,7 +114,7 @@ $hostProtocol = "http://".$hostProtocol . ":" . $port;
 }
 
 $host = $hostProtocol;
-if ($port == "" || $port == "80" || $port == '7993') {
+if ($port == "" || $port == "80" || $port == '7793') {
   $host = $hostProtocol. '/'. $url[1];
 }
 
@@ -370,7 +370,7 @@ if ($_POST['submit'] == 1) {
             if ($isEksternalProcess && $dataDivisi[$i] != 'Direksi') {
                 $path = '/view-bpu-verify.php?id='.$bpuVerify["id"].'&bpu='.$bpuItem["noid"];
             } else if ($isEksternalProcess && $dataDivisi[$i] == 'Direksi') {
-                $path = '/views-direksi.php?code='.$idBudget;
+                $path = '/rekap-finance.php?see';
             } else {
                 if ($dataDivisi[$i] == 'FINANCE') {
                     $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $budget['jenis'] == 'B1' ? '/view-finance-manager-b1.php?code='.$idBudget : '/view-finance-manager.php?code='.$idBudget ;
@@ -378,7 +378,7 @@ if ($_POST['submit'] == 1) {
                     $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $budget['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin.php?code='.$idBudget  : '/view-finance.php?code='.$idBudget ;
                     $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
                 } else if ($dataDivisi[$i] == 'Direksi') {
-                    $path = '/views-direksi.php?code='.$idBudget;
+                    $path = '/rekap-finance.php?see';
                 }
             }
 
@@ -491,7 +491,7 @@ else if ($submit == 0) {
                 $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $budget['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin.php?code='.$idBudget : '/view-finance.php?code='.$idBudget;
                 $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
             } else if ($dataDivisi[$i] == 'Direksi') {
-                $path = '/views-direksi.php';
+                $path = '/views-direksi.php?code='.$idBudget;
             }
         }
         $url =  $host. $path.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
