@@ -148,7 +148,7 @@ $subTabUmum = ['Rutin', 'Non-Rutin']
     </nav>
 
 
-    <div class="container">
+    <div class="container-fluid">
 
         <!-- Nav List budget 2018 - 2019 -->
         <!-- <ul class="nav nav-pills">
