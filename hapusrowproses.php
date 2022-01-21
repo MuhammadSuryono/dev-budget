@@ -5,6 +5,10 @@ require "application/config/database.php";
 $con = new Database();
 $koneksi = $con->connect();
 
+$con->set_name_db(DB_TRANSFER);
+$con->init_connection();
+$koneksiBridge = $con->connect();
+
 $no     = $_POST['no'];
 $waktu  = $_POST['waktu'];
 
@@ -13,6 +17,12 @@ $waktu  = $_POST['waktu'];
 if (isset($_POST['submit'])) {
 
   $update = mysqli_query($koneksi, "DELETE FROM selesai WHERE no ='$no' AND waktu ='$waktu'");
+
+  $queryBpu = mysqli_query($koneksi, "SELECT * FROM bpu WHERE no ='$no' AND waktu ='$waktu'");
+  while ($dataBpu = mysqli_fetch_assoc($queryBpu)) {
+    $idBpu = $dataBpu['noid'];
+    $delete = mysqli_query($koneksiBridge, "DELETE FROM data_transfer WHERE noid_bpu ='$idBpu'");
+  }
 
 
   if ($update) {

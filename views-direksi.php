@@ -7,6 +7,10 @@ require "application/config/database.php";
 $con = new Database();
 $koneksi = $con->connect();
 
+$con->set_name_db(DB_TRANSFER);
+$con->init_connection();
+$koneksiBridge = $con->connect();
+
 if (!isset($_SESSION['nama_user'])) {
   header("location:login.php");
   // die('location:login.php');//jika belum login jangan lanjut
@@ -369,6 +373,18 @@ $setting = mysqli_fetch_assoc($querySetting);
                               $sisarealisasi    = $jumlbayar - $kembreal;
                               $statusPengajuanBpu = $bayar['status_pengajuan_bpu'];
                               $fileuploadRealisasi       = $bayar['fileupload_realisasi'];
+                              $bankAccountName       = $bayar['bank_account_name'];
+
+                              $tglcair = $tglcair == "0000-00-00" ? "-" : $tglcair;
+
+                              $queryBank = mysqli_query($koneksi, "SELECT namabank FROM bank WHERE kodebank = '$namabank'");
+                              $dataBank = mysqli_fetch_assoc($queryBank);
+                              $bank = $dataBank['namabank'];
+
+                              $queryTransfer = mysqli_query($koneksiBridge, "SELECT bank, jadwal_transfer FROM data_transfer WHERE noid_bpu = '$noidbpu'");
+                              $dataTransfer = mysqli_fetch_assoc($queryTransfer);
+
+                              $jadwalTransfer = $dataTransfer['jadwal_transfer'];
 
                               if ($uangkembali == 0) {
                                 $jumlahjadi = $jumlbayar;
@@ -436,6 +452,8 @@ $setting = mysqli_fetch_assoc($querySetting);
                               // echo "<tr><td>No Term</td><td> : <b>$term</b></td></tr>";
                               // echo "<tr><td>No Term</td><td> : <b>$term</b></td></tr>";
                               // echo "</table>";
+                              echo "No. BPU :<b> $noidbpu";
+                              echo "</b><br>";
                               echo "No Term:<b> $term";
                               echo "</b><br>";
                               echo "No. STKB :<b> $noStkb";
@@ -461,12 +479,24 @@ $setting = mysqli_fetch_assoc($querySetting);
                               echo "</b></br>";
                               echo "Request Pembayaran : <br><b>$tglcair ";
                               echo "</b></br>";
-                              echo "Diajukan Oleh : <br><b> $pengaju($divisi2)";
+                              echo "Metode Pembayaran : <br><b>$metodePembayaran ";
                               echo "</b><br>";
-                              echo "Tgl Pembayaran : <br><b> $tanggalbayar";
+                              echo "<hr />";
+                              echo "Tanggal Pembayaran : <br><b> $tanggalbayar";
+                              echo "</b><br/>";
+                              echo "Nama Penerima : <br><b> $namapenerima";
+                              echo "</b><br/>";
+                              echo "Bank : <br><b> $bank";
+                              echo "</b><br/>";
+                              echo "Nomor Rekening : <br><b> $norek";
+                              echo "</b><br/>";
+                              echo "Nama Penerima Sesuai Rekening : <br><b> $bankAccountName";
+                              echo "</b><br/>";
+                              echo "Nominal Pembayaran : <br><b> Rp. " . number_format($jumlbayar);
                               echo "</b><br/>";
                               echo "No Voucher : <br><b> $novoucher ";
                               echo "</b><br/>";
+                              echo "<hr />";
                               echo "Kasir : <br><b> $pembayar ";
                               echo "</b><br/>";
                               echo "File Rincian BPU : <br>";

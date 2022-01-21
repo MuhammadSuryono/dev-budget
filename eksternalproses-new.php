@@ -4,8 +4,10 @@ require "application/config/database.php";
 require_once "application/config/whatsapp.php";
 require_once "application/config/message.php";
 require_once "application/config/email.php";
+require_once "application/controllers/Cuti.php";
 
 $emailHelper = new Email();
+$cuti = new Cuti();
 
 $con = new Database();
 $koneksi = $con->connect();
@@ -22,7 +24,6 @@ $koneksiTransfer = $con->connect();
 session_start();
 if (!isset($_SESSION['nama_user'])) {
     header("location:login.php");
-    // die('location:login.php');//jika belum login jangan lanjut
 }
 
 $time = date("Y-m-d H:i:s");
@@ -171,7 +172,6 @@ if ($jumlah == 0 || $jumlah == "") {
 
 
 //periksa apakah udah submit
-
 if ($actionProcess == "update") {
     $queryBpuNew = mysqli_query($koneksi, "SELECT * FROM bpu WHERE noid='$idBpu'");
     $bpu = mysqli_fetch_assoc($queryBpuNew);
@@ -520,19 +520,19 @@ if (isset($_POST['submit'])) {
                             $path = '/views-direksi.php?code='.$numb.'';
                         }
                     }
-                  $url =  $host. $path.'&session='.base64_encode(json_encode(["id_user" => $idUserInternal[$i], "timeout" => time()]));
-                  if ($actionProcess == "update" && $isEksternalProcess) {
-                    $msg = $messageHelper->messagePengajuanBPU($namaInternal[$i], $pengaju, $namaProject, $namapenerima, $jumlah, "", $url);
-                  } else {
-                    $penerima = $vendorName;
-                    if ($penerima == "") {
-                        $penerima = "-";
+                    $url =  $host. $path.'&session='.base64_encode(json_encode(["id_user" => $idUserInternal[$i], "timeout" => time()]));
+                    if ($actionProcess == "update" && $isEksternalProcess) {
+                        $msg = $messageHelper->messagePengajuanBPU($namaInternal[$i], $pengaju, $namaProject, $namapenerima, $jumlah, "", $url);
+                    } else {
+                        $penerima = $vendorName;
+                        if ($penerima == "") {
+                            $penerima = "-";
+                        }
+                        $msg = $messageHelper->messagePembuatanBPUEksternal($namaInternal[$i], $_SESSION['nama_user'], $namaProject, $penerima, $jumlah, "", $url);
                     }
-                    $msg = $messageHelper->messagePembuatanBPUEksternal($namaInternal[$i], $_SESSION['nama_user'], $namaProject, $penerima, $jumlah, "", $url);
-                  }
-                  if($emailInternal[$i] != "") $wa->sendMessage($emailInternal[$i], $msg);
+                    if($emailInternal[$i] != "") $wa->sendMessage($emailInternal[$i], $msg);
 
-                  $notification .= ($namaInternal[$i] . ' (' . $emailInternal[$i] . ')');
+                    $notification .= ($namaInternal[$i] . ' (' . $emailInternal[$i] . ')');
                     if ($i < count($emailInternal) - 1) $notification .= ', ';
                     else $notification .= '.';
                 }
