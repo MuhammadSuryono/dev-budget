@@ -70,7 +70,7 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
 
     <div class="form-group">
         <label for="tglbayar" class="control-label">Tanggal Pembayaran :</label>
-        <input type="date" class="form-control" id="tglbayar" name="tanggalbayar" min="<?= date('Y-m-d', strtotime($Date . ' + 2 days')) ?>" required>
+        <input type="date" class="form-control" id="tglbayar" name="tanggalbayar" min="<?= date('Y-m-d', strtotime($Date . ' + 2 days')) ?>">
     </div>
 
     <div class="form-group">
