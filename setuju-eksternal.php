@@ -133,8 +133,8 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
 
     <div class="form-group">
         <label for="tglcair" class="control-label">Status Urgent :</label>
-        <select class="form-control" name="urgent">
-            <option value="Not Urgent" selected>-</option>
+        <select class="form-control" name="urgent" onchange="onChangeStatusUrgent(this)">
+            <option value="Not Urgent" selected>Not Urgent</option>
             <option value="Urgent">Urgent</option>
         </select>
     </div>
@@ -150,6 +150,9 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
     var jenis = '<?= $jenis ?>';
     var typeVendor = '<?= $typeVendor ?>';
     var maxTransfer = '<?= $resultJenisPembayaran["max_transfer"] ?>';
+    var tanggalBayar = '<?= $dataBpu['tanggalbayar'] ?>'
+    const inputDate = document.getElementById("tglbayar")
+
     const picker = document.getElementById('tglbayar');
     picker.addEventListener('input', function(e) {
         var day = new Date(this.value).getUTCDay();
@@ -184,6 +187,27 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
         let totalAfterPph = Math.round((resDpp - resPPh) + resPpn)
 
         return Math.round(totalData - totalAfterPph)
+    }
+
+    function onChangeStatusUrgent(e) {
+        if (e.value === "Urgent") {
+            inputDate.value = formatDate("yyyy-mm-dd")
+            inputDate.setAttribute("min", formatDate("yyyy-mm-dd"))
+        } else {
+            inputDate.value = tanggalBayar
+            inputDate.setAttribute("min", tanggalBayar)
+        }
+    }
+
+    function formatDate(format) {
+        const date = new Date();
+        let month = date.getMonth() + 1;
+        let day = date.getDate()
+        let year = date.getFullYear()
+        let singleMonth = [1,2,3,4,5,6,7,8,9]
+
+        month = singleMonth.includes(month) ? "0" + month : month
+        return `${year}-${month}-${day}`
     }
 
     $('input[name=pajak]').change(function() {

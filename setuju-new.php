@@ -92,6 +92,11 @@ $koneksi->close();
 ?>
 <script>
     const picker = document.getElementById('tglbayar');
+    
+    var tanggalBayar = '<?= $baris['tanggalbayar'] ?>'
+    const inputDate = document.getElementById("tglbayar")
+
+
     picker.addEventListener('input', function(e) {
         var day = new Date(this.value).getUTCDay();
         if ([6, 0].includes(day)) {
@@ -109,4 +114,26 @@ $koneksi->close();
         }
         console.log('here');
     })
+
+    function onChangeStatusUrgent(e) {
+        
+        if (e.value === "Urgent") {
+            inputDate.value = formatDate("yyyy-mm-dd")
+            inputDate.setAttribute("min", formatDate("yyyy-mm-dd"))
+        } else {
+            inputDate.value = tanggalBayar
+            inputDate.setAttribute("min", tanggalBayar)
+        }
+    }
+
+    function formatDate(format) {
+        const date = new Date();
+        let month = date.getMonth() + 1;
+        let day = date.getDate()
+        let year = date.getFullYear()
+        let singleMonth = [1,2,3,4,5,6,7,8,9]
+
+        month = singleMonth.includes(month) ? "0" + month : month
+        return `${year}-${month}-${day}`
+    }
 </script>
