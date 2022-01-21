@@ -7,14 +7,17 @@ class Cuti {
 
     public function __construct()
     {
-        $db = new Database();
-        $db->set_name_db(DB_CUTI);
-        $db->init_connection();
-        $this->conn = $db->connect();
+        
     }
 
     public function checkStatusCutiUser($namaUser)
     {
+        $db = new Database();
+        $db->set_name_db(DB_CUTI);
+        $db->init_connection();
+        $this->conn = $db->connect();
+
+        
         $sqlUser = mysqli_query($this->conn, "SELECT id_user FROM tb_user WHERE nama_user = '$namaUser'");
         $user = mysqli_fetch_assoc($sqlUser);
 
