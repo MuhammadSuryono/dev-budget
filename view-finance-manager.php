@@ -9,7 +9,9 @@ $helper = new Helper();
 $con = new Database();
 $koneksi = $con->connect();
 
-
+$con->set_name_db(DB_TRANSFER);
+$con->init_connection();
+$koneksiBridge = $con->connect();
 
 $querySetting = mysqli_query($koneksi, "SELECT * FROM setting_budget WHERE keterangan = 'approval_bpu'") or die(mysqli_error($koneksi));
 $setting = mysqli_fetch_assoc($querySetting);
@@ -338,7 +340,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                               }
 
                               $showButtonBayar =  mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) AS count FROM bpu WHERE waktu='$waktu' AND no='$no' AND term = '$bayar[term]'  AND status = 'Belum Di Bayar' AND metode_pembayaran = 'MRI Kas'"))['count'];
-
+                              $noidbpu          = $bayar['noid'];
                               $noidbpu        = $bayar['noid'];
                               $jumlbayar      = $bayar['jumlah'];
                               $pengajuanJumlah      = $bayar['pengajuan_jumlah'];
@@ -378,6 +380,20 @@ $setting = mysqli_fetch_assoc($querySetting);
                               $batasTanggalBayar = $bayar['batas_tanggal_bayar'];
                               // $metodePembayaran = $bayar['metode_pembayaran'];
                               $ketPembayaran = $bayar['ket_pembayaran'];
+
+                              $bankAccountName       = $bayar['bank_account_name'];
+
+                              $tglcair = $tglcair == "0000-00-00" ? "-" : $tglcair;
+
+                              $queryBank = mysqli_query($koneksi, "SELECT namabank FROM bank WHERE kodebank = '$namabank'");
+                              $dataBank = mysqli_fetch_assoc($queryBank);
+                              $bank = $dataBank['namabank'];
+
+                              $queryTransfer = mysqli_query($koneksiBridge, "SELECT bank, jadwal_transfer FROM data_transfer WHERE noid_bpu = '$noidbpu'");
+                              $dataTransfer = mysqli_fetch_assoc($queryTransfer);
+
+                              $jadwalTransfer = $dataTransfer['jadwal_transfer'];
+
 
                               $noStkb       = ($bayar['nomorstkb']) ? $bayar['nomorstkb'] : '-';
                               $kembreal         = $realisasi + $uangkembali;
@@ -436,6 +452,10 @@ $setting = mysqli_fetch_assoc($querySetting);
                               // }
 
                               echo "<td bgcolor=' $color '>";
+                              echo "No. BPU :<b> $noidbpu";
+                              echo "</b><br>";
+                              echo "</b><br>";
+                              echo "No. BPU :<b> $noidbpu";
                               echo "</b><br>";
                               echo "No. STKB :<b> $noStkb";
                               echo "</b><br>";
@@ -460,14 +480,25 @@ $setting = mysqli_fetch_assoc($querySetting);
                               echo "</b></b>";
                               echo "Tanggal Terima Uang : <b>$tglcair ";
                               echo "</b></br>";
-                              echo "Diajukan Oleh : <br><b> $pengaju($divisi2)";
+                              echo "</b></br>";
+                              echo "Metode Pembayaran : <br><b>$metodePembayaran ";
                               echo "</b><br>";
+                              echo "<hr />";
+                              echo "Tanggal Pembayaran : <br><b> $tanggalbayar";
+                              echo "</b><br/>";
+                              echo "Nama Penerima : <br><b> $namapenerima";
+                              echo "</b><br/>";
+                              echo "Bank : <br><b> $bank";
+                              echo "</b><br/>";
+                              echo "Nomor Rekening : <br><b> $norek";
+                              echo "</b><br/>";
+                              echo "Nama Penerima Sesuai Rekening : <br><b> $bankAccountName";
+                              echo "</b><br/>";
+                              echo "Nominal Pembayaran : <br><b> Rp. " . number_format($jumlbayar);
+                              echo "</b><br/>";
                               echo "No Voucher : <br><b> $novoucher ";
                               echo "</b><br/>";
-                              echo "Tgl Bayar : <br><b> $tanggalbayar";
-                              echo "</b><br/>";
-                              echo "Tgl Bayar : <br><b> ". $bayar['metode_pembayaran'];
-                              echo "</b><br/>";
+                              echo "<hr />";
                               echo "Kasir : <br><b> $pembayar ";
                               echo "</b><br/>";
                               echo "File Rincian BPU : <br>";

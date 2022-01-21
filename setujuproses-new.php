@@ -150,7 +150,7 @@ if ($_POST['submit'] == 1) {
         $pengaju = $item['pengaju'];
 
         if (!$isEksternalProcess && $item['metode_pembayaran'] == 'MRI PAL') {
-            $update = mysqli_query($koneksiTransfer, "UPDATE data_transfer SET jadwal_transfer ='$tanggalbayar', nm_otorisasi = '$userSetuju' WHERE noid_bpu = '$item[noid]'") or die(mysqli_error($koneksiTransfer));
+            $update = mysqli_query($koneksiTransfer, "UPDATE data_transfer SET jadwal_transfer ='$tanggalbayar', nm_otorisasi = '$userSetuju', url_callback = '$urlCallback' WHERE noid_bpu = '$item[noid]'") or die(mysqli_error($koneksiTransfer));
 
             if (!$update) {
                 echo "<script language='javascript'>";
