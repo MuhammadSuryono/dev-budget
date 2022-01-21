@@ -37,6 +37,8 @@ $divisi = $data['divisi'];
 $totalbudget = $data['totalbudget'];
 $jenis = $data['jenis'];
 
+$duplciate = [];
+
 if ($jenis == 'B1' && $_GET['kodepro'] != 'undefined') {
     if (count($kodepro) == 1) {
         $kode = $kodepro[0];
@@ -140,52 +142,69 @@ if ($totalbudget > 1000000) {
         }
     }
 } else {
+    $cuti = new Cuti();
     $queryGetEmail = mysqli_query($koneksi, "SELECT id_user, email,nama_user, phone_number, divisi, level from tb_user WHERE nama_user='$pembuatG' AND aktif='Y'");
     $getEmail =  mysqli_fetch_assoc($queryGetEmail);
+
     array_push($phoneNumbers, $getEmail['phone_number']);
     array_push($namaUser, $getEmail['nama_user']);
     array_push($idUsersNotification, $getEmail['id_user']);
+    array_push($duplciate, $getEmail['phone_number']);
 
-    $cuti = new Cuti();
-    $struktural = ["Manager", 'Direksi'];
-    if ($getEmail["divisi"] != "Finance") {
-        $getDataUserFinance = false;
-        foreach ($struktural as $struktur) {
-            $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='Finance' AND level = '$struktur' AND aktif='Y'");
-            $e = mysqli_fetch_assoc($queryEmail);
-           
-            if (false) {
-                $getDataUserFinance = true;
-                while ($e) {
-                    if ($e['phone_number']) {
-                        array_push($phoneNumbers, $e['phone_number']);
-                        array_push($namaUser, $e['nama_user']);
-                        array_push($idUsersNotification, $getEmail['id_user']);
+    if ($cuti->checkStatusCutiUser($getEmail['nama_user'])) {
+        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='Direksi' AND aktif='Y'");
+        while ($e = mysqli_fetch_assoc($queryEmail)) {
+            if ($e['phone_number'] && !in_array($e['phone_number'], $duplciate)) {
+                array_push($phoneNumbers, $e['phone_number']);
+                array_push($namaUser, $e['nama_user']);
+                array_push($idUsersNotification, $e['id_user']);
+                array_push($duplciate, $getEmail['phone_number']);
+            }
+        }
+    } else {
+        $struktural = ["Manager", 'Direksi'];
+        if ($getEmail["divisi"] != "Finance") {
+            $getDataUserFinance = false;
+            foreach ($struktural as $struktur) {
+                $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='Finance' AND level = '$struktur' AND aktif='Y'");
+                $e = mysqli_fetch_assoc($queryEmail);
+               
+                if (false) {
+                    $getDataUserFinance = true;
+                    while ($e) {
+                        if ($e['phone_number'] && !in_array($e['phone_number'], $duplciate)) {
+                            array_push($phoneNumbers, $e['phone_number']);
+                            array_push($namaUser, $e['nama_user']);
+                            array_push($idUsersNotification, $getEmail['id_user']);
+                            array_push($duplciate, $getEmail['phone_number']);
+                        }
                     }
                 }
             }
-        }
-
-    } else if ($getEmail["divisi"] == "Finance" && ($getEmail["level"] != "Manager" || $getEmail["level"] != "Senior Manager") && $cuti->checkStatusCutiUser($getEmail["nama_user"])) {
-        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='Finance' AND aktif='Y'");
-        $e = mysqli_fetch_assoc($queryEmail);
-        if (false) {
-            $getDataUserFinance = true;
-            while ($e) {
-                if ($e['phone_number']) {
+    
+        } else if ($getEmail["divisi"] == "Finance" && ($getEmail["level"] != "Manager" || $getEmail["level"] != "Senior Manager") && $cuti->checkStatusCutiUser($getEmail["nama_user"])) {
+            $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='Finance' AND aktif='Y'");
+            $e = mysqli_fetch_assoc($queryEmail);
+            if (false) {
+                $getDataUserFinance = true;
+                while ($e) {
+                    if ($e['phone_number'] && !in_array($e['phone_number'], $duplciate)) {
+                        array_push($phoneNumbers, $e['phone_number']);
+                        array_push($namaUser, $e['nama_user']);
+                        array_push($idUsersNotification, $getEmail['id_user']);
+                        array_push($duplciate, $getEmail['phone_number']);
+                    }
+                }
+            }
+        } else if ($getEmail["divisi"] == "Finance" && ($getEmail["level"] == "Manager" || $getEmail["level"] == "Senior Manager") && $cuti->checkStatusCutiUser($getEmail["nama_user"])) {
+            $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='Direksi' AND aktif='Y'");
+            while ($e = mysqli_fetch_assoc($queryEmail)) {
+                if ($e['phone_number'] && !in_array($e['phone_number'], $duplciate)) {
                     array_push($phoneNumbers, $e['phone_number']);
                     array_push($namaUser, $e['nama_user']);
                     array_push($idUsersNotification, $getEmail['id_user']);
+                    array_push($duplciate, $getEmail['phone_number']);
                 }
-            }
-        }
-    } else if ($getEmail["divisi"] == "Finance" && ($getEmail["level"] == "Manager" || $getEmail["level"] == "Senior Manager") && $cuti->checkStatusCutiUser($getEmail["nama_user"])) {
-        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='Direksi' AND aktif='Y'");
-        while ($e = mysqli_fetch_assoc($queryEmail)) {
-            if ($e['phone_number']) {
-                array_push($phoneNumbers, $e['phone_number']);
-                array_push($namaUser, $e['nama_user']);
-                array_push($idUsersNotification, $getEmail['id_user']);
             }
         }
     }
