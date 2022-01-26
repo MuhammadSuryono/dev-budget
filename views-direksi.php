@@ -38,6 +38,10 @@ $setting = mysqli_fetch_assoc($querySetting);
 </head>
 
 <body>
+<style>
+    .tableFixHead          { overflow: auto; height: 100px; }
+    .tableFixHead thead th { position: sticky; top: 0; z-index: 1; }
+  </style>
   <nav class="navbar navbar-inverse">
     <div class="container-fluid">
       <div class="navbar-header">
@@ -162,7 +166,7 @@ $setting = mysqli_fetch_assoc($querySetting);
 
           <div class="panel panel-warning" data-widget="{&quot;draggable&quot;: &quot;false&quot;}" data-widget-static="">
             <div class="panel-body no-padding">
-              <table class="table table-striped table-bordered table-hover">
+              <table class="table table-striped table-bordered table-hover tableFixHead">
                 <thead>
                   <tr class="warning">
                     <th>No</th>
@@ -642,18 +646,22 @@ $setting = mysqli_fetch_assoc($querySetting);
 
           <div class="row">
             <div class="col-xs-3">Total Budget Keseluruhan</div>
-            <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></b></div>
+            <?php
+              $queryTotalBudget = mysqli_query($koneksi, "SELECT sum(total) as total_budget FROM selesai WHERE waktu = '$d[waktu]'");
+              $dataTotalBudget = mysqli_fetch_assoc($queryTotalBudget);
+            ?>
+            <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($dataTotalBudget['total_budget'], 0, '', ','); ?></b></div>
           </div>
 
           <div class="row">
             <div class="col-xs-3">
-              <font color="#1bd34f">Total Biaya dan Uang Muka </font>
+              <font color="#1bd34f">Total Biaya dan Uang Muka 
                 <hr />
             </div>
 
             <?php
             // echo $waktu . "\n";
-            $query2 = "SELECT sum(jumlahbayar) AS sum FROM bpu WHERE waktu='$waktu'";
+            $query2 = "SELECT sum(jumlah) AS sum FROM bpu WHERE waktu='$waktu'";
             $result2 = mysqli_query($koneksi, $query2);
             $row2 = mysqli_fetch_array($result2);
 

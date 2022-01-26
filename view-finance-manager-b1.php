@@ -37,6 +37,11 @@ $setting = mysqli_fetch_assoc($querySetting);
 
 <body>
 
+<style>
+    .tableFixHead          { overflow: auto; height: 100px; }
+    .tableFixHead thead th { position: sticky; top: 0; z-index: 1; }
+  </style>
+
   <nav class="navbar navbar-inverse">
     <div class="container-fluid">
       <div class="navbar-header">
@@ -257,7 +262,7 @@ $setting = mysqli_fetch_assoc($querySetting);
 
           <div class="panel panel-warning" data-widget="{&quot;draggable&quot;: &quot;false&quot;}" data-widget-static="">
             <div class="panel-body no-padding">
-              <table class="table table-striped table-bordered">
+              <table class="table table-striped table-bordered tableFixHead">
                 <thead>
                   <tr class="warning">
                     <th>No</th>
@@ -655,33 +660,39 @@ $setting = mysqli_fetch_assoc($querySetting);
           </div>
           <div class="row">
             <div class="col-xs-3">Total Budget Keseluruhan</div>
-            <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></b></div>
+            <?php
+              $queryTotalBudget = mysqli_query($koneksi, "SELECT sum(total) as total_budget FROM selesai WHERE waktu = '$d[waktu]'");
+              $dataTotalBudget = mysqli_fetch_assoc($queryTotalBudget);
+            ?>
+            <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($dataTotalBudget['total_budget'], 0, '', ','); ?></b></div>
           </div>
 
           <div class="row">
             <div class="col-xs-3">
-              <font color="#1bd34f">Total Yang Sudah Di bayarkan
+              <font color="#1bd34f">Total Yang Sudah Di bayarkan />
+              <hr/>
             </div>
 
             <?php
-            $query2 = "SELECT sum(jumlahbayar) AS sum FROM bpu WHERE waktu='$waktu'";
+            $query2 = "SELECT sum(jumlah) AS total_pembayaran FROM bpu WHERE waktu='$waktu'";
             $result2 = mysqli_query($koneksi, $query2);
             $row2 = mysqli_fetch_array($result2);
 
-            $query10 = "SELECT sum(uangkembali) AS sum FROM bpu WHERE waktu='$waktu'";
+            $query10 = "SELECT sum(uangkembali) AS total_kembalian FROM bpu WHERE waktu='$waktu'";
             $result10 = mysqli_query($koneksi, $query10);
             $row10 = mysqli_fetch_array($result10);
-            $tysb = $row2['sum'] - $row10['sum'];
+            $tysb = $row2['total_pembayaran'] - $row10['total_kembalian'];
             ?>
 
             <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($tysb, 0, '', ','); ?></font></b></div>
+            
           </div>
 
           <div class="row">
             <div class="col-xs-3">
               <font color="#cbf442">Total Uang Kembali Realisasi
             </div>
-            <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($row10['sum'], 0, '', ','); ?></font></b></div>
+            <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($row10['total_kembalian'], 0, '', ','); ?></font></b></div>
           </div>
 
           <!-- Yang belum Bayar -->
@@ -690,8 +701,8 @@ $setting = mysqli_fetch_assoc($querySetting);
               <font color='#f23f2b'>Total Yang Belum Di bayarkan
             </div>
             <?php
-            $aaaa = $d['totalbudget'];
-            $bbbb = $row2['sum'];
+            $aaaa = $dataTotalBudget['total_budget'];
+            $bbbb = $row2['total_pembayaran'];
             $belumbayar = $aaaa - $bbbb;
             ?>
             <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font></b></div>
@@ -704,11 +715,11 @@ $setting = mysqli_fetch_assoc($querySetting);
               <font color='#fcce00'>Ready To Pay :
             </div>
             <?php
-            $query3 = "SELECT sum(jumlah) AS sumi FROM bpu WHERE waktu='$waktu' AND persetujuan='Disetujui (Direksi)' AND status='Belum Di Bayar'";
+            $query3 = "SELECT sum(jumlah) AS ready_to_pay FROM bpu WHERE waktu='$waktu' AND persetujuan='Disetujui (Direksi)' AND status='Belum Di Bayar'";
             $result3 = mysqli_query($koneksi, $query3);
             $row3 = mysqli_fetch_array($result3);
             ?>
-            <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($row3['sumi'], 0, '', ','); ?></font></b></div>
+            <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($row3['ready_to_pay'], 0, '', ','); ?></font></b></div>
           </div>
           <!-- // Ready To Pay -->
 
