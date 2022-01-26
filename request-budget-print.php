@@ -148,7 +148,7 @@ $html .= '
                 <div class="col-xs-2">Total Biaya : <b class="totalElementBiaya">Rp. ' . number_format($dataTotalBiaya['total_biaya'], 0, '', ',') . '</b></div>
             </div>
             <div class="row">
-                <div class="col-xs-2">Total UM Burek : <b class="totalElementBiayaUmBurek"><Rp. ' . number_format($dataTotalBiayaUMBurek['total_budget_um_burek'], 0, '', ',').'</b></div>
+                <div class="col-xs-2">Total UM Burek : <b class="totalElementBiayaUmBurek">Rp. ' . number_format($dataTotalBiayaUMBurek['total_budget_um_burek'], 0, '', ',').'</b></div>
             </div>
 <div class="row">
     <div class="col-xs-3">Total Keseluruhan : <b class="totalElement">Rp. ' . number_format($dataTotalBiaya['total_biaya'] + $dataTotalBiayaUMBurek['total_budget_um_burek'], 0, '', ',') . '</b></div>
