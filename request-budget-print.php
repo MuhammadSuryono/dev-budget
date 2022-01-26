@@ -11,6 +11,12 @@ $id = $_GET['id'];
 $select = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE id='$id'");
 $d = mysqli_fetch_assoc($select);
 
+$queryTotalBiaya = mysqli_query($koneksi, "SELECT sum(total) as total_biaya FROM selesai_request WHERE id_pengajuan_request = '$id' AND status != 'UM Burek'");
+$dataTotalBiaya = mysqli_fetch_assoc($queryTotalBiaya);
+
+$queryTotalBiayaUMBurek = mysqli_query($koneksi, "SELECT sum(total) as total_budget_um_burek FROM selesai_request WHERE id_pengajuan_request = '$id' AND status = 'UM Burek'");
+$dataTotalBiayaUMBurek = mysqli_fetch_assoc($queryTotalBiayaUMBurek);
+
 $i = 1;
 $sql = mysqli_query($koneksi, "SELECT * FROM selesai_request WHERE id_pengajuan_request = '$id' ORDER BY urutan ASC");
 
@@ -114,7 +120,7 @@ $html .= "
                             </tr>
                         </thead>
 
-                        <tbody id='data-body'>
+                        <tbody id='data-body' style='font-size: 11pt'>
                         ";
 // var_dump($html);
 while ($a = mysqli_fetch_array($sql)) {
@@ -138,9 +144,14 @@ $html .= '
     </table>
     </font>
 <br /><br />
-
 <div class="row">
-    <div class="col-xs-3">Total Keseluruhan : <b class="totalElement">Rp. ' . number_format($d['totalbudget'], 0, '', ',') . '</b></div>
+                <div class="col-xs-2">Total Biaya : <b class="totalElementBiaya">Rp. ' . number_format($dataTotalBiaya['total_biaya'], 0, '', ',') . '</b></div>
+            </div>
+            <div class="row">
+                <div class="col-xs-2">Total UM Burek : <b class="totalElementBiayaUmBurek">Rp. ' . number_format($dataTotalBiayaUMBurek['total_budget_um_burek'], 0, '', ',').'</b></div>
+            </div>
+<div class="row">
+    <div class="col-xs-3">Total Keseluruhan : <b class="totalElement">Rp. ' . number_format($dataTotalBiaya['total_biaya'] + $dataTotalBiayaUMBurek['total_budget_um_burek'], 0, '', ',') . '</b></div>
 </div>
 </body>
 </html';

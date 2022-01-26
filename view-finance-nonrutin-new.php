@@ -504,7 +504,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                                                                 echo "<td bgcolor=' $color '>";
                                                                 echo "No. BPU :<b> $noidbpu";
                                                                 echo "</b><br>";
-                                                                echo "No :<b> $termm";
+                                                                echo "No. Term:<b> $termm";
                                                                 echo "</b><br>";
                                                                 echo ($statusPengajuanBpu != 0) ? "Request BPU : <br><b>Rp. " . number_format($total['jumlah_pengajuan'], 0, '', ',') : "BPU : <br><b>Rp. " . number_format($total['jumlah_total'], 0, '', ',');
                                                                 echo "</b><br>";

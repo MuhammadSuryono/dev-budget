@@ -42,7 +42,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                         if (!in_array($d['waktu'], $checkWaktu)) :
 
                             $waktu = $d['waktu'];
-                            $query2 = "SELECT sum(jumlahbayar) AS sumasum FROM bpu WHERE waktu='$waktu'";
+                            $query2 = "SELECT sum(jumlah) AS sumasum FROM bpu WHERE waktu='$waktu'";
                             $result2 = mysqli_query($koneksi, $query2);
                             $row2 = mysqli_fetch_array($result2);
 
@@ -51,7 +51,10 @@ if (strpos($tab, 'B1') !== false) : ?>
                             $row10 = mysqli_fetch_array($result10);
                             $tysb = $row2['sumasum'] - $row10['sum'];
 
-                            $aaaa = $d['totalbudget'];
+                            $queryTotalBudget = mysqli_query($koneksi, "SELECT sum(total) as total_budget FROM selesai WHERE waktu = '$d[waktu]'");
+                            $dataTotalBudget = mysqli_fetch_assoc($queryTotalBudget);
+
+                            $aaaa = $dataTotalBudget['total_budget'];
                             $bbbb = $row2['sumasum'];
                             $belumbayar = $aaaa - $bbbb;
 
@@ -99,7 +102,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                                     <td bgcolor="#fcfaa4"><?php echo $d['pengaju']; ?></td>
                                     <td bgcolor="#fcfaa4"><?php echo $d['divisi']; ?></td>
 
-                                    <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
+                                    <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($dataTotalBudget['total_budget'], 0, '', ','); ?></td>
                                     <td bgcolor="#fcfaa4">
                                         <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
                                     </td>
@@ -152,7 +155,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                                     <td bgcolor="#fea700"><?php echo $d['tahun']; ?></td>
                                     <td bgcolor="#fea700"><?php echo $d['pengaju']; ?></td>
                                     <td bgcolor="#fea700"><?php echo $d['divisi']; ?></td>
-                                    <td bgcolor="#fea700"><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
+                                    <td bgcolor="#fea700"><?php echo 'Rp. ' . number_format($dataTotalBudget['total_budget'], 0, '', ','); ?></td>
                                     <td bgcolor="#fea700">
                                         <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
                                     </td>
@@ -202,7 +205,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                                     <td><?php echo $d['tahun']; ?></td>
                                     <td><?php echo $d['pengaju']; ?></td>
                                     <td><?php echo $d['divisi']; ?></td>
-                                    <td><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
+                                    <td><?php echo 'Rp. ' . number_format($dataTotalBudget['total_budget'], 0, '', ','); ?></td>
                                     <td>
                                         <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
                                         </font>
@@ -262,11 +265,14 @@ if (strpos($tab, 'B1') !== false) : ?>
                     while ($e = mysqli_fetch_array($sql2)) {
 
                         $waktu = $e['waktu'];
-                        $query2 = "SELECT sum(jumlahbayar) AS sumasum FROM bpu WHERE waktu='$waktu'";
+                        $query2 = "SELECT sum(jumlah) AS sumasum FROM bpu WHERE waktu='$waktu'";
                         $result2 = mysqli_query($koneksi, $query2);
                         $row2 = mysqli_fetch_array($result2);
 
-                        $aaaa = $e['totalbudget'];
+                        $queryTotalBudget = mysqli_query($koneksi, "SELECT sum(total) as total_budget FROM selesai WHERE waktu = '$e[waktu]'");
+                        $dataTotalBudget = mysqli_fetch_assoc($queryTotalBudget);
+
+                        $aaaa = $dataTotalBudget['total_budget'];
                         $bbbb = $row2['sumasum'];
                         $belumbayar = $aaaa - $bbbb;
 
@@ -305,7 +311,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                                 <td bgcolor="#fcfaa4"><?php echo $e['tahun']; ?></td>
                                 <td bgcolor="#fcfaa4"><?php echo $e['pengaju']; ?></td>
                                 <td bgcolor="#fcfaa4"><?php echo $e['divisi']; ?></td>
-                                <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($e['totalbudget'], 0, '', ','); ?></td>
+                                <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($dataTotalBudget['total_budget'], 0, '', ','); ?></td>
                                 
                                 <td bgcolor="#fcfaa4">
                                     <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
@@ -359,7 +365,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                                 <td bgcolor="#ff99a1"><?php echo $e['tahun']; ?></td>
                                 <td bgcolor="#ff99a1"><?php echo $e['pengaju']; ?></td>
                                 <td bgcolor="#ff99a1"><?php echo $e['divisi']; ?></td>
-                                <td bgcolor="#ff99a1"><?php echo 'Rp. ' . number_format($e['totalbudget'], 0, '', ','); ?></td>
+                                <td bgcolor="#ff99a1"><?php echo 'Rp. ' . number_format($dataTotalBudget['total_budget'], 0, '', ','); ?></td>
                                 <td bgcolor="#ff99a1">
                                     <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
                                 </td>
@@ -409,7 +415,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                                 <td><?php echo $e['tahun']; ?></td>
                                 <td><?php echo $e['pengaju']; ?></td>
                                 <td><?php echo $e['divisi']; ?></td>
-                                <td><?php echo 'Rp. ' . number_format($e['totalbudget'], 0, '', ','); ?></td>
+                                <td><?php echo 'Rp. ' . number_format($dataTotalBudget['total_budget'], 0, '', ','); ?></td>
                                 <td>
                                     <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
                                     </font>
@@ -471,7 +477,10 @@ if (strpos($tab, 'B1') !== false) : ?>
                         $result2 = mysqli_query($koneksi, $query2);
                         $row2 = mysqli_fetch_array($result2);
 
-                        $aaaa = $d['totalbudget'];
+                        $queryTotalBudget = mysqli_query($koneksi, "SELECT sum(total) as total_budget FROM selesai WHERE waktu = '$d[waktu]'");
+                            $dataTotalBudget = mysqli_fetch_assoc($queryTotalBudget);
+
+                        $aaaa = $dataTotalBudget['total_budget'];
                         $bbbb = $row2['sumasum'];
                         $belumbayar = $aaaa - $bbbb;
 
@@ -497,7 +506,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                                 <td bgcolor="#fcfaa4"><?php echo $d['tahun']; ?></td>
                                 <td bgcolor="#fcfaa4"><?php echo $d['pengaju']; ?></td>
                                 <td bgcolor="#fcfaa4"><?php echo $d['divisi']; ?></td>
-                                <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
+                                <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($dataTotalBudget['total_budget'], 0, '', ','); ?></td>
                                 <td bgcolor="#fcfaa4">
                                     <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
                                 </td>
@@ -545,7 +554,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                                 <td bgcolor="#ff99a1"><?php echo $d['tahun']; ?></td>
                                 <td bgcolor="#ff99a1"><?php echo $d['pengaju']; ?></td>
                                 <td bgcolor="#ff99a1"><?php echo $d['divisi']; ?></td>
-                                <td bgcolor="#ff99a1"><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
+                                <td bgcolor="#ff99a1"><?php echo 'Rp. ' . number_format($dataTotalBudget['total_budget'], 0, '', ','); ?></td>
                                 <td bgcolor="#ff99a1">
                                     <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
                                 </td>
@@ -590,7 +599,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                                 <td><?php echo $d['tahun']; ?></td>
                                 <td><?php echo $d['pengaju']; ?></td>
                                 <td><?php echo $d['divisi']; ?></td>
-                                <td><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
+                                <td><?php echo 'Rp. ' . number_format($dataTotalBudget['total_budget'], 0, '', ','); ?></td>
                                 <td><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
                                 </td>
                                 <td><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
@@ -655,7 +664,10 @@ if (strpos($tab, 'B1') !== false) : ?>
                         $result2 = mysqli_query($koneksi, $query2);
                         $row2 = mysqli_fetch_array($result2);
 
-                        $aaaa = $d['totalbudget'];
+                        $queryTotalBudget = mysqli_query($koneksi, "SELECT sum(total) as total_budget FROM selesai WHERE waktu = '$d[waktu]'");
+                            $dataTotalBudget = mysqli_fetch_assoc($queryTotalBudget);
+
+                        $aaaa = $dataTotalBudget['total_budget'];
                         $bbbb = $row2['sumasum'];
                         $belumbayar = $aaaa - $bbbb;
 
@@ -682,7 +694,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                                 <td bgcolor="#fcfaa4"><?php echo $d['tahun']; ?></td>
                                 <td bgcolor="#fcfaa4"><?php echo $d['pengaju']; ?></td>
                                 <td bgcolor="#fcfaa4"><?php echo $d['divisi']; ?></td>
-                                <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
+                                <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($dataTotalBudget['total_budget'], 0, '', ','); ?></td>
                                 <td bgcolor="#fcfaa4">
                                     <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
                                 </td>
@@ -731,7 +743,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                                 <td bgcolor="#ff99a1"><?php echo $d['tahun']; ?></td>
                                 <td bgcolor="#ff99a1"><?php echo $d['pengaju']; ?></td>
                                 <td bgcolor="#ff99a1"><?php echo $d['divisi']; ?></td>
-                                <td bgcolor="#ff99a1"><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
+                                <td bgcolor="#ff99a1"><?php echo 'Rp. ' . number_format($dataTotalBudget['total_budget'], 0, '', ','); ?></td>
                                 <td bgcolor="#ff99a1">
                                     <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
                                 </td>
@@ -777,7 +789,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                                 <td><?php echo $d['tahun']; ?></td>
                                 <td><?php echo $d['pengaju']; ?></td>
                                 <td><?php echo $d['divisi']; ?></td>
-                                <td><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
+                                <td><?php echo 'Rp. ' . number_format($dataTotalBudget['total_budget'], 0, '', ','); ?></td>
                                 <td><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
                                 </td>
                                 <td><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
