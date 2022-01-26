@@ -3,7 +3,7 @@
 require_once "httpRequest.php";
 
 class Whastapp {
-    private $host = "http://192.168.8.2:8080/api/v1/whatsapp";
+    private $host = "http://192.168.10.240:8080/api/v1/whatsapp";
 
     public function __construct()
     {

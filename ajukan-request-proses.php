@@ -143,13 +143,13 @@ if ($totalbudget > 1000000) {
     }
 } else {
     $cuti = new Cuti();
-    $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='Finance' AND level = 'Manager' AND aktif='Y'");
+    $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='Finance' AND hak_akses = 'Manager' AND aktif='Y'");
     $userFinance = mysqli_fetch_assoc($queryEmail);
 
     if ($cuti->checkStatusCutiUser($userFinance['nama_user'])) {
         $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='Direksi' AND aktif='Y'");
         while ($e = mysqli_fetch_assoc($queryEmail)) {
-            if ($e['phone_number'] && !in_array($e['phone_number'], $duplciate)) {
+            if ($e['phone_number'] && !in_array($e['nama_user'], $duplciate)) {
                 array_push($phoneNumbers, $e['phone_number']);
                 array_push($namaUser, $e['nama_user']);
                 array_push($idUsersNotification, $e['id_user']);
@@ -157,7 +157,7 @@ if ($totalbudget > 1000000) {
             }
         }
     } else {
-        if ($userFinance['phone_number'] && !in_array($userFinance['phone_number'], $duplciate)) {
+        if ($userFinance['phone_number'] && !in_array($userFinance['nama_user'], $duplciate)) {
             array_push($phoneNumbers, $userFinance['phone_number']);
             array_push($namaUser, $userFinance['nama_user']);
             array_push($idUsersNotification, $userFinance['id_user']);
