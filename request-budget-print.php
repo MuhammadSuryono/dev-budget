@@ -120,7 +120,7 @@ $html .= "
                             </tr>
                         </thead>
 
-                        <tbody id='data-body'>
+                        <tbody id='data-body' style='font-size: 11pt'>
                         ";
 // var_dump($html);
 while ($a = mysqli_fetch_array($sql)) {
