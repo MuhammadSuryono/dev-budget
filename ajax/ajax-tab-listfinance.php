@@ -49,6 +49,10 @@ if (strpos($tab, 'B1') !== false) : ?>
                     $result2 = mysqli_query($koneksi, $query2);
                     $row2 = mysqli_fetch_array($result2);
 
+                    $query3 = "SELECT sum(jumlah) AS ready_to_pay FROM bpu WHERE waktu='$waktu' AND persetujuan='Disetujui (Direksi)' AND status='Belum Di Bayar'";
+                  $result3 = mysqli_query($koneksi, $query3);
+                  $row3 = mysqli_fetch_array($result3);
+
                     $queryTotalBudget = mysqli_query($koneksi, "SELECT sum(total) as total_budget FROM selesai WHERE waktu = '$d[waktu]'");
                             $dataTotalBudget = mysqli_fetch_assoc($queryTotalBudget);
   
@@ -59,7 +63,7 @@ if (strpos($tab, 'B1') !== false) : ?>
   
                     $aaaa = $dataTotalBudget['total_budget'];
                     $bbbb = $row2['sumasum'];
-                    $belumbayar = $aaaa - $bbbb;
+                    $belumbayar = $aaaa - ($bbbb - $row3['ready_to_pay']);
 
 
                     if ($d['status'] == "Disetujui") {
@@ -92,7 +96,7 @@ if (strpos($tab, 'B1') !== false) : ?>
 
                         <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($dataTotalBudget['total_budget'], 0, '', ','); ?></td>
                         <td bgcolor="#fcfaa4">
-                            <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
+                            <font color="#1bd34f"><?php echo 'Rp. ' . number_format($bbbb - $row3['ready_to_pay'], 0, '', ','); ?></font>
                         </td>
                         <td bgcolor="#fcfaa4">
                             <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
@@ -129,7 +133,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                         <td><?php echo $d['divisi']; ?></td>
                         <td><?php echo 'Rp. ' . number_format($dataTotalBudget['total_budget'], 0, '', ','); ?></td>
                         <td>
-                            <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
+                            <font color="#1bd34f"><?php echo 'Rp. ' . number_format($bbbb - $row3['ready_to_pay'], 0, '', ','); ?></font>
                         </td>
                         <td>
                             <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
@@ -185,6 +189,10 @@ if (strpos($tab, 'B1') !== false) : ?>
                     $query2 = "SELECT sum(jumlah) AS sumasum FROM bpu WHERE waktu='$waktu'";
                     $result2 = mysqli_query($koneksi, $query2);
                     $row2 = mysqli_fetch_array($result2);
+
+                    $query3 = "SELECT sum(jumlah) AS ready_to_pay FROM bpu WHERE waktu='$waktu' AND persetujuan='Disetujui (Direksi)' AND status='Belum Di Bayar'";
+                  $result3 = mysqli_query($koneksi, $query3);
+                  $row3 = mysqli_fetch_array($result3);
   
                     $query10 = "SELECT sum(uangkembali) AS sum FROM bpu WHERE waktu='$waktu'";
                     $result10 = mysqli_query($koneksi, $query10);
@@ -196,7 +204,7 @@ if (strpos($tab, 'B1') !== false) : ?>
   
                     $aaaa = $dataTotalBudget['total_budget'];
                     $bbbb = $row2['sumasum'];
-                    $belumbayar = $aaaa - $bbbb;
+                    $belumbayar = $aaaa - ($bbbb - $row3['ready_to_pay']);
 
 
                     if ($d['status'] == "Disetujui") {
@@ -228,7 +236,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                         <td bgcolor="#fcfaa4"><?php echo $d['divisi']; ?></td>
                         <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($dataTotalBudget['total_budget'], 0, '', ','); ?></td>
                         <td bgcolor="#fcfaa4">
-                            <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
+                            <font color="#1bd34f"><?php echo 'Rp. ' . number_format($bbbb - $row3['ready_to_pay'], 0, '', ','); ?></font>
                         </td>
                         <td bgcolor="#fcfaa4">
                             <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
@@ -264,7 +272,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                         <td><?php echo $d['divisi']; ?></td>
                         <td><?php echo 'Rp. ' . number_format($dataTotalBudget['total_budget'], 0, '', ','); ?></td>
                         <td>
-                            <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
+                            <font color="#1bd34f"><?php echo 'Rp. ' . number_format($bbbb - $row3['ready_to_pay'], 0, '', ','); ?></font>
                         </td>
                         <td>
                             <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
@@ -319,12 +327,16 @@ if (strpos($tab, 'B1') !== false) : ?>
                         $result2 = mysqli_query($koneksi, $query2);
                         $row2 = mysqli_fetch_array($result2);
 
+                        $query3 = "SELECT sum(jumlah) AS ready_to_pay FROM bpu WHERE waktu='$waktu' AND persetujuan='Disetujui (Direksi)' AND status='Belum Di Bayar'";
+                  $result3 = mysqli_query($koneksi, $query3);
+                  $row3 = mysqli_fetch_array($result3);
+
                         $queryTotalBudget = mysqli_query($koneksi, "SELECT sum(total) as total_budget FROM selesai WHERE waktu = '$d[waktu]'");
                             $dataTotalBudget = mysqli_fetch_assoc($queryTotalBudget);
 
                         $aaaa = $dataTotalBudget['total_budget'];
                         $bbbb = $row2['sumasum'];
-                        $belumbayar = $aaaa - $bbbb;
+                        $belumbayar = $aaaa - ($bbbb - $row3['ready_to_pay']);
 
                         if ($d['status'] == "Disetujui") {
                     ?>
@@ -354,7 +366,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                                     </font>
                                 </td>
                                 <td bgcolor="#fcfaa4">
-                                    <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
+                                    <font color="#1bd34f"><?php echo 'Rp. ' . number_format($bbbb - $row3['ready_to_pay'], 0, '', ','); ?></font>
                                 </td>
                                 <td bgcolor="#fcfaa4"><a href="view-finance-manager.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
                                 <td bgcolor="#fcfaa4">
@@ -402,7 +414,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                                     </font>
                                 </td>
                                 <td bgcolor="#ff99a1">
-                                    <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
+                                    <font color="#1bd34f"><?php echo 'Rp. ' . number_format($bbbb - $row3['ready_to_pay'], 0, '', ','); ?></font>
                                 </td>
                                 <td bgcolor="#ff99a1"><a href="view-finance-manager.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
                                 <td bgcolor="#ff99a1">
@@ -445,7 +457,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                                 <td><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
                                     </font>
                                 </td>
-                                <td><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
+                                <td><?php echo 'Rp. ' . number_format($bbbb - $row3['ready_to_pay'], 0, '', ','); ?></font>
                                 </td>
                                 <td><a href="view-direksi.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
                                 <td>
@@ -506,12 +518,16 @@ if (strpos($tab, 'B1') !== false) : ?>
           $result2 = mysqli_query($koneksi, $query2);
           $row2 = mysqli_fetch_array($result2);
 
+          $query3 = "SELECT sum(jumlah) AS ready_to_pay FROM bpu WHERE waktu='$waktu' AND persetujuan='Disetujui (Direksi)' AND status='Belum Di Bayar'";
+                  $result3 = mysqli_query($koneksi, $query3);
+                  $row3 = mysqli_fetch_array($result3);
+
           $queryTotalBudget = mysqli_query($koneksi, "SELECT sum(total) as total_budget FROM selesai WHERE waktu = '$d[waktu]'");
                             $dataTotalBudget = mysqli_fetch_assoc($queryTotalBudget);
 
           $aaaa = $dataTotalBudget['total_budget'];
           $bbbb = $row2['sumasum'];
-          $belumbayar = $aaaa - $bbbb;
+          $belumbayar = $aaaa - ($bbbb - $row3['ready_to_pay']);
 
           if ($d['status'] == "Disetujui") {
         ?>
@@ -542,7 +558,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                 </font>
               </td>
               <td bgcolor="#fcfaa4">
-                <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
+                <font color="#1bd34f"><?php echo 'Rp. ' . number_format($bbbb - $row3['ready_to_pay'], 0, '', ','); ?></font>
               </td>
               <td bgcolor="#fcfaa4"><a href="view-finance-nonrutin-manager.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
               <td bgcolor="#fcfaa4">
@@ -591,7 +607,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                 </font>
               </td>
               <td bgcolor="#ff99a1">
-                <font color="#1bd34f"><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
+                <font color="#1bd34f"><?php echo 'Rp. ' . number_format($bbbb - $row3['ready_to_pay'], 0, '', ','); ?></font>
               </td>
               <td bgcolor="#ff99a1"><a href="view-finance-nonrutin-manager.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
               <td bgcolor="#ff99a1">
@@ -635,7 +651,7 @@ if (strpos($tab, 'B1') !== false) : ?>
               <td><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
                 </font>
               </td>
-              <td><?php echo 'Rp. ' . number_format($row2['sumasum'], 0, '', ','); ?></font>
+              <td><?php echo 'Rp. ' . number_format($bbbb - $row3['ready_to_pay'], 0, '', ','); ?></font>
               </td>
               <td><a href="view-finance-nonrutin-manager.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
               <td>

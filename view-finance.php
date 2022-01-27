@@ -456,9 +456,14 @@ $helper = new Helper();
                                 echo "</b><br>";
                                 echo "No. Term:<b> $termm";
                                 echo "</b><br>";
-                                echo "Jenis Pajak :<b>" .isset($bayar['jenis_pajak']) ? $bayar['jenis_pajak'] : "-";
+                                echo "Tanggal Buat BPU: <br><b> " . date('Y-m-d', strtotime($waktustempel));
                                 echo "</b><br>";
-                                echo "Nominal Pajak :<b>Rp. " .number_format($bayar['nominal_pajak']);
+                                echo "Jam : <b>" . date('H:i:s', strtotime($waktustempel));
+                                echo "</b></br>";
+                                echo "Tanggal Terima Uang : <b>$tglcair ";
+                                echo "</b></br>";
+                                echo "<hr/>";
+                                echo "Nominal Pajak : <br><b>Rp. " .number_format($bayar['nominal_pajak']) . " (".$bayar['jenis_pajak'].")";
                                 echo "</b><br>";
                                 echo ($statusPengajuanBpu != 0) ? "Request BPU : <br><b>Rp. " . number_format($total['jumlah_pengajuan'], 0, '', ',') : "Nominal Pembayaran : <br><b>Rp. " . number_format($total['jumlah_total'], 0, '', ',');
                                 echo "</b><br>";
@@ -473,12 +478,6 @@ $helper = new Helper();
                                 } else {
                                   echo "";
                                 }
-                                echo "Tanggal Buat BPU: <br><b> " . date('Y-m-d', strtotime($waktustempel));
-                                echo "</b><br>";
-                                echo "Jam : <b>" . date('H:i:s', strtotime($waktustempel));
-                                echo "</b></br>";
-                                echo "Tanggal Terima Uang : <b>$tglcair ";
-                                echo "</b></br>";
                                 echo "</b></br>";
                               echo "Metode Pembayaran : <br><b>$metodePembayaran ";
                               echo "</b><br>";
@@ -699,13 +698,17 @@ $helper = new Helper();
               $result10 = mysqli_query($koneksi, $query10);
               $row10 = mysqli_fetch_array($result10);
 
+              $query3 = "SELECT sum(jumlah) AS sumi FROM bpu WHERE waktu='$waktu' AND persetujuan='Disetujui (Direksi)' AND status='Belum Di Bayar'";
+              $result3 = mysqli_query($koneksi, $query3);
+              $row3 = mysqli_fetch_array($result3);
+
               
               $totlah = $row2['total_pembayaran'];
               $reallah = $row10['total_kembalian'];
               $tysb = $totlah - $reallah;
               ?>
 
-              <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($tysb, 0, '', ','); ?></font></b></div>
+              <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($tysb - $row3['sumi'], 0, '', ','); ?></font></b></div>
             </div>
 
 
@@ -717,7 +720,7 @@ $helper = new Helper();
               <?php
               $aaaa = $dataTotalBudget['total_budget'];
               $bbbb = $row2['total_pembayaran'];
-              $belumbayar = $aaaa - $bbbb;
+              $belumbayar = $aaaa - ($tysb - $row3['sumi']);
               ?>
               <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font></b></div>
             </div>
@@ -728,11 +731,6 @@ $helper = new Helper();
               <div class="col-xs-3">
                 <font color='#fcce00'>Ready To Pay :
               </div>
-              <?php
-              $query3 = "SELECT sum(jumlah) AS sumi FROM bpu WHERE waktu='$waktu' AND persetujuan='Disetujui (Direksi)' AND status='Belum Di Bayar'";
-              $result3 = mysqli_query($koneksi, $query3);
-              $row3 = mysqli_fetch_array($result3);
-              ?>
               <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($row3['sumi'], 0, '', ','); ?></font></b></div>
             </div>
             <!-- // Ready To Pay -->
