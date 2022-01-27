@@ -134,6 +134,9 @@ $isEksternalProcess = in_array($bpuItem["statusbpu"], $eksternal);
 $path = '/view-bpu-verify.php?id='.$bpuVerify["id"].'&bpu='.$bpuItem["noid"];
 $duplicateNumber = [];
 
+
+$urlCallback = getHostUrl() . "/api/callback.php";
+
 if ($_POST['submit'] == 1) {
     
     $index = 0;
@@ -267,7 +270,6 @@ if ($_POST['submit'] == 1) {
             }
 
             $updateBpu = mysqli_query($koneksi, "UPDATE bpu SET rekening_sumber = '$kas[rekening]', jenis_pajak = '$jenisPajak', nominal_pajak = '$nominalPajak', rekening_id = '$formatId' WHERE noid = '$item[noid]'");
-            $urlCallback = getHostUrl() . "/api/callback.php";
 
             $insert = mysqli_query($koneksiTransfer, "INSERT INTO data_transfer (transfer_req_id, transfer_type, jenis_pembayaran_id, keterangan, waktu_request, norek, pemilik_rekening, bank, kode_bank, berita_transfer, jumlah, terotorisasi, hasil_transfer, ket_transfer, nm_pembuat, nm_otorisasi, nm_validasi, nm_manual, jenis_project, nm_project, noid_bpu, biaya_trf, rekening_sumber, email_pemilik_rekening, jadwal_transfer, url_callback) 
                     VALUES ('$formatId', '3', '$jenisPembayaran[jenispembayaranid]', '$item[statusbpu]', '$waktu', '$item[norek]', '$item[bank_account_name]','$bank[namabank]', '$bank[kodebank]', '$berita_transfer','$arrPengajuanJumlah[$index]', '2', '1', 'Antri', '$item[pengaju]', '$_SESSION[nama_user]', '$_SESSION[nama_user]','', '$budget[jenis]', '$nm_project', '$item[noid]', $biayaTrf, '$kas[rekening]', '$item[emailpenerima]', '$tanggalbayar', '$urlCallback')") or die(mysqli_error($koneksiTransfer));

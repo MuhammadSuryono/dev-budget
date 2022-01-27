@@ -61,6 +61,8 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                     <input type="hidden" name="noid[]" value="<?= $baris['noid'] ?>">
                     <input type="hidden" name="pengajuan_jumlah[]" value="<?= $baris['pengajuan_jumlah'] ?>">
                     <input type="hidden" name="metode_pembayaran[]" value="<?= $metode_pembayaran ?>">
+    <input type="hidden" name="jenispajak" id="jenis-pajak" value="">
+    <input type="hidden" name="nominalpajak" id="nominal-pajak" value="0">
                     <td><?= $baris['namapenerima'] ?></td>
                     <td class="td-pengajuan"><?= $baris['pengajuan_jumlah'] ?></td>
                     <td class="td-aktual"><?= $baris['pengajuan_jumlah'] ?></td>
@@ -238,6 +240,8 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
         var ketPembayaran = '<?= $ketPembayaran ?>';
         var jenis = '<?= $jenis ?>';
         var maxTransfer = '<?= $result["max_transfer"] ?>';
+    const jenisPajak = document.getElementById("jenis-pajak")
+    const nominalPajak = document.getElementById("nominal-pajak")
 
         $('.umo_biaya_kode_id').select2();
 
@@ -261,8 +265,6 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
             let inputMetodePembayaran = $("input[name='metode_pembayaran[]']");
             // let inputMetodePembayaran = $('input[name=metode_pembayaran[]]');
 
-            console.log(inputPengajuan)
-
             let result = 0;
             if ($(this).val() == 'pph21') {
                 if ($(this).prop('checked')) {
@@ -271,6 +273,8 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                         tdActual[i].innerText = result
 
                         inputPengajuan[i].value = result
+                        jenisPajak.value = "PPH 21"
+                        nominalPajak.value = 0.05 * 0.5 * parseInt(tdPengajuan[i].textContent)
 
                         if (result < maxTransfer) {
                             inputMetodePembayaran[i].value = 'MRI PAL';
@@ -287,6 +291,8 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                         tdActual[i].innerText = result
 
                         inputPengajuan[i].value = result
+                        jenisPajak.value = ""
+                        nominalPajak.value = ""
 
                         if (result < maxTransfer) {
                             inputMetodePembayaran[i].value = 'MRI PAL';
@@ -304,6 +310,8 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                         result = Math.round(parseInt(tdActual[i].textContent) - (0.1 * parseInt(tdPengajuan[i].textContent)));
                         tdActual[i].innerText = result
                         inputPengajuan[i].value = result
+                        jenisPajak.value = "PPH 4 Ayat 2"
+                        nominalPajak.value = 0.1 * parseInt(tdPengajuan[i].textContent)
 
                         if (result < maxTransfer) {
                             inputMetodePembayaran[i].value = 'MRI PAL';
@@ -319,6 +327,8 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                         result = Math.round(parseInt(tdActual[i].textContent) + (0.1 * parseInt(tdPengajuan[i].textContent)));
                         tdActual[i].innerText = result
                         inputPengajuan[i].value = result
+                        jenisPajak.value = ""
+                        nominalPajak.value = ""
 
                         if (result < maxTransfer) {
                             inputMetodePembayaran[i].value = 'MRI PAL';
@@ -336,6 +346,8 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                         result = Math.round(parseInt(tdActual[i].textContent) - (0.02 * parseInt(tdPengajuan[i].textContent)));
                         tdActual[i].innerText = result
                         inputPengajuan[i].value = result
+                        jenisPajak.value = "PPH 23 (2%)"
+                        nominalPajak.value = 0.02 * parseInt(tdPengajuan[i].textContent)
 
                         if (result < maxTransfer) {
                             inputMetodePembayaran[i].value = 'MRI PAL';
@@ -351,6 +363,8 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                         result = Math.round(parseInt(tdActual[i].textContent) + (0.02 * parseInt(tdPengajuan[i].textContent)));
                         tdActual[i].innerText = result
                         inputPengajuan[i].value = result
+                        jenisPajak.value = ""
+                        nominalPajak.value = ""
 
                         if (result < maxTransfer) {
                             inputMetodePembayaran[i].value = 'MRI PAL';
@@ -368,6 +382,8 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                         result = Math.round(parseInt(tdActual[i].textContent) - (0.04 * parseInt(tdPengajuan[i].textContent)));
                         tdActual[i].innerText = result
                         inputPengajuan[i].value = result
+                        jenisPajak.value = "PPH 23 (4%)"
+                        nominalPajak.value = 0.04 * parseInt(tdPengajuan[i].textContent)
 
                         if (result < maxTransfer) {
                             inputMetodePembayaran[i].value = 'MRI PAL';
@@ -383,6 +399,8 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                         result = Math.round(parseInt(tdActual[i].textContent) + (0.04 * parseInt(tdPengajuan[i].textContent)));
                         tdActual[i].innerText = result
                         inputPengajuan[i].value = result
+                        jenisPajak.value = ""
+                        nominalPajak.value = ""
 
                         if (result < maxTransfer) {
                             inputMetodePembayaran[i].value = 'MRI PAL';
@@ -394,31 +412,6 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                     }
                 }
             }
-            // else if ($(this).val() == 'pph23') {
-            //     if ($(this).prop('checked')) {
-            //         $('#pph23value').show();
-            //         // result = Math.round(parseInt(actual) - ($('#pph23value').val() * bpu));
-
-            //         for (let i = 0; i < tdPengajuan.length; i++) {
-            //             result = Math.round(parseInt(tdActual[i].textContent) + ($('#pph23value').val() * parseInt(tdPengajuan[i].textContent)));
-            //             tdActual[i].innerText = result
-            //         }
-            //         $('#pph23value').change(function() {
-            //             // result = Math.round(parseInt(actual) - ($(this).val() * bpu));
-            //             for (let i = 0; i < tdPengajuan.length; i++) {
-            //                 result = Math.round(parseInt(tdActual[i].textContent) + ($(this).val() * parseInt(tdPengajuan[i].textContent)));
-            //                 tdActual[i].innerText = result
-            //             }
-            //         })
-            //     } else {
-            //         $('#pph23value').hide();
-            //         // result = Math.round(parseInt(actual) + ($('#pph23value').val() * bpu));
-            //         for (let i = 0; i < tdPengajuan.length; i++) {
-            //             result = Math.round(parseInt(tdActual[i].textContent) + ($('#pph23value').val() * parseInt(tdPengajuan[i].textContent)));
-            //             tdActual[i].innerText = result
-            //         }
-            //     }
-            // }
         })
 
         // $('#image').attr('src', `uploads/${file}`)
