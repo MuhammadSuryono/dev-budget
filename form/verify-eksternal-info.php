@@ -1,4 +1,10 @@
 <?php
+
+
+require_once "application/controllers/Cuti.php";
+$cuti = new Cuti();
+
+
 $query = mysqli_query($koneksi, "SELECT namabank FROM bank WHERE kodebank = '$dataBpu[namabank]'");
 $dataBank = [];
 while($row = mysqli_fetch_assoc($query)) {
@@ -95,6 +101,10 @@ if (!$dataVerify["is_approved"] && $dataVerify["is_need_approved"] && ($_SESSION
 <?php }
 
 if (!$dataVerify["is_approved"] && $dataVerify["is_need_approved"] && ($dataPengajuan['jenis'] == 'Rutin' && (strpos(strtolower($dataSelesai['rincian']), 'kas negara') !== false || strpos(strtolower($dataSelesai['rincian']), 'penerimaan negara') !== false) && $_SESSION['hak_akses'] == 'Level 2' && $_SESSION['level'] == 'Manager' && $_SESSION['divisi'] == 'FINANCE')) { ?>
+    <button class="btn btn-success btn-flat" onclick="setujuiBpu('<?=$bpuNo?>', '<?=$waktu?>', '<?=$term?>')">Setujui</button>
+<?php }
+
+if (!$dataVerify["is_approved"] && $dataVerify["is_need_approved"] && $_SESSION['divisi'] == 'Direksi' && $cuti->check_manager_divisi_finance_cuti()) { ?>
     <button class="btn btn-success btn-flat" onclick="setujuiBpu('<?=$bpuNo?>', '<?=$waktu?>', '<?=$term?>')">Setujui</button>
 <?php }
 

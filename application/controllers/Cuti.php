@@ -49,7 +49,7 @@ class Cuti {
         $koneksi = $db->connect();
 
         $divisi = $_SESSION['divisi'];
-        $queryUserManagerDivisi = mysqli_query($koneksi, "SELECT nama_user FROM tb_user WHERE divisi = '$divisi' AND hak_akses = 'Manager'");
+        $queryUserManagerDivisi = mysqli_query($koneksi, "SELECT nama_user FROM tb_user WHERE divisi = 'FINANCE' AND hak_akses = 'Manager'");
         $userFinanceManager = mysqli_fetch_assoc($queryUserManagerDivisi);
 
         $isCuti = $this->checkStatusCutiUser($userFinanceManager['nama_user']);
