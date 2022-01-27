@@ -62,9 +62,13 @@ $dataDivisi = [];
 $dataLevel = [];
 $idPengajuan = [];
 $duplicatePhoneNumber = [];
+$hakAkses = [];
 
 $queryItemBpu = mysqli_query($koneksi, "SELECT rincian FROM selesai where no = '$no' AND waktu = '$waktu'");
 $dataItemBpu = mysqli_fetch_assoc($queryItemBpu);
+
+$queryPengajuan = mysqli_query($koneksi, "SELECT jenis FROM pengajuan where waktu = '$waktu'");
+$dataPengajuan = mysqli_fetch_assoc($queryPengajuan);
 
 if ($actionProcess == "update" && (strpos(strtolower($dataItemBpu['rincian']), 'kas negara') !== false || strpos(strtolower($dataItemBpu['rincian']), 'penerimaan negara') !== false)) {
     $queryUser = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi = 'FINANCE' AND hak_akses = 'Level 2' AND level = 'Manager'");
@@ -75,6 +79,7 @@ if ($actionProcess == "update" && (strpos(strtolower($dataItemBpu['rincian']), '
             array_push($idUserInternal, $e['id_user']);
             array_push($dataDivisi, $e['divisi']);
             array_push($dataLevel, $e['level']);
+            array_push($hakAkses, $e['hak_akses']);
             array_push($duplicatePhoneNumber, $e['phone_number']);
         }
     }
@@ -89,6 +94,7 @@ while ($e = mysqli_fetch_assoc($queryUser)) {
         array_push($idUserInternal, $e['id_user']);
         array_push($dataDivisi, $e['divisi']);
         array_push($dataLevel, $e['level']);
+        array_push($hakAkses, $e['hak_akses']);
         array_push($duplicatePhoneNumber, $e['phone_number']);
     }
 }
@@ -101,6 +107,7 @@ while ($e = mysqli_fetch_assoc($queryUser)) {
         array_push($idUserInternal, $e['id_user']);
         array_push($dataDivisi, $e['divisi']);
         array_push($dataLevel, $e['level']);
+        array_push($hakAkses, $e['hak_akses']);
         array_push($duplicatePhoneNumber, $e['phone_number']);
     }
 }
@@ -113,7 +120,29 @@ while ($e = mysqli_fetch_assoc($queryUser)) {
         array_push($idUserInternal, $e['id_user']);
         array_push($dataDivisi, $e['divisi']);
         array_push($dataLevel, $e['level']);
+        array_push($hakAkses, $e['hak_akses']);
         array_push($duplicatePhoneNumber, $e['phone_number']);
+    }
+}
+
+if ($actionProcess == "update") {
+    if ((strpos(strtolower($dataItemBpu['rincian']), 'kas negara') == false || strpos(strtolower($dataItemBpu['rincian']), 'penerimaan negara') == false) && $dataPengajuan['jenis'] != "Rutin") {
+        for ($i=0; $i < count($emailInternal); $i++) { 
+            if ($dataDivisi[$i] == "FINANCE" && $hakAkses[$i] == 'Manager') {
+                $isCuti = $cuti->checkStatusCutiUser($namaInternal[$i]);
+                if ($isCuti) {
+                    $queryUser = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi = 'Direksi'");
+                    $e = mysqli_fetch_assoc($queryUser);
+                    $emailInternal[$i] = $e['phone_number'];
+                    $namaInternal[$i] = $e['nama_user'];
+                    $idUserInternal[$i] = $e['id_user'];
+                    $dataDivisi[$i] = $e['divisi'];
+                    $dataLevel[$i] = $e['level'];
+                    $hakAkses[$i] = $e['hak_akses'];
+                    $duplicatePhoneNumber[$i] = $e['phone_number'];
+                }
+            }
+        }
     }
 }
 
@@ -405,27 +434,29 @@ if (isset($_POST['submit'])) {
             for($i = 0; $i < count($emailInternal); $i++) {
                 $path = '/views.php';
 
-                if ($isEksternalProcess && $dataDivisi[$i] != "Direksi") {
-                    $path = '/view-bpu-verify.php?id='.$dataVerify["id"].'&bpu='.$dataVerify["id_bpu"];
-                } else {
-                    if ($dataDivisi[$i] == 'FINANCE') {
-                        $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $jenis == 'B1' ? '/view-finance-manager-b1.php?code='.$numb.'' : '/view-finance-manager.php?code='.$numb.'';
-                        $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $jenis == 'Non Rutin' ? '/view-finance-nonrutin-manager.php?code='.$numb.'' : '/view-finance-manager.php?code='.$numb.'';
-                        $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $jenis == 'Non Rutin' ? '/view-finance-nonrutin.php?code='.$numb.'' : '/view-finance.php?code='.$numb.'';
-                        $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
-                        $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
-                    } else if ($dataDivisi[$i] == 'Direksi') {
-                        $path = '/views-direksi.php?code='.$numb.'';
+                if (!$cuti->checkStatusCutiUser($namaInternal[$i])) {
+                    if ($isEksternalProcess && $dataDivisi[$i] != "Direksi") {
+                        $path = '/view-bpu-verify.php?id='.$dataVerify["id"].'&bpu='.$dataVerify["id_bpu"];
+                    } else {
+                        if ($dataDivisi[$i] == 'FINANCE') {
+                            $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $jenis == 'B1' ? '/view-finance-manager-b1.php?code='.$numb.'' : '/view-finance-manager.php?code='.$numb.'';
+                            $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $jenis == 'Non Rutin' ? '/view-finance-nonrutin-manager.php?code='.$numb.'' : '/view-finance-manager.php?code='.$numb.'';
+                            $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $jenis == 'Non Rutin' ? '/view-finance-nonrutin.php?code='.$numb.'' : '/view-finance.php?code='.$numb.'';
+                            $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
+                            $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
+                        } else if ($dataDivisi[$i] == 'Direksi') {
+                            $path = '/views-direksi.php?code='.$numb.'';
+                        }
                     }
+    
+                  $url =  $host. $path.'&session='.base64_encode(json_encode(["id_user" => $idUserInternal[$i], "timeout" => time()]));
+                  $msg = $messageHelper->messagePengajuanBPU($namaInternal[$i], $pengaju, $namaProject, $namaPenerima, $jumlahDiterima, "", $url);
+                  if($emailInternal[$i] != "") $wa->sendMessage($emailInternal[$i], $msg);
+    
+                  $notification .= ($namaInternal[$i] . ' (' . $emailInternal[$i] . ')');
+                    if ($i < count($emailInternal) - 1) $notification .= ', ';
+                    else $notification .= '.';
                 }
-
-              $url =  $host. $path.'&session='.base64_encode(json_encode(["id_user" => $idUserInternal[$i], "timeout" => time()]));
-              $msg = $messageHelper->messagePengajuanBPU($namaInternal[$i], $pengaju, $namaProject, $namaPenerima, $jumlahDiterima, "", $url);
-              if($emailInternal[$i] != "") $wa->sendMessage($emailInternal[$i], $msg);
-
-              $notification .= ($namaInternal[$i] . ' (' . $emailInternal[$i] . ')');
-                if ($i < count($emailInternal) - 1) $notification .= ', ';
-                else $notification .= '.';
             }
         } else {
             if ($_SESSION['divisi'] == 'Direksi' || ($isEksternalProcess && $_SESSION['divisi'] == 'FINANCE' && $_SESSION['level'] == 'Manager')) {
@@ -507,34 +538,36 @@ if (isset($_POST['submit'])) {
                 for($i = 0; $i < count($emailInternal); $i++) {
                     $path = '/views.php';
 
-                    if ($isEksternalProcess && $dataDivisi[$i] != "Direksi") {
-                        $path = '/view-bpu-verify.php?id='.$dataVerify["id"].'&bpu='.$dataVerify["id_bpu"];
-                    } else {
-                        if ($dataDivisi[$i] == 'FINANCE') {
-                            $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $jenis == 'B1' ? '/view-finance-manager-b1.php?code='.$numb.'' : '/view-finance-manager.php?code='.$numb.'';
-                            $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $jenis == 'Non Rutin' ? '/view-finance-nonrutin-manager.php?code='.$numb.'' : '/view-finance-manager.php?code='.$numb.'';
-                            $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $jenis == 'Non Rutin' ? '/view-finance-nonrutin.php?code='.$numb : '/view-finance.php?code='.$numb.'';
-                            $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
-                            $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
-                        } else if ($dataDivisi[$i] == 'Direksi') {
-                            $path = '/views-direksi.php?code='.$numb.'';
+                    if (!$cuti->checkStatusCutiUser($namaInternal[$i])) {
+                        if ($isEksternalProcess && $dataDivisi[$i] != "Direksi") {
+                            $path = '/view-bpu-verify.php?id='.$dataVerify["id"].'&bpu='.$dataVerify["id_bpu"];
+                        } else {
+                            if ($dataDivisi[$i] == 'FINANCE') {
+                                $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $jenis == 'B1' ? '/view-finance-manager-b1.php?code='.$numb.'' : '/view-finance-manager.php?code='.$numb.'';
+                                $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $jenis == 'Non Rutin' ? '/view-finance-nonrutin-manager.php?code='.$numb.'' : '/view-finance-manager.php?code='.$numb.'';
+                                $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $jenis == 'Non Rutin' ? '/view-finance-nonrutin.php?code='.$numb : '/view-finance.php?code='.$numb.'';
+                                $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
+                                $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
+                            } else if ($dataDivisi[$i] == 'Direksi') {
+                                $path = '/views-direksi.php?code='.$numb.'';
+                            }
                         }
-                    }
-                    $url =  $host. $path.'&session='.base64_encode(json_encode(["id_user" => $idUserInternal[$i], "timeout" => time()]));
-                    if ($actionProcess == "update" && $isEksternalProcess) {
-                        $msg = $messageHelper->messagePengajuanBPU($namaInternal[$i], $pengaju, $namaProject, $namapenerima, $jumlah, "", $url);
-                    } else {
-                        $penerima = $vendorName;
-                        if ($penerima == "") {
-                            $penerima = "-";
+                        $url =  $host. $path.'&session='.base64_encode(json_encode(["id_user" => $idUserInternal[$i], "timeout" => time()]));
+                        if ($actionProcess == "update" && $isEksternalProcess) {
+                            $msg = $messageHelper->messagePengajuanBPU($namaInternal[$i], $pengaju, $namaProject, $namapenerima, $jumlah, "", $url);
+                        } else {
+                            $penerima = $vendorName;
+                            if ($penerima == "") {
+                                $penerima = "-";
+                            }
+                            $msg = $messageHelper->messagePembuatanBPUEksternal($namaInternal[$i], $_SESSION['nama_user'], $namaProject, $penerima, $jumlah, "", $url);
                         }
-                        $msg = $messageHelper->messagePembuatanBPUEksternal($namaInternal[$i], $_SESSION['nama_user'], $namaProject, $penerima, $jumlah, "", $url);
+                        if($emailInternal[$i] != "") $wa->sendMessage($emailInternal[$i], $msg);
+    
+                        $notification .= ($namaInternal[$i] . ' (' . $emailInternal[$i] . ')');
+                        if ($i < count($emailInternal) - 1) $notification .= ', ';
+                        else $notification .= '.';
                     }
-                    if($emailInternal[$i] != "") $wa->sendMessage($emailInternal[$i], $msg);
-
-                    $notification .= ($namaInternal[$i] . ' (' . $emailInternal[$i] . ')');
-                    if ($i < count($emailInternal) - 1) $notification .= ', ';
-                    else $notification .= '.';
                 }
             }
 
