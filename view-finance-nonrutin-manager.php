@@ -559,9 +559,14 @@ $setting = mysqli_fetch_assoc($querySetting);
                               echo "</b><br>";
                               echo "No. STKB :<b> $noStkb";
                               echo "</b><br>";
-                              echo "Jenis Pajak :<b>" .isset($bayar['jenis_pajak']) ? $bayar['jenis_pajak'] : "-";
+                              echo "Tanggal Buat BPU: <br><b> " . date('Y-m-d', strtotime($waktustempel));
                               echo "</b><br>";
-                              echo "Nominal Pajak :<b>Rp. " .number_format($bayar['nominal_pajak']);
+                              echo "Jam : <b>" . date('H:i:s', strtotime($waktustempel));
+                              echo "</b></br>";
+                              echo "Request Pembayaran : <br><b>$tglcair ";
+                              
+                              echo "<hr/>";
+echo "Nominal Pajak :<b>Rp. " .number_format($bayar['nominal_pajak']) . " (".$bayar['jenis_pajak'].")";
                               echo "</b><br>";
                               echo ($statusPengajuanBpu != 0) ? "Request BPU : <br><b>Rp. " . number_format($total['jumlah_pengajuan'], 0, '', ',') : "Nominal Pembayaran : <br><b>Rp. " . number_format($total['jumlah_total'], 0, '', ',');
                               echo "</b><br>";
@@ -578,11 +583,6 @@ $setting = mysqli_fetch_assoc($querySetting);
                               } else {
                                 echo "";
                               }
-                              echo "Tanggal Buat BPU: <br><b> " . date('Y-m-d', strtotime($waktustempel));
-                              echo "</b><br>";
-                              echo "Jam : <b>" . date('H:i:s', strtotime($waktustempel));
-                              echo "</b></br>";
-                              echo "Request Pembayaran : <br><b>$tglcair ";
                               echo "</b></br>";
                               echo "Metode Pembayaran : <br><b>$metodePembayaran ";
                               echo "</b><br>";
@@ -810,9 +810,14 @@ $setting = mysqli_fetch_assoc($querySetting);
             $tysb = $totlah - $reallah;
 
             $totuangkembali = $reallah - $uangkembaliused;
+
+
+            $query3 = "SELECT sum(jumlah) AS ready_to_pay FROM bpu WHERE waktu='$waktu' AND persetujuan='Disetujui (Direksi)' AND status='Belum Di Bayar'";
+            $result3 = mysqli_query($koneksi, $query3);
+            $row3 = mysqli_fetch_array($result3);
             ?>
 
-            <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($tysb, 0, '', ','); ?></font></b></div>
+            <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($tysb - $row3['ready_to_pay'], 0, '', ','); ?></font></b></div>
           </div>
 
 
@@ -824,7 +829,7 @@ $setting = mysqli_fetch_assoc($querySetting);
             <?php
             $aaaa = $dataTotalBudget['total_budget'];
             $bbbb = $row2['total_pembayaran'];
-            $belumbayar = $aaaa - $bbbb;
+            $belumbayar = $aaaa - ($tysb - $row3['ready_to_pay']);
             ?>
             <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font></b></div>
           </div>
@@ -836,9 +841,6 @@ $setting = mysqli_fetch_assoc($querySetting);
               <font color='#fcce00'>Ready To Pay :
             </div>
             <?php
-            $query3 = "SELECT sum(jumlah) AS ready_to_pay FROM bpu WHERE waktu='$waktu' AND persetujuan='Disetujui (Direksi)' AND status='Belum Di Bayar'";
-            $result3 = mysqli_query($koneksi, $query3);
-            $row3 = mysqli_fetch_array($result3);
             ?>
             <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($row3['ready_to_pay'], 0, '', ','); ?></font></b></div>
           </div>

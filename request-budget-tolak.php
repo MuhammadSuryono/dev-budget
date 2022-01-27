@@ -2,6 +2,11 @@
 
 session_start();
 require "application/config/database.php";
+require_once "application/config/message.php";
+require_once "application/config/whatsapp.php";
+
+$wa = new Whastapp();
+$messageHelpepr = new Message();
 
 $con = new Database();
 $koneksi = $con->connect();
@@ -28,44 +33,51 @@ while ($row = mysqli_fetch_array($queryGetAllId)) {
 }
 if ($updatePengajuanRequest) {;
 
-    $email = [];
+    $phoneNumber = [];
     $nama = [];
-    $queryGetEmail = mysqli_query($koneksi, "SELECT email,divisi,nama_user from tb_user WHERE nama_user='$pengaju' AND aktif='Y'");
+    $queryGetEmail = mysqli_query($koneksi, "SELECT * from tb_user WHERE nama_user='$pengaju' AND aktif='Y'");
     $data = mysqli_fetch_assoc($queryGetEmail);
     $divisi = $data['divisi'];
-    array_push($email, $data['email']);
+    array_push($phoneNumber, $data['phone_number']);
     array_push($nama, $data['nama_user']);
 
     $queryUserByDivisi = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi = '$data[divisi]' AND (level = 'Manager' OR level = 'Senior Manager') AND aktif='Y'") or die(mysqli_error($koneksi));
     $user = mysqli_fetch_assoc($queryUserByDivisi);
-    array_push($email, $user['email']);
+    array_push($phoneNumber, $user['phone_number']);
     array_push($nama, $user['nama_user']);
 
     $url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
     $url = explode('/', $url);
     $url = $url[0] . '/' . $url[1] . '/' . 'login.php';
 
-    $msg = "Dear $pengaju, <br><br>
-        Budget dengan keterangan berikut:<br><br>
-        Nama Project    : <strong>$namaProject</strong><br>
-        Pengaju         : <strong>$pengaju</strong><br>
-        Divisi          : <strong>$divisi</strong><br>
-        Total Budget    : <strong>Rp. " . number_format($totalbudget, 0, '', ',') . "</strong><br><br>
+    $message = $messageHelpepr->messageTolakPengajuanBudget($pengaju, $namaProject, $divisi, $totalbudget, $pembuat, $alasan);
+
+    // $msg = "Dear $pengaju, <br><br>
+    //     Budget dengan keterangan berikut:<br><br>
+    //     Nama Project    : <strong>$namaProject</strong><br>
+    //     Pengaju         : <strong>$pengaju</strong><br>
+    //     Divisi          : <strong>$divisi</strong><br>
+    //     Total Budget    : <strong>Rp. " . number_format($totalbudget, 0, '', ',') . "</strong><br><br>
         
-        Telah Ditolak oleh <strong> $pembuat </strong> pada <strong> " . date("d/m/Y H:i:s") . "</strong> dengan keterangan <strong>$alasan</strong><br><br>
-        ";
+    //     Telah Ditolak oleh <strong> $pembuat </strong> pada <strong> " . date("d/m/Y H:i:s") . "</strong> dengan keterangan <strong>$alasan</strong><br><br>
+    //     ";
 
-    $msg .= "Klik <a href='$url'>Disini</a> untuk membuka aplikasi budget.";
+    // $msg .= "Klik <a href='$url'>Disini</a> untuk membuka aplikasi budget.";
 
-    $subject = "Notifikasi Untuk Penolakan Budget";
-    if ($email) {
-        $message = sendEmail($msg, $subject, $email, $name, $address = "multiple");
-    }
+    // $subject = "Notifikasi Untuk Penolakan Budget";
+    // if ($email) {
+    //     $message = sendEmail($msg, $subject, $email, $name, $address = "multiple");
+    // }
 
     $notification = 'Budget Berhasil Ditolak. Pemberitahuan via email telah terkirim ke ';
-    for ($i = 0; $i < count($email); $i++) {
-        $notification .= ($nama[$i] . ' (' . $email[$i] . ')');
-        if ($i < count($email) - 1) $notification .= ', ';
+    for ($i = 0; $i < count($phoneNumber); $i++) {
+        $notification .= ($nama[$i] . ' (' . $phoneNumber[$i] . ')');
+
+        if ($phoneNumber[$i] != "") {
+            $wa->sendMessage($phoneNumber[$i], $message);
+        }
+
+        if ($i < count($phoneNumber) - 1) $notification .= ', ';
         else $notification .= '.';
     }
 

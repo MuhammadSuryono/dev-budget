@@ -1,6 +1,23 @@
 <?php
 
 class Message {
+
+    public function messageTolakPengajuanBudget($pengaju, $namaProject, $divisi, $totalbudget, $penolak, $alasan)
+    {
+        $msg = "Dear $pengaju, <br><br>
+Budget dengan keterangan berikut:<br><br>
+Nama Project    : <strong>$namaProject</strong><br>
+Pengaju         : <strong>$pengaju</strong><br>
+Divisi          : <strong>$divisi</strong><br>
+Total Budget    : <strong>Rp. " . number_format($totalbudget, 0, '', ',') . "</strong><br><br>
+
+Telah Ditolak oleh <strong> $penolak </strong> pada <strong> " . date("d/m/Y H:i:s") . "</strong> dengan keterangan <strong>$alasan</strong><br><br>
+        ";
+
+        return $msg;
+    }
+
+
     public function messageCreateProject($namaCreatorBudget, $namaUserPic, $pembuat, $projectName, $divisi, $urlPengajuan, $judul)
     {
         $msg = "

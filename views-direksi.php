@@ -462,9 +462,15 @@ $setting = mysqli_fetch_assoc($querySetting);
                               echo "</b><br>";
                               echo "No. STKB :<b> $noStkb";
                               echo "</b><br>";
-                              echo "Jenis Pajak :<b>" .isset($bayar['jenis_pajak']) ? $bayar['jenis_pajak'] : "-";
+                              echo "Tanggal Buat BPU: <br><b> " . date('Y-m-d', strtotime($waktustempel));
                               echo "</b><br>";
-                              echo "Nominal Pajak :<b>Rp. " .number_format($bayar['nominal_pajak']);
+                              echo "Jam : <b>" . date('H:i:s', strtotime($waktustempel));
+                              echo "</b></br>";
+                              echo "Request Pembayaran : <br><b>$tglcair ";
+                              echo "</b></br>";
+                              echo "<hr/>";
+                              
+                              echo "Nominal Pajak :<b>Rp. " .number_format($bayar['nominal_pajak']) . " (".$bayar['jenis_pajak'].")";
                               echo "</b><br>";
                               echo ($statusPengajuanBpu != 0) ? "Request BPU : <br><b>Rp. " . number_format($total['jumlah_pengajuan'], 0, '', ',') : "Nominal Pembayaran : <br><b>Rp. " . number_format($total['jumlah_total'], 0, '', ',');
                               echo "</b><br>";
@@ -481,12 +487,6 @@ $setting = mysqli_fetch_assoc($querySetting);
                               } else {
                                 echo "";
                               }
-                              echo "Tanggal Buat BPU: <br><b> " . date('Y-m-d', strtotime($waktustempel));
-                              echo "</b><br>";
-                              echo "Jam : <b>" . date('H:i:s', strtotime($waktustempel));
-                              echo "</b></br>";
-                              echo "Request Pembayaran : <br><b>$tglcair ";
-                              echo "</b></br>";
                               echo "Metode Pembayaran : <br><b>$metodePembayaran ";
                               echo "</b><br>";
                               echo "<hr />";
@@ -681,6 +681,10 @@ $setting = mysqli_fetch_assoc($querySetting);
             $uak = mysqli_fetch_array($useduangkemb);
             $uangkembaliused = $uak['sumused'];
 
+            $query3 = "SELECT sum(jumlah) AS sumi FROM bpu WHERE waktu='$waktu' AND persetujuan='Disetujui (Direksi)' AND status='Belum Di Bayar'";
+            $result3 = mysqli_query($koneksi, $query3);
+            $row3 = mysqli_fetch_array($result3);
+
 
             $totlah = $row2['sum']; // total bayar
             $reallah = $row10['sum'];
@@ -689,7 +693,7 @@ $setting = mysqli_fetch_assoc($querySetting);
             $totuangkembali = $reallah - $uangkembaliused;
             ?>
 
-            <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($tysb, 0, '', ','); ?></font></b></div>
+            <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($tysb - $row3['sumi'], 0, '', ','); ?></font></b></div>
           </div>
 
 
@@ -701,7 +705,7 @@ $setting = mysqli_fetch_assoc($querySetting);
             <?php
             $aaaa = $d['totalbudget'];
             $bbbb = $row2['sum'];
-            $belumbayar = $aaaa - $bbbb;
+            $belumbayar = $aaaa - ($tysb - $row3['sumi']);
             ?>
             <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font></b></div>
           </div>
@@ -712,11 +716,6 @@ $setting = mysqli_fetch_assoc($querySetting);
             <div class="col-xs-3">
               <font color='#fcce00'>Ready To Pay :
             </div>
-            <?php
-            $query3 = "SELECT sum(jumlah) AS sumi FROM bpu WHERE waktu='$waktu' AND persetujuan='Disetujui (Direksi)' AND status='Belum Di Bayar'";
-            $result3 = mysqli_query($koneksi, $query3);
-            $row3 = mysqli_fetch_array($result3);
-            ?>
             <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($row3['sumi'], 0, '', ','); ?></font></b></div>
           </div>
           <!-- // Ready To Pay -->
