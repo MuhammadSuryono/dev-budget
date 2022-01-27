@@ -123,6 +123,8 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
     <input type="hidden" name="waktu" value="<?php echo $waktu ?>">
     <input type="hidden" name="term" value="<?php echo $term ?>">
     <input type="hidden" name="persetujuan" value="Sudah Disetujui">
+    <input type="hidden" name="jenispajak" id="jenis-pajak" value="">
+    <input type="hidden" name="nominalpajak" id="nominal-pajak" value="0">
 
     <p>Apakah anda ingin menyetujui <b>BPU</b> di Nomor <b><?= $baris['no']; ?></b>?</p>
 
@@ -152,6 +154,8 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
     var maxTransfer = '<?= $resultJenisPembayaran["max_transfer"] ?>';
     var tanggalBayar = '<?= $dataBpu['tanggalbayar'] ?>'
     const inputDate = document.getElementById("tglbayar")
+    const jenisPajak = document.getElementById("jenis-pajak")
+    const nominalPajak = document.getElementById("nominal-pajak")
 
     const picker = document.getElementById('tglbayar');
     picker.addEventListener('input', function(e) {
@@ -226,6 +230,8 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                         tdActual[i].innerText = result
 
                         inputPengajuan[i].value = result
+                        jenisPajak.value = "PPH 21 (2.5%)"
+                        nominalPajak.value = 0.05 * 0.5 * parseInt(tdPengajuan[i].textContent)
 
                         if (result < maxTransfer) {
                             inputMetodePembayaran[i].value = 'MRI PAL';
@@ -236,12 +242,13 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                         }
                     }
                 } else {
-                    // result = Math.round(parseInt(actual) + (0.05 * 0.5 * bpu));
                     for (let i = 0; i < tdPengajuan.length; i++) {
                         result = Math.round(parseInt(tdActual[i].textContent) + (0.05 * 0.5 * parseInt(tdPengajuan[i].textContent)));
                         tdActual[i].innerText = result
 
                         inputPengajuan[i].value = result
+                        jenisPajak.value = ""
+                        nominalPajak.value = 0
 
                         if (result < maxTransfer) {
                             inputMetodePembayaran[i].value = 'MRI PAL';
@@ -259,6 +266,8 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                         tdActual[i].innerText = result
 
                         inputPengajuan[i].value = result
+                        jenisPajak.value = "PPH 21 (3%)"
+                        nominalPajak.value = 0.03 * parseInt(tdPengajuan[i].textContent)
 
                         if (result < maxTransfer) {
                             inputMetodePembayaran[i].value = 'MRI PAL';
@@ -275,6 +284,8 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                         tdActual[i].innerText = result
 
                         inputPengajuan[i].value = result
+                        jenisPajak.value = ""
+                        nominalPajak.value = "0"
 
                         if (result < maxTransfer) {
                             inputMetodePembayaran[i].value = 'MRI PAL';
@@ -292,6 +303,8 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                         result = Math.round(parseInt(tdActual[i].textContent) - (0.1 * parseInt(tdPengajuan[i].textContent)));
                         tdActual[i].innerText = result
                         inputPengajuan[i].value = result
+                        jenisPajak.value = "PPH 4 Ayat 2"
+                        nominalPajak.value = 0.1 * parseInt(tdPengajuan[i].textContent)
 
                         if (result < maxTransfer) {
                             inputMetodePembayaran[i].value = 'MRI PAL';
@@ -307,6 +320,8 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                         result = Math.round(parseInt(tdActual[i].textContent) + (0.1 * parseInt(tdPengajuan[i].textContent)));
                         tdActual[i].innerText = result
                         inputPengajuan[i].value = result
+                        jenisPajak.value = ""
+                        nominalPajak.value = ""
 
                         if (result < maxTransfer) {
                             inputMetodePembayaran[i].value = 'MRI PAL';
@@ -327,6 +342,8 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                         
                         tdActual[i].innerText = result
                         inputPengajuan[i].value = result
+                        jenisPajak.value = "PPH 23 (2%)"
+                        nominalPajak.value = countPph(0.02, totalData)
 
                         if (result < maxTransfer) {
                             inputMetodePembayaran[i].value = 'MRI PAL';
@@ -344,6 +361,8 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                         result = Math.round(parseInt(tdActual[i].textContent) + selisih);
                         tdActual[i].innerText = result
                         inputPengajuan[i].value = result
+                        jenisPajak.value = ""
+                        nominalPajak.value = ""
 
                         if (result < maxTransfer) {
                             inputMetodePembayaran[i].value = 'MRI PAL';
@@ -364,6 +383,8 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                         result = Math.round(parseInt(tdActual[i].textContent) - selisih);
                         tdActual[i].innerText = result
                         inputPengajuan[i].value = result
+                        jenisPajak.value = "PPH 23 (4%)"
+                        nominalPajak.value = countPph(0.04, totalData)
 
                         if (result < maxTransfer) {
                             inputMetodePembayaran[i].value = 'MRI PAL';
@@ -382,6 +403,8 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                         result = Math.round(parseInt(tdActual[i].textContent) + selisih);
                         tdActual[i].innerText = result
                         inputPengajuan[i].value = result
+                        jenisPajak.value = ""
+                        nominalPajak.value = ""
 
                         if (result < maxTransfer) {
                             inputMetodePembayaran[i].value = 'MRI PAL';
