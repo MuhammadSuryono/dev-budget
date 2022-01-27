@@ -703,6 +703,10 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
       echo '<a href="home-finance.php?page=1"><button type="button" class="btn btn-primary">Create Folder Project</button></a>';
     } ?>
 
+    <?php if ($_SESSION['hak_akses'] == 'Manager' && $_SESSION['divisi'] == 'FINANCE' && !$cuti->check_manager_divisi_finance_cuti()) {
+      echo '<a href="home-finance.php?page=1"><button type="button" class="btn btn-primary">Create Folder Project</button></a>';
+    } ?>
+
     <br /><br />
 
     <?php
