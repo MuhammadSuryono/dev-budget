@@ -47,8 +47,8 @@ if (strpos($tab, 'B1') !== false) : ?>
                             $row2 = mysqli_fetch_array($result2);
 
                             $query3 = "SELECT sum(jumlah) AS ready_to_pay FROM bpu WHERE waktu='$waktu' AND persetujuan='Disetujui (Direksi)' AND status='Belum Di Bayar'";
-                  $result3 = mysqli_query($koneksi, $query3);
-                  $row3 = mysqli_fetch_array($result3);
+                            $result3 = mysqli_query($koneksi, $query3);
+                            $row3 = mysqli_fetch_array($result3);
 
                             $query10 = "SELECT sum(uangkembali) AS sum FROM bpu WHERE waktu='$waktu'";
                             $result10 = mysqli_query($koneksi, $query10);
@@ -481,7 +481,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                     while ($d = mysqli_fetch_array($sql)) {
 
                         $waktu = $d['waktu'];
-                        $query2 = "SELECT sum(jumlahbayar) AS sumasum FROM bpu WHERE waktu='$waktu'";
+                        $query2 = "SELECT sum(jumlah) AS sumasum FROM bpu WHERE waktu='$waktu'";
                         $result2 = mysqli_query($koneksi, $query2);
                         $row2 = mysqli_fetch_array($result2);
 
@@ -672,7 +672,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                     while ($d = mysqli_fetch_array($sql)) {
 
                         $waktu = $d['waktu'];
-                        $query2 = "SELECT sum(jumlahbayar) AS sumasum FROM bpu WHERE waktu='$waktu'";
+                        $query2 = "SELECT sum(jumlah) AS sumasum FROM bpu WHERE waktu='$waktu'";
                         $result2 = mysqli_query($koneksi, $query2);
                         $row2 = mysqli_fetch_array($result2);
 
@@ -686,7 +686,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                         $aaaa = $dataTotalBudget['total_budget'];
                         $bbbb = $row2['sumasum'];
                         $belumbayar = $aaaa - ($bbbb - $row3['ready_to_pay']);
-
+                        
                         if ($d['status'] == "Disetujui") {
                     ?>
                             <tr>
