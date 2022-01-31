@@ -333,14 +333,6 @@ if ($submit == 1) {
                 }
             }
 
-            // if ($dataDivisi[$i] == 'FINANCE') {
-            //     $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $pengajuan['jenis'] == 'B1' ? '/view-finance-manager-b1.php' : '/view-finance-manager.php';
-            //     $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $pengajuan['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin-manager.php' : '/view-finance-manager.php';
-            //     $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $pengajuan['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin.php' : '/view-finance.php';
-            //     $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
-            // } else if ($dataDivisi[$i] == 'Direksi') {
-            //     $path = '/views-direksi.php';
-            // }
           $url =  $host. $path.'?code='.$kode.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
           $msg = $messageHelper->messageProcessBPUFinance($pengajuan["nama"], $no, $term, $bpu["pengaju"], $arrPenerima, $arrJumlah, $keterangan, $url);
           if($email[$i] != "") $whatsapp->sendMessage($email[$i], $msg);
@@ -354,28 +346,6 @@ if ($submit == 1) {
         if ($i < count($email) - 1) $notification .= ', ';
         else $notification .= '.';
     }
-
-    // if ($bpu['statusbpu'] != "UM" && $bpu['statusbpu'] != "UM Burek") {
-    //     $msg = "Notifikasi BPU, <br><br>
-    //     BPU telah di verifikasi oleh Finance dengan keterangan sebagai berikut:<br><br>
-    //     Nama Project   : <strong>" . $pengajuan['nama'] . "</strong><br>
-    //     Item No.       : <strong>$no</strong><br>
-    //     Term           : <strong>$term</strong><br>
-    //     Nama Pengaju   : <strong>" . $bpu['pengaju'] . "</strong><br>
-    //     Nama Penerima  : <strong>" . implode(', ', $arrPenerima) . "</strong><br>
-    //     Total Diajukan : <strong>" . implode(', ', $arrJumlah) . "</strong><br>
-    //     ";
-    //     if ($keterangan) {
-    //         $msg .= "Keterangan:<strong> $keterangan </strong><br><br>";
-    //     } else {
-    //         $msg .= "<br>";
-    //     }
-    //     $msg .= "<br></br>Terimkasih";
-    //     $subject = "Notifikasi Aplikasi Budget";
-    
-    //     $emailHelper->sendEmail($msg, $subject, $arremailpenerima, '', 'multiple');
-    //     $notification .= " Dan telah dikirim pemberitahuan ke penerima via email ke " . implode(",", $arremailpenerima);   
-    // }
 
 
 } else if ($submit == 0) {
@@ -561,12 +531,12 @@ function getHostUrl()
     return $host;
 }
 
-// function random_bytes($length = 6)
-// {
-//     $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-//     $characters_length = strlen($characters);
-//     $output = '';
-//     for ($i = 0; $i < $length; $i++)
-//         $output .= $characters[rand(0, $characters_length - 1)];
-//     return $output;
-// }
+function random_bytes($length = 6)
+{
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $characters_length = strlen($characters);
+    $output = '';
+    for ($i = 0; $i < $length; $i++)
+        $output .= $characters[rand(0, $characters_length - 1)];
+    return $output;
+}
