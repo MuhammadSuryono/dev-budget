@@ -153,24 +153,24 @@ class Callback extends Database {
 
     private function get_receiver_whatsapp()
     {
-        $userDireksi = $this->select("phone_number")->where('divisi', '=', 'Direksi')->first();
+        $userDireksi = $this->select("phone_number")->from("tb_user")->where('divisi', '=', 'Direksi')->first();
         if ($userDireksi['phone_number'] != '') array_push($this->phoneNumberReceiver, $userDireksi['phone_number']);
 
         if ($this->dataBpu['statusbpu'] == "UM" || $this->dataBpu['statusbpu'] == "UM Burek") {
-            $userFinanceUM = $this->select("phone_number")->where('divisi', '=', 'Finance')->where('hak_akses', '=', 'Level 2')->where('level', '=', 'Manager')->first();
+            $userFinanceUM = $this->select("phone_number")->from("tb_user")->where('divisi', '=', 'Finance')->where('hak_akses', '=', 'Level 2')->where('level', '=', 'Manager')->first();
             if ($userFinanceUM['phone_number'] != '') array_push($this->phoneNumberReceiver, $userFinanceUM['phone_number']);
         }
 
-        $userFinance = $this->select("phone_number")->where('divisi', '=', 'Finance')->where('status_penerima_email_id', '=', '3')->get();
+        $userFinance = $this->select("phone_number")->from("tb_user")->where('divisi', '=', 'Finance')->where('status_penerima_email_id', '=', '3')->get();
         foreach ($userFinance as $user) {
             if ($user['phone_number'] != '') array_push($this->phoneNumberReceiver, $user['phone_number']);
         }
 
         if ($this->dataBpu['divisi'] != 'FINANCE' || $this->dataBpu['pengaju'] != 'Sistem') {
-            $userPengaju = $this->select("phone_number")->where('nama_user', '=', $this->dataBpu['pengaju'])->first();
+            $userPengaju = $this->select("phone_number")->from("tb_user")->where('nama_user', '=', $this->dataBpu['pengaju'])->first();
             if ($userPengaju['phone_number'] != '') array_push($this->phoneNumberReceiver, $userPengaju['phone_number']);
 
-            $userDivisiManager = $this->select("phone_number")->where('divisi', '=', $this->dataBpu['divisi'])->where('hak_akses', '=', 'Manager')->get();
+            $userDivisiManager = $this->select("phone_number")->from("tb_user")->where('divisi', '=', $this->dataBpu['divisi'])->where('hak_akses', '=', 'Manager')->get();
             foreach ($userDivisiManager as $user) {
                 if ($user['phone_number'] != '') array_push($this->phoneNumberReceiver, $user['phone_number']);
             }
