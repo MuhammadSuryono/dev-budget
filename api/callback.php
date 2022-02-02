@@ -2,6 +2,7 @@
 require_once "../application/config/database.php";
 require_once "../application/config/message.php";
 require_once "../application/config/email.php";
+require_once "../application/config/whatsapp.php";
 
 class Callback extends Database {
     private $dataInput;
@@ -33,6 +34,7 @@ class Callback extends Database {
             $this->send_email();
         } else {
             var_dump("Error Transfer: ", $this->dataInput);
+            var_dump("Error code: ", $this->dataInputResponse->ErrorCode);
         }
     }
 
