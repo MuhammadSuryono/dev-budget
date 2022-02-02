@@ -3,18 +3,21 @@ session_start();
 require "application/config/database.php";
 require_once "application/config/whatsapp.php";
 require_once "application/config/message.php";
+require_once "application/controllers/Cuti.php";
 
 $helper = new Message();
 $con = new Database();
 $koneksi = $con->connect();
+$con->load_database($koneksi);
+
 require "dompdf/save-document.php";
 require_once("dompdf/dompdf_config.inc.php");
 
 $user = $_SESSION['nama_user'];
 $time = date("Y-m-d h:i:sa");
 $id = $_GET['id'];
-$queryWaktu = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE id=$id") or die(mysqli_error($koneksi));
-$dataPengajuan = mysqli_fetch_assoc($queryWaktu);
+
+$dataPengajuan = $con->select()->from('pengajuan_request')->where('id', '=', $id)->first();
 $waktu = $dataPengajuan['waktu'];
 $gPengaju = '';
 $gNamaProject = '';
@@ -24,19 +27,22 @@ $gPembuat = $_SESSION['nama_user'];
 $duplicateStatus = 0;
 $idPengajuan = 0;
 
-$updatePengajuanRequest = mysqli_query($koneksi, "UPDATE pengajuan_request SET status_request='Disetujui', waktu='$waktu', on_revision_status = '0' WHERE waktu='$waktu'") or die(mysqli_error($koneksi));
+$updatePengajuanRequest = $con->update('pengajuan_request')
+    ->set_value_update('status_request', 'Disetujui')
+    ->set_value_update('waktu', $waktu)
+    ->set_value_update('on_revision_status', 0)
+    ->where('waktu', '=', $waktu)
+    ->save_update();
 
 if ($updatePengajuanRequest) {
-    $cariwaktunya = mysqli_query($koneksi, "SELECT waktu FROM pengajuan_request WHERE id='$id' ORDER BY id DESC LIMIT 1");
-    $waktu = mysqli_fetch_assoc($cariwaktunya);
+    $waktu = $con->select('waktu')->from('pengajuan_request')->where('id', '=', $id)->order_by('id', 'desc')->first();
     $waktunya = $waktu['waktu'];
 
-    $queryGetAllId = mysqli_query($koneksi, "SELECT id FROM pengajuan_request WHERE waktu='$waktunya'");
-    while ($row = mysqli_fetch_array($queryGetAllId)) {
+    $queryGetAllId = $con->select('id')->from('pengajuan_request')->where('waktu', '=', $waktunya)->get();
+    foreach ($queryGetAllId as $row) {
 
         $idGet = $row['id'];
-        $queryPengajuanRequest = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE id='$idGet'") or die(mysqli_error($koneksi));
-        $pengajuanRequest = mysqli_fetch_assoc($queryPengajuanRequest);
+        $pengajuanRequest = $con->select()->from('pengajuan_request')->where('id', '=', $idGet)->first();
         $jenis = $pengajuanRequest['jenis'];
         $nama = $pengajuanRequest['nama'];
         $gNamaProject = $nama;
@@ -50,43 +56,57 @@ if ($updatePengajuanRequest) {
         $gTotalBudget = $totalbudget;
         $document = $pengajuanRequest['document'];
 
-        $queryCheckData = mysqli_query($koneksi, "SELECT COUNT(*) AS count_check FROM pengajuan WHERE kodeproject = '$kodepro' AND waktu = '$waktunya'");
-        $checkData = mysqli_fetch_assoc($queryCheckData);
+        $checkData = $con->select('COUNT(*) AS count_check')->from('pengajuan')->where('kodeproject', '=', $kodepro)->where('waktu', '=', $waktunya)->first();
         if ($checkData['count_check'] == 0) {
-            $insertkepengaju = mysqli_query($koneksi, "INSERT INTO pengajuan(jenis,nama,tahun,pengaju,divisi,status,kodeproject, totalbudget, pembuat, waktu, penyetuju, date_approved, document, on_revision_status)
-                                                        VALUES ('$jenis','$nama','$tahun','$pengaju','$divisi','Disetujui','$kodepro', '$totalbudget', '$pembuat', '$waktunya', '$user', '$time', '$document', '0')") or die(mysqli_error($koneksi));
-            $idPengajuan = mysqli_insert_id($koneksi);
+            $insertkepengaju = $con->insert('pengajuan')
+                ->set_value_insert('jenis', $jenis)
+                ->set_value_insert('nama', $nama)
+                ->set_value_insert('tahun', $tahun)
+                ->set_value_insert('pengaju', $pengaju)
+                ->set_value_insert('divisi', $divisi)
+                ->set_value_insert('status', 'Disetujui')
+                ->set_value_insert('kodeproject', $kodepro)
+                ->set_value_insert('totalbudget', $totalbudget)
+                ->set_value_insert('pembuat', $pembuat)
+                ->set_value_insert('waktu', $waktunya)
+                ->set_value_insert('penyetuju', $user)
+                ->set_value_insert('date_approved', $time)
+                ->set_value_insert('document', $document)
+                ->set_value_insert('on_revision_status', 0)
+                ->save_insert();
+
+            $idPengajuan = $con->get_id_insert();
         } else {
             $duplicateStatus = 1;
         }
     }
 
     if (!$insertkepengaju && $duplicateStatus == 1) {
-        $updatePengajuanRequestDouble = mysqli_query($koneksi, "UPDATE pengajuan_request SET ket='Data Double', waktu='$waktu[waktu]', on_revision_status = '0' WHERE waktu='$waktu[waktu]'") or die(mysqli_error($koneksi));
+        $updatePengajuanRequestDouble = $con->update('pengajuan_request')
+            ->set_value_update('ket', 'Data Double')
+            ->set_value_update('waktu', $waktu['waktu'])
+            ->set_value_update('on_revision_status', 0)
+            ->where('waktu', '=', $waktu['waktu'])
+            ->save_update();
+
         if ($_SESSION['divisi'] == 'FINANCE') {
-            echo "<script language='javascript'>";
-            echo "alert('Proses dihentikan, Terindikasi data double')";
-            echo "</script>";
-            echo "<script> document.location.href='home-finance.php'; </script>";
+            echo $helper->alertMessage('Proses dihentikan, Terindikasi data double', 'home-finance.php');
         } else {
-            echo "<script language='javascript'>";
-            echo "alert('Proses dihentikan, Terindikasi data double')";
-            echo "</script>";
-            echo "<script> document.location.href='home-direksi.php'; </script>";
+            echo $helper->alertMessage('Proses dihentikan, Terindikasi data double', 'home-direksi.php');
         }
         die;
     }
-    $querySelesaiRequest = mysqli_query($koneksi, "SELECT * FROM selesai_request WHERE waktu = '$waktunya' AND rincian != ''") or die(mysqli_error($koneksi));
+
+    $dataSelesaiRequest = $con->select()->from('selesai_request')->where('waktu',$waktunya)->where('rincian', '!=', '')->get();
     $selesaiRequest = [];
     $checkName = [];
-    while ($row = mysqli_fetch_assoc($querySelesaiRequest)) {
+    foreach ($dataSelesaiRequest as $row ) {
         if (!in_array($row["rincian"], $checkName)) {
             array_push($selesaiRequest, $row);
             array_push($checkName, $row['rincian']);
         }
     }
-    // var_dump($selesaiRequest);
-    // die;
+
     $countTrue = 0;
     foreach ($selesaiRequest as $sr) {
         $urutan = $sr['urutan'];
@@ -102,8 +122,22 @@ if ($updatePengajuanRequest) {
 
 
         if ($rincian != "") {
-            $insertSelesai = mysqli_query($koneksi, "INSERT INTO selesai (no,rincian,kota,status,penerima,harga,quantity,total,pembayaran,pengaju,divisi,waktu,komentar,uangkembaliused)
-                                                    VALUES ('$urutan','$rincian','$kota','$status','$penerima','$harga','$quantity','$total','','$pengaju','$divisi','$waktunya','','')") or die(mysqli_error($koneksi));
+            $insertSelesai = $con->insert('selesai')
+                ->set_value_insert('no', $urutan)
+                ->set_value_insert('rincian', $rincian)
+                ->set_value_insert('kota', $kota)
+                ->set_value_insert('status', $status)
+                ->set_value_insert('penerima', $penerima)
+                ->set_value_insert('harga', $harga)
+                ->set_value_insert('quantity', $quantity)
+                ->set_value_insert('total', $total)
+                ->set_value_insert('pembayaran', '')
+                ->set_value_insert('pengaju', $pengaju)
+                ->set_value_insert('divisi', $divisi)
+                ->set_value_insert('waktu', $waktunya)
+                ->set_value_insert('komentar', '$document')
+                ->set_value_insert('uangkembaliused', '')
+                ->save_insert();
         }
         if ($insertkepengaju) $countTrue++;
     }
@@ -114,22 +148,14 @@ if ($updatePengajuanRequest) {
         $idUsersNotification = [];
         $dataDivisi = [];
         $dataLevel = [];
-        $queryGetEmail = mysqli_query($koneksi, "SELECT phone_number,divisi,nama_user,id_user,level from tb_user WHERE nama_user='$gPengaju' AND aktif='Y'");
-        $data = mysqli_fetch_assoc($queryGetEmail);
+        $data = $con->select('phone_number,divisi,nama_user,id_user,level')->from('tb_user')->where('nama_user', '=', $gPengaju)->where('aktif', '=', 'Y')->first();
         $divisi = $data['divisi'];
+
         array_push($phoneNumbers, $data['phone_number']);
         array_push($namaUserSendNotifications, $data['nama_user']);
         array_push($idUsersNotification, $data['id_user']);
         array_push($dataDivisi, $data['divisi']);
         array_push($dataLevel, $data['level']);
-
-        // $queryUserByDivisi = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi = '$data[divisi]' AND (level = 'Manager' OR level = 'Senior Manager') AND aktif='Y'") or die(mysqli_error($koneksi));
-        // $user = mysqli_fetch_assoc($queryUserByDivisi);
-        // array_push($phoneNumbers, $user['phone_number']);
-        // array_push($namaUserSendNotifications, $user['nama_user']);
-        // array_push($idUsersNotification, $data['id_user']);
-        // array_push($dataDivisi, $data['divisi']);
-        // array_push($dataLevel, $data['level']);
 
         $url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
         $port = $_SERVER['SERVER_PORT'];
@@ -140,33 +166,35 @@ if ($updatePengajuanRequest) {
         }
         $host = $hostProtocol. '/'. $url[1];
 
+        $notification = 'Persetujuan Berhasil. Pemberitahuan via whatsapp sedang dikirimkan ke ';
         if (count($phoneNumbers) > 0) {
             $whatsapp = new Whastapp();
+            $cuti = new Cuti();
             for($i = 0; $i < count($phoneNumbers); $i++) {
-                $path = '/views.php';
-                if ($dataDivisi[$i] == 'FINANCE') {
-                    $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $dataPengajuan['jenis'] == 'B1' ? '/view-finance-manager-b1.php' : '/view-finance-manager.php';
-                    $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $dataPengajuan['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin-manager.php' : '/view-finance-manager.php';
-                    $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $dataPengajuan['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin.php' : '/view-finance.php';
-                    $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
-                } else if ($dataDivisi[$i] == 'Direksi') {
-                    $path = '/views-direksi.php';
+                if (!$cuti->checkStatusCutiUser($namaUserSendNotifications[$i]) || $namaUserSendNotifications[$i] != $_SESSION['nama_user'])
+                {
+                    $notification .= ($namaUserSendNotifications[$i] . ' (' . $phoneNumbers[$i] . ')');
+                    if ($i < count($phoneNumbers) - 1) $notification .= ', ';
+                    else $notification .= '.';
+
+                    $path = '/views.php';
+                    if ($dataDivisi[$i] == 'FINANCE') {
+                        $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $dataPengajuan['jenis'] == 'B1' ? '/view-finance-manager-b1.php' : '/view-finance-manager.php';
+                        $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $dataPengajuan['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin-manager.php' : '/view-finance-manager.php';
+                        $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $dataPengajuan['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin.php' : '/view-finance.php';
+                        $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
+                    } else if ($dataDivisi[$i] == 'Direksi') {
+                        $path = '/views-direksi.php';
+                    }
+                    $url =  $host. $path.'?code='.$idPengajuan.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
+                    $msg = $helper->messagePersetujuanBudget($namaUserSendNotifications[$i], $pengaju, $gNamaProject, $divisi, $gTotalBudget, $gPembuat, $url);
+                    if($phoneNumbers[$i] != "") $whatsapp->sendMessage($phoneNumbers[$i], $msg);
                 }
-              $url =  $host. $path.'?code='.$idPengajuan.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
-              $msg = $helper->messagePersetujuanBudget($namaUserSendNotifications[$i], $pengaju, $gNamaProject, $divisi, $gTotalBudget, $gPembuat, $url);
-              if($phoneNumbers[$i] != "") $whatsapp->sendMessage($phoneNumbers[$i], $msg);
+
             }
           }
 
-        $notification = 'Persetujuan Berhasil. Pemberitahuan via whatsapp sedang dikirimkan ke ';
-        for ($i = 0; $i < count($phoneNumbers); $i++) {
-            $notification .= ($namaUserSendNotifications[$i] . ' (' . $phoneNumbers[$i] . ')');
-            if ($i < count($phoneNumbers) - 1) $notification .= ', ';
-            else $notification .= '.';
-        }
-
-        $queryDocument = mysqli_query($koneksi, "SELECT noid, document FROM pengajuan ORDER BY noid DESC LIMIT 1");
-        $document = mysqli_fetch_assoc($queryDocument);
+        $document = $con->select('noid, document')->from('pengajuan')->first();
         $doc = unserialize($document['document']);
         $noid = $document['noid'];
 
@@ -176,43 +204,24 @@ if ($updatePengajuanRequest) {
             $name = $doc;
         }
 
-        saveDocApproved($koneksi, $noid, $name);
-
-        // SELECT waktu FROM pengajuan_request WHERE id='$id' ORDER BY id DESC LIMIT 1
+//        saveDocApproved($koneksi, $noid, $name);
         if ($_SESSION['divisi'] == 'FINANCE') {
-            echo "<script language='javascript'>";
-            echo "alert('$notification')";
-            echo "</script>";
-            echo "<script> document.location.href='home-finance.php'; </script>";
+            echo $helper->alertMessage($notification, 'home-finance.php');
+
         } else {
-            echo "<script language='javascript'>";
-            echo "alert('$notification')";
-            echo "</script>";
-            echo "<script> document.location.href='home-direksi.php'; </script>";
+            echo $helper->alertMessage($notification, 'home-direksi.php');
         }
     } else {
         if ($_SESSION['divisi'] == 'FINANCE') {
-            echo "<script language='javascript'>";
-            echo "alert('Persetujuan Gagal')";
-            echo "</script>";
-            echo "<script> document.location.href='home-finance.php'; </script>";
+            echo $helper->alertMessage('Peresetujuan Gagal', 'home-finance.php');
         } else {
-            echo "<script language='javascript'>";
-            echo "alert('Persetujuan Gagal')";
-            echo "</script>";
-            echo "<script> document.location.href='home-direksi.php'; </script>";
+            echo $helper->alertMessage('Peresetujuan Gagal', 'home-direksi.php');
         }
     }
 } else {
     if ($_SESSION['divisi'] == 'FINANCE') {
-        echo "<script language='javascript'>";
-        echo "alert('Persetujuan Gagal')";
-        echo "</script>";
-        echo "<script> document.location.href='home-finance.php'; </script>";
+        echo $helper->alertMessage('Peresetujuan Gagal', 'home-finance.php');
     } else {
-        echo "<script language='javascript'>";
-        echo "alert('Persetujuan Gagal')";
-        echo "</script>";
-        echo "<script> document.location.href='home-direksi.php'; </script>";
+        echo $helper->alertMessage('Peresetujuan Gagal', 'home-direksi.php');
     }
 }

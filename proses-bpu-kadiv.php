@@ -159,7 +159,7 @@ array_unique($nama);
 $notification = 'Persetujuan BPU Sukses. Pemberitahuan via whatsapp sedang dikirimkan ke ';
 $i = 0;
 for ($i = 0; $i < count($email); $i++) {
-    if ($email[$i] != "") {
+    if ($email[$i] != "" || $nama[$i] != $_SESSION['nama_user']) {
         $path = '/views.php';
         if ($dataDivisi[$i] == 'FINANCE') {
             $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $dataPengajuan['jenis'] == 'B1' ? '/view-finance-manager-b1.php' : '/view-finance-manager.php';

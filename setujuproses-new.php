@@ -372,27 +372,29 @@ if ($_POST['submit'] == 1) {
         for($i = 0; $i < count($email); $i++) {
             $path = '/views.php';
 
-            if ($isEksternalProcess && $dataDivisi[$i] != 'Direksi') {
-                $path = '/view-bpu-verify.php?id='.$bpuVerify["id"].'&bpu='.$bpuItem["noid"];
-            } else if ($isEksternalProcess && $dataDivisi[$i] == 'Direksi') {
-                $path = '/rekap-finance.php?see';
-            } else {
-                if ($dataDivisi[$i] == 'FINANCE') {
-                    $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $budget['jenis'] == 'B1' ? '/view-finance-manager-b1.php?code='.$idBudget : '/view-finance-manager.php?code='.$idBudget ;
-                    $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $budget['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin-manager.php?code='.$idBudget  : '/view-finance-manager.php?code='.$idBudget ;
-                    $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $budget['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin.php?code='.$idBudget  : '/view-finance.php?code='.$idBudget ;
-                    $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
-                } else if ($dataDivisi[$i] == 'Direksi') {
+            if ($_SESSION['nama_user'] != $nama[$i]) {
+                if ($isEksternalProcess && $dataDivisi[$i] != 'Direksi') {
+                    $path = '/view-bpu-verify.php?id='.$bpuVerify["id"].'&bpu='.$bpuItem["noid"];
+                } else if ($isEksternalProcess && $dataDivisi[$i] == 'Direksi') {
                     $path = '/rekap-finance.php?see';
+                } else {
+                    if ($dataDivisi[$i] == 'FINANCE') {
+                        $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $budget['jenis'] == 'B1' ? '/view-finance-manager-b1.php?code='.$idBudget : '/view-finance-manager.php?code='.$idBudget ;
+                        $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $budget['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin-manager.php?code='.$idBudget  : '/view-finance-manager.php?code='.$idBudget ;
+                        $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $budget['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin.php?code='.$idBudget  : '/view-finance.php?code='.$idBudget ;
+                        $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
+                    } else if ($dataDivisi[$i] == 'Direksi') {
+                        $path = '/rekap-finance.php?see';
+                    }
                 }
+    
+              $url =  $host. $path.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
+              $msg = $messageHelper->messageApprovePengajuanBPU($userSetuju, $budget['nama'], $no, $term, $arrPenerima, $tanggalbayar, $arrPembayaran, $arrJumlah, $keterangan, $url);
+              if($email[$i] != "") $whatsapp->sendMessage($email[$i], $msg);
+              $notification .= ($nama[$i] . ' (' . $email[$i] . ')');
+              if ($i < count($email) - 1) $notification .= ', ';
+              else $notification .= '.';
             }
-
-          $url =  $host. $path.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
-          $msg = $messageHelper->messageApprovePengajuanBPU($userSetuju, $budget['nama'], $no, $term, $arrPenerima, $tanggalbayar, $arrPembayaran, $arrJumlah, $keterangan, $url);
-          if($email[$i] != "") $whatsapp->sendMessage($email[$i], $msg);
-          $notification .= ($nama[$i] . ' (' . $email[$i] . ')');
-          if ($i < count($email) - 1) $notification .= ', ';
-          else $notification .= '.';
         }
 
         if (count($arremailpenerima) > 0) {
@@ -487,25 +489,27 @@ else if ($submit == 0) {
     for($i = 0; $i < count($email); $i++) {
         $path = '/views.php';
 
-        if ($isEksternalProcess) {
-            $path = '/view-bpu-verify.php?id='.$bpuVerify["id"].'&bpu='.$bpuItem["noid"];
-        } else {
-            if ($dataDivisi[$i] == 'FINANCE') {
-                $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $budget['jenis'] == 'B1' ? '/view-finance-manager-b1.php?code='.$idBudget : '/view-finance-manager.php?code='.$idBudget;
-                $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $budget['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin-manager.php?code='.$idBudget : '/view-finance-manager.php?code='.$idBudget;
-                $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $budget['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin.php?code='.$idBudget : '/view-finance.php?code='.$idBudget;
-                $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
-            } else if ($dataDivisi[$i] == 'Direksi') {
-                $path = '/views-direksi.php?code='.$idBudget;
+        if ($_SESSION['nama_user'] != $nama[$i]) {
+            if ($isEksternalProcess) {
+                $path = '/view-bpu-verify.php?id='.$bpuVerify["id"].'&bpu='.$bpuItem["noid"];
+            } else {
+                if ($dataDivisi[$i] == 'FINANCE') {
+                    $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $budget['jenis'] == 'B1' ? '/view-finance-manager-b1.php?code='.$idBudget : '/view-finance-manager.php?code='.$idBudget;
+                    $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $budget['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin-manager.php?code='.$idBudget : '/view-finance-manager.php?code='.$idBudget;
+                    $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $budget['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin.php?code='.$idBudget : '/view-finance.php?code='.$idBudget;
+                    $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
+                } else if ($dataDivisi[$i] == 'Direksi') {
+                    $path = '/views-direksi.php?code='.$idBudget;
+                }
             }
+            $url =  $host. $path.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
+            $msg = $messageHelper->messageTolakPengajuanBPU($userSetuju, $budget['nama'], $no, $term, $arrPenerima, $tanggalbayar, $arrPembayaran, $arrJumlah, $keterangan, $url);
+            if($email[$i] != "") $whatsapp->sendMessage($email[$i], $msg);
+    
+            $notification .= ($nama[$i] . ' (' . $email[$i] . ')');
+            if ($i < count($email) - 1) $notification .= ', ';
+            else $notification .= '.';
         }
-        $url =  $host. $path.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
-        $msg = $messageHelper->messageTolakPengajuanBPU($userSetuju, $budget['nama'], $no, $term, $arrPenerima, $tanggalbayar, $arrPembayaran, $arrJumlah, $keterangan, $url);
-        if($email[$i] != "") $whatsapp->sendMessage($email[$i], $msg);
-
-        $notification .= ($nama[$i] . ' (' . $email[$i] . ')');
-        if ($i < count($email) - 1) $notification .= ', ';
-        else $notification .= '.';
     }
 
     if ($bpuItem['status'] != "UM" && $bpuItem['status'] != "UM Burek") {
