@@ -25,7 +25,7 @@ class Callback extends Database {
 
     public function callback_transfer() 
     {
-        var_dump($this->get_input());
+        var_dump($this->dataInput['response']);
         $isSuccessTransfer = $this->is_success_process_transfer();
         if ($isSuccessTransfer) {
             $this->get_data_transfer();
@@ -57,6 +57,9 @@ class Callback extends Database {
 
     private function is_success_process_transfer()
 	{
+        if (!isset($this->dataInput['response']['TransactionID'])) {
+            return false;
+        }
 		return $this->dataInput['response']['TransactionID'] == $this->dataInput['transfer_req_id'];
 	}
 
