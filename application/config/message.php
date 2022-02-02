@@ -403,6 +403,50 @@ Klik $url untuk membuka aplikasi budget.";
         
         return $msg;
     }
+
+    public function messageSuccessTransferNonVendorWA($penerima, $jenisPembayaran, $norek, $job, $bank, $totalTransfer, $tanggal)
+    {
+        $msg = "Notifikasi Informasi Pembayaran
+Berikut informasi status pembayaran Anda:<br><br>
+
+Pembayaran       : *$jenisPembayaran*
+No. Rekening Anda       : *$norek*
+Nama Job       : *$job*
+Bank       : *$bank*
+Nama Penerima       : *$penerima*
+Jumlah Dibayarkan       : *Rp. " . number_format($totalTransfer, 0, '', '.') . "*
+Status       : *Terbayar Lunas</strong> Tanggal:  $tanggal*
+
+Jika ada pertanyaan lebih lanjut, silahkan email Divisi Finance ke finance@mri-research-ind.com
+Hormat kami,
+Divisi Finance 
+Marketing Research Indonesia";
+        
+        return $msg;
+    }
+
+    public function messageSuccessTransferVendorWA($penerima, $jenisPembayaran, $norek, $bank, $totalTransfer, $tanggal, $noInvoice, $tanggalInvoice, $startTerm, $endTerm)
+    {
+        $msg = "Notifikasi Informasi Pembayaran
+Berikut informasi status pembayaran Anda:
+
+No. Invoice       : *$noInvoice*
+Tanggal Invoice       : *$tanggalInvoice*
+Term       : *$startTerm dari $endTerm*
+Jenis Pembayaran       : *$jenisPembayaran*
+No. Rekening Anda       : *$norek*
+Bank       : *$bank*
+Nama Penerima       : *$penerima*
+Jumlah Dibayarkan       : *Rp. " . number_format($totalTransfer, 0, '', '.') . "*
+Status       : *Terbayar</strong> Tanggal:  $tanggal*
+
+Jika ada pertanyaan lebih lanjut, silahkan email Divisi Finance ke finance@mri-research-ind.com
+Hormat kami,
+Divisi Finance 
+Marketing Research Indonesia";
+        
+        return $msg;
+    }
 }
 
     
