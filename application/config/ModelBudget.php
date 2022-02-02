@@ -56,7 +56,7 @@ class ModelBudget
         return $this;
     }
 
-    public function join($table, $on, $type = null|'left'|'right'|'inner')
+    public function join($table, $on, $type = null)
     {
         $typeJoin = ' JOIN ';
         if ($type != null) $typeJoin = $type . $typeJoin;
