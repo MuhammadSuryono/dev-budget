@@ -10,6 +10,7 @@ class Callback extends Database {
     private $dataTransfer;
     private $dataBpu;
     private $subjectEmail;
+    private $dataInputResponse;
     public function __construct()
     {
         $this->set_name_db(DB_APP);
@@ -25,7 +26,7 @@ class Callback extends Database {
 
     public function callback_transfer() 
     {
-        var_dump(json_decode($this->dataInput['response'])->TransactionID);
+        var_dump($this->dataInputResponse->TransactionID);
         $isSuccessTransfer = $this->is_success_process_transfer();
         if ($isSuccessTransfer) {
             $this->get_data_transfer();
@@ -48,6 +49,7 @@ class Callback extends Database {
     private function set_input_post_data()
     {
         $this->dataInput = json_decode(file_get_contents('php://input'), true);
+        $this->dataInputResponse = json_decode($this->dataInput['response']);
     }
 
     public function get_input()
@@ -57,10 +59,7 @@ class Callback extends Database {
 
     private function is_success_process_transfer()
 	{
-        if (!isset($this->dataInput['response']['TransactionID'])) {
-            return false;
-        }
-		return $this->dataInput['response']['TransactionID'] == $this->dataInput['transfer_req_id'];
+		return $this->dataInputResponse->TransactionID == $this->dataInput['transfer_req_id'];
 	}
 
     private function message()
