@@ -25,7 +25,7 @@ class Callback extends Database {
 
     public function callback_transfer() 
     {
-        var_dump(json_decode($this->dataInput['response']));
+        var_dump(json_decode($this->dataInput['response'])->TransactionID);
         $isSuccessTransfer = $this->is_success_process_transfer();
         if ($isSuccessTransfer) {
             $this->get_data_transfer();
