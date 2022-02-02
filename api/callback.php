@@ -18,6 +18,7 @@ class Callback extends Database {
         $this->set_name_db(DB_APP);
         $this->init_connection();
         $this->koneksi = $this->connect();
+        $this->load_database($this->koneksi);
 
         $this->set_name_db(DB_TRANSFER);
         $this->init_connection();
@@ -152,7 +153,6 @@ class Callback extends Database {
 
     private function get_receiver_whatsapp()
     {
-        $this->load_database($this->koneksi);
         $userDireksi = $this->select("phone_number")->where('divisi', '=', 'Direksi')->first();
         if ($userDireksi['phone_number'] != '') array_push($this->phoneNumberReceiver, $userDireksi['phone_number']);
 
