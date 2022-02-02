@@ -26,12 +26,13 @@ class Callback extends Database {
 
     public function callback_transfer() 
     {
-        var_dump($this->dataInputResponse->TransactionID);
         $isSuccessTransfer = $this->is_success_process_transfer();
         if ($isSuccessTransfer) {
             $this->get_data_transfer();
             $this->get_data_bpu();
             $this->send_email();
+        } else {
+            var_dump("Error Transfer: ", $this->dataInput);
         }
     }
 
@@ -81,10 +82,10 @@ class Callback extends Database {
             $endTerm = $explodeTerm[1]; // [END TERM PEMBAYARAN]
             $ketPembayaran = $this->dataBpu['rincian']; // [KETERANGAN]
             $this->subjectEmail = "Laporan Transaksi Transfer " . $ketPembayaran;
-            return $messageHelper->messageSuccessTransferVendor($this->dataBpu['namapenerima'], $ketPembayaran, $this->dataTransfer['norek'], $this->dataTransfer['bank'], $this->dataTransfer['jumlah'], $this->dataInput['response']['TransactionDate'], $numberInvoce, $dateInvoice, $startTerm, $endTerm);
+            return $messageHelper->messageSuccessTransferVendor($this->dataBpu['namapenerima'], $ketPembayaran, $this->dataTransfer['norek'], $this->dataTransfer['bank'], $this->dataTransfer['jumlah'], $this->dataInputResponse->TransactionDate, $numberInvoce, $dateInvoice, $startTerm, $endTerm);
         } else {
             $this->subjectEmail = "Laporan Transaksi Transfer " . $this->dataBpu['rincian'];
-            return $messageHelper->messageSuccessTransferNonVendor($this->dataBpu['namapenerima'], $this->dataBpu['rincian'], $this->dataTransfer['norek'], $this->dataBpu['nama'], $this->dataTransfer['bank'], $this->dataTransfer['jumlah'], $this->dataInput['response']['TransactionDate']);
+            return $messageHelper->messageSuccessTransferNonVendor($this->dataBpu['namapenerima'], $this->dataBpu['rincian'], $this->dataTransfer['norek'], $this->dataBpu['nama'], $this->dataTransfer['bank'], $this->dataTransfer['jumlah'], $this->dataInputResponse->TransactionDate);
         }
     }
 
