@@ -12,7 +12,7 @@ class Callback extends Database {
     private $dataBpu;
     private $subjectEmail;
     private $dataInputResponse;
-    private $phoneNumberReceiver;
+    private $phoneNumberReceiver = [];
     public function __construct()
     {
         $this->set_name_db(DB_APP);
