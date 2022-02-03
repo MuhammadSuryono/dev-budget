@@ -5,6 +5,7 @@ require_once "application/config/whatsapp.php";
 require_once "application/config/message.php";
 require_once "application/config/email.php";
 require_once "application/controllers/Cuti.php";
+require_once "application/config/messageEmail.php";
 
 $emailHelper = new Email();
 $cuti = new Cuti();
@@ -15,7 +16,7 @@ require "vendor/email/send-email.php";
 
 $wa = new Whastapp();
 $messageHelper = new Message();
-
+$messageEmail = new MessageEmail();
 
 $con->set_name_db(DB_TRANSFER);
 $con->init_connection();
@@ -63,6 +64,7 @@ $dataLevel = [];
 $idPengajuan = [];
 $duplicatePhoneNumber = [];
 $hakAkses = [];
+$emails = [];
 
 $queryItemBpu = mysqli_query($koneksi, "SELECT rincian FROM selesai where no = '$no' AND waktu = '$waktu'");
 $dataItemBpu = mysqli_fetch_assoc($queryItemBpu);
@@ -96,6 +98,7 @@ while ($e = mysqli_fetch_assoc($queryUser)) {
         array_push($dataLevel, $e['level']);
         array_push($hakAkses, $e['hak_akses']);
         array_push($duplicatePhoneNumber, $e['phone_number']);
+        array_push($emails, $e['email']);
     }
 }
 
@@ -109,6 +112,7 @@ while ($e = mysqli_fetch_assoc($queryUser)) {
         array_push($dataLevel, $e['level']);
         array_push($hakAkses, $e['hak_akses']);
         array_push($duplicatePhoneNumber, $e['phone_number']);
+        array_push($emails, $e['email']);
     }
 }
 
@@ -122,6 +126,7 @@ while ($e = mysqli_fetch_assoc($queryUser)) {
         array_push($dataLevel, $e['level']);
         array_push($hakAkses, $e['hak_akses']);
         array_push($duplicatePhoneNumber, $e['phone_number']);
+        array_push($emails, $e['email']);
     }
 }
 
@@ -140,6 +145,7 @@ if ($actionProcess == "update") {
                     $dataLevel[$i] = $e['level'];
                     $hakAkses[$i] = $e['hak_akses'];
                     $duplicatePhoneNumber[$i] = $e['phone_number'];
+                    $emails[$i] = $e['email'];
                 }
             }
         }
@@ -451,7 +457,9 @@ if (isset($_POST['submit'])) {
     
                   $url =  $host. $path.'&session='.base64_encode(json_encode(["id_user" => $idUserInternal[$i], "timeout" => time()]));
                   $msg = $messageHelper->messagePengajuanBPU($namaInternal[$i], $pengaju, $namaProject, $namaPenerima, $jumlahDiterima, "", $url);
+                  $msgEmail = $messageEmail->applyBPU($namaInternal[$i], $pengaju, $namaProject, $namaPenerima, $jumlahDiterima, "", $url);
                   if($emailInternal[$i] != "") $wa->sendMessage($emailInternal[$i], $msg);
+                  if ($emails[$i] != "") $emailHelper->sendEmail($msgEmail, "Informais Pengajuan BPU", $emails[$i]);
     
                   $notification .= ($namaInternal[$i] . ' (' . $emailInternal[$i] . ')');
                     if ($i < count($emailInternal) - 1) $notification .= ', ';
@@ -555,14 +563,17 @@ if (isset($_POST['submit'])) {
                         $url =  $host. $path.'&session='.base64_encode(json_encode(["id_user" => $idUserInternal[$i], "timeout" => time()]));
                         if ($actionProcess == "update" && $isEksternalProcess) {
                             $msg = $messageHelper->messagePengajuanBPU($namaInternal[$i], $pengaju, $namaProject, $namapenerima, $jumlah, "", $url);
+                            $msgEmail = $messageEmail->applyBPU($namaInternal[$i], $pengaju, $namaProject, $namapenerima, $jumlah, "", $url);
                         } else {
                             $penerima = $vendorName;
                             if ($penerima == "") {
                                 $penerima = "-";
                             }
                             $msg = $messageHelper->messagePembuatanBPUEksternal($namaInternal[$i], $_SESSION['nama_user'], $namaProject, $penerima, $jumlah, "", $url);
+                            $msgEmail = $messageEmail->applyBPUEksternal($namaInternal[$i], $_SESSION['nama_user'], $namaProject, $penerima, $jumlah, "", $url);
                         }
                         if($emailInternal[$i] != "") $wa->sendMessage($emailInternal[$i], $msg);
+                        if ($emails[$i] != "") $emailHelper->sendEmail($msgEmail, "Informasi Pengajuan BPU", $emails[$i]);
     
                         $notification .= ($namaInternal[$i] . ' (' . $emailInternal[$i] . ')');
                         if ($i < count($emailInternal) - 1) $notification .= ', ';

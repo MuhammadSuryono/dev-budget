@@ -6,6 +6,7 @@ require_once "application/config/whatsapp.php";
 require_once "application/config/message.php";
 require_once "application/config/email.php";
 require_once "application/controllers/Cuti.php";
+require_once "application/config/messageEmail.php";
 
 
 $emailHelper = new Email();
@@ -16,6 +17,7 @@ $koneksi = $con->connect();
 
 $messageHelpper = new Message();
 $wa = new Whastapp();
+$messgaeEmail = new MessageEmail();
 
 require "vendor/email/send-email.php";
 
@@ -84,6 +86,7 @@ $idUsersNotification = [];
 $dataDivisi = [];
 $dataLevel = [];
 $arremailpenerima = [];
+$emails = [];
 
 
 $url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
@@ -158,6 +161,7 @@ if ($update) {
         array_push($idUsersNotification, $emailUser['id_user']);
         array_push($dataDivisi, $emailUser['divisi']);
         array_push($dataLevel, $emailUser['level']);
+        array_push($emails, $emailUser['email']);
     }
 
     $queryEmail = mysqli_query($koneksi, "SELECT *,divisi FROM tb_user WHERE nama_user = '$budget[pengaju]' AND aktif='Y'");
@@ -168,6 +172,7 @@ if ($update) {
         array_push($idUsersNotification, $emailUser['id_user']);
         array_push($dataDivisi, $emailUser['divisi']);
         array_push($dataLevel, $emailUser['level']);
+        array_push($emails, $emailUser['email']);
     }
 
     $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$acknowledged' AND aktif='Y'");
@@ -178,6 +183,7 @@ if ($update) {
         array_push($idUsersNotification, $emailUser['id_user']);
         array_push($dataDivisi, $emailUser['divisi']);
         array_push($dataLevel, $emailUser['level']);
+        array_push($emails, $emailUser['email']);
     }
 
     if ($budget['jenis'] == 'B1' || $budget['jenis'] == 'B2') {
@@ -189,6 +195,7 @@ if ($update) {
                 array_push($idUsersNotification, $emailUser['id_user']);
                 array_push($dataDivisi, $emailUser['divisi']);
                 array_push($dataLevel, $emailUser['level']);
+                array_push($emails, $emailUser['email']);
             }
         }
     } else {
@@ -200,6 +207,7 @@ if ($update) {
                 array_push($idUsersNotification, $emailUser['id_user']);
                 array_push($dataDivisi, $emailUser['divisi']);
                 array_push($dataLevel, $emailUser['level']);
+                array_push($emails, $emailUser['email']);
             }
         }
     }
@@ -212,6 +220,7 @@ if ($update) {
         array_push($idUsersNotification, $emailUser['id_user']);
         array_push($dataDivisi, $emailUser['divisi']);
         array_push($dataLevel, $emailUser['level']);
+        array_push($emails, $emailUser['email']);
     }
 
     $notification = 'Bayar Budget Berhasil. Pemberitahuan via whatsapp telah terkirim ke ';
@@ -229,7 +238,9 @@ if ($update) {
             }
             $url =  $host. $path.'?code='.$id.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
             $msg = $messageHelpper->messageStatusPembayaranBPUVendorSuplier($budget['nama'],$no,$term,$arrPenerima[$i], $user, $tanggalbayar, $nomorvoucher, $arrJumlah, $keterangan, $url);
+            $msgEmail = $messgaeEmail->statusPaymentBPUVendor($budget['nama'],$no,$term,$arrPenerima[$i], $user, $tanggalbayar, $nomorvoucher, $arrJumlah, $keterangan, $url);
             if($email[$i] != "") $wa->sendMessage($email[$i], $msg);
+            if ($emails[$i] != "") $emailHelper->sendEmail($msgEmail, 'Informasi Pembayaran BPU', $emails[$i]);
             $notification .= ($nama[$i] . ' (' . $email[$i] . ')');
             if ($i < count($email) - 1) $notification .= ', ';
             else $notification .= '.';

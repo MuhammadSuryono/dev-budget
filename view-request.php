@@ -6,8 +6,11 @@ require "application/config/helper.php";
 
 $con = new Database();
 $koneksi = $con->connect();
+$session = $_GET['session'];
+$isSetSession = false;
+if (isset($session)) $isSetSession = true;
 
-$helper = new Helper();
+$helper = new Helper($isSetSession);
 
 $con->set_name_db(DB_JAY);
 $con->init_connection();

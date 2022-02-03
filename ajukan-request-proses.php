@@ -5,8 +5,12 @@ require_once "application/config/message.php";
 require_once "application/config/whatsapp.php";
 require_once "application/config/helper.php";
 require_once "application/controllers/Cuti.php";
+require_once "application/config/messageEmail.php";
+require_once "application/config/email.php";
 
 $messageHelper = new Message();
+$messageEmail = new MessageEmail();
+$emailSender = new Email();
 
 $helper = new Helper();
 $host = $helper->getHostUrl();
@@ -136,12 +140,14 @@ if (@unserialize($data['document'])) {
 }
 
 $phoneNumbers = [];
+$emails= [];
 $namaUser = [];
 $idUsersNotification = [];
 
 if ($totalbudget > 1000000) {
     $dataUserDireksi = $con->select()->from('tb_user')->where('divisi', '=', 'Direksi')->where('aktif', '=', 'Y')->first();
     if ($dataUserDireksi['phone_number']) {
+        array_push($emails, $dataUserDireksi['email']);
         array_push($phoneNumbers, $dataUserDireksi['phone_number']);
         array_push($namaUser, $dataUserDireksi['nama_user']);
         array_push($idUsersNotification, $dataUserDireksi['id_user']);
@@ -157,12 +163,14 @@ if ($totalbudget > 1000000) {
     if ($cuti->checkStatusCutiUser($userFinance['nama_user'])) {
         $dataUserDireksi = $con->select()->from('tb_user')->where('divisi', '=', 'Direksi')->where('aktif', '=', 'Y')->first();
         if ($dataUserDireksi['phone_number']) {
+            array_push($emails, $dataUserDireksi['email']);
             array_push($phoneNumbers, $dataUserDireksi['phone_number']);
             array_push($namaUser, $dataUserDireksi['nama_user']);
             array_push($idUsersNotification, $dataUserDireksi['id_user']);
         }
     } else {
         if ($userFinance['phone_number'] && !in_array($userFinance['nama_user'], $duplciate)) {
+            array_push($emails, $userFinance['email']);
             array_push($phoneNumbers, $userFinance['phone_number']);
             array_push($namaUser, $userFinance['nama_user']);
             array_push($idUsersNotification, $userFinance['id_user']);
@@ -202,7 +210,9 @@ if ($updatePengajuanRequest) {
             if ($phoneNumbers[$i] != "") {
                 $url =  $host. '/view-request.php?id='.$id.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
                 $msg = $messageHelper->messageAjukanBudget($namaUser[$i], $pengaju, $namaProject, $divisi, $totalbudget, $keterangan, $url);
+                $msgEmail = $messageEmail->applyBudget($namaUser[$i], $pengaju, $namaProject, $divisi, $totalbudget, $keterangan, $url);
                 $wa->sendMessage($phoneNumbers[$i], $msg);
+                $emailSender->sendEmail($msgEmail, 'Notifikasi Pengajuan Budget ' . $namaProject, $emails[$i]);
             }
         }
     }

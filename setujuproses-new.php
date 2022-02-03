@@ -4,6 +4,7 @@ require_once "application/config/database.php";
 require_once "application/config/message.php";
 require_once "application/config/whatsapp.php";
 require_once "application/config/email.php";
+require_once "application/config/messageEmail.php";
 
 $emailHelper = new Email();
 
@@ -12,6 +13,7 @@ $koneksi = $con->connect();
 
 $messageHelper = new Message();
 $whatsapp = new Whastapp();
+$messageEmail = new MessageEmail();
 
 $con->set_name_db(DB_TRANSFER);
 $con->init_connection();
@@ -104,6 +106,7 @@ $arrPembayaran = [];
 $idUsersNotification = [];
 $dataDivisi = [];
 $dataLevel = [];
+$emails = [];
 $arremailpenerima = [];
 
 
@@ -223,6 +226,7 @@ if ($_POST['submit'] == 1) {
                 array_push($idUsersNotification, $emailUser['id_user']);
                 array_push($dataDivisi, $emailUser['divisi']);
                 array_push($dataLevel, $emailUser['level']);
+                array_push($emails, $emailUser['email']);
             }
         }
 
@@ -235,6 +239,7 @@ if ($_POST['submit'] == 1) {
             array_push($dataDivisi, $emailUser['divisi']);
             array_push($dataLevel, $emailUser['level']);
             array_push($duplicateNumber, $emailUser['phone_number']);
+            array_push($emails, $emailUser['email']);
         }
 
 
@@ -287,6 +292,7 @@ if ($_POST['submit'] == 1) {
             array_push($dataDivisi, $emailUser['divisi']);
             array_push($dataLevel, $emailUser['level']);
             array_push($duplicateNumber, $emailUser['phone_number']);
+            array_push($emails, $emailUser['email']);
         }
     }
 
@@ -300,6 +306,7 @@ if ($_POST['submit'] == 1) {
             array_push($dataDivisi, $emailUser['divisi']);
             array_push($dataLevel, $emailUser['level']);
             array_push($duplicateNumber, $emailUser['phone_number']);
+            array_push($emails, $emailUser['email']);
         }
     }
 
@@ -312,6 +319,7 @@ if ($_POST['submit'] == 1) {
         array_push($idUsersNotification, $emailUser['id_user']);
         array_push($dataLevel, $emailUser['level']);
         array_push($duplicateNumber, $emailUser['phone_number']);
+        array_push($emails, $emailUser['email']);
     }
 
     if ($budget['jenis'] == 'B1' || $budget['jenis'] == 'B2') {
@@ -324,6 +332,7 @@ if ($_POST['submit'] == 1) {
                 array_push($dataDivisi, $e['divisi']);
                 array_push($dataLevel, $e['level']);
                 array_push($duplicateNumber, $emailUser['phone_number']);
+                array_push($emails, $emailUser['email']);
             }
         }
     } else {
@@ -336,6 +345,7 @@ if ($_POST['submit'] == 1) {
                 array_push($dataDivisi, $e['divisi']);
                 array_push($dataLevel, $e['level']);
                 array_push($duplicateNumber, $emailUser['phone_number']);
+                array_push($emails, $emailUser['email']);
             }
         }
     }
@@ -390,7 +400,9 @@ if ($_POST['submit'] == 1) {
     
               $url =  $host. $path.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
               $msg = $messageHelper->messageApprovePengajuanBPU($userSetuju, $budget['nama'], $no, $term, $arrPenerima, $tanggalbayar, $arrPembayaran, $arrJumlah, $keterangan, $url);
+              $msgEmail = $messageEmail->approvedApplyBPU($userSetuju, $budget['nama'], $no, $term, $arrPenerima, $tanggalbayar, $arrPembayaran, $arrJumlah, $keterangan, $url);
               if($email[$i] != "") $whatsapp->sendMessage($email[$i], $msg);
+              if ($emails[$i] != "") $emailHelper->sendEmail($msgEmail, "Informasi Persetujuan BPU", $emails[$i]);
               $notification .= ($nama[$i] . ' (' . $email[$i] . ')');
               if ($i < count($email) - 1) $notification .= ', ';
               else $notification .= '.';
@@ -504,7 +516,9 @@ else if ($submit == 0) {
             }
             $url =  $host. $path.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
             $msg = $messageHelper->messageTolakPengajuanBPU($userSetuju, $budget['nama'], $no, $term, $arrPenerima, $tanggalbayar, $arrPembayaran, $arrJumlah, $keterangan, $url);
+            $msgEmail = $messageEmail->rejectedApplyBPU($userSetuju, $budget['nama'], $no, $term, $arrPenerima, $tanggalbayar, $arrPembayaran, $arrJumlah, $keterangan, $url, $alasanTolakBpu);
             if($email[$i] != "") $whatsapp->sendMessage($email[$i], $msg);
+            if ($emails[$i] != "") $emailHelper->sendEmail($msgEmail, "Informais Penolakan BPU", $emails[$i]);
     
             $notification .= ($nama[$i] . ' (' . $email[$i] . ')');
             if ($i < count($email) - 1) $notification .= ', ';
