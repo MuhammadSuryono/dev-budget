@@ -4,11 +4,16 @@ require "application/config/database.php";
 require_once "application/config/whatsapp.php";
 require_once "application/config/message.php";
 require_once "application/controllers/Cuti.php";
+require_once "application/config/messageEmail.php";
+require_once "application/config/email.php";
 
 $helper = new Message();
 $con = new Database();
 $koneksi = $con->connect();
 $con->load_database($koneksi);
+
+$messageEmail = new MessageEmail();
+$emailSender = new Email();
 
 require "dompdf/save-document.php";
 require_once("dompdf/dompdf_config.inc.php");
@@ -97,7 +102,7 @@ if ($updatePengajuanRequest) {
         die;
     }
 
-    $dataSelesaiRequest = $con->select()->from('selesai_request')->where('waktu',$waktunya)->where('rincian', '!=', '')->get();
+    $dataSelesaiRequest = $con->select()->from('selesai_request')->where('waktu', '=', $waktunya)->where('rincian', '!=', '')->get();
     $selesaiRequest = [];
     $checkName = [];
     foreach ($dataSelesaiRequest as $row ) {
@@ -148,7 +153,8 @@ if ($updatePengajuanRequest) {
         $idUsersNotification = [];
         $dataDivisi = [];
         $dataLevel = [];
-        $data = $con->select('phone_number,divisi,nama_user,id_user,level')->from('tb_user')->where('nama_user', '=', $gPengaju)->where('aktif', '=', 'Y')->first();
+        $emails = [];
+        $data = $con->select()->from('tb_user')->where('nama_user', '=', $gPengaju)->where('aktif', '=', 'Y')->first();
         $divisi = $data['divisi'];
 
         array_push($phoneNumbers, $data['phone_number']);
@@ -156,6 +162,7 @@ if ($updatePengajuanRequest) {
         array_push($idUsersNotification, $data['id_user']);
         array_push($dataDivisi, $data['divisi']);
         array_push($dataLevel, $data['level']);
+        array_push($emails, $data['email']);
 
         $url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
         $port = $_SERVER['SERVER_PORT'];
@@ -188,7 +195,9 @@ if ($updatePengajuanRequest) {
                     }
                     $url =  $host. $path.'?code='.$idPengajuan.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
                     $msg = $helper->messagePersetujuanBudget($namaUserSendNotifications[$i], $pengaju, $gNamaProject, $divisi, $gTotalBudget, $gPembuat, $url);
+                    $msgEmail = $messageEmail->approvedBudget($namaUserSendNotifications[$i], $pengaju, $gNamaProject, $divisi, $gTotalBudget, $gPembuat, $url);
                     if($phoneNumbers[$i] != "") $whatsapp->sendMessage($phoneNumbers[$i], $msg);
+                    if ($emails[$i] != "") $emailSender->sendEmail($msgEmail, "Notifikasi Persetujuan Budget", $emails[$i]);
                 }
 
             }
@@ -204,7 +213,7 @@ if ($updatePengajuanRequest) {
             $name = $doc;
         }
 
-//        saveDocApproved($koneksi, $noid, $name);
+        saveDocApproved($koneksi, $noid, $name);
         if ($_SESSION['divisi'] == 'FINANCE') {
             echo $helper->alertMessage($notification, 'home-finance.php');
 

@@ -8,12 +8,14 @@ require_once "application/config/whatsapp.php";
 require_once "application/config/helper.php";
 require_once "application/config/message.php";
 require_once "application/config/email.php";
+require_once "application/config/messageEmail.php";
 
 session_start();
 $helper = new Helper();
 $messageHelper = new Message();
 $whatsapp = new Whastapp();
 $emailHelper = new Email();
+$messageEmail = new MessageEmail();
 
 $userCheck = $_SESSION['nama_user'];
 $now = date_create('now')->format('Y-m-d H:i:s');
@@ -39,6 +41,7 @@ $idUsersNotification = [];
 $dataDivisi = [];
 $dataLevel = [];
 $arremailpenerima = [];
+$emails = [];
 
 $url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
 $port = $_SERVER['SERVER_PORT'];
@@ -59,6 +62,7 @@ if ($pengajuan['jenis'] == 'B1' || $pengajuan['jenis'] == 'B2') {
                 array_push($idUsersNotification, $e['id_user']);
                 array_push($dataDivisi, $e['divisi']);
                 array_push($dataLevel, $e['level']);
+                array_push($emails, $e['email']);
             }
         }
     } else {
@@ -73,6 +77,7 @@ if ($pengajuan['jenis'] == 'B1' || $pengajuan['jenis'] == 'B2') {
                         array_push($idUsersNotification, $e['id_user']);
                         array_push($dataDivisi, $e['divisi']);
                         array_push($dataLevel, $e['level']);
+                        array_push($emails, $e['email']);
                     }
                 }
             }
@@ -89,6 +94,7 @@ if ($pengajuan['jenis'] == 'B1' || $pengajuan['jenis'] == 'B2') {
                 array_push($idUsersNotification, $e['id_user']);
                 array_push($dataDivisi, $e['divisi']);
                 array_push($dataLevel, $e['level']);
+                array_push($emails, $e['email']);
             }
         }
     } else {
@@ -103,6 +109,7 @@ if ($pengajuan['jenis'] == 'B1' || $pengajuan['jenis'] == 'B2') {
                         array_push($idUsersNotification, $e['id_user']);
                         array_push($dataDivisi, $e['divisi']);
                         array_push($dataLevel, $e['level']);
+                        array_push($emails, $e['email']);
                     }
                 }
             }
@@ -121,6 +128,7 @@ if ($emailUser) {
         array_push($idUsersNotification, $emailUser['id_user']);
         array_push($dataDivisi, $emailUser['divisi']);
         array_push($dataLevel, $emailUser['level']);
+        array_push($emails, $e['email']);
     }
 }
 
@@ -132,24 +140,9 @@ if ($emailUser) {
     array_push($idUsersNotification, $emailUser['id_user']);
     array_push($dataDivisi, $emailUser['divisi']);
     array_push($dataLevel, $emailUser['level']);
+    array_push($emails, $e['email']);
 }
 
-// $queryProject = mysqli_query($koneksi, "SELECT nama FROM pengajuan WHERE waktu='$waktu'");
-// $namaProject = mysqli_fetch_array($queryProject)[0];
-
-// $msg = "Notifikasi BPU, <br><br>
-//   BPU telah diajukan dengan keterangan sebagai berikut:<br><br>
-//   Nama Project      : <strong>$namaProject</strong><br>
-//   Nama Pengaju      : <strong>" . $bpu['pengaju'] . "</strong><br>
-//   Nama Penerima     : <strong>" . $bpu['namapenerima'] . "</strong><br>
-//   Jumlah Diajukan   : <strong>Rp. " . number_format($bpu['pengajuan_jumlah'], 0, '', ',') . "</strong><br>
-//   ";
-// if ($keterangan) {
-    //     $msg .= "Keterangan:<strong> $keterangan </strong><br><br>";
-    // } else {
-        //     $msg .= "<br>";
-        // }
-        // $msg .= "Klik <a href='$url'>Disini</a> untuk membuka aplikasi budget.";
 $subject = "Notifikasi Aplikasi Budget";
 
 array_unique($email);
@@ -171,6 +164,8 @@ for ($i = 0; $i < count($email); $i++) {
         }
         $url =  $host. $path.'?code='.$id.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
         $msg = $messageHelper->messagePengajuanBPUKadiv($nama[$i], $bpu['pengaju'], $namaProject, $bpu['namapenerima'], $bpu['pengajuan_jumlah'], $keterangan, $url);
+        $msgEmail = $messageEmail->applyBpuKadiv($nama[$i], $bpu['pengaju'], $namaProject, $bpu['namapenerima'], $bpu['pengajuan_jumlah'], $keterangan, $url);
+        $emailHelper->sendEmail($msgEmail, "Informasi BPU Di Ketahui KADIV", $emails[$i]);
         $whatsapp->sendMessage($email[$i], $msg);
 
         if ($i++ < count($email) - 1) $notification .= $nama[$i].'('.$email[$i].'),';
