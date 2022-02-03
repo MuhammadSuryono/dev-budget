@@ -120,7 +120,6 @@ class Callback extends Database {
         $this->get_receiver_whatsapp();
 
         $phoneNumberReceiver = $this->phoneNumberReceiver;
-        var_dump($phoneNumberReceiver);
         for ($i=0; $i < count($phoneNumberReceiver); $i++) { 
             $wa->sendMessage($phoneNumberReceiver[$i], $message);
         }
@@ -155,7 +154,6 @@ class Callback extends Database {
     private function get_receiver_whatsapp()
     {
         $userDireksi = $this->select("phone_number")->from("tb_user")->where('divisi', '=', 'Direksi')->first();
-        var_dump($userDireksi);
         if ($userDireksi['phone_number'] != '') array_push($this->phoneNumberReceiver, $userDireksi['phone_number']);
 
         if ($this->dataBpu['statusbpu'] == "UM" || $this->dataBpu['statusbpu'] == "UM Burek") {
