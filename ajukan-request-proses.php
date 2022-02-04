@@ -187,10 +187,6 @@ $updatePengajuanRequest = $con->update('pengajuan_request')
     ->save_update();
 
 saveDoc($koneksi, $id, $name);
-
-$row = $con->select('id')->where('waktu', '=', $waktu)->first();
-
-$id = $row['id'];
 $updateSelesaiRequest = $con->update('selesai_request')->set_value_update('waktu', $waktu)->where('id_pengajuan_request', '=', $id)->save_update();
 
 $url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
