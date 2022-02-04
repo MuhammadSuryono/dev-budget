@@ -144,40 +144,48 @@ $emails= [];
 $namaUser = [];
 $idUsersNotification = [];
 
-if ($totalbudget > 1000000) {
-    $dataUserDireksi = $con->select()->from('tb_user')->where('divisi', '=', 'Direksi')->where('aktif', '=', 'Y')->first();
-    if ($dataUserDireksi['phone_number']) {
-        array_push($emails, $dataUserDireksi['email']);
-        array_push($phoneNumbers, $dataUserDireksi['phone_number']);
-        array_push($namaUser, $dataUserDireksi['nama_user']);
-        array_push($idUsersNotification, $dataUserDireksi['id_user']);
-    }
-} else {
-    $cuti = new Cuti();
-    $userFinance = $con->select()->from('tb_user')
-        ->where('divisi', '=', 'Finance')
-        ->where('hak_akses', '=', 'Manager')
-        ->where('aktif', '=', 'Y')
-        ->first();
-
-    if ($cuti->checkStatusCutiUser($userFinance['nama_user'])) {
-        $dataUserDireksi = $con->select()->from('tb_user')->where('divisi', '=', 'Direksi')->where('aktif', '=', 'Y')->first();
-        if ($dataUserDireksi['phone_number']) {
-            array_push($emails, $dataUserDireksi['email']);
-            array_push($phoneNumbers, $dataUserDireksi['phone_number']);
-            array_push($namaUser, $dataUserDireksi['nama_user']);
-            array_push($idUsersNotification, $dataUserDireksi['id_user']);
-        }
-    } else {
-        if ($userFinance['phone_number'] && !in_array($userFinance['nama_user'], $duplciate)) {
-            array_push($emails, $userFinance['email']);
-            array_push($phoneNumbers, $userFinance['phone_number']);
-            array_push($namaUser, $userFinance['nama_user']);
-            array_push($idUsersNotification, $userFinance['id_user']);
-            array_push($duplciate, $userFinance['phone_number']);
-        }
-    }
+$dataUserDireksi = $con->select()->from('tb_user')->where('divisi', '=', 'Direksi')->where('aktif', '=', 'Y')->first();
+if ($dataUserDireksi['phone_number']) {
+    array_push($emails, $dataUserDireksi['email']);
+    array_push($phoneNumbers, $dataUserDireksi['phone_number']);
+    array_push($namaUser, $dataUserDireksi['nama_user']);
+    array_push($idUsersNotification, $dataUserDireksi['id_user']);
 }
+
+// if ($totalbudget > 1000000) {
+//     $dataUserDireksi = $con->select()->from('tb_user')->where('divisi', '=', 'Direksi')->where('aktif', '=', 'Y')->first();
+//     if ($dataUserDireksi['phone_number']) {
+//         array_push($emails, $dataUserDireksi['email']);
+//         array_push($phoneNumbers, $dataUserDireksi['phone_number']);
+//         array_push($namaUser, $dataUserDireksi['nama_user']);
+//         array_push($idUsersNotification, $dataUserDireksi['id_user']);
+//     }
+// } else {
+//     $cuti = new Cuti();
+//     $userFinance = $con->select()->from('tb_user')
+//         ->where('divisi', '=', 'Finance')
+//         ->where('hak_akses', '=', 'Manager')
+//         ->where('aktif', '=', 'Y')
+//         ->first();
+
+//     if ($cuti->checkStatusCutiUser($userFinance['nama_user'])) {
+//         $dataUserDireksi = $con->select()->from('tb_user')->where('divisi', '=', 'Direksi')->where('aktif', '=', 'Y')->first();
+//         if ($dataUserDireksi['phone_number']) {
+//             array_push($emails, $dataUserDireksi['email']);
+//             array_push($phoneNumbers, $dataUserDireksi['phone_number']);
+//             array_push($namaUser, $dataUserDireksi['nama_user']);
+//             array_push($idUsersNotification, $dataUserDireksi['id_user']);
+//         }
+//     } else {
+//         if ($userFinance['phone_number'] && !in_array($userFinance['nama_user'], $duplciate)) {
+//             array_push($emails, $userFinance['email']);
+//             array_push($phoneNumbers, $userFinance['phone_number']);
+//             array_push($namaUser, $userFinance['nama_user']);
+//             array_push($idUsersNotification, $userFinance['id_user']);
+//             array_push($duplciate, $userFinance['phone_number']);
+//         }
+//     }
+// }
 $updatePengajuanRequest = $con->update('pengajuan_request')
     ->set_value_update('status_request', 'Di Ajukan')
     ->set_value_update('waktu', $waktu)
