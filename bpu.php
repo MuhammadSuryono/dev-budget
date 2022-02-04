@@ -280,14 +280,14 @@ if ($_POST['no'] && $_POST['waktu']) {
       var statusBpu = '<?= $statusbpu ?>';
       if (statusBpu == 'UM' || statusBpu == 'UM Burek') {
         var picker = document.getElementById('tanggal-bayar');
-        // picker.addEventListener('input', function(e) {
-        //   var day = new Date(this.value).getUTCDay();
-        //   if ([6, 0].includes(day)) {
-        //     e.preventDefault();
-        //     this.value = '';
-        //     alert('Weekends not allowed');
-        //   }
-        // });
+        picker.addEventListener('input', function(e) {
+          var day = new Date(this.value).getUTCDay();
+          if ([6, 0].includes(day)) {
+            e.preventDefault();
+            this.value = '';
+            alert('Weekends not allowed');
+          }
+        });
 
       }
 
