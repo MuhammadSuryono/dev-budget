@@ -226,24 +226,27 @@ if ($update) {
     $notification = 'Bayar Budget Berhasil. Pemberitahuan via whatsapp telah terkirim ke ';
     $i = 0;
     for($i = 0; $i < count($email); $i++) {
-        if ($cuti->checkStatusCutiUser($nama[$i]) || $nama[$i] != $_SESSION['nama_user']) {
-            $path = '/views.php';
-            if ($dataDivisi[$i] == 'FINANCE') {
-                $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $dataPengajuan['jenis'] == 'B1' ? '/view-finance-manager-b1.php' : '/view-finance-manager.php';
-                $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $dataPengajuan['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin-manager.php' : '/view-finance-manager.php';
-                $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $dataPengajuan['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin.php' : '/view-finance.php';
-                $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
-            } else if ($dataDivisi[$i] == 'Direksi') {
-                $path = '/views-direksi.php';
+        if ($cuti->checkStatusCutiUser($nama[$i])) {
+            if ($nama[$i] != $_SESSION['nama_user']) {
+                $path = '/views.php';
+                if ($dataDivisi[$i] == 'FINANCE') {
+                    $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $dataPengajuan['jenis'] == 'B1' ? '/view-finance-manager-b1.php' : '/view-finance-manager.php';
+                    $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $dataPengajuan['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin-manager.php' : '/view-finance-manager.php';
+                    $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $dataPengajuan['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin.php' : '/view-finance.php';
+                    $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
+                } else if ($dataDivisi[$i] == 'Direksi') {
+                    $path = '/views-direksi.php';
+                }
+                $url =  $host. $path.'?code='.$id.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
+                $msg = $messageHelpper->messageStatusPembayaranBPUVendorSuplier($budget['nama'],$no,$term,$arrPenerima[$i], $user, $tanggalbayar, $nomorvoucher, $arrJumlah, $keterangan, $url);
+                $msgEmail = $messgaeEmail->statusPaymentBPUVendor($budget['nama'],$no,$term,$arrPenerima[$i], $user, $tanggalbayar, $nomorvoucher, $arrJumlah, $keterangan, $url);
+                if($email[$i] != "") $wa->sendMessage($email[$i], $msg);
+                if ($emails[$i] != "") $emailHelper->sendEmail($msgEmail, 'Informasi Pembayaran BPU', $emails[$i]);
+                $notification .= ($nama[$i] . ' (' . $email[$i] . ')');
+                if ($i < count($email) - 1) $notification .= ', ';
+                else $notification .= '.';
             }
-            $url =  $host. $path.'?code='.$id.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
-            $msg = $messageHelpper->messageStatusPembayaranBPUVendorSuplier($budget['nama'],$no,$term,$arrPenerima[$i], $user, $tanggalbayar, $nomorvoucher, $arrJumlah, $keterangan, $url);
-            $msgEmail = $messgaeEmail->statusPaymentBPUVendor($budget['nama'],$no,$term,$arrPenerima[$i], $user, $tanggalbayar, $nomorvoucher, $arrJumlah, $keterangan, $url);
-            if($email[$i] != "") $wa->sendMessage($email[$i], $msg);
-            if ($emails[$i] != "") $emailHelper->sendEmail($msgEmail, 'Informasi Pembayaran BPU', $emails[$i]);
-            $notification .= ($nama[$i] . ' (' . $email[$i] . ')');
-            if ($i < count($email) - 1) $notification .= ', ';
-            else $notification .= '.';
+        
         }
     }
     $notification = 'Bayar Budget Berhasil. Pemberitahuan via email telah terkirim ke ' . implode(",", $arremailpenerima);

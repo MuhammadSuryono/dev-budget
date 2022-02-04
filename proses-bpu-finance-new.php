@@ -423,25 +423,28 @@ if ($submit == 1) {
             $statusBpu = $bpuItem["statusbpu"];
             $isEksternalProcess = $statusbpu == 'Vendor/Supplier' || $statusbpu == 'Honor Eksternal' || $statusbpu == 'Honor Area Head' || $statusbpu == 'STKB OPS' || $statusbpu == 'STKB TRK Luar Kota' || $statusbpu == 'Honor Luar Kota' || $statusbpu == 'Honor Jakarta' || $statusbpu == 'STKB TRK Jakarta' ? true : false;
             
-            if ($cuti->checkStatusCutiUser($nama[$i]) || $nama[$i] != $_SESSION['nama_user']) {
-                if ($isEksternalProcess) {
-                    $path = '/view-bpu-verify.php?id='.$bpuVerify["id"].'&bpu='.$bpu["noid"];
-                } else {
-                    if ($dataDivisi[$i] == 'FINANCE') {
-                        $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $pengajuan['jenis'] == 'B1' ? '/view-finance-manager-b1.php' : '/view-finance-manager.php';
-                        $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $pengajuan['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin-manager.php' : '/view-finance-manager.php';
-                        $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $pengajuan['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin.php' : '/view-finance.php';
-                        $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
-                    } else if ($dataDivisi[$i] == 'Direksi') {
-                        $path = '/views-direksi.php';
+            if ($cuti->checkStatusCutiUser($nama[$i])) {
+                if ($nama[$i] != $_SESSION['nama_user']) {
+                    if ($isEksternalProcess) {
+                        $path = '/view-bpu-verify.php?id='.$bpuVerify["id"].'&bpu='.$bpu["noid"];
+                    } else {
+                        if ($dataDivisi[$i] == 'FINANCE') {
+                            $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $pengajuan['jenis'] == 'B1' ? '/view-finance-manager-b1.php' : '/view-finance-manager.php';
+                            $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $pengajuan['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin-manager.php' : '/view-finance-manager.php';
+                            $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $pengajuan['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin.php' : '/view-finance.php';
+                            $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
+                        } else if ($dataDivisi[$i] == 'Direksi') {
+                            $path = '/views-direksi.php';
+                        }
                     }
+                    $notification .= ($nama[$i] . ' (' . $email[$i] . ')');
+                    if ($i < count($email) - 1) $notification .= ', ';
+                    else $notification .= '.';
+                    $url =  $host. $path.'?code='.$kode.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
+                    $msg = $messageHelper->messageProcessTolakBPUFinance($pengajuan["nama"], $no, $term, $bpu["pengaju"], $arrPenerima, $arrJumlah, $keterangan, $url);
+                    if($email[$i] != "") $whatsapp->sendMessage($email[$i], $msg);
                 }
-                $notification .= ($nama[$i] . ' (' . $email[$i] . ')');
-                if ($i < count($email) - 1) $notification .= ', ';
-                else $notification .= '.';
-                $url =  $host. $path.'?code='.$kode.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
-                $msg = $messageHelper->messageProcessTolakBPUFinance($pengajuan["nama"], $no, $term, $bpu["pengaju"], $arrPenerima, $arrJumlah, $keterangan, $url);
-                if($email[$i] != "") $whatsapp->sendMessage($email[$i], $msg);
+                
             }
         }
     }

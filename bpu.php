@@ -158,7 +158,7 @@ if ($_POST['no'] && $_POST['waktu']) {
 
         <div class="form-group">
           <label for="namabank" class="control-label">Tanggal Pembayaran :</label>
-          <input type="date" class="form-control" name="tanggal_bayar" id="tanggal-bayar" min="<?= date('Y-m-d', strtotime($Date . ' + 2 days')) ?>">
+          <input type="date" class="form-control" name="tanggal_bayar" id="tanggal-bayar" min="<?= date('Y-m-d', strtotime($Date . ' + 1 days')) ?>">
         </div>
 
         <div class="form-group">
@@ -280,14 +280,14 @@ if ($_POST['no'] && $_POST['waktu']) {
       var statusBpu = '<?= $statusbpu ?>';
       if (statusBpu == 'UM' || statusBpu == 'UM Burek') {
         var picker = document.getElementById('tanggal-bayar');
-        picker.addEventListener('input', function(e) {
-          var day = new Date(this.value).getUTCDay();
-          if ([6, 0].includes(day)) {
-            e.preventDefault();
-            this.value = '';
-            alert('Weekends not allowed');
-          }
-        });
+        // picker.addEventListener('input', function(e) {
+        //   var day = new Date(this.value).getUTCDay();
+        //   if ([6, 0].includes(day)) {
+        //     e.preventDefault();
+        //     this.value = '';
+        //     alert('Weekends not allowed');
+        //   }
+        // });
 
       }
 

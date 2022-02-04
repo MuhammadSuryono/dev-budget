@@ -334,23 +334,26 @@ if (isset($_POST['submit'])) {
         $whatsapp = new Whastapp();
         for($i = 0; $i < count($phoneNumbers); $i++) {
           $path = '/views.php';
-          if (!$cuti->checkStatusCutiUser($nama[$i]) || $nama[$i] != $_SESSION['nama_user']) {
-            if ($dataDivisi[$i] == 'FINANCE') {
-              $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $dataProject['jenis'] == 'B1' ? '/view-finance-manager-b1.php' : '/view-finance-manager.php';
-              $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $dataProject['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin-manager.php' : '/view-finance-manager.php';
-              $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $dataProject['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin.php' : '/view-finance.php';
-              $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
-            } else if ($dataDivisi[$i] == 'Direksi') {
-                $path = '/views-direksi.php';
+          if (!$cuti->checkStatusCutiUser($nama[$i])) {
+            if ($nama[$i] != $_SESSION['nama_user']) {
+              if ($dataDivisi[$i] == 'FINANCE') {
+                $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $dataProject['jenis'] == 'B1' ? '/view-finance-manager-b1.php' : '/view-finance-manager.php';
+                $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $dataProject['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin-manager.php' : '/view-finance-manager.php';
+                $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $dataProject['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin.php' : '/view-finance.php';
+                $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
+              } else if ($dataDivisi[$i] == 'Direksi') {
+                  $path = '/views-direksi.php';
+              }
+              $notification .= ($nama[$i] . ' (' . $phoneNumbers[$i] . ')');
+              if ($i < count($phoneNumbers) - 1) $notification .= ', ';
+              else $notification .= '.';
+              $url =  $host. $path.'?code='.$numb.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
+              $msg = $helper->messagePengajuanBPU($nama[$i], $pengaju, $namaProject, $namapenerima, $jumlah, $keterangan, $url);
+              $msgEmail = $mssageEmail->applyBPU($nama[$i], $pengaju, $namaProject, $namapenerima, $jumlah, $keterangan, $url);
+              if($phoneNumbers[$i] != "") $whatsapp->sendMessage($phoneNumbers[$i], $msg);
+              if ($emails[$i] != "") $emailHelper->sendEmail($mssageEmail, "Informasi Pengajuan BPU", $emails[$i]);
             }
-            $notification .= ($nama[$i] . ' (' . $phoneNumbers[$i] . ')');
-            if ($i < count($phoneNumbers) - 1) $notification .= ', ';
-            else $notification .= '.';
-            $url =  $host. $path.'?code='.$numb.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
-            $msg = $helper->messagePengajuanBPU($nama[$i], $pengaju, $namaProject, $namapenerima, $jumlah, $keterangan, $url);
-            $msgEmail = $mssageEmail->applyBPU($nama[$i], $pengaju, $namaProject, $namapenerima, $jumlah, $keterangan, $url);
-            if($phoneNumbers[$i] != "") $whatsapp->sendMessage($phoneNumbers[$i], $msg);
-            if ($emails[$i] != "") $emailHelper->sendEmail($mssageEmail, "Informasi Pengajuan BPU", $emails[$i]);
+            
           }
         }
       }
@@ -477,8 +480,9 @@ if (isset($_POST['submit'])) {
         $whatsapp = new Whastapp();
         for($i = 0; $i < count($phoneNumbers); $i++) {
           $path = '/views.php';
-          if (!$cuti->checkStatusCutiUser($nama[$i]) || $nama[$i] != $_SESSION['nama_user']) {
-            if ($dataDivisi[$i] == 'FINANCE') {
+          if (!$cuti->checkStatusCutiUser($nama[$i])) {
+            if ($nama[$i] != $_SESSION['nama_user']) {
+              if ($dataDivisi[$i] == 'FINANCE') {
                 $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $dataProject['jenis'] == 'B1' ? '/view-finance-manager-b1.php' : '/view-finance-manager.php';
                 $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $dataProject['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin-manager.php' : '/view-finance-manager.php';
                 $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $dataProject['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin.php' : '/view-finance.php';
@@ -494,6 +498,7 @@ if (isset($_POST['submit'])) {
             $msgEmail = $mssageEmail->applyBPU($nama[$i], $pengaju, $namaProject, $namapenerima, $jumlah, $keterangan, $url);
             if($phoneNumbers[$i] != "") $whatsapp->sendMessage($phoneNumbers[$i], $msg);
             if ($emails[$i] != "") $emailHelper->sendEmail($msgEmail, "Informasi Pengajuan BPU", $emails[$i]);
+            }
           }
         }
       }

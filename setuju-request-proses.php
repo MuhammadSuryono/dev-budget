@@ -102,7 +102,7 @@ if ($updatePengajuanRequest) {
         die;
     }
 
-    $dataSelesaiRequest = $con->select()->from('selesai_request')->where('waktu', '=', $waktunya)->where('rincian', '!=', '')->get();
+    $dataSelesaiRequest = $con->select()->from('selesai_request')->where('waktu', '=', $waktunya)->get();
     $selesaiRequest = [];
     $checkName = [];
     foreach ($dataSelesaiRequest as $row ) {
