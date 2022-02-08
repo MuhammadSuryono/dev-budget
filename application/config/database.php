@@ -3,7 +3,7 @@ defined("MODE_APP") OR define("MODE_APP", "dev");
 defined("DB_APP") OR define("DB_APP", "budget");
 defined("DB_HOST") OR define("DB_HOST", "192.168.8.2");
 defined("DB_USER") OR define("DB_USER", "adam");
-defined("DB_PASS") OR define("DB_PASS", "Ad@mMR1db");
+defined("DB_PASS") OR define("DB_PASS", "Ad@mMR!db213");
 defined("DB_PORT") OR define("DB_PORT", "3306");
 
 // Define other const value here
