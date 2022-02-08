@@ -153,17 +153,27 @@ class Callback extends Database {
 
     private function get_receiver_whatsapp()
     {
+        $duplicate = [];
         $userDireksi = $this->select("phone_number")->from("tb_user")->where('divisi', '=', 'Direksi')->first();
-        if ($userDireksi['phone_number'] != '') array_push($this->phoneNumberReceiver, $userDireksi['phone_number']);
+        if ($userDireksi['phone_number'] != '' && !in_array($userDireksi['phone_number'], $duplicate)) {
+            array_push($this->phoneNumberReceiver, $userDireksi['phone_number']);
+            array_push($duplicate, $userDireksi['phone_number']);
+        }
 
         if ($this->dataBpu['statusbpu'] == "UM" || $this->dataBpu['statusbpu'] == "UM Burek") {
             $userFinanceUM = $this->select("phone_number")->from("tb_user")->where('divisi', '=', 'Finance')->where('hak_akses', '=', 'Level 2')->where('level', '=', 'Manager')->first();
-            if ($userFinanceUM['phone_number'] != '') array_push($this->phoneNumberReceiver, $userFinanceUM['phone_number']);
+            if ($userFinanceUM['phone_number'] != '' && !in_array($userFinanceUM['phone_number'], $duplicate)) {
+                array_push($this->phoneNumberReceiver, $userFinanceUM['phone_number']);
+                array_push($duplicate, $userFinanceUM['phone_number']);
+            }
         }
 
         $userFinance = $this->select("phone_number")->from("tb_user")->where('divisi', '=', 'Finance')->where('status_penerima_email_id', '=', '3')->get();
         foreach ($userFinance as $user) {
-            if ($user['phone_number'] != '') array_push($this->phoneNumberReceiver, $user['phone_number']);
+            if ($user['phone_number'] != '' && !in_array($user['phone_number'], $duplicate)) {
+                array_push($this->phoneNumberReceiver, $user['phone_number']);
+                array_push($duplicate, $user['phone_number']);
+            }
         }
 
         if ($this->dataBpu['divisi'] != 'FINANCE' || $this->dataBpu['pengaju'] != 'Sistem') {
@@ -172,7 +182,10 @@ class Callback extends Database {
 
             $userDivisiManager = $this->select("phone_number")->from("tb_user")->where('divisi', '=', $this->dataBpu['divisi'])->where('hak_akses', '=', 'Manager')->get();
             foreach ($userDivisiManager as $user) {
-                if ($user['phone_number'] != '') array_push($this->phoneNumberReceiver, $user['phone_number']);
+                if ($user['phone_number'] != '' && !in_array($user['phone_number'], $duplicate)) {
+                    array_push($this->phoneNumberReceiver, $user['phone_number']);
+                    array_push($duplicate, $user['phone_number']);
+                }
             }
         }
     }
