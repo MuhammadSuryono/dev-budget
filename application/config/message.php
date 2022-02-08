@@ -407,7 +407,7 @@ Klik $url untuk membuka aplikasi budget.";
     public function messageSuccessTransferNonVendorWA($penerima, $jenisPembayaran, $norek, $job, $bank, $totalTransfer, $tanggal)
     {
         $msg = "Notifikasi Informasi Pembayaran
-Berikut informasi status pembayaran Anda:<br><br>
+Berikut informasi status pembayaran Anda:
 
 Pembayaran       : *$jenisPembayaran*
 No. Rekening Anda       : *$norek*
@@ -415,7 +415,7 @@ Nama Job       : *$job*
 Bank       : *$bank*
 Nama Penerima       : *$penerima*
 Jumlah Dibayarkan       : *Rp. " . number_format($totalTransfer, 0, '', '.') . "*
-Status       : *Terbayar Lunas</strong> Tanggal:  $tanggal*
+Status       : *Terbayar Lunas Tanggal:  $tanggal*
 
 Jika ada pertanyaan lebih lanjut, silahkan email Divisi Finance ke finance@mri-research-ind.com
 Hormat kami,
@@ -438,7 +438,7 @@ No. Rekening Anda       : *$norek*
 Bank       : *$bank*
 Nama Penerima       : *$penerima*
 Jumlah Dibayarkan       : *Rp. " . number_format($totalTransfer, 0, '', '.') . "*
-Status       : *Terbayar</strong> Tanggal:  $tanggal*
+Status       : *Terbayar Tanggal:  $tanggal*
 
 Jika ada pertanyaan lebih lanjut, silahkan email Divisi Finance ke finance@mri-research-ind.com
 Hormat kami,
