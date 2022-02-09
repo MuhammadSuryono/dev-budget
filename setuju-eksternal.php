@@ -26,21 +26,21 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
 
     $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE stat = 'MRI'");
 
-    $sql = "SELECT a.*, b.jenis FROM bpu a JOIN pengajuan b ON a.waktu = b.waktu WHERE a.no = '$id' AND a.waktu = '$waktu' AND a.term = '$term' GROUP BY a.noid";
+    $sql = "SELECT a.*, b.jenis, c.namabank as bank FROM bpu a JOIN pengajuan b ON a.waktu = b.waktu LEFT JOIN bank c ON a.namabank = c.kodebank WHERE a.no = '$id' AND a.waktu = '$waktu' AND a.term = '$term' GROUP BY a.noid";
     $dataBpuQuery = mysqli_query($koneksi, $sql);
     $dataBpu = mysqli_fetch_assoc($dataBpuQuery);
     $statusBpu = $dataBpu['statusbpu'];
     $namaVendor = $dataBpu['nama_vendor'];
     $typeVendor = $dataBpu['vendor_type'];
     $result = $koneksi->query($sql); ?>
-    <table class="table table-bordered">
+    <table class="table table-stiped">
         <thead>
-            <th>Nama Penerima</th>
-            <th>Diajukan</th>
-            <th>Total</th>
-            <th>Bank</th>
-            <th>No. Rekening</th>
-            <th>Metode Pembayaran</th>
+            <th class="text-center">Nama Penerima</th>
+            <th class="text-center">Diajukan</th>
+            <th class="text-center">Total</th>
+            <th class="text-center">Bank</th>
+            <th class="text-center">No. Rekening</th>
+            <th class="text-center">Metode Pembayaran</th>
         </thead>
 
         <tbody>
@@ -70,7 +70,7 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                     <td><?= $baris['namapenerima'] ?></td>
                     <td class="td-pengajuan"><?= $baris['pengajuan_jumlah'] ?></td>
                     <td class="td-aktual"><?= $baris['pengajuan_jumlah'] ?></td>
-                    <td><?= $baris['namabank'] ?></td>
+                    <td><?= $baris['bank'] ?></td>
                     <td><?= $baris['norek'] ?></td>
                     <td class="td-metode-pembayaran"><?= $metode_pembayaran ?></td>
                 </tr>
@@ -132,7 +132,11 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
         <label for="tglbayar" class="control-label">Tanggal Pembayaran :</label> 
         <input type="date" class="form-control" id="tglbayar" name="tanggalbayar" value="<?= $dataBpu['tanggalbayar'] ?>" min="<?= $dataBpu['tanggalbayar'] == '' ? date('Y-m-d', strtotime($Date . ' + 2 days')) : $dataBpu['tanggalbayar'] ?>">
     </div>
-
+    
+    <div class="alert alert-warning" role="alert">
+        <h5 class="alert-heading"><b>PERHATIAN !!!</b></h5>
+        <p>Untuk Metode Pembayaran MRI PALL dengan status <b>URGENT</b> akan di jadwalkan 2 jam dari waktu sekarang.<br>Untuk jadwal yang melebihi pukul 14:00 akan ditransfer di kemudian hari</p>
+    </div>
     <div class="form-group">
         <label for="tglcair" class="control-label">Status Urgent :</label>
         <select class="form-control" name="urgent" onchange="onChangeStatusUrgent(this)">
@@ -208,9 +212,10 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
         let month = date.getMonth() + 1;
         let day = date.getDate()
         let year = date.getFullYear()
-        let singleMonth = [1,2,3,4,5,6,7,8,9]
+        let singleNumber = [1,2,3,4,5,6,7,8,9]
 
-        month = singleMonth.includes(month) ? "0" + month : month
+        month = singleNumber.includes(month) ? "0" + month : month
+        day = singleNumber.includes(day) ? "0" + day : day
         return `${year}-${month}-${day}`
     }
 

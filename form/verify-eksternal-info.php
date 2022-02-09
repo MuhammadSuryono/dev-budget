@@ -100,7 +100,7 @@ if (!$dataVerify["is_approved"] && $dataVerify["is_need_approved"] && ($_SESSION
     <button class="btn btn-success btn-flat" onclick="setujuiBpu('<?=$bpuNo?>', '<?=$waktu?>', '<?=$term?>')">Setujui</button>
 <?php }
 
-if (!$dataVerify["is_approved"] && $dataVerify["is_need_approved"] && ($dataPengajuan['jenis'] == 'Rutin' && (strpos(strtolower($dataSelesai['rincian']), 'kas negara') !== false || strpos(strtolower($dataSelesai['rincian']), 'penerimaan negara') !== false) && $_SESSION['hak_akses'] == 'Level 2' && $_SESSION['level'] == 'Manager' && $_SESSION['divisi'] == 'FINANCE')) { ?>
+if (!$dataVerify["is_approved"] && $dataVerify["is_need_approved"] && ($dataPengajuan['jenis'] == 'Rutin' && (strpos(strtolower($dataSelesai['rincian']), 'kas negara') !== false || strpos(strtolower($dataSelesai['rincian']), 'penerimaan negara') !== false || strpos(strtolower($dataSelesai['rincian']), 'pph') !== false) && $_SESSION['hak_akses'] == 'Level 2' && $_SESSION['level'] == 'Manager' && $_SESSION['divisi'] == 'FINANCE')) { ?>
     <button class="btn btn-success btn-flat" onclick="setujuiBpu('<?=$bpuNo?>', '<?=$waktu?>', '<?=$term?>')">Setujui</button>
 <?php }
 

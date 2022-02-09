@@ -21,7 +21,7 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
 
     $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE stat = 'MRI'");
 
-    $sql = "SELECT t1.*, t2.berita_transfer, t4.nama AS nama_rekening, t3.label_kas, t3.bank AS kas_bank FROM bpu t1 LEFT JOIN bridgetransfer.data_transfer t2 ON t1.noid = t2.noid_bpu LEFT JOIN develop.kas t3 ON t1.rekening_sumber = t3.rekening LEFT JOIN rekening t4 ON t4.no = t1.rekening_id WHERE t1.no = '$id' AND t1.waktu = '$waktu' AND t1.term='$term' AND t1.persetujuan IN ('Belum Disetujui','Disetujui (Direksi)') GROUP BY t1.noid";
+    $sql = "SELECT t1.*, t2.berita_transfer, t4.nama AS nama_rekening, t3.label_kas, t3.bank AS kas_bank, b.namabank as bank FROM bpu t1 LEFT JOIN bridgetransfer.data_transfer t2 ON t1.noid = t2.noid_bpu LEFT JOIN bank b ON t1.namabank = b.kodebank LEFT JOIN develop.kas t3 ON t1.rekening_sumber = t3.rekening LEFT JOIN rekening t4 ON t4.no = t1.rekening_id WHERE t1.no = '$id' AND t1.waktu = '$waktu' AND t1.term='$term' AND t1.persetujuan IN ('Belum Disetujui','Disetujui (Direksi)') GROUP BY t1.noid";
     $result = $koneksi->query($sql); ?>
 
     <table class="table table-bordered">
@@ -43,7 +43,7 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                 <tr>
                     <td><?= $baris['namapenerima'] ?></td>
                     <td>Rp. <?= number_format($baris['jumlah']) ?></td>
-                    <td><?= $baris['namabank'] ?></td>
+                    <td><?= $baris['bank'] ?></td>
                     <td><?= $baris['norek'] ?></td>
                     <td><?= $baris['metode_pembayaran'] ?></td>
                     <td><?= $baris['rekening_sumber'] ?></td>
@@ -72,7 +72,11 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
         <label for="tglbayar" class="control-label">Tanggal Pembayaran :</label>
         <input type="date" class="form-control" id="tglbayar" name="tanggalbayar" min="<?= date('Y-m-d', strtotime($Date . ' + 2 days')) ?>">
     </div>
-
+    
+    <div class="alert alert-warning" role="alert">
+        <h5 class="alert-heading"><b>PERHATIAN !!!</b></h5>
+        <p>Untuk Metode Pembayaran MRI PALL dengan status <b>URGENT</b> akan di jadwalkan 2 jam dari waktu sekarang.<br>Untuk jadwal yang melebihi pukul 14:00 akan ditransfer di kemudian hari</p>
+    </div>
     <div class="form-group">
         <label for="tglcair" class="control-label">Status Urgent :</label>
         <select class="form-control" name="urgent">
@@ -131,9 +135,10 @@ $koneksi->close();
         let month = date.getMonth() + 1;
         let day = date.getDate()
         let year = date.getFullYear()
-        let singleMonth = [1,2,3,4,5,6,7,8,9]
+        let singleNumber = [1,2,3,4,5,6,7,8,9]
 
-        month = singleMonth.includes(month) ? "0" + month : month
+        month = singleNumber.includes(month) ? "0" + month : month
+        day = singleNumber.includes(day) ? "0" + day : day
         return `${year}-${month}-${day}`
     }
 </script>
