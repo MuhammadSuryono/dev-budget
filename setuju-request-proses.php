@@ -154,15 +154,15 @@ if ($updatePengajuanRequest) {
         $dataDivisi = [];
         $dataLevel = [];
         $emails = [];
-        $data = $con->select()->from('tb_user')->where('nama_user', '=', $gPengaju)->where('aktif', '=', 'Y')->first();
-        $divisi = $data['divisi'];
 
-        array_push($phoneNumbers, $data['phone_number']);
-        array_push($namaUserSendNotifications, $data['nama_user']);
-        array_push($idUsersNotification, $data['id_user']);
-        array_push($dataDivisi, $data['divisi']);
-        array_push($dataLevel, $data['level']);
-        array_push($emails, $data['email']);
+        $dataPembuat = $con->select()->from('tb_user')->where('nama_user', '=', $pembuat)->where('aktif', '=', 'Y')->first();
+        $divisi = $dataPembuat['divisi'];
+        array_push($phoneNumbers, $dataPembuat['phone_number']);
+        array_push($namaUserSendNotifications, $dataPembuat['nama_user']);
+        array_push($idUsersNotification, $dataPembuat['id_user']);
+        array_push($dataDivisi, $dataPembuat['divisi']);
+        array_push($dataLevel, $dataPembuat['level']);
+        array_push($emails, $dataPembuat['email']);
 
         $url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
         $port = $_SERVER['SERVER_PORT'];
