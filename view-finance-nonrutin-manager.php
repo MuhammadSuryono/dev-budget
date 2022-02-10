@@ -566,7 +566,9 @@ $setting = mysqli_fetch_assoc($querySetting);
                               echo "Request Pembayaran : <br><b>$tglcair ";
                               
                               echo "<hr/>";
-echo "Nominal Pajak :<b>Rp. " .number_format($bayar['nominal_pajak']) . " (".$bayar['jenis_pajak'].")";
+                              echo "Nominal Pengajuan :<br><b>Rp. " .number_format($pengajuanJumlah) ;
+                                                            echo "</b><br>";
+echo "Nominal Pajak :<br><b>Rp. " .number_format($bayar['nominal_pajak']) . " (".$bayar['jenis_pajak'].")";
                               echo "</b><br>";
                               echo ($statusPengajuanBpu != 0) ? "Request BPU : <br><b>Rp. " . number_format($total['jumlah_pengajuan'], 0, '', ',') : "Nominal Pembayaran : <br><b>Rp. " . number_format($total['jumlah_total'], 0, '', ',');
                               echo "</b><br>";
@@ -1425,7 +1427,7 @@ echo "Nominal Pajak :<b>Rp. " .number_format($bayar['nominal_pajak']) . " (".$ba
     </div>
 
     <div class="modal fade" id="setujuiBpuModal" role="dialog" aria-labelledby="setujuiBpuModalLabel">
-      <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-dialog modal-lg" role="document" style="width: 1200px">
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>

@@ -38,6 +38,7 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
         <?php foreach ($result as $baris) :
             $pengaju = $baris['pengaju'];
             $ket_pembayaran = $baris['ket_pembayaran'];
+            $tanggalBayar = $baris['tanggalbayar'];
         ?>
             <tbody>
                 <tr>
@@ -67,10 +68,9 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
     <input type="hidden" name="persetujuan" value="Sudah Disetujui">
 
     <p>Apakah anda ingin menyetujui <b>BPU</b> di Nomor <b><?= $baris['no']; ?></b>?</p>
-
     <div class="form-group">
         <label for="tglbayar" class="control-label">Tanggal Pembayaran :</label>
-        <input type="date" class="form-control" id="tglbayar" name="tanggalbayar" min="<?= date('Y-m-d', strtotime($Date . ' + 2 days')) ?>">
+        <input type="date" class="form-control" id="tglbayar" name="tanggalbayar" value="<?= $tanggalBayar ?>" min="<?= date('Y-m-d', strtotime($Date . ' + 2 days')) ?>">
     </div>
     
     <div class="alert alert-warning" role="alert">
@@ -95,13 +95,11 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
 $koneksi->close();
 ?>
 <script>
-    const picker = document.getElementById('tglbayar');
-    
+    const inputdate = document.getElementById('tglbayar');
     var tanggalBayar = '<?= $baris['tanggalbayar'] ?>'
-    const inputDate = document.getElementById("tglbayar")
 
 
-    picker.addEventListener('input', function(e) {
+    inputdate.addEventListener('input', function(e) {
         var day = new Date(this.value).getUTCDay();
         if ([6, 0].includes(day)) {
             e.preventDefault();
@@ -122,11 +120,11 @@ $koneksi->close();
     function onChangeStatusUrgent(e) {
         
         if (e.value === "Urgent") {
-            inputDate.value = formatDate("yyyy-mm-dd")
-            inputDate.setAttribute("min", formatDate("yyyy-mm-dd"))
+            inputdate.value = formatDate("yyyy-mm-dd")
+            inputdate.setAttribute("min", formatDate("yyyy-mm-dd"))
         } else {
-            inputDate.value = tanggalBayar
-            inputDate.setAttribute("min", tanggalBayar)
+            inputdate.value = tanggalBayar
+            inputdate.setAttribute("min", tanggalBayar)
         }
     }
 
