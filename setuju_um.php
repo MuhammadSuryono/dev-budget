@@ -34,7 +34,7 @@ if ($_POST['term'] && $_POST['namapenerima']) {
 
       <div class="form-group">
         <label for="tglcair" class="control-label">Tanggal Pembayaran :</label>
-        <input type="date" class="form-control" id="tglbayar" name="tanggalbayar" required>
+        <input type="date" class="form-control" id="tglbayar" name="tanggalbayar">
       </div>
 
       <button class="btn btn-primary" type="submit" name="submit">Setujui</button>

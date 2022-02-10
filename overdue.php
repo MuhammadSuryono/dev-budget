@@ -1,6 +1,6 @@
 <?php
 
-require "application/config/database.php";
+require_once "application/config/database.php";
 
 $con = new Database();
 $koneksi = $con->connect();

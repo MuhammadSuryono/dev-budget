@@ -45,7 +45,7 @@ if (!isset($_SESSION['nama_user'])) {
           <!-- <li><a href="request-budget.php">Request Budget</a></li> -->
         </ul>
        <ul class="nav navbar-nav navbar-right">
-                        <li><a href="notif-page.php"><i class="fa fa-envelope"></i></a></li>
+                        <li><a href="/log-notifikasi-aplikasi/index.html" target="_blank"><i class="fa fa-envelope"></i></a></li>
           <li><a href="ubahpassword.php"><span class="glyphicon glyphicon-user"></span><?php echo $_SESSION['nama_user']; ?> (<?php echo $_SESSION['divisi']; ?>)</a></li>
           <li><a href="logout.php"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
         </ul>
@@ -328,11 +328,15 @@ if (!isset($_SESSION['nama_user'])) {
                                 // }
 
                                 echo "<td bgcolor=' $color '>";
-                                echo "No :<b> $term";
+                                echo "No. Term:<b> $term";
                                 echo "</b><br>";
                                 echo "No. STKB :<b> $noStkb";
                                 echo "</b><br>";
-                                echo ($statusPengajuanBpu != 0) ? "Request BPU : <br><b>Rp. " . number_format($total['jumlah_pengajuan'], 0, '', ',') : "BPU : <br><b>Rp. " . number_format($total['jumlah_total'], 0, '', ',');
+                                echo "Jenis Pajak :<b>" .isset($bayar['jenis_pajak']) ? $bayar['jenis_pajak'] : "-";
+                                echo "</b><br>";
+                                echo "Nominal Pajak :<b>Rp. " .number_format($bayar['nominal_pajak']);
+                                echo "</b><br>";
+                                echo ($statusPengajuanBpu != 0) ? "Request BPU : <br><b>Rp. " . number_format($total['jumlah_pengajuan'], 0, '', ',') : "Nominal Pembayaran : <br><b>Rp. " . number_format($total['jumlah_total'], 0, '', ',');
                                 echo "</b><br>";
                                 if ($realisasi != 0 && $statusbayar == 'Telah Di Bayar' && $statusbpu == 'UM') {
                                   echo "Realisasi Biaya : <br><b>Rp. " . number_format($kembreal, 0, '', ',');

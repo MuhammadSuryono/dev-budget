@@ -24,12 +24,37 @@ if ($_POST['no'] && $_POST['waktu']) {
   $waktu = $_POST['waktu'];
   $code = $_POST['id'];
 
+  $queryBpu = "SELECT max(term) as last_term, SUM(jumlah) as total FROM bpu WHERE no = '$no' AND waktu = '$waktu'";
+  $mysqlQuery = mysqli_query($koneksi, $queryBpu);
+
+  $lastTerm = 0;
+  $total = 0;
+  while($row = mysqli_fetch_assoc($mysqlQuery)) {
+      $lastTerm = $row['last_term'];
+      $total = $row['total'];
+  }
+
+  if ($lastTerm == NULL) {
+    $lastTerm = 0;
+  }
+
+  if ($total == NULL) {
+    $total = 0;
+  }
+
+  $totalTerm = 1;
+
+
 
   // mengambil data berdasarkan id
   // dan menampilkan data ke dalam form modal bootstrap
   $sql = "SELECT * FROM selesai WHERE no = '$id' AND waktu = '$waktu'";
   $result = $koneksi->query($sql);
   foreach ($result as $baris) {
+
+
+  $totalPengajuan = $baris['total'];
+  $sisaPembayaran = $totalPengajuan - $total;
 
 ?>
 
@@ -57,8 +82,9 @@ if ($_POST['no'] && $_POST['waktu']) {
       <input type="hidden" name="divisi" value="<?php echo $_SESSION['divisi']; ?>">
       <input type="hidden" name="statusbpu" value="<?php echo $baris['status']; ?>">
 
+      <div id="alert-more-than"></div>
       <div class="form-group">
-        <label for="rincian" class="control-label">Total BPU (IDR) :</label>
+        <label for="rincian" class="control-label">Total BPU (IDR)s :</label>
         <input class="form-control" name="jumlah" id="id_step2-number_2" type="text">
       </div>
 
@@ -132,7 +158,7 @@ if ($_POST['no'] && $_POST['waktu']) {
 
         <div class="form-group">
           <label for="namabank" class="control-label">Tanggal Pembayaran :</label>
-          <input type="date" class="form-control" name="tanggal_bayar" id="tanggal-bayar" min="<?= date('Y-m-d', strtotime($Date . ' + 2 days')) ?>">
+          <input type="date" class="form-control" name="tanggal_bayar" id="tanggal-bayar" min="<?= date('Y-m-d', strtotime($Date . ' + 1 days')) ?>">
         </div>
 
         <div class="form-group">
@@ -229,6 +255,28 @@ if ($_POST['no'] && $_POST['waktu']) {
     </form>
 
     <script>
+      let sisaPembayaran = '<?= $sisaPembayaran ?>';
+      sisaPembayaran = parseInt(sisaPembayaran)
+      let inputJumlah = document.getElementById("id_step2-number_2")
+
+      let alertError = document.getElementById("alert-more-than")
+
+
+      inputJumlah.addEventListener('change', (e) => {
+        let value = e.target.value
+        value = parseInt(value)
+
+        if (value > sisaPembayaran) {
+            inputJumlah.value = sisaPembayaran
+            alertError.innerHTML = `<div class="alert alert-warning" role="alert">
+                Total melebihi sisa pembayaran, total otomatis di atur sama dengan sisa pembayaran 
+            </div>`;
+            submitBtn.disabled = false
+        } else {
+            alertError.innerHTML = ''
+        }
+    })
+
       var statusBpu = '<?= $statusbpu ?>';
       if (statusBpu == 'UM' || statusBpu == 'UM Burek') {
         var picker = document.getElementById('tanggal-bayar');
@@ -354,19 +402,17 @@ if ($_POST['no'] && $_POST['waktu']) {
 
         $("#id_step2-number_2").keyup(function(event) {
           // skip for arrow keys
-          if (event.which >= 37 && event.which <= 40) {
-            event.preventDefault();
-          }
-          var $this = $(this);
-          var num = $this.val().replace(/,/gi, "").split("").reverse().join("");
+          // if (event.which >= 37 && event.which <= 40) {
+          //   event.preventDefault();
+          // }
+          // var $this = $(this);
+          // var num = $this.val().replace(/,/gi, "").split("").reverse().join("");
 
-          var num2 = RemoveRougeChar(num.replace(/(.{3})/g, "$1,").split("").reverse().join(""));
-
-          console.log(num2);
+          // var num2 = RemoveRougeChar(num.replace(/(.{3})/g, "$1,").split("").reverse().join(""));
 
 
-          // the following line has been simplified. Revision history contains original.
-          $this.val(num2);
+          // // the following line has been simplified. Revision history contains original.
+          // $this.val(num2);
         });
       });
 

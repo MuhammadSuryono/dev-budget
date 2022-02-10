@@ -7,6 +7,8 @@ $koneksi = $con->connect();
 
 $con->set_host_db(DB_HOST_DIGITALISASI_MARKETING);
 $con->set_name_db(DB_DIGITAL_MARKET);
+$con->set_user_db(DB_USER_DIGITAL_MARKET);
+$con->set_password_db(DB_PASS_DIGITAK_MARKET);
 $con->init_connection();
 $koneksiDigitalMarket = $con->connect();
 
@@ -24,12 +26,9 @@ $arrTableB2 = [];
 if ($jenis) {
     $project = mysqli_query($koneksiDigitalMarket, "SELECT * FROM comm_voucher WHERE on_budget <> 1");
     while ($p = mysqli_fetch_assoc($project)) {
-        // $researchExecutive = $p['research_executive'];
         $queryUser = mysqli_query($koneksiDigitalMarket, "SELECT * FROM data_user WHERE id_user = $p[research_executive]");
         $user = mysqli_fetch_assoc($queryUser);
-        // $tipeProject = unserialize($p['tipe_project']);
-        // var_dump($user['dept']);
-        // die;
+
         if ($user['dept'] == "76") {
             array_push($arrNameB1, $p['nama_project_internal']);
             array_push($arrIdB1, $p['id_comm_voucher']);

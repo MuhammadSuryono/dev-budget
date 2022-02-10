@@ -53,7 +53,7 @@ if (!isset($_SESSION['nama_user'])) {
           ?>
         </ul>
        <ul class="nav navbar-nav navbar-right">
-                        <li><a href="notif-page.php"><i class="fa fa-envelope"></i></a></li>
+                        <li><a href="/log-notifikasi-aplikasi/index.html" target="_blank"><i class="fa fa-envelope"></i></a></li>
           <li><a href="ubahpassword.php"><span class="glyphicon glyphicon-user"></span><?php echo $_SESSION['nama_user']; ?> (<?php echo $_SESSION['divisi']; ?>)</a></li>
           <li><a href="logout.php"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
         </ul>
@@ -338,6 +338,13 @@ if (!isset($_SESSION['nama_user'])) {
                                 $statusPengajuanBpu = $bayar['status_pengajuan_bpu'];
                                 $alasanTolakBpu = $bayar['alasan_tolak_bpu'];
                                 $alasanTolakRealisasi = $bayar['alasan_tolak_realisasi'];
+                                $ketPembayaran = $bayar['ket_pembayaran'];
+
+                                $bankAccountName       = $bayar['bank_account_name'];
+
+                                $queryBank = mysqli_query($koneksi, "SELECT namabank FROM bank WHERE kodebank = '$namabank'");
+                              $dataBank = mysqli_fetch_assoc($queryBank);
+                              $bank = $dataBank['namabank'];
 
                                 if ($uangkembali == 0) {
                                   $jumlahjadi = $jumlbayar;
@@ -393,12 +400,20 @@ if (!isset($_SESSION['nama_user'])) {
                                 // }
 
                                 echo "<td bgcolor=' $color '>";
-                                echo "No :<b> $term";
+                                echo "No. Term:<b> $term";
                                 echo "</b><br>";
                                 echo "No. STKB :<b> $noStkb";
                                 echo "</b><br>";
-
-                                echo ($statusPengajuanBpu != 0) ? "Request BPU : <br><b>Rp. " . number_format($total['jumlah_pengajuan'], 0, '', ',') : "BPU : <br><b>Rp. " . number_format($total['jumlah_total'], 0, '', ',');
+                                echo "Buat BPU : <br><b> " . date('Y-m-d', strtotime($waktustempel));
+                                echo "</b><br>";
+                                echo "Jam : <b>" . date('H:i:s', strtotime($waktustempel));
+                                echo "</b></br>";
+                                echo "Tanggal Terima Uang : <b>$tglcair ";
+                                echo "</b></br>";
+                                echo "<hr/>";
+                                echo "Nominal Pajak : <br><b>Rp. " .number_format($bayar['nominal_pajak']) . " (".$bayar['jenis_pajak'].")";
+                                echo "</b><br>";
+                                echo ($statusPengajuanBpu != 0) ? "Request BPU : <br><b>Rp. " . number_format($total['jumlah_pengajuan'], 0, '', ',') : "Nominal Pemmbayaran : <br><b>Rp. " . number_format($total['jumlah_total'], 0, '', ',');
                                 echo "</b><br>";
                                 if ($realisasi != 0 && $statusbayar == 'Telah Di Bayar' && $statusbpu == 'UM') {
                                   echo "Realisasi Biaya : <br><b>Rp. " . number_format($kembreal, 0, '', ',');
@@ -411,20 +426,28 @@ if (!isset($_SESSION['nama_user'])) {
                                 } else {
                                   echo "";
                                 }
-                                echo "Tanggal : <br><b> " . date('Y-m-d', strtotime($waktustempel));
-                                echo "</b><br>";
-                                echo "Jam : <b>" . date('H:i:s', strtotime($waktustempel));
-                                echo "</b></br>";
-                                echo "Tanggal Terima Uang : <b>$tglcair ";
-                                echo "</b></br>";
-                                echo "Diajukan Oleh : <br><b> $pengaju($divisi2)";
-                                echo "</b><br>";
-                                echo "No Voucher : <br><b> $novoucher ";
-                                echo "</b><br/>";
-                                echo "Tgl Bayar : <br><b> $tanggalbayar";
-                                echo "</b><br/>";
+                              
                                 echo "Metode Pembayaran : <br><b> ".$bayar['metode_pembayaran'];
                                 echo "</b><br/>";
+
+                                echo "<hr />";
+                              echo "Tanggal Pembayaran : <br><b> $tanggalbayar";
+                              echo "</b><br/>";
+                              echo "Nama Penerima : <br><b> $namapenerima";
+                              echo "</b><br/>";
+                              echo "Bank : <br><b> $bank";
+                              echo "</b><br/>";
+                              echo "Nomor Rekening : <br><b> $norek";
+                              echo "</b><br/>";
+                              echo "Nama Penerima Sesuai Rekening : <br><b> $bankAccountName";
+                              echo "</b><br/>";
+                              echo "Keterangan Pembayaran : <br><b> " . $ketPembayaran;
+                              echo "</b><br/>";
+                              echo "No Voucher : <br><b> $novoucher ";
+                              echo "</b><br/>";
+                              echo "<hr />";
+
+
                                 echo "Kasir : <br><b> $pembayar ";
                                 echo "</b><br/>";
                                 echo "File Rincian BPU : <br>";

@@ -44,7 +44,8 @@ if ($port == "" || $port == "80" || $port == "7793") {
   $host = $hostProtocol. '/'. $url[1];
 }
 
-
+$pengajuanQuery = mysqli_query($koneksi, "SELECT jenis FROM pengajuan WHERE waktu = '$dataBpu[waktu]'");
+$dataPengajuan = mysqli_fetch_assoc($pengajuanQuery);
 ?>
 
 <!DOCTYPE html>
@@ -59,9 +60,41 @@ if ($port == "" || $port == "80" || $port == "7793") {
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
-
+  
 </head>
 <body>
+  <style>
+    input[list]:focus {
+      outline: none;
+    }
+    input[list] + div[list] {
+      display: none;
+      position: absolute;
+      width: 100%;
+      max-height: 164px;
+      overflow-y: auto;
+      max-width: 330px;
+      background: #FFF;
+      border: var(--border);
+      border-top: none;
+      border-radius: 0 0 5px 5px;
+      box-shadow: 0 3px 3px -3px #333;
+      z-index: 100;
+    }
+    input[list] + div[list] span {
+      display: block;
+      padding: 7px 5px 7px 20px;
+      color: #069;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    input[list] + div[list] span:not(:last-child) {
+      border-bottom: 1px solid #EEE;
+    }
+    input[list] + div[list] span:hover {
+      background: rgba(100, 120, 140, .2);
+    }
+  </style>
 
   <nav class="navbar navbar-inverse">
     <div class="container-fluid">
@@ -123,7 +156,7 @@ if ($port == "" || $port == "80" || $port == "7793") {
 
       
        <ul class="nav navbar-nav navbar-right">
-                        <li><a href="notif-page.php"><i class="fa fa-envelope"></i></a></li>
+                        <li><a href="/log-notifikasi-aplikasi/index.html" target="_blank"><i class="fa fa-envelope"></i></a></li>
           <li><a href="ubahpassword.php"><span class="glyphicon glyphicon-user"></span><?php echo $_SESSION['nama_user']; ?> (<?php echo $_SESSION['divisi']; ?>)</a></li>
           <li><a href="logout.php"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
         </ul>
@@ -172,6 +205,7 @@ if ($port == "" || $port == "80" || $port == "7793") {
                   echo '<div class="form-group">
                   <label>File Pendukung:</label>
                   <input type="file" class="form-control" accept="image/*" id="inputImage" required/>
+                  <small>Maksimal size upload file 1Mb. File yang didukung <i>(.png,.jpg,.jpeg,.pdf,.doc,.docx)</i></small>
                 </div>';
                 }
               }
@@ -199,7 +233,7 @@ if ($port == "" || $port == "80" || $port == "7793") {
                   include 'form/verify-eksternal-vendor.php';
                 }
 
-                if ($dataVerify["is_need_approved"] && $dataVerify["is_verified"] || ($dataVerify["is_verified"] && $dataBpu["namapenerima"] != "")) {
+                if ($dataVerify["is_need_approved"] && $dataVerify["is_verified"] || ($dataVerify["is_verified"] && $dataVerify["is_approved"])) {
                   include 'form/verify-eksternal-info.php';
                 }
               }
@@ -211,9 +245,8 @@ if ($port == "" || $port == "80" || $port == "7793") {
               title="Inline Frame Example"
               width="900"
               height="800"
-              src="<?= $dataVerify['document'] != '' ? 'http://'.$host.'/fileupload/'.$dataVerify['document']:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMGwPo04v2vaxbXlOkSuBK1aDQs1ntPnFM9_5P7BhEULVguY4tv4EZMuF88SaA7HZ8a1o&usqp=CAU' ?>">
+              src="<?= $dataVerify['document'] != '' ? 'http://'.$host.'/uploads/'.$dataVerify['document']:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMGwPo04v2vaxbXlOkSuBK1aDQs1ntPnFM9_5P7BhEULVguY4tv4EZMuF88SaA7HZ8a1o&usqp=CAU' ?>">
           </iframe>
-            <!-- <img id="content-image" style="max-width: 720px;" src="<?= $dataVerify['document'] != '' ? 'fileupload/'.$dataVerify['document']:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMGwPo04v2vaxbXlOkSuBK1aDQs1ntPnFM9_5P7BhEULVguY4tv4EZMuF88SaA7HZ8a1o&usqp=CAU' ?>" /> -->
           </div>
         </div>
       </div>
@@ -256,9 +289,17 @@ if ($port == "" || $port == "80" || $port == "7793") {
     const nominal = $('#nominal-verify').val()
     const input = document.getElementById('inputImage');
 		let file = input.files[0];
+
+    if (file !== undefined && file.size > 1000000) {
+      notifErrorForm.innerHTML = alertError("danger", "Ukuran file melebihi maksimal file upload 1Mb")
+      setTimeout(() => {
+        notifErrorForm.innerHTML = ""
+      }, 3000)
+      return
+    }
     
     if ((file === undefined || nominal.length < 3) || stateNominal !== nominal) {
-      notifErrorForm.innerHTML = alertError("danger", "Form tidak boleh kosong")
+      notifErrorForm.innerHTML = alertError("danger", "Periksa kembali data yang akan di verifikasi")
       
       setTimeout(() => {
         notifErrorForm.innerHTML = ""
@@ -270,6 +311,8 @@ if ($port == "" || $port == "80" || $port == "7793") {
         window.location.reload()
       })
     }
+    
+    
   }
 
   function readURLSign(input) {

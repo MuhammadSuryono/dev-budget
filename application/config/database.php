@@ -3,7 +3,7 @@ defined("MODE_APP") OR define("MODE_APP", "dev");
 defined("DB_APP") OR define("DB_APP", "budget");
 defined("DB_HOST") OR define("DB_HOST", "192.168.8.2");
 defined("DB_USER") OR define("DB_USER", "adam");
-defined("DB_PASS") OR define("DB_PASS", "Ad@mMR1db");
+defined("DB_PASS") OR define("DB_PASS", "Ad@mMR!db213");
 defined("DB_PORT") OR define("DB_PORT", "3306");
 
 // Define other const value here
@@ -14,9 +14,13 @@ defined("DB_MRI_TRANSFER") OR define("DB_MRI_TRANSFER", "mritransferapi");
 defined("DB_CUTI") OR define("DB_CUTI", "db_cuti");
 defined("DB_DEVELOP") OR define("DB_DEVELOP", "develop");
 defined("DB_HOST_DIGITALISASI_MARKETING") OR define("DB_HOST_DIGITALISASI_MARKETING", MODE_APP == "dev" ? "192.168.8.2" : "192.168.10.240");
+defined("DB_USER_DIGITAL_MARKET") OR define("DB_USER_DIGITAL_MARKET", "adam");
+defined("DB_PASS_DIGITAK_MARKET") OR define("DB_PASS_DIGITAK_MARKET", "Ad@mMR1db");
 
 
-class Database {
+require_once 'ModelBudget.php';
+
+class Database extends ModelBudget {
     private $conn;
     private $dbUser = DB_USER;
     private $dbPass = DB_PASS;
@@ -24,7 +28,7 @@ class Database {
     private $dbPort = DB_PORT;
     private $dbHost = DB_HOST;
 
-    public function __construct()  {
+    public function __construct($fromInit = true)  {
         $this->init_connection();
     }
 
@@ -39,6 +43,7 @@ class Database {
         if (!$this->conn) {
             die("Connection error: " . mysqli_connect_error());
         }
+
     }
 
     public function connect()

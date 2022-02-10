@@ -6,8 +6,11 @@ require "application/config/helper.php";
 
 $con = new Database();
 $koneksi = $con->connect();
+$session = $_GET['session'];
+$isSetSession = false;
+if (isset($session)) $isSetSession = true;
 
-$helper = new Helper();
+$helper = new Helper($isSetSession);
 
 $con->set_name_db(DB_JAY);
 $con->init_connection();
@@ -141,7 +144,7 @@ $koneksiJay = $con->connect();
                 </ul>
             <?php endif; ?>
            <ul class="nav navbar-nav navbar-right">
-                        <li><a href="notif-page.php"><i class="fa fa-envelope"></i></a></li>
+                        <li><a href="/log-notifikasi-aplikasi/index.html" target="_blank"><i class="fa fa-envelope"></i></a></li>
                 <li><a href="ubahpassword.php"><span class="glyphicon glyphicon-user"></span><?php echo $_SESSION['nama_user']; ?> (<?php echo $_SESSION['divisi']; ?>)</a></li>]; ?>)</a></li>
                 <li><a href="logout.php"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
             </ul>
@@ -156,6 +159,8 @@ $koneksiJay = $con->connect();
         $select = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE id='$id'");
         $d = mysqli_fetch_assoc($select);
         $statusKodeProject = ($d['kode_project']) ? 1 : 0;
+        $queryTotalBudget = mysqli_query($koneksi, "SELECT sum(total) as total_budget FROM selesai_request WHERE waktu = '$d[waktu]'");
+                            $dataTotalBudget = mysqli_fetch_assoc($queryTotalBudget);
         ?>
 
         <center>
@@ -312,11 +317,28 @@ $koneksiJay = $con->connect();
             <button type="button" id="buttonTambah" class="btn btn-default btn-small pull-right" style="display: none;" onclick="tambah_budget()" margin-left: 5px;display: none;>Tambah</button>
             <?php } ?>
             <br /><br />
+            <?php
+            $queryTotalBiaya = mysqli_query($koneksi, "SELECT sum(total) as total_biaya FROM selesai_request WHERE waktu = '$d[waktu]' AND status != 'UM Burek'");
+            $dataTotalBiaya = mysqli_fetch_assoc($queryTotalBiaya);
+
+            $queryTotalBiayaUMBurek = mysqli_query($koneksi, "SELECT sum(total) as total_budget_um_burek FROM selesai_request WHERE waktu = '$d[waktu]' AND status = 'UM Burek'");
+            $dataTotalBiayaUMBurek = mysqli_fetch_assoc($queryTotalBiayaUMBurek);
+            ?>
+            <div class="row">
+                <div class="col-xs-2">Total Biaya</div>
+                <div class="col-xs-2">: <b class="totalElementBiaya"><?php echo 'Rp. ' . number_format($dataTotalBiaya['total_biaya'], 0, '', ','); ?></b></div>
+                <input type="hidden" name="tBiaya" id="totalBiaya" value="<?php echo $dataTotalBiaya['total_biaya'] ?>">
+            </div>
+            <div class="row">
+                <div class="col-xs-2">Total UM Burek <hr/></div>
+                <div class="col-xs-2">: <b class="totalElementBiayaUmBurek"><?php echo 'Rp. ' . number_format($dataTotalBiayaUMBurek['total_budget_um_burek'], 0, '', ','); ?></b></div>
+                <input type="hidden" name="tBiayaUmBurek" id="totalBiayaUmBurek" value="<?php echo $dataTotalBiayaUMBurek['total_budget_um_burek'] ?>">
+            </div>
 
             <div class="row">
                 <div class="col-xs-2">Total Keseluruhan</div>
-                <div class="col-xs-2">: <b class="totalElement"><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></b></div>
-                <input type="hidden" name="tKeseluruhan" id="totalKeseluruhan" value="<?php echo $d['totalbudget'] ?>">
+                <div class="col-xs-2">: <b class="totalElementKeseluruhan"><?php echo 'Rp. ' . number_format($dataTotalBudget['total_budget'], 0, '', ','); ?></b></div>
+                <input type="hidden" name="tKeseluruhan" id="totalKeseluruhan" value="<?php echo $dataTotalBudget['total_budget'] ?>">
             </div>
             <?php if ($_SESSION['divisi'] == 'Direksi') : ?>
                 <?php
@@ -711,7 +733,7 @@ $koneksiJay = $con->connect();
 
                 updateRow(numberClicked, jenis);
 
-                hitungTotalKeseluruhan();
+                hitungTotalKeseluruhan(true);
 
                 resetOption(arrStatus);
 
@@ -776,7 +798,7 @@ $koneksiJay = $con->connect();
                     `;
                 $("#data-body").append(html);
 
-                hitungTotalKeseluruhan();
+                hitungTotalKeseluruhan(true);
 
                 $("#rincianTambah").val('');
                 $("#kotaTambah").val('');
@@ -1116,14 +1138,21 @@ $koneksiJay = $con->connect();
             sum();
         }
 
-        function hitungTotalKeseluruhan() {
+        function hitungTotalKeseluruhan(update = false) {
             const allTotalHarga = document.querySelectorAll(".inputTHarga");
             let total = 0;
+            let totalBiaya = 0;
+            let totalUmBurek = 0;
             allTotalHarga.forEach(function(e, i) {
                 let status = $(`#inputStatus${i+1}`).val();
+                let result = e.value;
+                
                 if (status != "UM Burek") {
-                    let result = e.value;
                     total += parseFloat(result);
+                    totalBiaya += parseFloat(result);
+                } else {
+                    total += parseFloat(result);
+                    totalUmBurek += parseFloat(result);
                 }
             })
             if (isNaN(total)) total = 0;
@@ -1133,8 +1162,15 @@ $koneksiJay = $con->connect();
                 elmBtnAjukan.setAttribute("disabled", ""); 
                 elmBtnPrint.style.display = "none"
             }
-            $('.totalElement').text(`Rp. ${formatNumber(total)}`);
+
+            $('.totalElementKeseluruhan').text(`Rp. ${formatNumber(total)}`);
             $('#totalKeseluruhan').val((total));
+
+            $('.totalElementBiaya').text(`Rp. ${formatNumber(totalBiaya)}`);
+            $('#totalBiaya').val((totalBiaya));
+
+            $('.totalElementBiayaUmBurek').text(`Rp. ${formatNumber(totalUmBurek)}`);
+            $('#totalBiayaUmBurek').val((totalUmBurek));
         }
 
         function resetOption(arrStatus) {

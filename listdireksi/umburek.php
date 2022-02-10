@@ -132,7 +132,7 @@ $koneksi = $con->connect();
                     }
 
                     echo "<td bgcolor=' $color '>";
-                    echo "No :<b> $term";
+                    echo "No. Term:<b> $term";
                     echo "</b><br>";
                     echo "No. STKB :<b> $noStkb";
                     echo "</b><br>";

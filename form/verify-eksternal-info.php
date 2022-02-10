@@ -1,38 +1,69 @@
 <?php
+
+
+require_once "application/controllers/Cuti.php";
+$cuti = new Cuti();
+
+
 $query = mysqli_query($koneksi, "SELECT namabank FROM bank WHERE kodebank = '$dataBpu[namabank]'");
 $dataBank = [];
 while($row = mysqli_fetch_assoc($query)) {
     $dataBank = $row;
 }
+
+$querySelesai = mysqli_query($koneksi, "SELECT rincian FROM selesai WHERE no = '$dataBpu[no]' AND waktu = '$dataBpu[waktu]'");
+$dataSelesai = mysqli_fetch_assoc($querySelesai);
 ?>
 <div class="row">
     <div class="col=lg-12">
 
     </div>
-    <div class="col-lg-6">
-        <dl>
-            <dt>Nama Penerima</dt>
-            <dd><?=$dataBpu["namapenerima"]?></dd>
-        </dl>
-        <dl>
-            <dt>Email Penerima</dt>
-            <dd><?=$dataBpu["emailpenerima"]?></dd>
-        </dl>
-        <dl>
-            <dt>Bank Penerima</dt>
-            <dd><?=$dataBank["namabank"]?></dd>
-        </dl>
-        <dl>
-            <dt>Nomor Rekening Penerima</dt>
-            <dd><?=$dataBpu["norek"]?></dd>
-        </dl>
+    <div class="col-lg-12">
+        <table class="table table-bordered">
+            <thead>
+                <th>No</th>
+                <th>Nama Penerima</th>
+                <th>Email Penerima</th>
+                <th>Nama Rekening</th>
+                <th>Nomor Rekening</th>
+                <th>Jumlah</th>
+            </thead>
+            <tbody>
+                <?php
+                    $queryListPenerima = mysqli_query($koneksi, "SELECT * FROM bpu WHERE no = '$dataBpu[no]' AND term = '$dataBpu[term]' AND waktu = '$dataBpu[waktu]' ");
+                    $no = 1;
+                    while($row = mysqli_fetch_assoc($queryListPenerima)) {
+                ?>
+                <tr>
+                    <td><?= $no ?></td>
+                    <td><?= $row['namapenerima'] ?></td>
+                    <td><?= $row['emailpenerima'] ?></td>
+                    <td><?= $row['bank_account_name'] ?></td>
+                    <td><?= $row['norek'] ?></td>
+                    <td>Rp. <?= number_format($row['jumlah'] == '0' ? $row['pengajuan_jumlah'] : $row['jumlah']) ?></td>
+                </tr>
+                <?php $no++; } ?>
+            </tbody>
+        </table>
+        <?php
+        if ($dataBpu['statusbpu'] == 'Vendor/Supplier') { ?>
+            <dl>
+                <dt>Nama Vendor</dt>
+                <dd><?=$dataBpu["nama_vendor"]?></dd>
+            </dl>
+            <dl>
+                <dt>Jenis Vendor</dt>
+                <dd><?=strtoupper($dataBpu["vendor_type"])?></dd>
+            </dl>
+        <?php }
+        ?>
         <dl>
             <dt>Di Ajukan Oleh</dt>
             <dd><?=$dataBpu["pengaju"]?></dd>
         </dl>
         <dl>
             <dt>Waktu Pengajuan</dt>
-            <dd><?=$dataBpu["waktu"]?></dd>
+            <dd><?=$dataBpu["created_at"]?></dd>
         </dl>
         <dl>
             <dt>Term Pengajuan</dt>
@@ -51,8 +82,8 @@ while($row = mysqli_fetch_assoc($query)) {
             <dd><?=$dataBpu["statusbpu"]?></dd>
         </dl>
         <dl>
-            <dt>Di Check Oleh</dt>
-            <dd><?=$dataBpu["checkby"]?></dd>
+            <dt>Di Periksa Oleh</dt>
+            <dd><?=$dataBpu["checkby"] == '' ? 'Belum Di Periksa' : $dataBpu["checkby"]?></dd>
         </dl>
         <dl>
             <dt>Keterangan Pembayaran</dt>
@@ -65,7 +96,19 @@ $bpuNo = $dataBpu["no"];
 $waktu = $dataBpu["waktu"];
 $term = $dataBpu["term"];
 
-if (!$dataVerify["is_approved"] && $dataVerify["is_need_approved"] && $_SESSION["hak_akses"] == "Manager") { ?>
+if (!$dataVerify["is_approved"] && $dataVerify["is_need_approved"] && ($_SESSION["hak_akses"] == "Manager" || ($dataPengajuan['jenis'] == 'Rutin' && $_SESSION['hak_akses'] == 'Pegawai2' && $_SESSION['level'] == 'Koordinator'))) { ?>
+    <button class="btn btn-success btn-flat" onclick="setujuiBpu('<?=$bpuNo?>', '<?=$waktu?>', '<?=$term?>')">Setujui</button>
+<?php }
+
+if (!$dataVerify["is_approved"] && $dataVerify["is_need_approved"] && ($dataPengajuan['jenis'] == 'Rutin' && (strpos(strtolower($dataSelesai['rincian']), 'kas negara') !== false || strpos(strtolower($dataSelesai['rincian']), 'penerimaan negara') !== false || strpos(strtolower($dataSelesai['rincian']), 'pph') !== false) && $_SESSION['hak_akses'] == 'Level 2' && $_SESSION['level'] == 'Manager' && $_SESSION['divisi'] == 'FINANCE')) { ?>
+    <button class="btn btn-success btn-flat" onclick="setujuiBpu('<?=$bpuNo?>', '<?=$waktu?>', '<?=$term?>')">Setujui</button>
+<?php }
+
+if (!$dataVerify["is_approved"] && $dataVerify["is_need_approved"] && $_SESSION['divisi'] == 'Direksi' && $cuti->check_manager_divisi_finance_cuti()) { ?>
+    <button class="btn btn-success btn-flat" onclick="setujuiBpu('<?=$bpuNo?>', '<?=$waktu?>', '<?=$term?>')">Setujui</button>
+<?php }
+
+if (!$dataVerify["is_approved"] && $dataVerify["is_need_approved"] && $dataBpu['pengajuan_jumlah'] < 1000000 && $dataPengajuan['jenis'] != 'Rutin' && $_SESSION['hak_akses'] == 'Pegawai2' && $_SESSION['level'] == 'Koordinator') { ?>
     <button class="btn btn-success btn-flat" onclick="setujuiBpu('<?=$bpuNo?>', '<?=$waktu?>', '<?=$term?>')">Setujui</button>
 <?php }
 ?>

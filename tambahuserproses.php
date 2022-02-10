@@ -19,10 +19,10 @@ if ($_POST['save'] == "save") {
 
   function random_username($string)
   {
-    require "application/config/database.php";
+    require_once "application/config/database.php";
 
-$con = new Database();
-$koneksi = $con->connect();
+    $con = new Database();
+    $koneksi = $con->connect();
 
     while (1) {
       $nrRand = rand(0, 999);

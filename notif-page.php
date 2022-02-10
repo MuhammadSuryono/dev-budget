@@ -10,6 +10,9 @@ if (!isset($_SESSION['nama_user'])) {
     // die('location:login.php');//jika belum login jangan lanjut
 }
 
+$con->set_host_db('192.168.8.2');
+$con->set_user_db('adam');
+$con->set_password_db('Ad@mMR1db');
 $con->set_name_db("db_log");
 $con->init_connection();
 $koneksiLog = $con->connect();
@@ -52,7 +55,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                     <?php if ($_SESSION['hak_akses'] == 'HRD') { ?>
                         <li><a href="home-finance.php">Home</a></li>
                         <li><a href="list-finance.php">List</a></li>
-                        <li><a href="saldobpu.php">Data User</a></li>
+                        <li><a href="saldobpu.php">Saldo BPU</a></li>
                         <!--<li><a href="summary.php">Summary</a></li>-->
                         <li><a href="listfinish-finance.php">Budget Finish</a></li>
                     <?php } else { ?>
@@ -70,7 +73,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                         ?>
                             <li><a href="list-finance.php">List</a></li>
                         <?php } ?>
-                        <li><a href="saldobpu.php">Data User</a></li>
+                        <li><a href="saldobpu.php">Saldo BPU</a></li>
                         <li><a href="history-finance.php">History</a></li>
                         <li><a href="list.php">Personal</a></li>
                         <li><a href="summary-finance.php">Summary</a></li>
@@ -98,7 +101,7 @@ $setting = mysqli_fetch_assoc($querySetting);
 
                 <?php if ($_SESSION['hak_akses'] != 'HRD') { ?>
                    <ul class="nav navbar-nav navbar-right">
-                        <li><a href="notif-page.php"><i class="fa fa-envelope"></i></a></li>
+                        <li><a href="/log-notifikasi-aplikasi/index.html" target="_blank"><i class="fa fa-envelope"></i></a></li>
                         <li><a href="ubahpassword.php"><span class="glyphicon glyphicon-user"></span><?php echo $_SESSION['nama_user']; ?> (<?php echo $_SESSION['divisi']; ?>)</a></li>
                         <li><a href="logout.php"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
                     </ul>
@@ -106,7 +109,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                     
                 ?>
                    <ul class="nav navbar-nav navbar-right">
-                        <li><a href="notif-page.php"><i class="fa fa-envelope"></i></a></li>
+                        <li><a href="/log-notifikasi-aplikasi/index.html" target="_blank"><i class="fa fa-envelope"></i></a></li>
 
                         <li><a href="ubahpassword.php"><span class="glyphicon glyphicon-user"></span><?php echo $_SESSION['nama_user']; ?> (<?php echo $_SESSION['divisi']; ?>)</a></li>
                         <li><a href="logout.php"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>

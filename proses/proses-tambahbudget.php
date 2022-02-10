@@ -1,25 +1,26 @@
 <?php
+error_reporting(0);
+session_start();
 require_once "../application/config/database.php";
 require_once "../application/config/whatsapp.php";
 require_once "../application/config/message.php";
+require_once "../application/config/messageEmail.php";
+require_once "../application/config/email.php";
 
 $con = new Database();
 $koneksi = $con->connect();
+$con->load_database($koneksi);
 
 $helper = new Message();
-// require "../vendor/email/send-email.php";
-
-session_start();
-if (!isset($_SESSION['nama_user'])) {
-  header("location:../login.php");
-}
+$messageEmail = new MessageEmail();
+$emailHelper = new Email();
 
 if (isset($_POST['submit'])) {
   $jenis             = $_POST['jenis'];
-  $namaProject             = $_POST['nama'];
+  $namaProject       = $_POST['nama'];
   $tahun             = $_POST['tahun'];
   $status            = $_POST['status'];
-  $idUserPICBudget         = $_POST['idUser'];
+  $idUserPICBudget   = $_POST['idUser'];
   $katnon            = $_POST['katnon'];
   $namaCreatorProject           = $_SESSION['nama_user'];
   $idProject = $_POST['project'];
@@ -61,38 +62,32 @@ if (isset($_POST['submit'])) {
   $phoneNumbers = [];
   $namaUserSendNotifications = [];
   $idUsersNotification = [];
+  $emails = [];
 
-  // Get data user Yang Mengajukan
-  $queryCreator = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE id_user='$idUserPICBudget' AND aktif='Y'");
-  $dataCreatorBudget = mysqli_fetch_assoc($queryCreator);
+  // Get data user
+  $dataCreatorBudget = $con->select()->from('tb_user')->where('id_user', '=', $idUserPICBudget)->where('aktif', '=', 'Y')->first();
+
   $namaCreatorBudget           = $dataCreatorBudget['nama_user'];
   $divisiCreatorBudget            = $dataCreatorBudget['divisi'];
 
-  // $phoneNumbers = $dataCreatorBudget['email'];
   array_push($phoneNumbers, $dataCreatorBudget['phone_number']);
   array_push($namaUserSendNotifications, $dataCreatorBudget['nama_user']);
   array_push($idUsersNotification, $idUserPICBudget);
-
-  // $queryUserByDivisi = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi = '$divisiCreatorBudget' AND (level = 'Manager' OR level = 'Senior Manager') AND aktif='Y'") or die(mysqli_error($koneksi));
-  // $user = mysqli_fetch_assoc($queryUserByDivisi);
-  
-  // array_push($phoneNumbers, $user['phone_number']);
-  // array_push($namaUserSendNotifications, $user['nama_user']);
-  // array_push($idUsersNotification, $user['id_user']);
-
+  array_push($emails, $dataCreatorBudget['email']);
 
   $countInsert = 0;
-  $insertPengajuanRequest = mysqli_query($koneksi, "INSERT INTO pengajuan_request(jenis, nama, tahun, pembuat, pengaju, divisi, totalbudget, status_request, kode_project, on_revision_status) VALUES (
-                                            '$jenis', 
-                                            '$namaProject', 
-                                            '$tahun',
-                                            '$namaCreatorProject',
-                                            '$namaCreatorBudget',
-                                            '$divisiCreatorBudget',
-                                            '0',
-                                            'Belum Di Ajukan',
-                                            '$kode',
-                                            '1')") or die(mysqli_error($koneksi));
+  $insertPengajuanRequest = $con->insert('pengajuan_request')
+      ->set_value_insert('jenis', $jenis)
+      ->set_value_insert('nama', $namaProject)
+      ->set_value_insert('tahun', $tahun)
+      ->set_value_insert('pembuat', $namaCreatorProject)
+      ->set_value_insert('pengaju', $namaCreatorBudget)
+      ->set_value_insert('divisi', $divisiCreatorBudget)
+      ->set_value_insert('totalbudget', 0)
+      ->set_value_insert('status_request', 'Belum Di Ajukan')
+      ->set_value_insert('kode_project', $kode)
+      ->set_value_insert('on_revision_status', 1)
+      ->save_insert();
               
   $idUserPICBudgetanRequest = mysqli_insert_id($koneksi);
 
@@ -184,6 +179,8 @@ if (isset($_POST['submit'])) {
 
     $con->set_host_db(DB_HOST_DIGITALISASI_MARKETING);
     $con->set_name_db(DB_DIGITAL_MARKET);
+    $con->set_user_db(DB_USER_DIGITAL_MARKET);
+    $con->set_password_db(DB_PASS_DIGITAK_MARKET);
     $con->init_connection();
 
     $koneksiDigitalMarket = $con->connect();
@@ -225,7 +222,9 @@ if (isset($_POST['submit'])) {
       for($i = 0; $i < count($phoneNumbers); $i++) {
         $url =  $host. '/view-request.php?id='.$idUserPICBudgetanRequest.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
         $msg = $helper->messageCreateProject($namaUserSendNotifications[$i], $namaUserSendNotifications[0], $namaCreatorProject, $namaProject, $divisiCreatorBudget, $url, "Notifikasi Pembukaan Akses Untuk Pengajuan Budget");
+        $msgEmail = $messageEmail->createBudget($namaUserSendNotifications[$i], $namaUserSendNotifications[0], $namaCreatorProject, $namaProject, $divisiCreatorBudget, $url);
         if($phoneNumbers[$i] != "") $whatsapp->sendMessage($phoneNumbers[$i], $msg);
+        if ($emails[$i] != "") $emailHelper->sendEmail($msgEmail, "Notifikasi Pembukaan Akses Untuk Pengajuan Budget", $emails[$i]);
       }
     }
 
@@ -234,7 +233,7 @@ if (isset($_POST['submit'])) {
     for ($i = 0; $i < count($phoneNumbers); $i++) {
       if ($phoneNumbers[$i] != "" && $i != 0) {
         $notification .= ($namaUserSendNotifications[$i] . ' (' . $phoneNumbers[$i] . ')');
-        if ($i < count($phone) - 1) $notification .= ', ';
+        if ($i < count($phoneNumbers) - 1) $notification .= ', ';
         else $notification .= '.';
       }
     }

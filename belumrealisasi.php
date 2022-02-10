@@ -48,7 +48,7 @@ if (!isset($_SESSION['nama_user'])) {
           <?php if ($_SESSION['hak_akses'] == 'HRD') { ?>
             <li class="active"><a href="home-direksi.php">Home</a></li>
             <li><a href="list-direksi.php">List</a></li>
-            <li><a href="saldobpu.php">Data User</a></li>
+            <li><a href="saldobpu.php">Saldo BPU</a></li>
             <!--<li><a href="summary.php">Summary</a></li>-->
             <li><a href="listfinish-direksi.php">Budget Finish</a></li>
             <li class="dropdown">
@@ -75,7 +75,7 @@ if (!isset($_SESSION['nama_user'])) {
             ?>
               <li><a href="list-finance.php">List</a></li>
             <?php } ?>
-            <li><a href="saldobpu.php">Data User</a></li>
+            <li><a href="saldobpu.php">Saldo BPU</a></li>
             <li><a href="history-finance.php">History</a></li>
             <li><a href="list.php">Personal</a></li>
             <li><a href="summary-finance.php">Summary</a></li>
@@ -102,7 +102,7 @@ if (!isset($_SESSION['nama_user'])) {
         <?php if ($_SESSION['hak_akses'] != 'HRD') { ?>
           
          <ul class="nav navbar-nav navbar-right">
-                        <li><a href="notif-page.php"><i class="fa fa-envelope"></i></a></li>
+                        <li><a href="/log-notifikasi-aplikasi/index.html" target="_blank"><i class="fa fa-envelope"></i></a></li>
             
             <li><a href="ubahpassword.php"><span class="glyphicon glyphicon-user"></span><?php echo $_SESSION['nama_user']; ?> (<?php echo $_SESSION['divisi']; ?>)</a></li>
             <li><a href="logout.php"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
@@ -111,7 +111,7 @@ if (!isset($_SESSION['nama_user'])) {
           
         ?>
          <ul class="nav navbar-nav navbar-right">
-                        <li><a href="notif-page.php"><i class="fa fa-envelope"></i></a></li>
+                        <li><a href="/log-notifikasi-aplikasi/index.html" target="_blank"><i class="fa fa-envelope"></i></a></li>
             
 
             <li><a href="ubahpassword.php"><span class="glyphicon glyphicon-user"></span><?php echo $_SESSION['nama_user']; ?> (<?php echo $_SESSION['divisi']; ?>)</a></li>

@@ -1,19 +1,23 @@
 <?php
-
 session_start();
 require "application/config/database.php";
 require_once "application/config/message.php";
 require_once "application/config/whatsapp.php";
 require_once "application/config/helper.php";
 require_once "application/controllers/Cuti.php";
+require_once "application/config/messageEmail.php";
+require_once "application/config/email.php";
 
 $messageHelper = new Message();
+$messageEmail = new MessageEmail();
+$emailSender = new Email();
 
 $helper = new Helper();
 $host = $helper->getHostUrl();
 
 $con = new Database();
 $koneksi = $con->connect();
+$con->load_database($koneksi);
 require "dompdf/save-document.php";
 require_once("dompdf/dompdf_config.inc.php");
 
@@ -23,11 +27,10 @@ $arrStatus = ['Honor Jakarta', 'Honor Luar Kota', 'STKB TRK Jakarta', 'STKB TRK 
 $arrPenerima = ['Shopper/PWT', 'Shopper/PWT', 'TLF', 'TLF', 'TLF'];
 
 $id = $_GET['id'];
-$keterangan = ($_GET['ket']) ? $_GET['ket'] : 'Tidak ada';
+$keterangan = isset($_GET['ket']) ? $_GET['ket'] : 'Tidak ada';
 $kodepro = explode(',', $_GET['kodepro']);
 
-$queryGetData = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE id=$id");
-$data = mysqli_fetch_assoc($queryGetData);
+$data = $con->select()->from('pengajuan_request')->where('id', '=', $id)->first();
 
 $waktu = $data['waktu'];
 $pembuatG = $data['pembuat'];
@@ -37,13 +40,18 @@ $divisi = $data['divisi'];
 $totalbudget = $data['totalbudget'];
 $jenis = $data['jenis'];
 
+$duplciate = [];
+
 if ($jenis == 'B1' && $_GET['kodepro'] != 'undefined') {
     if (count($kodepro) == 1) {
         $kode = $kodepro[0];
-        $updatePengajuanRequest = mysqli_query($koneksi, "UPDATE pengajuan_request SET kode_project='$kode', waktu='$waktu' WHERE id=$id");
+        $updatePengajuanRequest = $con->update('pengajuan_request')
+            ->set_value_update('kode_project', $kode)
+            ->set_value_update('waktu', $waktu)
+            ->where('id', '=', $id)
+            ->save_update();
     } else {
-        $queryPengajuanRequest = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE id=$id");
-        $pengajuanRequest = mysqli_fetch_assoc($queryPengajuanRequest);
+        $pengajuanRequest = $con->select()->from('pengajuan_request')->where('id', '=', $id)->first();
         $jenis = $pengajuanRequest['jenis'];
         $nama = $pengajuanRequest['nama'];
         $tahun = $pengajuanRequest['tahun'];
@@ -57,26 +65,31 @@ if ($jenis == 'B1' && $_GET['kodepro'] != 'undefined') {
         for ($i = 0; $i < count($kodepro); $i++) {
             $kode = $kodepro[$i];
             if ($i == 0) {
-                $updatePengajuanRequest = mysqli_query($koneksi, "UPDATE pengajuan_request SET kode_project='$kode', waktu='$waktu' WHERE id=$id") or die(mysqli_error($koneksi));
+                $updatePengajuanRequest = $con->update('pengajuan_request')
+                    ->set_value_update('kode_project', $kode)
+                    ->set_value_update('waktu', $waktu)
+                    ->where('id', '=', $id)
+                    ->save_update();
             } else {
-                $insertPengajuanRequest = mysqli_query($koneksi, "INSERT INTO pengajuan_request(jenis, nama, tahun, pembuat, pengaju, divisi, totalbudget, status_request, kode_project, on_revision_status, waktu) VALUES (
-                                            '$jenis', 
-                                            '$nama', 
-                                            '$tahun',
-                                            '$pembuat',
-                                            '$pengaju',
-                                            '$divisi',
-                                            '$totalbudget',
-                                            '$status_request',
-                                            '$kode',
-                                            '$on_revision_status',
-                                            '$waktu')") or die(mysqli_error($koneksi));
+                $insertPengajuanRequest = $con->insert('pengajuan_request')
+                    ->set_value_insert('jenis', $jenis)
+                    ->set_value_insert('nama', $nama)
+                    ->set_value_insert('tahun', $tahun)
+                    ->set_value_insert('pembuat', $pembuat)
+                    ->set_value_insert('pengaju', $pengaju)
+                    ->set_value_insert('divisi', $divisi)
+                    ->set_value_insert('totalbudget', $totalbudget)
+                    ->set_value_insert('status_request', $status_request)
+                    ->set_value_insert('kode_project', $kode)
+                    ->set_value_insert('on_revision_status', $on_revision_status)
+                    ->set_value_insert('waktu', $waktu)
+                    ->save_insert();
             }
         }
 
         for ($j = 0; $j < count($kodepro) - 1; $j++) {
-            $queryCheckId = mysqli_query($koneksi, "SELECT id FROM pengajuan_request ORDER BY ID DESC LIMIT 1");
-            $checkId = mysqli_fetch_assoc($queryCheckId)["id"];
+            $dataPengajuanRequestId = $con->select('id')->from('pengajuan_request')->order_by('ID', 'DESC')->first();
+            $checkId = $dataPengajuanRequestId["id"];
             $checkId -= $j;
             for ($i = 0; $i  < count($arrNama); $i++) {
                 $nama = $arrNama[$i];
@@ -86,20 +99,20 @@ if ($jenis == 'B1' && $_GET['kodepro'] != 'undefined') {
                 $checkId = (int)$checkId;
                 $urutan = $i + 1;
                 if ($nama != "") {
-                    $insertSelesaiRequest = mysqli_query($koneksi, "INSERT INTO selesai_request(urutan, id_pengajuan_request, rincian, kota, status, penerima, harga, quantity, total, pengaju, divisi, waktu) VALUES(                             
-                                                        '$urutan',
-                                                        '$checkId',
-                                                        '$nama',
-                                                        '$kota',
-                                                        '$status',
-                                                        '$pUang',
-                                                        '0',
-                                                        '0',
-                                                        '0',
-                                                        '$namaUser',
-                                                        '$divisiUser',
-                                                        '$waktu')                           
-                                                        ") or die(mysqli_error($koneksi));
+                    $insertSelesaiRequest = $con->insert('selesai_request')
+                        ->set_value_insert('urutan', $urutan)
+                        ->set_value_insert('id_pengajuan_request', $checkId)
+                        ->set_value_insert('rincian', $nama)
+                        ->set_value_insert('kota', $kota)
+                        ->set_value_insert('status', $status)
+                        ->set_value_insert('penerima', $pUang)
+                        ->set_value_insert('harga', 0)
+                        ->set_value_insert('quantity', 0)
+                        ->set_value_insert('total', 0)
+                        ->set_value_insert('pengaju', $namaUser)
+                        ->set_value_insert('divisi', $divisiUser)
+                        ->set_value_insert('waktu', $waktu)
+                        ->save_insert();
                 }
             }
         }
@@ -127,103 +140,83 @@ if (@unserialize($data['document'])) {
 }
 
 $phoneNumbers = [];
-$nama = [];
+$emails= [];
+$namaUser = [];
 $idUsersNotification = [];
 
-if ($totalbudget > 1000000) {
-    $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='Direksi' AND aktif='Y'");
-    while ($e = mysqli_fetch_assoc($queryEmail)) {
-        if ($e['phone_number']) {
-            array_push($phoneNumbers, $e['phone_number']);
-            array_push($nama, $e['nama_user']);
-            array_push($idUsersNotification, $e['id_user']);
-        }
-    }
-} else {
-    $queryGetEmail = mysqli_query($koneksi, "SELECT id_user, email,nama_user, phone_number, divisi, level from tb_user WHERE nama_user='$pembuatG' AND aktif='Y'");
-    $getEmail =  mysqli_fetch_assoc($queryGetEmail);
-    array_push($phoneNumbers, $getEmail['phone_number']);
-    array_push($nama, $getEmail['nama_user']);
-    array_push($idUsersNotification, $getEmail['id_user']);
-
-    $cuti = new Cuti();
-    $struktural = ["Manager", 'Direksi'];
-    if ($getEmail["divisi"] != "Finance") {
-        $getDataUserFinance = false;
-        foreach ($struktural as $struktur) {
-            $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='Finance' AND level = '$struktur' AND aktif='Y'");
-            $e = mysqli_fetch_assoc($queryEmail);
-           
-            if (!$cuti->checkStatusCutiUser($e["nama_user"])) {
-                $getDataUserFinance = true;
-                while ($e) {
-                    if ($e['phone_number']) {
-                        array_push($phoneNumbers, $e['phone_number']);
-                        array_push($nama, $e['nama_user']);
-                        array_push($idUsersNotification, $getEmail['id_user']);
-                    }
-                }
-            }
-        }
-
-    } else if ($getEmail["divisi"] == "Finance" && ($getEmail["level"] != "Manager" || $getEmail["level"] != "Senior Manager") && $cuti->checkStatusCutiUser($getEmail["nama_user"])) {
-        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='Finance' AND aktif='Y'");
-        $e = mysqli_fetch_assoc($queryEmail);
-        if (!$cuti->checkStatusCutiUser($e["nama_user"])) {
-            $getDataUserFinance = true;
-            while ($e) {
-                if ($e['phone_number']) {
-                    array_push($phoneNumbers, $e['phone_number']);
-                    array_push($nama, $e['nama_user']);
-                    array_push($idUsersNotification, $getEmail['id_user']);
-                }
-            }
-        }
-    } else if ($getEmail["divisi"] == "Finance" && ($getEmail["level"] == "Manager" || $getEmail["level"] == "Senior Manager") && $cuti->checkStatusCutiUser($getEmail["nama_user"])) {
-        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='Direksi' AND aktif='Y'");
-        while ($e = mysqli_fetch_assoc($queryEmail)) {
-            if ($e['phone_number']) {
-                array_push($phoneNumbers, $e['phone_number']);
-                array_push($nama, $e['nama_user']);
-                array_push($idUsersNotification, $getEmail['id_user']);
-            }
-        }
-    }
+$dataUserDireksi = $con->select()->from('tb_user')->where('divisi', '=', 'Direksi')->where('aktif', '=', 'Y')->first();
+if ($dataUserDireksi['phone_number']) {
+    array_push($emails, $dataUserDireksi['email']);
+    array_push($phoneNumbers, $dataUserDireksi['phone_number']);
+    array_push($namaUser, $dataUserDireksi['nama_user']);
+    array_push($idUsersNotification, $dataUserDireksi['id_user']);
 }
 
-// var_dump($nama);
+// if ($totalbudget > 1000000) {
+//     $dataUserDireksi = $con->select()->from('tb_user')->where('divisi', '=', 'Direksi')->where('aktif', '=', 'Y')->first();
+//     if ($dataUserDireksi['phone_number']) {
+//         array_push($emails, $dataUserDireksi['email']);
+//         array_push($phoneNumbers, $dataUserDireksi['phone_number']);
+//         array_push($namaUser, $dataUserDireksi['nama_user']);
+//         array_push($idUsersNotification, $dataUserDireksi['id_user']);
+//     }
+// } else {
+//     $cuti = new Cuti();
+//     $userFinance = $con->select()->from('tb_user')
+//         ->where('divisi', '=', 'Finance')
+//         ->where('hak_akses', '=', 'Manager')
+//         ->where('aktif', '=', 'Y')
+//         ->first();
 
-$updatePengajuanRequest = mysqli_query($koneksi, "UPDATE pengajuan_request SET status_request='Di Ajukan', waktu='$waktu', submission_note='$keterangan', document='$document' WHERE waktu='$waktu'") or die(mysqli_error($koneksi));
-$queryGetAllId = mysqli_query($koneksi, "SELECT id FROM pengajuan_request WHERE waktu='$waktu'");
+//     if ($cuti->checkStatusCutiUser($userFinance['nama_user'])) {
+//         $dataUserDireksi = $con->select()->from('tb_user')->where('divisi', '=', 'Direksi')->where('aktif', '=', 'Y')->first();
+//         if ($dataUserDireksi['phone_number']) {
+//             array_push($emails, $dataUserDireksi['email']);
+//             array_push($phoneNumbers, $dataUserDireksi['phone_number']);
+//             array_push($namaUser, $dataUserDireksi['nama_user']);
+//             array_push($idUsersNotification, $dataUserDireksi['id_user']);
+//         }
+//     } else {
+//         if ($userFinance['phone_number'] && !in_array($userFinance['nama_user'], $duplciate)) {
+//             array_push($emails, $userFinance['email']);
+//             array_push($phoneNumbers, $userFinance['phone_number']);
+//             array_push($namaUser, $userFinance['nama_user']);
+//             array_push($idUsersNotification, $userFinance['id_user']);
+//             array_push($duplciate, $userFinance['phone_number']);
+//         }
+//     }
+// }
+$updatePengajuanRequest = $con->update('pengajuan_request')
+    ->set_value_update('status_request', 'Di Ajukan')
+    ->set_value_update('waktu', $waktu)
+    ->set_value_update('submission_note', $keterangan)
+    ->set_value_update('document', $document)
+    ->where('waktu','=', $waktu)
+    ->save_update();
+
 saveDoc($koneksi, $id, $name);
-while ($row = mysqli_fetch_array($queryGetAllId)) {
-    $id = $row['id'];
-    $updateSelesaiRequest = mysqli_query($koneksi, "UPDATE selesai_request SET waktu='$waktu' WHERE id_pengajuan_request=$id");
-}
+$updateSelesaiRequest = $con->update('selesai_request')->set_value_update('waktu', $waktu)->where('id_pengajuan_request', '=', $id)->save_update();
 
 $url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
 $port = $_SERVER['SERVER_PORT'];
 $url = explode('/', $url);
 $hostProtocol = $url[0];
-if ($port != "") {
+if ($port != "" || $port != "80") {
     $hostProtocol = $hostProtocol . ":" . $port;
 }
 $host = $hostProtocol. '/'. $url[1];
 
 if ($updatePengajuanRequest) {
-    $subject = "Notifikasi Untuk Pengajuan Budget";
-
     if ($phoneNumbers) {
         $wa = new Whastapp();
 
         for($i = 0; $i < count($phoneNumbers); $i++) {
             if ($phoneNumbers[$i] != "") {
                 $url =  $host. '/view-request.php?id='.$id.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
-                $msg = $messageHelper->messageAjukanBudget($nama[$i], $pengaju, $namaProject, $divisi, $totalbudget, $keterangan, $url);
+                $msg = $messageHelper->messageAjukanBudget($namaUser[$i], $pengaju, $namaProject, $divisi, $totalbudget, $keterangan, $url);
+                $msgEmail = $messageEmail->applyBudget($namaUser[$i], $pengaju, $namaProject, $divisi, $totalbudget, $keterangan, $url);
                 $wa->sendMessage($phoneNumbers[$i], $msg);
-                if ($name != "") {
-                    $wa->sendDocumentMessage($phone, $msg, getPathFile($host, $name));
-                }
+                $emailSender->sendEmail($msgEmail, 'Notifikasi Pengajuan Budget ' . $namaProject, $emails[$i]);
             }
         }
     }
@@ -231,7 +224,7 @@ if ($updatePengajuanRequest) {
     $notification = "Data Berhasil Diajukan. Pemberitahuan via whatsapp sedang dikirimkan ke ";
     for ($i = 0; $i < count($phoneNumbers); $i++) {
         if ($phoneNumbers[$i] != "") {
-          $notification .= ($nama[$i] . ' (' . $phoneNumbers[$i] . ')');
+          $notification .= ($namaUser[$i] . ' (' . $phoneNumbers[$i] . ')');
           if ($i < count($phoneNumbers) - 1) $notification .= ', ';
           else $notification .= '.';
         }

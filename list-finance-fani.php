@@ -54,7 +54,7 @@ if (!isset($_SESSION['nama_user'])) {
           ?>
             <li><a href="list-finance.php">List</a></li>
           <?php } ?>
-          <li><a href="saldobpu.php">Data User</a></li>
+          <li><a href="saldobpu.php">Saldo BPU</a></li>
           <li><a href="history-finance.php">History</a></li>
           <li><a href="list.php">Personal</a></li>
           <li><a href="summary-finance.php">Summary</a></li>
@@ -80,7 +80,8 @@ if (!isset($_SESSION['nama_user'])) {
         $cari = mysqli_query($koneksi, "SELECT * FROM bpu WHERE status ='Belum Di Bayar' AND persetujuan !='Belum Disetujui' AND waktu != 0");
         $belbyr = mysqli_num_rows($cari);
         ?>
-        <ul class="nav navbar-nav navbar-right">
+       <ul class="nav navbar-nav navbar-right">
+                        <li><a href="/log-notifikasi-aplikasi/index.html" target="_blank"><i class="fa fa-envelope"></i></a></li>
           <li class="dropdown messages-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-inbox"></i><span class="label label-warning"><?= $belbyr ?></span></a>
             <ul class="dropdown-menu">

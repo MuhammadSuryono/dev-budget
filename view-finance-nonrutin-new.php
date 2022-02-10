@@ -6,6 +6,10 @@ require "application/config/database.php";
 $con = new Database();
 $koneksi = $con->connect();
 
+$con->set_name_db(DB_TRANSFER);
+$con->init_connection();
+$koneksiBridge = $con->connect();
+
 require_once "application/config/helper.php";
 $helper = new Helper();
 
@@ -47,7 +51,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                     <?php if ($_SESSION['hak_akses'] == 'HRD') { ?>
                         <li><a href="home-direksi.php">Home</a></li>
                         <li><a href="list-direksi.php">List</a></li>
-                        <li><a href="saldobpu.php">Data User</a></li>
+                        <li><a href="saldobpu.php">Saldo BPU</a></li>
                         <!--<li><a href="summary.php">Summary</a></li>-->
                         <li><a href="listfinish-direksi.php">Budget Finish</a></li>
                     <?php } else { ?>
@@ -65,7 +69,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                         ?>
                             <li><a href="list-finance.php">List</a></li>
                         <?php } ?>
-                        <li><a href="saldobpu.php">Data User</a></li>
+                        <li><a href="saldobpu.php">Saldo BPU</a></li>
                         <li><a href="history-finance.php">History</a></li>
                         <li><a href="list.php">Personal</a></li>
                         <li><a href="summary-finance.php">Summary</a></li>
@@ -98,7 +102,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                     $belbyr = mysqli_num_rows($cari);
                     ?>
                    <ul class="nav navbar-nav navbar-right">
-                        <li><a href="notif-page.php"><i class="fa fa-envelope"></i></a></li>
+                        <li><a href="/log-notifikasi-aplikasi/index.html" target="_blank"><i class="fa fa-envelope"></i></a></li>
                         <li class="dropdown messages-menu">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-inbox"></i><span class="label label-warning"><?= $belbyr ?></span></a>
                             <ul class="dropdown-menu">
@@ -130,7 +134,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                     $notif = $belbyr + $bpuyahud + $countPengajuanReq;
                 ?>
                    <ul class="nav navbar-nav navbar-right">
-                        <li><a href="notif-page.php"><i class="fa fa-envelope"></i></a></li>
+                        <li><a href="/log-notifikasi-aplikasi/index.html" target="_blank"><i class="fa fa-envelope"></i></a></li>
                         <li class="dropdown messages-menu">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-inbox"></i><span class="label label-warning"><?= $notif ?></span></a>
                             <ul class="dropdown-menu">
@@ -394,7 +398,7 @@ $setting = mysqli_fetch_assoc($querySetting);
 
                                                                 $showButtonBayar =  mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) AS count FROM bpu WHERE waktu='$waktu' AND no='$no' AND term = '$bayar[term]'  AND status = 'Belum Di Bayar' AND metode_pembayaran = 'MRI Kas'"))['count'];
                                                                 // var_dump($showButtonBayar);
-
+                                                                $noidbpu          = $bayar['noid'];
                                                                 $jumlbayar          = $bayar['jumlah'];
                                                                 $pengajuanJumlah = $bayar['pengajuan_jumlah'];
                                                                 $tglbyr             = $bayar['tglcair'];
@@ -433,12 +437,32 @@ $setting = mysqli_fetch_assoc($querySetting);
                                                                 $batasTanggalBayar = $bayar['batas_tanggal_bayar'];
                                                                 $ketPembayaran = $bayar['ket_pembayaran'];
 
+                                                                $bankAccountName       = $bayar['bank_account_name'];
+
+                                                                $tglcair = $tglcair == "0000-00-00" ? "-" : $tglcair;
+
+                                                                $queryBank = mysqli_query($koneksi, "SELECT namabank FROM bank WHERE kodebank = '$namabank'");
+                                                                $dataBank = mysqli_fetch_assoc($queryBank);
+                                                                $bank = $dataBank['namabank'];
+
+                                                                $queryTransfer = mysqli_query($koneksiBridge, "SELECT bank, jadwal_transfer FROM data_transfer WHERE noid_bpu = '$noidbpu'");
+                                                                $dataTransfer = mysqli_fetch_assoc($queryTransfer);
+
+                                                                $jadwalTransfer = $dataTransfer['jadwal_transfer'];
+
+
                                                                 if ($uangkembali == 0) {
                                                                     $jumlahjadi = $jumlbayar;
                                                                 } else if ($kembreal < $jumlbayar) {
                                                                     $jumlahjadi = $jumlbayar;
                                                                 } else {
                                                                     $jumlahjadi = $realisasi;
+                                                                }
+
+                                                                $isEksternalProcess = $statusbpu == 'Vendor/Supplier' || $statusbpu == 'Honor Eksternal' || $statusbpu == 'Honor Area Head' || $statusbpu == 'STKB OPS' || $statusbpu == 'STKB TRK Luar Kota' || $statusbpu == 'Honor Luar Kota' || $statusbpu == 'Honor Jakarta' || $statusbpu == 'STKB TRK Jakarta' ? true : false;
+
+                                                                if ($statusPengajuanBpu == 1 && $isEksternalProcess) {
+                                                                    $color = 'orange';
                                                                 }
 
                                                                 $selstat = mysqli_query($koneksi, "SELECT status FROM selesai WHERE waktu='$waktu' AND no='$no'");
@@ -478,7 +502,9 @@ $setting = mysqli_fetch_assoc($querySetting);
                                                                 }
 
                                                                 echo "<td bgcolor=' $color '>";
-                                                                echo "No :<b> $termm";
+                                                                echo "No. BPU :<b> $noidbpu";
+                                                                echo "</b><br>";
+                                                                echo "No. Term:<b> $termm";
                                                                 echo "</b><br>";
                                                                 echo ($statusPengajuanBpu != 0) ? "Request BPU : <br><b>Rp. " . number_format($total['jumlah_pengajuan'], 0, '', ',') : "BPU : <br><b>Rp. " . number_format($total['jumlah_total'], 0, '', ',');
                                                                 echo "</b><br>";
@@ -499,12 +525,25 @@ $setting = mysqli_fetch_assoc($querySetting);
                                                                 echo "</b></br>";
                                                                 echo "Tanggal Terima Uang : <b>$tglcair ";
                                                                 echo "</b></br>";
-                                                                echo "Diajukan Oleh : <br><b> $pengaju($divisi2)";
-                                                                echo "</b><br>";
-                                                                echo "No Voucher : <br><b> $novoucher ";
-                                                                echo "</b><br/>";
-                                                                echo "Tgl Bayar : <br><b> $tanggalbayar";
-                                                                echo "</b><br/>";
+                                                                echo "</b></br>";
+                                                                    echo "Metode Pembayaran : <br><b>$metodePembayaran ";
+                                                                    echo "</b><br>";
+                                                                    echo "<hr />";
+                                                                    echo "Tanggal Pembayaran : <br><b> $tanggalbayar";
+                                                                    echo "</b><br/>";
+                                                                    echo "Nama Penerima : <br><b> $namapenerima";
+                                                                    echo "</b><br/>";
+                                                                    echo "Bank : <br><b> $bank";
+                                                                    echo "</b><br/>";
+                                                                    echo "Nomor Rekening : <br><b> $norek";
+                                                                    echo "</b><br/>";
+                                                                    echo "Nama Penerima Sesuai Rekening : <br><b> $bankAccountName";
+                                                                    echo "</b><br/>";
+                                                                    echo "Nominal Pembayaran : <br><b> Rp. " . number_format($jumlbayar);
+                                                                    echo "</b><br/>";
+                                                                    echo "No Voucher : <br><b> $novoucher ";
+                                                                    echo "</b><br/>";
+                                                                    echo "<hr />";
                                                                 echo "Kasir : <br><b> $pembayar ";
                                                                 echo "</b><br/>";
                                                                 echo "File Rincian BPU : <br>";

@@ -109,7 +109,7 @@ $subTabUmum = ['Rutin', 'Non-Rutin']
                 <ul class="nav navbar-nav">
                     <li><a href="home-finance.php">Home</a></li>
                     <li class="active"><a href="list-finance.php">List</a></li>
-                    <li><a href="saldobpu.php">Data User</a></li>
+                    <li><a href="saldobpu.php">Saldo BPU</a></li>
                     <!--<li><a href="summary.php">Summary</a></li>-->
                     <!-- <li><a href="hak-akses.php">Hak Akses</a></li> -->
                     <li><a href="listfinish-finance.php">Budget Finish</a></li>
@@ -138,7 +138,7 @@ $subTabUmum = ['Rutin', 'Non-Rutin']
                 
                 ?>
                <ul class="nav navbar-nav navbar-right">
-                        <li><a href="notif-page.php"><i class="fa fa-envelope"></i></a></li>
+                        <li><a href="/log-notifikasi-aplikasi/index.html" target="_blank"><i class="fa fa-envelope"></i></a></li>
 
                     <li><a href="ubahpassword.php"><span class="glyphicon glyphicon-user"></span><?php echo $_SESSION['nama_user']; ?> (<?php echo $_SESSION['divisi']; ?>)</a></li>
                     <li><a href="logout.php"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
@@ -148,7 +148,7 @@ $subTabUmum = ['Rutin', 'Non-Rutin']
     </nav>
 
 
-    <div class="container">
+    <div class="container-fluid">
 
         <!-- Nav List budget 2018 - 2019 -->
         <!-- <ul class="nav nav-pills">
@@ -356,7 +356,7 @@ $subTabUmum = ['Rutin', 'Non-Rutin']
                                                 }
 
                                                 echo "<td bgcolor=' $color '>";
-                                                echo "No :<b> $term";
+                                                echo "No. Term:<b> $term";
                                                 echo "</b><br>";
                                                 echo "No. STKB :<b> $noStkb";
                                                 echo "</b><br>";

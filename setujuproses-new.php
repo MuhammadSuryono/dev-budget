@@ -4,6 +4,7 @@ require_once "application/config/database.php";
 require_once "application/config/message.php";
 require_once "application/config/whatsapp.php";
 require_once "application/config/email.php";
+require_once "application/config/messageEmail.php";
 
 $emailHelper = new Email();
 
@@ -12,6 +13,7 @@ $koneksi = $con->connect();
 
 $messageHelper = new Message();
 $whatsapp = new Whastapp();
+$messageEmail = new MessageEmail();
 
 $con->set_name_db(DB_TRANSFER);
 $con->init_connection();
@@ -41,7 +43,7 @@ if (!isset($_SESSION['nama_user'])) {
 $userSetuju = $_SESSION['nama_user'];
 $divisi = $_SESSION['divisi'];
 $aksesSes = $_SESSION['hak_akses'];
-date_default_timezone_set("Asia/Bangkok");
+date_default_timezone_set("Asia/Jakarta");
 
 $time = date('Y-m-d H:i:s');
 $finance      = $_SESSION['divisi'];
@@ -58,6 +60,9 @@ $rekening_sumber_mri_kas = $_POST['rekening_sumber_mri_kas'];
 $arrPengajuanJumlah = $_POST['pengajuan_jumlah'];
 $arrNoid = $_POST['noid'];
 $arrMetodePembayaran = $_POST['metode_pembayaran'];
+
+$jenisPajak = $_POST['jenispajak'];
+$nominalPajak = $_POST['nominalpajak'];
 
 $dt = new DateTime($tanggalbayar);
 
@@ -79,7 +84,15 @@ if ($urgent == 'Urgent') {
 } else {
     $d = mktime(8, 15, 0);
     $hour = date("H:i:s", $d);
-    $tanggalbayar = $_POST['tanggalbayar'] . ' ' .  $hour;
+    $dateNow = date("Y-m-d");
+
+    if ($_POST['tanggalbayar'] == $dateNow) {
+        $dateTime = date("H:i:s", time() + 1800);
+        $tanggalbayar = $_POST['tanggalbayar'] . ' ' . $dateTime;
+    } else {
+        $tanggalbayar = $_POST['tanggalbayar'] . ' ' .  $hour;
+    }
+
 }
 
 $dt = new DateTime($tanggalbayar);
@@ -93,6 +106,7 @@ $arrPembayaran = [];
 $idUsersNotification = [];
 $dataDivisi = [];
 $dataLevel = [];
+$emails = [];
 $arremailpenerima = [];
 
 
@@ -106,7 +120,7 @@ $hostProtocol = "http://".$hostProtocol . ":" . $port;
 }
 
 $host = $hostProtocol;
-if ($port == "" || $port == "80") {
+if ($port == "" || $port == "80" || $port == '7793') {
   $host = $hostProtocol. '/'. $url[1];
 }
 
@@ -118,13 +132,17 @@ $queryBpuVerify = mysqli_query($koneksi, "SELECT * FROM bpu_verify WHERE id_bpu 
 $bpuVerify = mysqli_fetch_assoc($queryBpuVerify);
 
 $statusBpu = $bpuItem["statusbpu"];
-
-$isEksternalProcess = $bpuItem["statusbpu"] == 'Vendor/Supplier';
+$eksternal = ['Honor Eksternal','Honor Area Head','STKB OPS', 'STKB TRK Luar Kota', 'Honor Luar Kota', 'Honor Jakarta', 'STKB TRK Jakarta', 'Vendor/Supplier'];
+$isEksternalProcess = in_array($bpuItem["statusbpu"], $eksternal);
 $path = '/view-bpu-verify.php?id='.$bpuVerify["id"].'&bpu='.$bpuItem["noid"];
+$duplicateNumber = [];
 
+
+$urlCallback = getHostUrl() . "/api/callback.php";
 
 if ($_POST['submit'] == 1) {
     
+    $index = 0;
     while ($item = mysqli_fetch_assoc($queryBpuItem)) {
         array_push($arrPembayaran, $item['metode_pembayaran']);
         array_push($arrPenerima, $item['namapenerima']);
@@ -132,16 +150,16 @@ if ($_POST['submit'] == 1) {
             array_push($arrJumlah, "Rp. " . number_format($item['jumlah'], 0, ",", "."));
         }
 
-        if (isset($arrPengajuanJumlah[0])) {
-            if ($arrPengajuanJumlah[0] != "") {
-                array_push($arrJumlah, "Rp. " . number_format($arrPengajuanJumlah[0], 0, ",", "."));
+        if (isset($arrPengajuanJumlah[$index])) {
+            if ($arrPengajuanJumlah[$index] != "") {
+                array_push($arrJumlah, "Rp. " . number_format($arrPengajuanJumlah[$index], 0, ",", "."));
             }
         }
 
         $pengaju = $item['pengaju'];
 
         if (!$isEksternalProcess && $item['metode_pembayaran'] == 'MRI PAL') {
-            $update = mysqli_query($koneksiTransfer, "UPDATE data_transfer SET jadwal_transfer ='$tanggalbayar', nm_otorisasi = '$userSetuju' WHERE noid_bpu = '$item[noid]'") or die(mysqli_error($koneksiTransfer));
+            $update = mysqli_query($koneksiTransfer, "UPDATE data_transfer SET jadwal_transfer ='$tanggalbayar', nm_otorisasi = '$userSetuju', url_callback = '$urlCallback' WHERE noid_bpu = '$item[noid]'") or die(mysqli_error($koneksiTransfer));
 
             if (!$update) {
                 echo "<script language='javascript'>";
@@ -154,8 +172,8 @@ if ($_POST['submit'] == 1) {
         }
 
         if ($isEksternalProcess) {
-            $update = mysqli_query($koneksi, "UPDATE bpu SET jumlah = '$arrPengajuanJumlah[0]', checkby = '$userSetuju', tglcheck='$time' WHERE noid = '$arrNoid[0]'");
-            $item['jumlah'] = $arrPengajuanJumlah[0];
+            $update = mysqli_query($koneksi, "UPDATE bpu SET jumlah = '$arrPengajuanJumlah[$index]', jenis_pajak = '$jenisPajak', nominal_pajak = '$nominalPajak', checkby = '$userSetuju', tglcheck='$time' WHERE noid = '$arrNoid[$index]'");
+            $item['jumlah'] = $arrPengajuanJumlah[$index];
         }
 
         $queryBank = mysqli_query($koneksi, "SELECT * FROM bank WHERE kodebank = '$item[namabank]'");
@@ -201,23 +219,27 @@ if ($_POST['submit'] == 1) {
         } else {
             $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$item[namapenerima]' AND aktif='Y'");
             $emailUser = mysqli_fetch_assoc($queryEmail);
-            if ($emailUser) {
+            if ($emailUser && !in_array($emailUser['phone_number'], $duplicateNumber)) {
+                array_push($duplicateNumber, $emailUser['phone_number']);
                 array_push($email, $emailUser['phone_number']);
                 array_push($nama, $emailUser['nama_user']);
                 array_push($idUsersNotification, $emailUser['id_user']);
                 array_push($dataDivisi, $emailUser['divisi']);
                 array_push($dataLevel, $emailUser['level']);
+                array_push($emails, $emailUser['email']);
             }
         }
 
         $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$item[acknowledged_by]' AND aktif='Y'");
         $emailUser = mysqli_fetch_assoc($queryEmail);
-        if ($emailUser['phone_number'] != "") {
+        if ($emailUser['phone_number'] != "" && !in_array($emailUser['phone_number'], $duplicateNumber)) {
             array_push($email, $emailUser['phone_number']);
             array_push($nama, $emailUser['nama_user']);
             array_push($idUsersNotification, $emailUser['id_user']);
             array_push($dataDivisi, $emailUser['divisi']);
             array_push($dataLevel, $emailUser['level']);
+            array_push($duplicateNumber, $emailUser['phone_number']);
+            array_push($emails, $emailUser['email']);
         }
 
 
@@ -244,53 +266,86 @@ if ($_POST['submit'] == 1) {
 
             $queryJenisPembayaran = mysqli_query($koneksiMriTransfer, "SELECT * FROM jenis_pembayaran WHERE jenispembayaran = '$item[statusbpu]'");
             $jenisPembayaran = mysqli_fetch_assoc($queryJenisPembayaran);
-            $insert = mysqli_query($koneksiTransfer, "INSERT INTO data_transfer (transfer_req_id, transfer_type, jenis_pembayaran_id, keterangan, waktu_request, norek, pemilik_rekening, bank, kode_bank, berita_transfer, jumlah, terotorisasi, hasil_transfer, ket_transfer, nm_pembuat, nm_otorisasi, nm_validasi, nm_manual, jenis_project, nm_project, noid_bpu, biaya_trf, rekening_sumber, email_pemilik_rekening, jadwal_transfer) 
-                    VALUES ('$formatId', '3', '$jenisPembayaran[jenispembayaranid]', '$item[statusbpu]', '$waktu', '$item[norek]', '$item[namapenerima]','$bank[namabank]', '$bank[kodebank]', '$berita_transfer','$arrPengajuanJumlah[0]', '2', '1', 'Antri', '$item[pengaju]', '$_SESSION[nama_user]', '$_SESSION[nama_user]','', '$budget[jenis]', '$nm_project', '$item[noid]', $biayaTrf, '0613005878', '$item[emailpenerima]', '$tanggalbayar')") or die(mysqli_error($koneksiTransfer));
+
+            $typeKas = typeKas($item['statusbpu']);
+            $queryKas = mysqli_query($koneksiDevelop, "SELECT rekening FROM kas WHERE label_kas = '$typeKas'");
+            $kas = mysqli_fetch_assoc($queryKas);
+            if ($typeKas == U_UNDEFINED_VARIABLE) {
+                $kas['rekening'] = U_UNDEFINED_VARIABLE;
+            }
+
+            $updateBpu = mysqli_query($koneksi, "UPDATE bpu SET rekening_sumber = '$kas[rekening]', jenis_pajak = '$jenisPajak', nominal_pajak = '$nominalPajak', rekening_id = '$formatId' WHERE noid = '$item[noid]'");
+
+            $insert = mysqli_query($koneksiTransfer, "INSERT INTO data_transfer (transfer_req_id, transfer_type, jenis_pembayaran_id, keterangan, waktu_request, norek, pemilik_rekening, bank, kode_bank, berita_transfer, jumlah, terotorisasi, hasil_transfer, ket_transfer, nm_pembuat, nm_otorisasi, nm_validasi, nm_manual, jenis_project, nm_project, noid_bpu, biaya_trf, rekening_sumber, email_pemilik_rekening, jadwal_transfer, url_callback) 
+                    VALUES ('$formatId', '3', '$jenisPembayaran[jenispembayaranid]', '$item[statusbpu]', '$waktu', '$item[norek]', '$item[bank_account_name]','$bank[namabank]', '$bank[kodebank]', '$berita_transfer','$arrPengajuanJumlah[$index]', '2', '1', 'Antri', '$item[pengaju]', '$_SESSION[nama_user]', '$_SESSION[nama_user]','', '$budget[jenis]', '$nm_project', '$item[noid]', $biayaTrf, '$kas[rekening]', '$item[emailpenerima]', '$tanggalbayar', '$urlCallback')") or die(mysqli_error($koneksiTransfer));
+        }
+        $index++;
+    }
+
+    if ($isEksternalProcess) {
+        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi = 'Direksi' AND aktif='Y'");
+        $emailUser = mysqli_fetch_assoc($queryEmail);
+        if ($emailUser['phone_number'] != "" && !in_array($emailUser['phone_number'], $duplicateNumber)) {
+            array_push($email, $emailUser['phone_number']);
+            array_push($nama, $emailUser['nama_user']);
+            array_push($idUsersNotification, $emailUser['id_user']);
+            array_push($dataDivisi, $emailUser['divisi']);
+            array_push($dataLevel, $emailUser['level']);
+            array_push($duplicateNumber, $emailUser['phone_number']);
+            array_push($emails, $emailUser['email']);
         }
     }
 
     if ($bpuItem['statusbpu'] == 'UM' || $bpuItem['statusbpu'] == 'UM Burek') {
         $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$bpuItem[namapenerima]' AND aktif='Y'");
         $emailUser = mysqli_fetch_assoc($queryEmail);
-        if ($emailUser['phone_number'] != "") {
+        if ($emailUser['phone_number'] != "" && !in_array($emailUser['phone_number'], $duplicateNumber)) {
             array_push($email, $emailUser['phone_number']);
             array_push($nama, $emailUser['nama_user']);
             array_push($idUsersNotification, $emailUser['id_user']);
             array_push($dataDivisi, $emailUser['divisi']);
             array_push($dataLevel, $emailUser['level']);
+            array_push($duplicateNumber, $emailUser['phone_number']);
+            array_push($emails, $emailUser['email']);
         }
     }
 
     $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$budget[pengaju]' AND aktif='Y'");
     $emailUser = mysqli_fetch_assoc($queryEmail);
-    if ($emailUser['phone_number']) {
+    if ($emailUser['phone_number'] && !in_array($emailUser['phone_number'], $duplicateNumber)) {
         array_push($email, $emailUser['phone_number']);
         array_push($nama, $emailUser['nama_user']);
         array_push($dataDivisi, $emailUser['divisi']);
         array_push($idUsersNotification, $emailUser['id_user']);
         array_push($dataLevel, $emailUser['level']);
+        array_push($duplicateNumber, $emailUser['phone_number']);
+        array_push($emails, $emailUser['email']);
     }
 
     if ($budget['jenis'] == 'B1' || $budget['jenis'] == 'B2') {
         $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1', '3')");
         while ($e = mysqli_fetch_assoc($queryEmail)) {
-            if ($e['phone_number'] != "") {
+            if ($e['phone_number'] != "" && !in_array($emailUser['phone_number'], $duplicateNumber)) {
                 array_push($email, $e['phone_number']);
                 array_push($nama, $e['nama_user']);
                 array_push($idUsersNotification, $e['id_user']);
                 array_push($dataDivisi, $e['divisi']);
                 array_push($dataLevel, $e['level']);
+                array_push($duplicateNumber, $emailUser['phone_number']);
+                array_push($emails, $emailUser['email']);
             }
         }
     } else {
         $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('2', '3')");
         while ($e = mysqli_fetch_assoc($queryEmail)) {
-            if ($e['phone_number'] != "") {
+            if ($e['phone_number'] != "" && !in_array($emailUser['phone_number'], $duplicateNumber)) {
                 array_push($email, $e['phone_number']);
                 array_push($nama, $e['nama_user']);
                 array_push($idUsersNotification, $e['id_user']);
                 array_push($dataDivisi, $e['divisi']);
                 array_push($dataLevel, $e['level']);
+                array_push($duplicateNumber, $emailUser['phone_number']);
+                array_push($emails, $emailUser['email']);
             }
         }
     }
@@ -306,14 +361,14 @@ if ($_POST['submit'] == 1) {
 
 
     if ($isEksternalProcess) {
-        $update = mysqli_query($koneksi, "UPDATE bpu SET status_pengajuan_bpu =0, tanggalbayar = '$tanggalbayar', urgent = '$urgent', checkby = '$userSetuju', tglcheck = '$time'
+        $update = mysqli_query($koneksi, "UPDATE bpu SET status_pengajuan_bpu =0, tanggalbayar = '$tanggalbayar', jenis_pajak = '$jenisPajak', nominal_pajak = '$nominalPajak', urgent = '$urgent', checkby = '$userSetuju', tglcheck = '$time'
                                WHERE no='$no' AND waktu='$waktu' AND persetujuan='Belum Disetujui' AND term=$term");
         $update = mysqli_query($koneksi, "UPDATE bpu_verify SET is_need_approved = '0', status_approved = '1', is_approved = '1' WHERE id = '$bpuVerify[id]'");
 
         
 
     } else {
-        $update = mysqli_query($koneksi, "UPDATE bpu SET status_pengajuan_bpu =0, persetujuan = '$persetujuan', tanggalbayar = '$tanggalbayar', urgent = '$urgent', approveby = '$userSetuju', tglapprove = '$time'
+        $update = mysqli_query($koneksi, "UPDATE bpu SET status_pengajuan_bpu =0, persetujuan = '$persetujuan', jenis_pajak = '$jenisPajak', nominal_pajak = '$nominalPajak', tanggalbayar = '$tanggalbayar', urgent = '$urgent', approveby = '$userSetuju', tglapprove = '$time'
                                WHERE no='$no' AND waktu='$waktu' AND persetujuan='Belum Disetujui' AND term=$term");
         $update = mysqli_query($koneksi, "UPDATE bpu_verify SET is_need_approved = '0', status_approved = '1', is_approved = '1' WHERE id = '$bpuVerify[id]'");
     }
@@ -327,25 +382,31 @@ if ($_POST['submit'] == 1) {
         for($i = 0; $i < count($email); $i++) {
             $path = '/views.php';
 
-            if ($isEksternalProcess) {
-                $path = '/view-bpu-verify.php?id='.$bpuVerify["id"].'&bpu='.$bpuItem["noid"];
-            } else {
-                if ($dataDivisi[$i] == 'FINANCE') {
-                    $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $budget['jenis'] == 'B1' ? '/view-finance-manager-b1.php?code='.$idBudget : '/view-finance-manager.php?code='.$idBudget ;
-                    $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $budget['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin-manager.php?code='.$idBudget  : '/view-finance-manager.php?code='.$idBudget ;
-                    $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $budget['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin.php?code='.$idBudget  : '/view-finance.php?code='.$idBudget ;
-                    $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
-                } else if ($dataDivisi[$i] == 'Direksi') {
-                    $path = '/views-direksi.php';
+            if ($_SESSION['nama_user'] != $nama[$i]) {
+                if ($isEksternalProcess && $dataDivisi[$i] != 'Direksi') {
+                    $path = '/view-bpu-verify.php?id='.$bpuVerify["id"].'&bpu='.$bpuItem["noid"];
+                } else if ($isEksternalProcess && $dataDivisi[$i] == 'Direksi') {
+                    $path = '/rekap-finance.php?see';
+                } else {
+                    if ($dataDivisi[$i] == 'FINANCE') {
+                        $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $budget['jenis'] == 'B1' ? '/view-finance-manager-b1.php?code='.$idBudget : '/view-finance-manager.php?code='.$idBudget ;
+                        $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $budget['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin-manager.php?code='.$idBudget  : '/view-finance-manager.php?code='.$idBudget ;
+                        $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $budget['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin.php?code='.$idBudget  : '/view-finance.php?code='.$idBudget ;
+                        $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
+                    } else if ($dataDivisi[$i] == 'Direksi') {
+                        $path = '/rekap-finance.php?see';
+                    }
                 }
+    
+              $url =  $host. $path.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
+              $msg = $messageHelper->messageApprovePengajuanBPU($userSetuju, $budget['nama'], $no, $term, $arrPenerima, $tanggalbayar, $arrPembayaran, $arrJumlah, $keterangan, $url);
+              $msgEmail = $messageEmail->approvedApplyBPU($userSetuju, $budget['nama'], $no, $term, $arrPenerima, $tanggalbayar, $arrPembayaran, $arrJumlah, $keterangan, $url);
+              if($email[$i] != "") $whatsapp->sendMessage($email[$i], $msg);
+              if ($emails[$i] != "") $emailHelper->sendEmail($msgEmail, "Informasi Persetujuan BPU", $emails[$i]);
+              $notification .= ($nama[$i] . ' (' . $email[$i] . ')');
+              if ($i < count($email) - 1) $notification .= ', ';
+              else $notification .= '.';
             }
-
-          $url =  $host. $path.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
-          $msg = $messageHelper->messageApprovePengajuanBPU($userSetuju, $budget['nama'], $no, $term, $arrPenerima, $tanggalbayar, $arrPembayaran, $arrJumlah, $keterangan, $url);
-          if($email[$i] != "") $whatsapp->sendMessage($email[$i], $msg);
-          $notification .= ($nama[$i] . ' (' . $email[$i] . ')');
-          if ($i < count($email) - 1) $notification .= ', ';
-          else $notification .= '.';
         }
 
         if (count($arremailpenerima) > 0) {
@@ -356,7 +417,7 @@ if ($_POST['submit'] == 1) {
 else if ($submit == 0) {
 
     $update = mysqli_query($koneksi, "UPDATE bpu SET jumlah = null, status_pengajuan_bpu = 2, alasan_tolak_bpu = '$alasanTolakBpu' WHERE no='$no' AND waktu='$waktu' AND term='$term'");
-    $update = mysqli_query($koneksi, "UPDATE bpu_verify SET is_need_approved = '0', status_approved = '0', is_approved = '1' WHERE id = '$bpuVerify[id]'");
+    $update = mysqli_query($koneksi, "UPDATE bpu_verify SET is_need_approved = '0', status_approved = '0', is_approved = '0', is_verified = '0' WHERE id = '$bpuVerify[id]'");
 
     $queryBpu = mysqli_query($koneksi, "SELECT * FROM bpu WHERE no='$no' AND waktu='$waktu' AND term='$term'");
     while ($bpu = mysqli_fetch_assoc($queryBpu)) {
@@ -366,44 +427,48 @@ else if ($submit == 0) {
 
         $queryEmail = mysqli_query($koneksi, "SELECT* FROM tb_user WHERE nama_user = '$bpu[pengaju]' AND aktif='Y'");
         $emailUser = mysqli_fetch_assoc($queryEmail);
-        if ($emailUser) {
+        if ($emailUser && !in_array($emailUser['phone_number'], $duplicateNumber)) {
             array_push($email, $emailUser['phone_number']);
             array_push($nama, $emailUser['nama_user']);
             array_push($idUsersNotification, $emailUser['id_user']);
             array_push($dataDivisi, $emailUser['divisi']);
             array_push($dataLevel, $emailUser['level']);
+            array_push($duplicateNumber, $emailUser['phone_number']);
         }
 
         $queryEmail = mysqli_query($koneksi, "SELECT* FROM tb_user WHERE nama_user = '$bpu[acknowledged_by]' AND aktif='Y'");
         $emailUser = mysqli_fetch_assoc($queryEmail);
-        if ($emailUser) {
+        if ($emailUser && !in_array($emailUser['phone_number'], $duplicateNumber)) {
             array_push($email, $emailUser['phone_number']);
             array_push($nama, $emailUser['nama_user']);
             array_push($idUsersNotification, $emailUser['id_user']);
             array_push($dataDivisi, $emailUser['divisi']);
             array_push($dataLevel, $emailUser['level']);
+            array_push($duplicateNumber, $emailUser['phone_number']);
         }
 
         if ($budget['jenis'] == 'B1' || $budget['jenis'] == 'B2') {
             $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1', '3')");
             while ($e = mysqli_fetch_assoc($queryEmail)) {
-                if ($e['phone_number']) {
+                if ($e['phone_number'] && !in_array($e['phone_number'], $duplicateNumber)) {
                     array_push($email, $e['phone_number']);
                     array_push($nama, $e['nama_user']);
                     array_push($idUsersNotification, $e['id_user']);
                     array_push($dataDivisi, $e['divisi']);
                     array_push($dataLevel, $e['level']);
+                    array_push($duplicateNumber, $emailUser['phone_number']);
                 }
             }
         } else {
             $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('2', '3')");
             while ($e = mysqli_fetch_assoc($queryEmail)) {
-                if ($e['phone_number']) {
+                if ($e['phone_number'] && !in_array($e['phone_number'], $duplicateNumber)) {
                     array_push($email, $e['phone_number']);
                     array_push($nama, $e['nama_user']);
                     array_push($idUsersNotification, $e['id_user']);
                     array_push($dataDivisi, $e['divisi']);
                     array_push($dataLevel, $e['level']);
+                    array_push($duplicateNumber, $emailUser['phone_number']);
                 }
             }
         }
@@ -418,12 +483,13 @@ else if ($submit == 0) {
                 $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$arrPenerima[$i]' AND aktif='Y'");
                 $emailUser = mysqli_fetch_assoc($queryEmail);
                 echo $emailUser['nama_user'];
-                if ($emailUser) {
+                if ($emailUser && !in_array($e['phone_number'], $duplicateNumber)) {
                     array_push($email, $emailUser['phone_number']);
                     array_push($nama, $emailUser['nama_user']);
                     array_push($idUsersNotification, $emailUser['id_user']);
                     array_push($dataDivisi, $emailUser['divisi']);
                     array_push($dataLevel, $emailUser['level']);
+                    array_push($duplicateNumber, $emailUser['phone_number']);
                 }
             }
         }
@@ -435,25 +501,29 @@ else if ($submit == 0) {
     for($i = 0; $i < count($email); $i++) {
         $path = '/views.php';
 
-        if ($isEksternalProcess) {
-            $path = '/view-bpu-verify.php?id='.$bpuVerify["id"].'&bpu='.$bpuItem["noid"];
-        } else {
-            if ($dataDivisi[$i] == 'FINANCE') {
-                $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $budget['jenis'] == 'B1' ? '/view-finance-manager-b1.php?code='.$idBudget : '/view-finance-manager.php?code='.$idBudget;
-                $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $budget['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin-manager.php?code='.$idBudget : '/view-finance-manager.php?code='.$idBudget;
-                $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $budget['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin.php?code='.$idBudget : '/view-finance.php?code='.$idBudget;
-                $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
-            } else if ($dataDivisi[$i] == 'Direksi') {
-                $path = '/views-direksi.php';
+        if ($_SESSION['nama_user'] != $nama[$i]) {
+            if ($isEksternalProcess) {
+                $path = '/view-bpu-verify.php?id='.$bpuVerify["id"].'&bpu='.$bpuItem["noid"];
+            } else {
+                if ($dataDivisi[$i] == 'FINANCE') {
+                    $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $budget['jenis'] == 'B1' ? '/view-finance-manager-b1.php?code='.$idBudget : '/view-finance-manager.php?code='.$idBudget;
+                    $pathManager = ($dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager") && $budget['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin-manager.php?code='.$idBudget : '/view-finance-manager.php?code='.$idBudget;
+                    $pathKaryawan = ($dataLevel[$i] != "Manager" || $dataLevel[$i] != "Senior Manager") && $budget['jenis'] == 'Non Rutin' ? '/view-finance-nonrutin.php?code='.$idBudget : '/view-finance.php?code='.$idBudget;
+                    $path =  $dataLevel[$i] == "Manager" || $dataLevel[$i] == "Senior Manager" ? $pathManager : $pathKaryawan;
+                } else if ($dataDivisi[$i] == 'Direksi') {
+                    $path = '/views-direksi.php?code='.$idBudget;
+                }
             }
+            $url =  $host. $path.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
+            $msg = $messageHelper->messageTolakPengajuanBPU($userSetuju, $budget['nama'], $no, $term, $arrPenerima, $tanggalbayar, $arrPembayaran, $arrJumlah, $keterangan, $url);
+            $msgEmail = $messageEmail->rejectedApplyBPU($userSetuju, $budget['nama'], $no, $term, $arrPenerima, $tanggalbayar, $arrPembayaran, $arrJumlah, $keterangan, $url, $alasanTolakBpu);
+            if($email[$i] != "") $whatsapp->sendMessage($email[$i], $msg);
+            if ($emails[$i] != "") $emailHelper->sendEmail($msgEmail, "Informais Penolakan BPU", $emails[$i]);
+    
+            $notification .= ($nama[$i] . ' (' . $email[$i] . ')');
+            if ($i < count($email) - 1) $notification .= ', ';
+            else $notification .= '.';
         }
-        $url =  $host. $path.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
-        $msg = $messageHelper->messageTolakPengajuanBPU($userSetuju, $budget['nama'], $no, $term, $arrPenerima, $tanggalbayar, $arrPembayaran, $arrJumlah, $keterangan, $url);
-        if($email[$i] != "") $whatsapp->sendMessage($email[$i], $msg);
-
-        $notification .= ($nama[$i] . ' (' . $email[$i] . ')');
-        if ($i < count($email) - 1) $notification .= ', ';
-        else $notification .= '.';
     }
 
     if ($bpuItem['status'] != "UM" && $bpuItem['status'] != "UM Burek") {
@@ -549,4 +619,35 @@ if ($update) {
         echo "</script>";
         echo "<script> document.location.href='".$q[1]."'; </script>";
     }
+}
+
+function typeKas($statusBpu = "") {
+    $project = ["Vendor/Supplier", "Honor Area Head", "Honor Eksternal"];
+    $uangMuka = ["UM", "UM Burek"];
+    $umum = [];
+
+    if (in_array($statusBpu, $project)) {
+        return "Kas Project";
+    } else if (in_array($statusBpu, $uangMuka)) {
+        return "Kas Uang Muka";
+    } else if (in_array($statusBpu, $umum)) {
+        return "Kas Umum";
+    }
+
+    return U_UNDEFINED_VARIABLE;
+
+}
+
+function getHostUrl()
+{
+    $protocol = strtolower(substr($_SERVER["SERVER_PROTOCOL"],0,strpos( $_SERVER["SERVER_PROTOCOL"],'/'))).'://';
+    $url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+    $port = $_SERVER['SERVER_PORT'];
+    $url = explode('/', $url);
+    $hostProtocol = $url[0];
+    if ($port != "") {
+        $hostProtocol = $hostProtocol . ":" . $port;
+    }
+    $host = $protocol.$hostProtocol. '/'. $url[1];
+    return $host;
 }
