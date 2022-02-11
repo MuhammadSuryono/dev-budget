@@ -10,6 +10,7 @@ $emailHelper = new Email();
 
 $con = new Database();
 $koneksi = $con->connect();
+$con->load_database($koneksi);
 
 $messageHelper = new Message();
 $whatsapp = new Whastapp();
@@ -30,14 +31,9 @@ $koneksiDevelop = $con->connect();
 
 require "vendor/email/send-email.php";
 
-$url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
-$url = explode('/', $url);
-$url = $url[0] . '/' . $url[1] . '/' . 'login.php';
-
 session_start();
 if (!isset($_SESSION['nama_user'])) {
     header("location:login.php");
-    // die('location:login.php');//jika belum login jangan lanjut
 }
 
 $userSetuju = $_SESSION['nama_user'];
@@ -45,7 +41,7 @@ $divisi = $_SESSION['divisi'];
 $aksesSes = $_SESSION['hak_akses'];
 date_default_timezone_set("Asia/Jakarta");
 
-$time = date('Y-m-d H:i:s');
+$time = date('Y-m-d H:i:s', time() + 7200);
 $finance      = $_SESSION['divisi'];
 
 $no           = $_POST['no'];
@@ -66,11 +62,8 @@ $nominalPajak = $_POST['nominalpajak'];
 
 $dt = new DateTime($tanggalbayar);
 
-$queryItemBudget = mysqli_query($koneksi, "SELECT * FROM selesai WHERE waktu = '$waktu' AND no = '$no'");
-$itemBudget = mysqli_fetch_assoc($queryItemBudget);
-
-$queryBudget = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE waktu = '$waktu'");
-$budget = mysqli_fetch_assoc($queryBudget);
+$itemBudget = $con->select()->from('selesai')->where('waktu', '=', $waktu)->where('no', '=', $no)->first();
+$budget = $con->select()->from('pengajuan')->where('waktu', '=', $waktu)->first();
 $idBudget = $budget['noid'];
 
 if ($budget['jenis'] == 'Non Rutin') {
@@ -87,7 +80,7 @@ if ($urgent == 'Urgent') {
     $dateNow = date("Y-m-d");
 
     if ($_POST['tanggalbayar'] == $dateNow) {
-        $dateTime = date("H:i:s", time() + 1800);
+        $dateTime = date("H:i:s", time() + 7200);
         $tanggalbayar = $_POST['tanggalbayar'] . ' ' . $dateTime;
     } else {
         $tanggalbayar = $_POST['tanggalbayar'] . ' ' .  $hour;
@@ -124,12 +117,9 @@ if ($port == "" || $port == "80" || $port == '7793') {
   $host = $hostProtocol. '/'. $url[1];
 }
 
-$queryBpu = mysqli_query($koneksi, "SELECT * FROM bpu WHERE no = '$no' AND waktu = '$waktu' AND term = '$term'");
-$queryBpuItem = mysqli_query($koneksi, "SELECT * FROM bpu WHERE no = '$no' AND waktu = '$waktu' AND term = '$term'");
-
-$bpuItem = mysqli_fetch_assoc($queryBpu);
-$queryBpuVerify = mysqli_query($koneksi, "SELECT * FROM bpu_verify WHERE id_bpu = '$bpuItem[noid]'");
-$bpuVerify = mysqli_fetch_assoc($queryBpuVerify);
+$dataBpuItem = $con->select()->from('bpu')->where('no', '=', $no)->where('waktu', '=', $waktu)->where('term', '=', $term)->get();
+$bpuItem = $con->select()->from('bpu')->where('no', '=', $no)->where('waktu', '=', $waktu)->where('term', '=', $term)->first();
+$bpuVerify = $con->select()->from('bpu_verify')->where('id_bpu', '=', $bpuItem['noid'])->first();
 
 $statusBpu = $bpuItem["statusbpu"];
 $eksternal = ['Honor Eksternal','Honor Area Head','STKB OPS', 'STKB TRK Luar Kota', 'Honor Luar Kota', 'Honor Jakarta', 'STKB TRK Jakarta', 'Vendor/Supplier'];
@@ -143,7 +133,7 @@ $urlCallback = getHostUrl() . "/api/callback.php";
 if ($_POST['submit'] == 1) {
     
     $index = 0;
-    while ($item = mysqli_fetch_assoc($queryBpuItem)) {
+    foreach ($dataBpuItem as $item) {
         array_push($arrPembayaran, $item['metode_pembayaran']);
         array_push($arrPenerima, $item['namapenerima']);
         if ($item['jumlah'] != 0) {
@@ -399,7 +389,7 @@ if ($_POST['submit'] == 1) {
                 }
     
               $url =  $host. $path.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
-              $msg = $messageHelper->messageApprovePengajuanBPU($userSetuju, $budget['nama'], $no, $term, $arrPenerima, $tanggalbayar, $arrPembayaran, $arrJumlah, $keterangan, $url);
+              $msg = $messageHelper->messageApprovePengajuanBPU($itemBudget['rincian'], $itemBudget['status'], $itemBudget['kota'], $userSetuju, $budget['nama'], $no, $term, $arrPenerima, $tanggalbayar, $arrPembayaran, $arrJumlah, $keterangan, $url);
               $msgEmail = $messageEmail->approvedApplyBPU($userSetuju, $budget['nama'], $no, $term, $arrPenerima, $tanggalbayar, $arrPembayaran, $arrJumlah, $keterangan, $url);
               if($email[$i] != "") $whatsapp->sendMessage($email[$i], $msg);
               if ($emails[$i] != "") $emailHelper->sendEmail($msgEmail, "Informasi Persetujuan BPU", $emails[$i]);
