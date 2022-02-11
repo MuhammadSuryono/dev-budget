@@ -309,13 +309,13 @@ $koneksiJay = $con->connect();
                 <p><b>Note: Budget yang telah diajukan tidak bisa dirubah kembali.</b></p>
             </div>';
             } ?>
-            <?php if ($_SESSION['nama_user'] == $d['pengaju']) { ?>
+            
             <span data-toggle="modal" data-target="#requestModal">
                 <button type="button" class="btn btn-success btn-small pull-right" style="margin-left: 5px; display: none;" data-toggle="tooltip" data-placement="bottom" title="Harap Simpan data terlebih dahulu sebelum mengajukan permohonan budget" id="buttonAjukan" data-id="<?= $id ?>">Ajukan</button>
             </span>
             <input type="button" class="btn btn-primary pull-right" id="submitButton" style="margin-left: 5px;display: none;" data-toggle="modal" value="Simpan" />
             <button type="button" id="buttonTambah" class="btn btn-default btn-small pull-right" style="display: none;" onclick="tambah_budget()" margin-left: 5px;display: none;>Tambah</button>
-            <?php } ?>
+           
             <br /><br />
             <?php
             $queryTotalBiaya = mysqli_query($koneksi, "SELECT sum(total) as total_biaya FROM selesai_request WHERE waktu = '$d[waktu]' AND status != 'UM Burek'");
