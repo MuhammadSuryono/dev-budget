@@ -47,7 +47,7 @@ if (count($conditions) > 0) {
 
 $bagianWhere = $sql;
 
-$getTrfFlap = mysqli_query($koneksiTransfer, "SELECT * FROM data_transfer JOIN ".DB_MRI_TRANSFER.".jenis_pembayaran AS t2 ON data_transfer.jenis_pembayaran_id = t2.jenispembayaranid " . (($bagianWhere) ? "WHERE " . $bagianWhere : "") . " ORDER BY data_transfer.transfer_id ASC") or die(mysqli_error($koneksiTransfer));
+$getTrfFlap = mysqli_query($koneksiTransfer, "SELECT * FROM data_transfer JOIN ".DB_MRI_TRANSFER.".jenis_pembayaran AS t2 ON data_transfer.jenis_pembayaran_id = t2.jenispembayaranid " . (($bagianWhere) ? "WHERE " . $bagianWhere : "") . " ORDER BY data_transfer.transfer_id DESC") or die(mysqli_error($koneksiTransfer));
 
 $url = explode('/', $_SERVER["REQUEST_URI"]);
 $url = $url[count($url) - 1];
@@ -240,7 +240,7 @@ $buttonAkses = unserialize($user['hak_button']);
                                         <?php
                                         $i = 1;
                                         $total = 0;
-                                        $getTrfFlap = mysqli_query($koneksiTransfer, "SELECT * FROM data_transfer JOIN ".DB_MRI_TRANSFER.".jenis_pembayaran AS t2 ON data_transfer.jenis_pembayaran_id = t2.jenispembayaranid WHERE hasil_transfer NOT IN ('1','4') AND jenis_project IN ('B1', 'B2') AND keterangan NOT IN ('UM', 'UM Burek')" . (($bagianWhere) ? " AND " . $bagianWhere : "") . "  ORDER BY data_transfer.transfer_id ASC") or die(mysqli_error($koneksiTransfer));
+                                        $getTrfFlap = mysqli_query($koneksiTransfer, "SELECT * FROM data_transfer JOIN ".DB_MRI_TRANSFER.".jenis_pembayaran AS t2 ON data_transfer.jenis_pembayaran_id = t2.jenispembayaranid WHERE hasil_transfer NOT IN ('1','4') AND jenis_project IN ('B1', 'B2') AND keterangan NOT IN ('UM', 'UM Burek')" . (($bagianWhere) ? " AND " . $bagianWhere : "") . "  ORDER BY data_transfer.transfer_id DESC") or die(mysqli_error($koneksiTransfer));
                                         while ($item = mysqli_fetch_assoc($getTrfFlap)) {
                                             $total += $item['jumlah'];
                                         }
@@ -282,7 +282,7 @@ $buttonAkses = unserialize($user['hak_button']);
                                                 </thead>
                                                 <tbody>
                                                     <?php
-                                                    $getTrfFlap = mysqli_query($koneksiTransfer, "SELECT * FROM data_transfer JOIN ".DB_MRI_TRANSFER.".jenis_pembayaran AS t2 ON data_transfer.jenis_pembayaran_id = t2.jenispembayaranid " . (($bagianWhere) ? "WHERE " . $bagianWhere : "") .  " AND hasil_transfer NOT IN ('1','4') AND jenis_project IN ('B1', 'B2') AND jumlah != '0' AND keterangan NOT IN ('UM', 'UM Burek') ORDER BY data_transfer.transfer_id ASC") or die(mysqli_error($koneksiTransfer));
+                                                    $getTrfFlap = mysqli_query($koneksiTransfer, "SELECT * FROM data_transfer JOIN ".DB_MRI_TRANSFER.".jenis_pembayaran AS t2 ON data_transfer.jenis_pembayaran_id = t2.jenispembayaranid " . (($bagianWhere) ? "WHERE " . $bagianWhere : "") .  " AND hasil_transfer NOT IN ('1','4') AND jenis_project IN ('B1', 'B2') AND jumlah != '0' AND keterangan NOT IN ('UM', 'UM Burek') ORDER BY data_transfer.transfer_id DESC") or die(mysqli_error($koneksiTransfer));
 
                                                     if (!empty($getTrfFlap)) {
                                                         error_reporting(0);
@@ -420,7 +420,7 @@ $buttonAkses = unserialize($user['hak_button']);
                                         <?php
                                         $i = 1;
                                         $total = 0;
-                                        $getTrfFlap = mysqli_query($koneksiTransfer, "SELECT * FROM data_transfer JOIN ".DB_MRI_TRANSFER.".jenis_pembayaran AS t2 ON data_transfer.jenis_pembayaran_id = t2.jenispembayaranid WHERE hasil_transfer NOT IN ('1','4') AND jenis_project IN ('Rutin', 'Non Rutin') AND keterangan NOT IN ('UM', 'UM Burek')" . (($bagianWhere) ? " AND " . $bagianWhere : "") . "  ORDER BY data_transfer.transfer_id ASC") or die(mysqli_error($koneksiTransfer));
+                                        $getTrfFlap = mysqli_query($koneksiTransfer, "SELECT * FROM data_transfer JOIN ".DB_MRI_TRANSFER.".jenis_pembayaran AS t2 ON data_transfer.jenis_pembayaran_id = t2.jenispembayaranid WHERE hasil_transfer NOT IN ('1','4') AND jenis_project IN ('Rutin', 'Non Rutin') AND keterangan NOT IN ('UM', 'UM Burek')" . (($bagianWhere) ? " AND " . $bagianWhere : "") . "  ORDER BY data_transfer.transfer_id DESC") or die(mysqli_error($koneksiTransfer));
                                         while ($item = mysqli_fetch_assoc($getTrfFlap)) {
                                             $total += $item['jumlah'];
                                         }
@@ -466,7 +466,7 @@ $buttonAkses = unserialize($user['hak_button']);
                                                 </thead>
                                                 <tbody>
                                                     <?php
-                                                    $getTrfFlap = mysqli_query($koneksiTransfer, "SELECT * FROM data_transfer JOIN ".DB_MRI_TRANSFER.".jenis_pembayaran AS t2 ON data_transfer.jenis_pembayaran_id = t2.jenispembayaranid " . (($bagianWhere) ? "WHERE " . $bagianWhere : "") . " AND hasil_transfer NOT IN ('1','4') AND jenis_project IN ('Rutin', 'Non Rutin') AND keterangan NOT IN ('UM', 'UM Burek') ORDER BY data_transfer.transfer_id ASC") or die(mysqli_error($koneksiTransfer));
+                                                    $getTrfFlap = mysqli_query($koneksiTransfer, "SELECT * FROM data_transfer JOIN ".DB_MRI_TRANSFER.".jenis_pembayaran AS t2 ON data_transfer.jenis_pembayaran_id = t2.jenispembayaranid " . (($bagianWhere) ? "WHERE " . $bagianWhere : "") . " AND hasil_transfer NOT IN ('1','4') AND jenis_project IN ('Rutin', 'Non Rutin') AND keterangan NOT IN ('UM', 'UM Burek') ORDER BY data_transfer.transfer_id DESC") or die(mysqli_error($koneksiTransfer));
 
                                                     if (!empty($getTrfFlap)) {
                                                         error_reporting(0);
@@ -598,7 +598,7 @@ $buttonAkses = unserialize($user['hak_button']);
                                         <?php
                                         $i = 1;
                                         $total = 0;
-                                        $getTrfFlap = mysqli_query($koneksiTransfer, "SELECT * FROM data_transfer JOIN ".DB_MRI_TRANSFER.".jenis_pembayaran AS t2 ON data_transfer.jenis_pembayaran_id = t2.jenispembayaranid WHERE hasil_transfer NOT IN ('1','4') AND keterangan IN ('UM', 'UM Burek')" . (($bagianWhere) ? " AND " . $bagianWhere : "") . "  ORDER BY data_transfer.transfer_id ASC") or die(mysqli_error($koneksiTransfer));
+                                        $getTrfFlap = mysqli_query($koneksiTransfer, "SELECT * FROM data_transfer JOIN ".DB_MRI_TRANSFER.".jenis_pembayaran AS t2 ON data_transfer.jenis_pembayaran_id = t2.jenispembayaranid WHERE hasil_transfer NOT IN ('1','4') AND keterangan IN ('UM', 'UM Burek')" . (($bagianWhere) ? " AND " . $bagianWhere : "") . "  ORDER BY data_transfer.transfer_id DESC") or die(mysqli_error($koneksiTransfer));
                                         while ($item = mysqli_fetch_assoc($getTrfFlap)) {
                                             $total += $item['jumlah'];
                                         }
@@ -644,7 +644,7 @@ $buttonAkses = unserialize($user['hak_button']);
                                                 </thead>
                                                 <tbody>
                                                     <?php
-                                                    $getTrfFlap = mysqli_query($koneksiTransfer, "SELECT * FROM data_transfer JOIN ".DB_MRI_TRANSFER.".jenis_pembayaran AS t2 ON data_transfer.jenis_pembayaran_id = t2.jenispembayaranid " . (($bagianWhere) ? "WHERE " . $bagianWhere : "") . " AND hasil_transfer NOT IN ('1','4') AND keterangan IN ('UM', 'UM Burek') ORDER BY data_transfer.transfer_id ASC") or die(mysqli_error($koneksiTransfer));
+                                                    $getTrfFlap = mysqli_query($koneksiTransfer, "SELECT * FROM data_transfer JOIN ".DB_MRI_TRANSFER.".jenis_pembayaran AS t2 ON data_transfer.jenis_pembayaran_id = t2.jenispembayaranid " . (($bagianWhere) ? "WHERE " . $bagianWhere : "") . " AND hasil_transfer NOT IN ('1','4') AND keterangan IN ('UM', 'UM Burek') ORDER BY data_transfer.transfer_id DESC") or die(mysqli_error($koneksiTransfer));
 
                                                     if (!empty($getTrfFlap)) {
                                                         error_reporting(0);

@@ -33,6 +33,7 @@ class Callback extends Database {
         if ($isSuccessTransfer) {
             $this->get_data_transfer();
             $this->get_data_bpu();
+            $this->update_status_bpu();
             $this->send_email();
             $this->send_whatsapp();
         } else {
@@ -87,17 +88,17 @@ class Callback extends Database {
             $endTerm = $explodeTerm[1]; // [END TERM PEMBAYARAN]
             $ketPembayaran = $this->dataBpu['rincian']; // [KETERANGAN]
             $this->subjectEmail = "Laporan Transaksi Transfer " . $ketPembayaran;
-            return $messageHelper->messageSuccessTransferVendor($this->dataBpu['namapenerima'], $ketPembayaran, $this->dataTransfer['norek'], $this->dataTransfer['bank'], $this->dataTransfer['jumlah'], $this->dataInputResponse->TransactionDate, $numberInvoce, $dateInvoice, $startTerm, $endTerm);
+            return $messageHelper->messageSuccessTransferVendor($this->dataBpu['namapenerima'], $ketPembayaran, $this->dataTransfer['norek'], $this->dataTransfer['bank'], $this->dataTransfer['jumlah'], $this->dataInputResponse->TransactionDate, $numberInvoce, $dateInvoice, $startTerm, $endTerm, $this->dataBpu['rincian'],$this->dataBpu['kota'],$this->dataBpu['status']);
         } else {
             $this->subjectEmail = "Laporan Transaksi Transfer " . $this->dataBpu['rincian'];
-            return $messageHelper->messageSuccessTransferNonVendor($this->dataBpu['namapenerima'], $this->dataBpu['rincian'], $this->dataTransfer['norek'], $this->dataBpu['nama'], $this->dataTransfer['bank'], $this->dataTransfer['jumlah'], $this->dataInputResponse->TransactionDate);
+            return $messageHelper->messageSuccessTransferNonVendor($this->dataBpu['namapenerima'], $this->dataBpu['rincian'], $this->dataTransfer['norek'], $this->dataBpu['nama'], $this->dataTransfer['bank'], $this->dataTransfer['jumlah'], $this->dataInputResponse->TransactionDate, $this->dataBpu['rincian'],$this->dataBpu['kota'],$this->dataBpu['status']);
         }
     }
 
     private function get_data_bpu()
     {
         $noid = $this->dataTransfer['noid_bpu'];
-        $query = mysqli_query($this->koneksi, "SELECT a.*, b.nama, c.rincian FROM bpu a LEFT JOIN pengajuan b ON a.waktu = b.waktu LEFT JOIN selesai c ON a.waktu = c.waktu AND a.no = c.no WHERE a.noid = '$noid'");
+        $query = mysqli_query($this->koneksi, "SELECT a.*, b.nama, c.rincian, c.kota, c.status FROM bpu a LEFT JOIN pengajuan b ON a.waktu = b.waktu LEFT JOIN selesai c ON a.waktu = c.waktu AND a.no = c.no WHERE a.noid = '$noid'");
         $data = [];
         while ($row = mysqli_fetch_assoc($query)) {
             $data[] = $row;
@@ -144,10 +145,10 @@ class Callback extends Database {
             $endTerm = $explodeTerm[1]; // [END TERM PEMBAYARAN]
             $ketPembayaran = $this->dataBpu['rincian']; // [KETERANGAN]
             $this->subjectEmail = "Laporan Transaksi Transfer " . $ketPembayaran;
-            return $messageHelper->messageSuccessTransferVendorWA($this->dataBpu['namapenerima'], $ketPembayaran, $this->dataTransfer['norek'], $this->dataTransfer['bank'], $this->dataTransfer['jumlah'], $this->dataInputResponse->TransactionDate, $numberInvoce, $dateInvoice, $startTerm, $endTerm);
+            return $messageHelper->messageSuccessTransferVendorWA($this->dataBpu['namapenerima'], $ketPembayaran, $this->dataTransfer['norek'], $this->dataTransfer['bank'], $this->dataTransfer['jumlah'], $this->dataInputResponse->TransactionDate, $numberInvoce, $dateInvoice, $startTerm, $endTerm, $this->dataBpu['rincian'],$this->dataBpu['kota'],$this->dataBpu['status'], $this->dataBpu['pengajuan_jumlah'], $this->dataTransfer['biaya_trf'], $this->dataBpu['jenis_pajak'], $this->dataBpu['nominal_pajak']);
         } else {
             $this->subjectEmail = "Laporan Transaksi Transfer " . $this->dataBpu['rincian'];
-            return $messageHelper->messageSuccessTransferNonVendorWA($this->dataBpu['namapenerima'], $this->dataBpu['rincian'], $this->dataTransfer['norek'], $this->dataBpu['nama'], $this->dataTransfer['bank'], $this->dataTransfer['jumlah'], $this->dataInputResponse->TransactionDate);
+            return $messageHelper->messageSuccessTransferNonVendorWA($this->dataBpu['namapenerima'], $this->dataBpu['rincian'], $this->dataTransfer['norek'], $this->dataBpu['nama'], $this->dataTransfer['bank'], $this->dataTransfer['jumlah'], $this->dataInputResponse->TransactionDate, $this->dataBpu['rincian'],$this->dataBpu['kota'],$this->dataBpu['status'], $this->dataBpu['pengajuan_jumlah'], $this->dataTransfer['biaya_trf'], $this->dataBpu['jenis_pajak'], $this->dataBpu['nominal_pajak']);
         }
     }
 
@@ -188,6 +189,13 @@ class Callback extends Database {
                 }
             }
         }
+    }
+
+    private function update_status_bpu()
+    {
+        $jumlahTransfer = $this->dataTransfer['jumlah'];
+        $noId = $this->dataBpu['noid'];
+        mysqli_query($this->koneksi, "UPDATE bpu SET status='Telah Di Bayar', jumlahbayar = $jumlahTransfer WHERE noid='$noId'");
     }
 }
 

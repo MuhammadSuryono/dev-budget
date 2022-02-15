@@ -112,6 +112,8 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
     <input type="hidden" name="waktu" value="<?= $waktu ?>">
     <input type="hidden" name="no" value="<?= $id ?>">
     <input type="hidden" name="term" value="<?= $term ?>">
+    <!-- <input type="hidden" name="jenispajak" id="jenis-pajak" value="">
+    <input type="hidden" name="nominalpajak" id="nominal-pajak" value="0"> -->
 
     <label for="">Pajak</label>
     <div class="row">

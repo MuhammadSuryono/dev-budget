@@ -217,7 +217,7 @@ $update = mysqli_query($koneksiTransfer, "UPDATE data_transfer SET hasil_transfe
                                                 $getRekening = mysqli_query($koneksiDevelop, "SELECT a.*, b.saldo, b.saldo_id FROM kas a LEFT JOIN ".DB_MRI_TRANSFER.".saldo b ON b.rekening = a.rekening WHERE a.label_kas = 'Kas Project' order by saldo_id desc LIMIT 1") or die(mysqli_error($koneksi));
                                                 $rekening = mysqli_fetch_assoc($getRekening);
 
-                                                $queryTotalProject = mysqli_query($koneksiTransfer, "SELECT SUM(jumlah) AS total  FROM data_transfer WHERE hasil_transfer = 1 AND ket_transfer = 'Antri' AND jenis_project IN ('B1', 'B2', 'STKB OPS', 'STKB TRK Jakarta','STKB TRK Luar Kota') AND keterangan NOT IN ('UM', 'UM Burek') AND jadwal_transfer IS NOT NULL");
+                                                $queryTotalProject = mysqli_query($koneksiTransfer, "SELECT SUM(jumlah) AS total  FROM data_transfer WHERE hasil_transfer = 1 AND ket_transfer = 'Antri' AND jenis_project IN ('B1', 'B2', 'STKB OPS', 'STKB TRK Jakarta','STKB TRK Luar Kota') AND keterangan NOT IN ('UM', 'UM Burek') AND jadwal_transfer IS NOT NULL ORDER BY transfer_id desc");
                                                 $totalProject = mysqli_fetch_assoc($queryTotalProject);
                                                 ?>
                                                 <p><?= $rekening['label_kas'] ?>, Nomor Rekening: <?= $rekening['rekening'] ?></p>
@@ -257,7 +257,7 @@ $update = mysqli_query($koneksiTransfer, "UPDATE data_transfer SET hasil_transfe
                                                 FROM data_transfer
                                                 JOIN ".DB_MRI_TRANSFER.".jenis_pembayaran AS t2 ON data_transfer.jenis_pembayaran_id = t2.jenispembayaranid
                                                 WHERE ket_transfer = 'Antri' AND jumlah != '0'
-                                                AND hasil_transfer =1  AND jenis_project IN ('B1', 'B2') AND keterangan NOT IN ('UM', 'UM Burek') AND jadwal_transfer IS NOT NULL") or die(mysqli_error($koneksiTransfer));;
+                                                AND hasil_transfer =1  AND jenis_project IN ('B1', 'B2') AND keterangan NOT IN ('UM', 'UM Burek') AND jadwal_transfer IS NOT NULL ORDER BY transfer_id desc") or die(mysqli_error($koneksiTransfer));;
 
                                                         while ($data = mysqli_fetch_assoc($getAntri)) :
                                                             if ($data['transfer_type'] == 1) {
@@ -312,7 +312,7 @@ $update = mysqli_query($koneksiTransfer, "UPDATE data_transfer SET hasil_transfe
                                     <div class="card-header">
                                         <h5 class="card-title">
                                             <?php
-                                            $getSumTrf = mysqli_query($koneksiTransfer, "SELECT COUNT(transfer_req_id) AS trx, SUM(jumlah) AS total  FROM data_transfer WHERE hasil_transfer = 1 AND jumlah != '0' AND ket_transfer = 'Antri' AND jenis_project IN ('Rutin', 'Non Rutin') AND keterangan NOT IN ('UM', 'UM Burek') AND jadwal_transfer IS NOT NULL");
+                                            $getSumTrf = mysqli_query($koneksiTransfer, "SELECT COUNT(transfer_req_id) AS trx, SUM(jumlah) AS total  FROM data_transfer WHERE hasil_transfer = 1 AND jumlah != '0' AND ket_transfer = 'Antri' AND jenis_project IN ('Rutin', 'Non Rutin') AND keterangan NOT IN ('UM', 'UM Burek') AND jadwal_transfer IS NOT NULL ORDER BY transfer_id desc");
                                             $sumTrf = mysqli_fetch_assoc($getSumTrf);
 
                                             ?>
@@ -326,7 +326,7 @@ $update = mysqli_query($koneksiTransfer, "UPDATE data_transfer SET hasil_transfe
                                                 $getRekening = mysqli_query($koneksiDevelop, "SELECT a.*, b.saldo, b.saldo_id FROM kas a LEFT JOIN ".DB_MRI_TRANSFER.".saldo b ON b.rekening = a.rekening WHERE a.label_kas = 'Kas Umum' order by saldo_id desc LIMIT 1") or die(mysqli_error($koneksi));
                                                 $rekening = mysqli_fetch_assoc($getRekening);
 
-                                                $queryTotalProject = mysqli_query($koneksiTransfer, "SELECT SUM(jumlah) AS total  FROM data_transfer WHERE hasil_transfer = 1 AND ket_transfer = 'Antri' AND jenis_project IN ('B1', 'B2', 'STKB OPS', 'STKB TRK Jakarta','STKB TRK Luar Kota') AND keterangan NOT IN ('UM', 'UM Burek') AND jadwal_transfer IS NOT NULL");
+                                                $queryTotalProject = mysqli_query($koneksiTransfer, "SELECT SUM(jumlah) AS total  FROM data_transfer WHERE hasil_transfer = 1 AND ket_transfer = 'Antri' AND jenis_project IN ('B1', 'B2', 'STKB OPS', 'STKB TRK Jakarta','STKB TRK Luar Kota') AND keterangan NOT IN ('UM', 'UM Burek') AND jadwal_transfer IS NOT NULL ORDER BY transfer_id desc");
                                                 $totalProject = mysqli_fetch_assoc($queryTotalProject);
                                                 ?>
 
@@ -365,7 +365,7 @@ $update = mysqli_query($koneksiTransfer, "UPDATE data_transfer SET hasil_transfe
                                                 FROM data_transfer
                                                 JOIN ".DB_MRI_TRANSFER.".jenis_pembayaran AS t2 ON data_transfer.jenis_pembayaran_id = t2.jenispembayaranid
                                                 WHERE ket_transfer = 'Antri'
-                                                AND hasil_transfer =1  AND jenis_project IN ('Rutin', 'Non Rutin') AND keterangan NOT IN ('UM', 'UM Burek') AND jadwal_transfer IS NOT NULL") or die(mysqli_error($koneksiTransfer));;
+                                                AND hasil_transfer =1  AND jenis_project IN ('Rutin', 'Non Rutin') AND keterangan NOT IN ('UM', 'UM Burek') AND jadwal_transfer IS NOT NULL ORDER BY transfer_id desc") or die(mysqli_error($koneksiTransfer));;
 
                                                         while ($data = mysqli_fetch_assoc($getAntri)) :
                                                             if ($data['transfer_type'] == 1) {
@@ -428,7 +428,7 @@ $update = mysqli_query($koneksiTransfer, "UPDATE data_transfer SET hasil_transfe
                                                 $getRekening = mysqli_query($koneksiDevelop, "SELECT a.*, b.saldo, b.saldo_id FROM kas a LEFT JOIN ".DB_MRI_TRANSFER.".saldo b ON b.rekening = a.rekening WHERE a.label_kas = 'Kas Uang Muka' order by saldo_id desc LIMIT 1") or die(mysqli_error($koneksi));
                                                 $rekening = mysqli_fetch_assoc($getRekening);
 
-                                                $queryTotalProject = mysqli_query($koneksiTransfer, "SELECT SUM(jumlah) AS total  FROM data_transfer WHERE hasil_transfer = 1 AND ket_transfer = 'Antri' AND keterangan IN ('UM', 'UM Burek') AND jadwal_transfer IS NOT NULL");
+                                                $queryTotalProject = mysqli_query($koneksiTransfer, "SELECT SUM(jumlah) AS total  FROM data_transfer WHERE hasil_transfer = 1 AND ket_transfer = 'Antri' AND keterangan IN ('UM', 'UM Burek') AND jadwal_transfer IS NOT NULL ORDER BY transfer_id desc");
                                                 $totalProject = mysqli_fetch_assoc($queryTotalProject);
                                                 ?>
 
@@ -467,7 +467,7 @@ $update = mysqli_query($koneksiTransfer, "UPDATE data_transfer SET hasil_transfe
                                                 FROM data_transfer
                                                 JOIN ".DB_MRI_TRANSFER.".jenis_pembayaran AS t2 ON data_transfer.jenis_pembayaran_id = t2.jenispembayaranid
                                                 WHERE ket_transfer = 'Antri' AND jumlah != '0'
-                                                AND hasil_transfer =1  AND keterangan IN ('UM', 'UM Burek') AND jadwal_transfer IS NOT NULL") or die(mysqli_error($koneksiTransfer));;
+                                                AND hasil_transfer =1  AND keterangan IN ('UM', 'UM Burek') AND jadwal_transfer IS NOT NULL ORDER BY transfer_id desc") or die(mysqli_error($koneksiTransfer));;
 
                                                         while ($data = mysqli_fetch_assoc($getAntri)) :
                                                             if ($data['transfer_type'] == 1) {

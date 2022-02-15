@@ -216,6 +216,11 @@ if ($penerima == "") {
                 element.selected = true
             }
 
+            // IBBKIDJA
+            if (e.valu.length === 10 && (thirdCharacter === "223" || thirdCharacter === "221") && element.value === "IBBKIDJA") {
+                element.selected = true
+            }
+
             if (e.value.length === 10 && element.value === "CENAIDJA") {
                 element.selected = true
             }

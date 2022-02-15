@@ -296,12 +296,15 @@ $urlPengajuan";
 return $msg;
     }
 
-    public function messageApprovePengajuanBPU($userSetuju, $namaProject, $noItem, $term, $arrPenerima, $tanggalBayar, $arrPembayaran, $arrJumlah, $keterangan, $link)
+    public function messageApprovePengajuanBPU($namaItem, $bpuType, $kota, $userSetuju, $namaProject, $noItem, $term, $arrPenerima, $tanggalBayar, $arrPembayaran, $arrJumlah, $keterangan, $link)
     {
         $msg = "Notifikasi BPU, 
 BPU telah di setujui oleh $userSetuju dengan keterangan sebagai berikut:
 Nama Project       : *" . $namaProject . "*
 Item No.           : *$noItem*
+Nama Item          : *$namaItem*
+Jenis BPU          : *$bpuType*
+Kota               : *$kota*
 Term               : *$term*
 Nama Penerima  : *" . implode(', ', $arrPenerima) . "*
 Tanggal Pembayaran : *$tanggalBayar*
@@ -360,7 +363,7 @@ Klik $url untuk membuka aplikasi budget.";
         return $msg;
     }
 
-    public function messageSuccessTransferNonVendor($penerima, $jenisPembayaran, $norek, $job, $bank, $totalTransfer, $tanggal)
+    public function messageSuccessTransferNonVendor($penerima, $jenisPembayaran, $norek, $job, $bank, $totalTransfer, $tanggal, $rincian, $kota, $jenis)
     {
         $msg = "Kepada $penerima <br><br>
                 Berikut informasi status pembayaran Anda:<br><br>
@@ -368,6 +371,9 @@ Klik $url untuk membuka aplikasi budget.";
                 <tr><td>Pembayaran       </td><td>: <strong>$jenisPembayaran</strong></td></tr>
                 <tr><td>No. Rekening Anda       </td><td>: <strong>$norek</strong></td></tr>
                 <tr><td>Nama Job       </td><td>: <strong>$job</strong></td></tr>
+                <tr><td>Nama Item       </td><td>: <strong>$rincian</strong></td></tr>
+                <tr><td>Kota       </td><td>: <strong>$kota</strong></td></tr>
+                <tr><td>Jenis BPU       </td><td>: <strong>$jenis</strong></td></tr>
                 <tr><td>Bank       </td><td>: <strong>$bank</strong></td></tr>
                 <tr><td>Nama Penerima       </td><td>: <strong>$penerima</strong></td></tr>
                 <tr><td>Jumlah Dibayarkan       </td><td>: <strong>Rp. " . number_format($totalTransfer, 0, '', '.') . "</strong></td></tr>
@@ -381,13 +387,16 @@ Klik $url untuk membuka aplikasi budget.";
         return $msg;
     }
 
-    public function messageSuccessTransferVendor($penerima, $jenisPembayaran, $norek, $bank, $totalTransfer, $tanggal, $noInvoice, $tanggalInvoice, $startTerm, $endTerm)
+    public function messageSuccessTransferVendor($penerima, $jenisPembayaran, $norek, $bank, $totalTransfer, $tanggal, $noInvoice, $tanggalInvoice, $startTerm, $endTerm, $rincian, $kota, $jenis)
     {
         $msg = "Kepada $penerima <br><br>
                 Berikut informasi status pembayaran Anda:<br><br>
                 <table>
                 <tr><td>No. Invoice       </td><td>: <strong>$noInvoice</strong></td></tr>
                 <tr><td>Tanggal Invoice       </td><td>: <strong>$tanggalInvoice</strong></td></tr>
+                <tr><td>Nama Item       </td><td>: <strong>$rincian</strong></td></tr>
+                <tr><td>Kota       </td><td>: <strong>$kota</strong></td></tr>
+                <tr><td>Jenis BPU       </td><td>: <strong>$jenis</strong></td></tr>
                 <tr><td>Term       </td><td>: <strong>$startTerm dari $endTerm</strong></td></tr>
                 <tr><td>Jenis Pembayaran       </td><td>: <strong>$jenisPembayaran</strong></td></tr>
                 <tr><td>No. Rekening Anda       </td><td>: <strong>$norek</strong></td></tr>
@@ -404,7 +413,7 @@ Klik $url untuk membuka aplikasi budget.";
         return $msg;
     }
 
-    public function messageSuccessTransferNonVendorWA($penerima, $jenisPembayaran, $norek, $job, $bank, $totalTransfer, $tanggal)
+    public function messageSuccessTransferNonVendorWA($penerima, $jenisPembayaran, $norek, $job, $bank, $totalTransfer, $tanggal, $rincian, $kota, $jenis, $pengajuanNominal, $biayaTransfer, $jenisPajak, $biayaPajak)
     {
         $msg = "Notifikasi Informasi Pembayaran
 Berikut informasi status pembayaran Anda:
@@ -414,6 +423,9 @@ No. Rekening Anda       : *$norek*
 Nama Job       : *$job*
 Bank       : *$bank*
 Nama Penerima       : *$penerima*
+Jumlah Diajukan       : *Rp. " . number_format($pengajuanNominal, 0, '', ',') . "*
+Biaya Transfer       : *Rp. " . number_format($biayaTransfer, 0, '', ',') . "*
+".$jenisPajak != '' ? "*Rp. " . number_format($biayaPajak, 0, '', ',') . "*" : "''"."
 Jumlah Dibayarkan       : *Rp. " . number_format($totalTransfer, 0, '', '.') . "*
 Status       : *Terbayar Lunas Tanggal:  $tanggal*
 
@@ -425,18 +437,24 @@ Marketing Research Indonesia";
         return $msg;
     }
 
-    public function messageSuccessTransferVendorWA($penerima, $jenisPembayaran, $norek, $bank, $totalTransfer, $tanggal, $noInvoice, $tanggalInvoice, $startTerm, $endTerm)
+    public function messageSuccessTransferVendorWA($penerima, $jenisPembayaran, $norek, $bank, $totalTransfer, $tanggal, $noInvoice, $tanggalInvoice, $startTerm, $endTerm, $rincian, $kota, $jenis, $pengajuanNominal, $biayaTransfer, $jenisPajak, $biayaPajak)
     {
         $msg = "Notifikasi Informasi Pembayaran
 Berikut informasi status pembayaran Anda:
 
 No. Invoice       : *$noInvoice*
 Tanggal Invoice       : *$tanggalInvoice*
+Nama Item       : *$rincian*
+Kota       : *$kota*
+Jenis BPU       : *$jenis*
 Term       : *$startTerm dari $endTerm*
 Jenis Pembayaran       : *$jenisPembayaran*
 No. Rekening Anda       : *$norek*
 Bank       : *$bank*
 Nama Penerima       : *$penerima*
+Jumlah Diajukan       : *Rp. " . number_format($pengajuanNominal, 0, '', ',') . "*
+Biaya Transfer       : *Rp. " . number_format($biayaTransfer, 0, '', ',') . "*
+".$jenisPajak != '' ? "*Rp. " . number_format($biayaPajak, 0, '', ',') . "*" : "''"."
 Jumlah Dibayarkan       : *Rp. " . number_format($totalTransfer, 0, '', '.') . "*
 Status       : *Terbayar Tanggal:  $tanggal*
 
