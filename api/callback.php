@@ -33,6 +33,7 @@ class Callback extends Database {
         if ($isSuccessTransfer) {
             $this->get_data_transfer();
             $this->get_data_bpu();
+            $this->update_status_bpu();
             $this->send_email();
             $this->send_whatsapp();
         } else {
@@ -188,6 +189,13 @@ class Callback extends Database {
                 }
             }
         }
+    }
+
+    private function update_status_bpu()
+    {
+        $jumlahTransfer = $this->dataTransfer['jumlah'];
+        $noId = $this->dataBpu['noid'];
+        mysqli_query($this->koneksi, "UPDATE bpu SET status='Telah Di Bayar', jumlahbayar = $jumlahTransfer WHERE noid='$noId'");
     }
 }
 
