@@ -83,7 +83,7 @@ class Database extends ModelBudget {
         return $this->dbPass;
     }
 
-    private function get_name_db() {
+    public function get_name_db() {
         return $this->dbName;
     }
 

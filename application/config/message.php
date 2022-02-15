@@ -413,7 +413,7 @@ Klik $url untuk membuka aplikasi budget.";
         return $msg;
     }
 
-    public function messageSuccessTransferNonVendorWA($penerima, $jenisPembayaran, $norek, $job, $bank, $totalTransfer, $tanggal, $rincian, $kota, $jenis, $pengajuanNominal, $biayaTransfer, $biayaPajak, $jenisPajak)
+    public function messageSuccessTransferNonVendorWA($penerima, $jenisPembayaran, $norek, $job, $bank, $totalTransfer, $tanggal, $rincian, $kota, $jenis, $pengajuanNominal, $biayaTransfer, $jenisPajak, $biayaPajak)
     {
         $msg = "Notifikasi Informasi Pembayaran
 Berikut informasi status pembayaran Anda:
@@ -437,7 +437,7 @@ Marketing Research Indonesia";
         return $msg;
     }
 
-    public function messageSuccessTransferVendorWA($penerima, $jenisPembayaran, $norek, $bank, $totalTransfer, $tanggal, $noInvoice, $tanggalInvoice, $startTerm, $endTerm, $rincian, $kota, $jenis, $pengajuanNominal, $biayaTransfer, $biayaPajak, $jenisPajak)
+    public function messageSuccessTransferVendorWA($penerima, $jenisPembayaran, $norek, $bank, $totalTransfer, $tanggal, $noInvoice, $tanggalInvoice, $startTerm, $endTerm, $rincian, $kota, $jenis, $pengajuanNominal, $biayaTransfer, $jenisPajak, $biayaPajak)
     {
         $msg = "Notifikasi Informasi Pembayaran
 Berikut informasi status pembayaran Anda:
