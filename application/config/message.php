@@ -204,10 +204,10 @@ $link
         return $msg;
     }
 
-    public function messageProcessBPUFinance($namaProject, $item, $term, $pengaju, $arrPenerima, $arrJumlah, $keterangan = "", $link)
+    public function messageProcessBPUFinance($namaProject, $verificator, $item, $term, $pengaju, $arrPenerima, $arrJumlah, $keterangan = "", $link)
     {
         $msg = "Notifikasi BPU, 
-BPU telah di *verifikasi* oleh Finance dengan keterangan sebagai berikut:
+BPU telah di *verifikasi* oleh $verificator dengan keterangan sebagai berikut:
 Nama Project   : *" . $namaProject . "*
 Item No.       : *$item*
 Term           : *$term*
@@ -227,33 +227,10 @@ $link;
         return $msg;
     }
 
-    public function messagerequestProcessBPUFinance($namaProject, $item, $term, $pengaju, $arrPenerima, $arrJumlah, $keterangan = "", $link)
+    public function messageProcessTolakBPUFinance($namaProject, $user, $item, $term, $pengaju, $arrPenerima, $arrJumlah, $keterangan = "", $link)
     {
         $msg = "Notifikasi BPU, 
-BPU telah di *verifikasi* oleh Finance dengan keterangan sebagai berikut:
-Nama Project   : *" . $namaProject . "*
-Item No.       : *$item*
-Term           : *$term*
-Nama Pengaju   : *" . $pengaju . "*
-Nama Penerima  : *" . implode(', ', $arrPenerima) . "*
-Total Diajukan : *" . implode(', ', $arrJumlah) . "*
-        ";
-    if ($keterangan != "") {
-        $msg .= "
-Keterangan:* $keterangan *";
-    }
-    $msg .="
-
-Lihat selengkapnya dibawah ini:
- ".
-$link;
-        return $msg;
-    }
-
-    public function messageProcessTolakBPUFinance($namaProject, $item, $term, $pengaju, $arrPenerima, $arrJumlah, $keterangan = "", $link)
-    {
-        $msg = "Notifikasi BPU, 
-BPU telah di *Tolak* oleh Finance dengan keterangan sebagai berikut:
+BPU telah di *Tolak* oleh $user dengan keterangan sebagai berikut:
 Nama Project   : *" . $namaProject . "*
 Item No.       : *$item*
 Term           : *$term*
@@ -424,8 +401,14 @@ Nama Job       : *$job*
 Bank       : *$bank*
 Nama Penerima       : *$penerima*
 Jumlah Diajukan       : *Rp. " . number_format($pengajuanNominal, 0, '', ',') . "*
-Biaya Transfer       : *Rp. " . number_format($biayaTransfer, 0, '', ',') . "*
-".$jenisPajak != '' ? "*Rp. " . number_format($biayaPajak, 0, '', ',') . "*" : "''"."
+Biaya Transfer       : *Rp. " . number_format($biayaTransfer, 0, '', ',') . "*";
+
+        if ($jenisPajak != "") {
+            $msg .= "
+$jenisPajak       : *Rp. " . number_format($biayaPajak == "" ? 0 : $biayaPajak, 0, '', ',') . "*";
+        }
+
+$msg .= "
 Jumlah Dibayarkan       : *Rp. " . number_format($totalTransfer, 0, '', '.') . "*
 Status       : *Terbayar Lunas Tanggal:  $tanggal*
 
@@ -433,7 +416,7 @@ Jika ada pertanyaan lebih lanjut, silahkan email Divisi Finance ke finance@mri-r
 Hormat kami,
 Divisi Finance 
 Marketing Research Indonesia";
-        
+
         return $msg;
     }
 
@@ -453,8 +436,13 @@ No. Rekening Anda       : *$norek*
 Bank       : *$bank*
 Nama Penerima       : *$penerima*
 Jumlah Diajukan       : *Rp. " . number_format($pengajuanNominal, 0, '', ',') . "*
-Biaya Transfer       : *Rp. " . number_format($biayaTransfer, 0, '', ',') . "*
-".$jenisPajak != '' ? "*Rp. " . number_format($biayaPajak, 0, '', ',') . "*" : "''"."
+Biaya Transfer       : *Rp. " . number_format($biayaTransfer, 0, '', ',') . "*";
+
+        if ($jenisPajak != "") {
+            $msg .= "
+$jenisPajak       : *Rp. " . number_format($biayaPajak == "" ? 0 : $biayaPajak, 0, '', ',') . "*";
+        }
+$msg .= "
 Jumlah Dibayarkan       : *Rp. " . number_format($totalTransfer, 0, '', '.') . "*
 Status       : *Terbayar Tanggal:  $tanggal*
 
