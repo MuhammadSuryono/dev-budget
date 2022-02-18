@@ -257,7 +257,7 @@ if ($_POST['submit'] == 1) {
             $queryJenisPembayaran = mysqli_query($koneksiMriTransfer, "SELECT * FROM jenis_pembayaran WHERE jenispembayaran = '$item[statusbpu]'");
             $jenisPembayaran = mysqli_fetch_assoc($queryJenisPembayaran);
 
-            $typeKas = typeKas($item['statusbpu']);
+            $typeKas = typeKas($budget['jenis'], $item['statusbpu']);
             $queryKas = mysqli_query($koneksiDevelop, "SELECT rekening FROM kas WHERE label_kas = '$typeKas'");
             $kas = mysqli_fetch_assoc($queryKas);
             if ($typeKas == U_UNDEFINED_VARIABLE) {
@@ -611,16 +611,16 @@ if ($update) {
     }
 }
 
-function typeKas($statusBpu = "") {
-    $project = ["Vendor/Supplier", "Honor Area Head", "Honor Eksternal"];
+function typeKas($typeBudget, $statusBpu = "") {
+    $project = ["B1", "B2"];
     $uangMuka = ["UM", "UM Burek"];
-    $umum = [];
+    $umum = ['Rutin', 'Non Rutin'];
 
-    if (in_array($statusBpu, $project)) {
+    if (in_array($typeBudget, $project) && !in_array($statusBpu, $uangMuka)) {
         return "Kas Project";
     } else if (in_array($statusBpu, $uangMuka)) {
         return "Kas Uang Muka";
-    } else if (in_array($statusBpu, $umum)) {
+    } else if (in_array($typeBudget, $umum) && !in_array($statusBpu, $uangMuka)) {
         return "Kas Umum";
     }
 
