@@ -13,6 +13,9 @@ $con->set_password_db(DB_PASS_DIGITAL_MARKET);
 $con->init_connection();
 $koneksiDigitalMarket = $con->connect();
 
+echo json_encode($_POST);
+exit();
+
 
 $id = $_POST['id'];
 $table = $_POST['table'];
