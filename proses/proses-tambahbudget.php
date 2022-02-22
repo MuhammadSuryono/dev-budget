@@ -83,7 +83,7 @@ if (isset($_POST['submit'])) {
   $namaCreatorBudget           = $dataCreatorBudget['nama_user'];
   $divisiCreatorBudget            = $dataCreatorBudget['divisi'];
 
-  array_push($phoneNumbers, $dataCreatorBudget['phone_number']);
+  array_push($phoneNumbers, $_POST["phone_number"]);
   array_push($namaUserSendNotifications, $dataCreatorBudget['nama_user']);
   array_push($idUsersNotification, $idUserPICBudget);
   array_push($emails, $dataCreatorBudget['email']);
@@ -240,6 +240,8 @@ if (isset($_POST['submit'])) {
         if ($emails[$i] != "") $emailHelper->sendEmail($msgEmail, "Notifikasi Pembukaan Akses Untuk Pengajuan Budget", $emails[$i]);
       }
     }
+
+
 
 
     $notification = "Pembuatan Permohonan Budget Berhasil. Pemberitahuan via whatsapp sedang dikirimkan ke $namaCreatorBudget ($phoneNumbers[0])";
