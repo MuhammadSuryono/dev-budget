@@ -83,7 +83,7 @@ if (isset($_POST['submit'])) {
   $namaCreatorBudget           = $dataCreatorBudget['nama_user'];
   $divisiCreatorBudget            = $dataCreatorBudget['divisi'];
 
-  array_push($phoneNumbers, $_POST["phone_number"]);
+  array_push($phoneNumbers, $dataCreatorBudget["phone_number"]);
   array_push($namaUserSendNotifications, $dataCreatorBudget['nama_user']);
   array_push($idUsersNotification, $idUserPICBudget);
   array_push($emails, $dataCreatorBudget['email']);
