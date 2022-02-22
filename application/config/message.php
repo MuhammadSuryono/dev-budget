@@ -4,14 +4,14 @@ class Message {
 
     public function messageTolakPengajuanBudget($pengaju, $namaProject, $divisi, $totalbudget, $penolak, $alasan)
     {
-        $msg = "Dear $pengaju, <br><br>
-Budget dengan keterangan berikut:<br><br>
-Nama Project    : <strong>$namaProject</strong><br>
-Pengaju         : <strong>$pengaju</strong><br>
-Divisi          : <strong>$divisi</strong><br>
-Total Budget    : <strong>Rp. " . number_format($totalbudget, 0, '', ',') . "</strong><br><br>
+        $msg = "Dear $pengaju, 
+Budget dengan keterangan berikut:
+Nama Project    : *$namaProject*
+Pengaju         : *$pengaju*
+Divisi          : *$divisi*
+Total Budget    : *Rp. " . number_format($totalbudget, 0, '', ',') . "*
 
-Telah Ditolak oleh <strong> $penolak </strong> pada <strong> " . date("d/m/Y H:i:s") . "</strong> dengan keterangan <strong>$alasan</strong><br><br>
+Telah Ditolak oleh * $penolak * pada * " . date("d/m/Y H:i:s") . "* dengan keterangan *$alasan*
         ";
 
         return $msg;
@@ -183,7 +183,7 @@ No. Rekening Anda : " . $noRekening . "
 Bank             : " . $bank . "
 Nama Penerima    : " . $penerima . "
 Jumlah Dibayarkan : Rp. " . number_format($jumlahBayar, 0, '', '.') . "
-Status           : Dibayar</strong>,  Tanggal : " . $dateBayar . "</strong>
+Status           : Dibayar*,  Tanggal : " . $dateBayar . "*
 Jika ada pertanyaan lebih lanjut, silahkan email Divisi Finance ke finance@mri-research-ind.com.
 Hormat kami,
 Finance Marketing Research Indonesia
