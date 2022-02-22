@@ -36,16 +36,31 @@ class Wewenang extends Database
             ->set_value_update('knowledge_bpu', $_POST['knowledgeBpu'])
             ->set_value_update('condition', $_POST['kondisiBpu'])
             ->set_value_update('value_condition', $_POST['valueKondisi'])
-            ->where('id', '=', $_POST['id'])
+            ->where('id', '=', $_GET['id'])
             ->save_update();
+    }
+
+    public function deleteWewenang()
+    {
+        return $this->delete('tb_role_bpu')->where('id', '=', $_GET['id'])->save_delete();
     }
 }
 
 $wewenang = new Wewenang();
 $message = new Message();
 $previous = $_SERVER['HTTP_REFERER'];
+$action = $_GET['action'];
 
-if (isset($_POST['id'])) {
+if ($action == 'delete') {
+    $deleted = $wewenang->deleteWewenang();
+    if ($deleted) {
+        echo $message->alertMessage("Berhasil menghapus data wewenang", $previous);
+    } else {
+        echo $message->alertMessage("Gagal menghapus data wewenang", $previous);
+    }
+}
+
+if ($action == 'update') {
     $updated = $wewenang->updateWewenang();
     if ($updated) {
         echo $message->alertMessage("Berhasil mengubah data wewenang", $previous);
