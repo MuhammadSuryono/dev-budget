@@ -3,7 +3,7 @@ error_reporting(0);
 session_start();
 require "application/config/database.php";
 require "application/config/helper.php";
-//require_once "application/config/Role.php";
+require_once "application/config/Role.php";
 
 $con = new Database();
 $koneksi = $con->connect();
@@ -22,12 +22,12 @@ $koneksiJay = $con->connect();
 $con->set_host_db(DB_HOST_DIGITALISASI_MARKETING);
 $con->set_name_db(DB_DIGITAL_MARKET);
 $con->set_user_db(DB_USER_DIGITAL_MARKET);
-$con->set_password_db(DB_PASS_DIGITAK_MARKET);
+$con->set_password_db(DB_PASS_DIGITAL_MARKET);
 $con->init_connection();
 $koneksiDigitalMarket = $con->connect();
 
-//$role = new Role(false, $koneksi);
-//$hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
+$role = new Role(false, $koneksi);
+$hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
 ?>
 
 <!DOCTYPE html>
@@ -390,7 +390,7 @@ $koneksiDigitalMarket = $con->connect();
             <br>
             <div class="row" style="margin-bottom: 20px;">
                 <!-- <div class="col-xs-2"></div> -->
-<!--                --><?php //if ($hasRoleBudget) { ?>
+                <?php if ($hasRoleBudget) { ?>
                     <div class="col-xs-4">
                         <?php $code = strtoupper(md5($d['nama'])); ?>
                         <a href='#requestModal2' class='btn btn-success btn-small buttonAjukan' style="display: none;" id="buttonSetujuiRequest" data-toggle='modal' data-id="<?= $id ?>" data-code="<?= $code ?>">Setujui</a>
@@ -399,7 +399,7 @@ $koneksiDigitalMarket = $con->connect();
                             <a href='http://180.211.92.134/	digital-market/?continue=projectDocument/printPdf/<?= $commisionVoucher['nomor_project'] ?>?status=view' target="_blank" class='btn btn-primary btn-small buttonView' style="display: none;" id="buttonViewCv" data-toggle='modal'>View Commision Voucher</a>
                         <?php endif; ?>
                     </div>
-<!--                --><?php //} ?>
+                <?php } ?>
             </div>
 
         </form>
