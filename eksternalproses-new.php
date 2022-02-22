@@ -72,7 +72,7 @@ $dataItemBpu = mysqli_fetch_assoc($queryItemBpu);
 $queryPengajuan = mysqli_query($koneksi, "SELECT jenis FROM pengajuan where waktu = '$waktu'");
 $dataPengajuan = mysqli_fetch_assoc($queryPengajuan);
 
-if ($actionProcess == "update" && (strpos(strtolower($dataItemBpu['rincian']), 'kas negara') !== false || strpos(strtolower($dataItemBpu['rincian']), 'penerimaan negara') !== false || strpos(strtolower($dataItemBpu['rincian']), 'pph') !== false)) {
+if ($actionProcess == "update" && (strpos(strtolower($dataItemBpu['rincian']), 'kas negara') !== false || strpos(strtolower($dataItemBpu['rincian']), 'penerimaan negara') !== false || strpos(strtolower($dataItemBpu['rincian']), 'pph') !== false || strpos(strtolower($dataItemBpu['rincian']), 'ppn') !== false )) {
     $queryUser = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi = 'FINANCE' AND hak_akses = 'Level 2' AND level = 'Manager'");
     while ($e = mysqli_fetch_assoc($queryUser)) {
         if ($e['phone_number'] && !in_array($e['phone_number'], $duplicatePhoneNumber)) {
@@ -131,7 +131,7 @@ while ($e = mysqli_fetch_assoc($queryUser)) {
 }
 
 if ($actionProcess == "update") {
-    if ((strpos(strtolower($dataItemBpu['rincian']), 'kas negara') == false || strpos(strtolower($dataItemBpu['rincian']), 'penerimaan negara') == false) && $dataPengajuan['jenis'] != "Rutin") {
+    if ((strpos(strtolower($dataItemBpu['rincian']), 'kas negara') == false || strpos(strtolower($dataItemBpu['rincian']), 'penerimaan negara') == false ) && $dataPengajuan['jenis'] != "Rutin") {
         for ($i=0; $i < count($emailInternal); $i++) { 
             if ($dataDivisi[$i] == "FINANCE" && $hakAkses[$i] == 'Manager') {
                 $isCuti = $cuti->checkStatusCutiUser($namaInternal[$i]);
