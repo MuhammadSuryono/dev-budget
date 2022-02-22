@@ -1,5 +1,5 @@
 <?php
-// error_reporting(0);
+ error_reporting(0);
 session_start();
 
 require "application/config/database.php";
@@ -101,6 +101,7 @@ $setting = mysqli_fetch_assoc($querySetting);
               <li><a href="antrian-transfer.php">Antrian Transfer</a></li>
             </ul>
           </li>
+          <li><a href="matriks-wewenang.php">Matriks Wewenang</a></li>
 
           <!-- <li><a href="history-direksi.php">History</a></li> -->
         </ul>

@@ -152,6 +152,13 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
             echo "";
           }
           ?>
+            <?php
+            if ($aksesSes == 'Manager') {
+                echo '<li><a href="matriks-wewenang.php">Matriks Wewenang</a></li>';
+            }
+
+            ?>
+
         </ul>
 
       
