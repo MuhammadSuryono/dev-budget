@@ -22,9 +22,14 @@ if (isset($_POST['submit'])) {
   $status            = $_POST['status'];
   $idUserPICBudget   = $_POST['idUser'];
   $katnon            = $_POST['katnon'];
+  $action = $_POST['action'];
   $namaCreatorProject           = $_SESSION['nama_user'];
   $idProject = $_POST['project'];
   $table = $_POST['table'];
+
+  if ($action == 'api') {
+      $namaCreatorBudget = $_POST['created_by'];
+  }
 
   $arrNamaB1 = ['Honor Jakarta', 'Honor Luar Kota', 'STKB Transaksi Jakarta', 'STKB Transaksi Luar Kota', 'STKB OPS', 'Honor Area Head Jakarta', 'Honor Area Head Luar Kota'];
   $arrKotaB1 = ['Jabodetabek', 'Luar kota', 'Jabodetabek', 'Luar Kota', 'Jabodetabek dan Luar Kota', 'Jabodetabek', 'Luar Kota'];
@@ -37,6 +42,10 @@ if (isset($_POST['submit'])) {
   $arrPenerimaB2 = ['Responden', 'Interviewer'];
 
   if (!$idUserPICBudget) {
+      if ($action == "api") {
+          echo json_encode(["status" => "error", "message" => "PIC Budget belum dipilih"]);
+          exit();
+      }
     if ($_SESSION['divisi'] == 'Direksi') {
       echo $helper->alertMessage("Pembuatan Budget Gagal, Data PIC Tidak ada","../home-direksi.php");
     } else if ($_SESSION['divisi'] == 'FINANCE' && $_SESSION['hak_akses']) {
@@ -48,6 +57,10 @@ if (isset($_POST['submit'])) {
   }
 
   if ($jenis == 'B1') {
+      if ($action == "api") {
+          echo  json_encode(["status" => "error", "message" => "Harap mengisi semua data"]);
+          exit();
+      }
     if (!$namaProject || !$tahun || !$status || !$idUserPICBudget) {
       if ($_SESSION['divisi'] == 'Direksi') {
         echo $helper->alertMessage("Pembuatan Budget Gagal, Harap mengisi semua data.","../home-direksi.php");
@@ -236,6 +249,11 @@ if (isset($_POST['submit'])) {
         if ($i < count($phoneNumbers) - 1) $notification .= ', ';
         else $notification .= '.';
       }
+    }
+
+    if ($action == "api") {
+        echo json_encode(["status" => "success", "message" => $notification]);
+        exit();
     }
 
     if ($_SESSION['divisi'] == 'Direksi') {
