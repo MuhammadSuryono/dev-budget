@@ -57,11 +57,11 @@ if (isset($_POST['submit'])) {
   }
 
   if ($jenis == 'B1') {
-      if ($action == "api") {
-          echo  json_encode(["status" => "error", "message" => "Harap mengisi semua data"]);
-          exit();
-      }
     if (!$namaProject || !$tahun || !$status || !$idUserPICBudget) {
+        if ($action == "api") {
+            echo  json_encode(["status" => "error", "message" => "Harap mengisi semua data"]);
+            exit();
+        }
       if ($_SESSION['divisi'] == 'Direksi') {
         echo $helper->alertMessage("Pembuatan Budget Gagal, Harap mengisi semua data.","../home-direksi.php");
       } else if ($_SESSION['divisi'] == 'FINANCE' && $_SESSION['hak_akses']) {
