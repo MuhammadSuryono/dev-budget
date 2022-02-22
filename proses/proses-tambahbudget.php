@@ -28,7 +28,7 @@ if (isset($_POST['submit'])) {
   $table = $_POST['table'];
 
   if ($action == 'api') {
-      $namaCreatorBudget = $_POST['created_by'];
+      $namaCreatorProject = $_POST['created_by'];
   }
 
   $arrNamaB1 = ['Honor Jakarta', 'Honor Luar Kota', 'STKB Transaksi Jakarta', 'STKB Transaksi Luar Kota', 'STKB OPS', 'Honor Area Head Jakarta', 'Honor Area Head Luar Kota'];
