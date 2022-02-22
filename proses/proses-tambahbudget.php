@@ -1,5 +1,5 @@
 <?php
-error_reporting(0);
+//error_reporting(0);
 session_start();
 require_once "../application/config/database.php";
 require_once "../application/config/whatsapp.php";
@@ -193,7 +193,7 @@ if (isset($_POST['submit'])) {
     $con->set_host_db(DB_HOST_DIGITALISASI_MARKETING);
     $con->set_name_db(DB_DIGITAL_MARKET);
     $con->set_user_db(DB_USER_DIGITAL_MARKET);
-    $con->set_password_db(DB_PASS_DIGITAK_MARKET);
+    $con->set_password_db(DB_PASS_DIGITAL_MARKET);
     $con->init_connection();
 
     $koneksiDigitalMarket = $con->connect();
