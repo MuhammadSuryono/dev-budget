@@ -278,7 +278,7 @@ $update = mysqli_query($koneksiTransfer, "UPDATE data_transfer SET hasil_transfe
                                                                 <td><?php echo $data['keterangan'] ?></td>
                                                                 <td><?php echo ($data['jadwal_transfer']) ? $data['jadwal_transfer'] : '-' ?></td>
                                                                 <td><?php echo $data['nomor_stkb'] ?></td>
-                                                                <td><?php echo $data['ket_transfer'] == 'STKB' ? $bpu['termstkb']:$bpu['term'] ?></td>
+                                                                <td><?php echo $data['keterangan'] == 'STKB' ? $bpu['termstkb']:$bpu['term'] ?></td>
                                                                 <td><?php echo $data['pemilik_rekening'] ?></td>
                                                                 <td><?php echo $data['norek'] ?></td>
                                                                 <td><?php echo $data['bank'] ?></td>
