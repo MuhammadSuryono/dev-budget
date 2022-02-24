@@ -267,8 +267,7 @@ $update = mysqli_query($koneksiTransfer, "UPDATE data_transfer SET hasil_transfe
                                                             } else {
                                                                 $transfer_type = 'Transfer Auto';
                                                             }
-
-                                                            $bpuQuery = mysqli_query($koneksi, "SELECT term,termstkb FROM bpu where nomorstkb = '$data[nomor_stkb]' LIMIT 1");
+                                                            $bpuQuery = mysqli_query($koneksi, "SELECT term,termstkb FROM bpu where nomorstkb = '$data[nomor_stkb]' AND noid='$data[noid_bpu]' LIMIT 1");
                                                             $bpu = mysqli_fetch_assoc($bpuQuery);
                                                         ?>
                                                             <tr>
