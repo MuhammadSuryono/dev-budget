@@ -320,13 +320,14 @@ $buttonAkses = unserialize($user['hak_button']);
 
                                                             $bpuQuery = mysqli_query($koneksi, "SELECT term,termstkb FROM bpu where nomorstkb = '$nomorStkb' LIMIT 1");
                                                             $bpu = mysqli_fetch_assoc($bpuQuery);
+                                                            $termData = $keterangan == 'STKB' ? $bpu['termstkb']:$bpu['term'];
 
                                                             echo "<tr>";
                                                             echo "<td>" . $i++ . "</td>";
                                                             echo "<td>" . $transfer_req_id . "</td>";
                                                             echo "<td>" . $keterangan . "</td>";
                                                             echo "<td>" . $nomorStkb . "</td>";
-                                                            echo "<td>" . $keterangan == 'STKB' ? $bpu['term'] : $bpu['termstkb'] . "</td>";
+                                                            echo "<td>" . $termData . "</td>";
                                                             echo "<td>" . $jadwal_transfer . "</td>";
                                                             echo "<td>" . $norek . "</td>";
                                                             echo "<td>" . number_format($jumlah, 0, '', ',') . "</td>";
