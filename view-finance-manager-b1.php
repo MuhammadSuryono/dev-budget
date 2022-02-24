@@ -406,6 +406,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                               $batasTanggalBayar = $bayar['batas_tanggal_bayar'];
                               // $metodePembayaran = $bayar['metode_pembayaran'];
                               $bankAccountName       = $bayar['bank_account_name'];
+                              $termStkb = $bayar['termstkb'];
 
                               $tglcair = $tglcair == "0000-00-00" ? "-" : $tglcair;
 
@@ -473,6 +474,8 @@ $setting = mysqli_fetch_assoc($querySetting);
                               echo "</b><br>";
                               echo "No. STKB :<b> $noStkb";
                               echo "</b><br>";
+                                echo "Term STKB :<b> $termStkb";
+                                echo "</b><br>";
                               echo "Tanggal : <br><b> " . $statusPengajuanBpu . date('Y-m-d', strtotime($waktustempel));
                               echo "</b><br>";
                               echo "Jam : <b>" . date('H:i:s', strtotime($waktustempel));
