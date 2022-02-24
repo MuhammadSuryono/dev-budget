@@ -378,6 +378,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                               $statusPengajuanBpu = $bayar['status_pengajuan_bpu'];
                               $fileuploadRealisasi       = $bayar['fileupload_realisasi'];
                               $bankAccountName       = $bayar['bank_account_name'];
+                              $termStkb     = $bayar['termstkb'];
 
                               $tglcair = $tglcair == "0000-00-00" ? "-" : $tglcair;
 
@@ -462,6 +463,8 @@ $setting = mysqli_fetch_assoc($querySetting);
                               echo "</b><br>";
                               echo "No. STKB :<b> $noStkb";
                               echo "</b><br>";
+                                echo "Term STKB :<b> $termStkb";
+                                echo "</b><br>";
                               echo "Tanggal Buat BPU: <br><b> " . date('Y-m-d', strtotime($waktustempel));
                               echo "</b><br>";
                               echo "Jam : <b>" . date('H:i:s', strtotime($waktustempel));

@@ -384,6 +384,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                               $batasTanggalBayar = $bayar['batas_tanggal_bayar'];
                               // $metodePembayaran = $bayar['metode_pembayaran'];
                               $ketPembayaran = $bayar['ket_pembayaran'];
+                                $termStkb     = $bayar['termstkb'];
 
                               $bankAccountName       = $bayar['bank_account_name'];
 
@@ -460,6 +461,8 @@ $setting = mysqli_fetch_assoc($querySetting);
                               echo "</b><br>";
                               echo "No. STKB :<b> $noStkb";
                               echo "</b><br>";
+                                echo "Term STKB :<b> $termStkb";
+                                echo "</b><br>";
                               echo "No. Term:<b> $termm";
                               echo "</b><br>";
                               echo "Tanggal Buat BPU: <br><b> " . date('Y-m-d', strtotime($waktustempel));

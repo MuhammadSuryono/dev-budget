@@ -381,6 +381,7 @@ $helper = new Helper();
                                 $alasanTolakRealisasi = $bayar['alasan_tolak_realisasi'];
                                 // $metodePembayaran = $bayar['metode_pembayaran'];
                                 $ketPembayaran = $bayar['ket_pembayaran'];
+                                $termStkb = $bayar['termstkb'];
 
                                 $bankAccountName       = $bayar['bank_account_name'];
 
@@ -454,6 +455,8 @@ $helper = new Helper();
                                 echo "</b><br>";
                                 echo "No. STKB :<b> $noStkb";
                                 echo "</b><br>";
+                                  echo "Term STKB :<b> $termStkb";
+                                  echo "</b><br>";
                                 echo "No. Term:<b> $termm";
                                 echo "</b><br>";
                                 echo "Tanggal Buat BPU: <br><b> " . date('Y-m-d', strtotime($waktustempel));
