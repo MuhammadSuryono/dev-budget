@@ -318,7 +318,7 @@ $buttonAkses = unserialize($user['hak_button']);
                                                                 $transfer_type = 'Transfer Auto';
                                                             }
 
-                                                            $bpuQuery = mysqli_query($koneksi, "SELECT term FROM bpu where nomorstkb = '$nomorStkb' LIMIT 1");
+                                                            $bpuQuery = mysqli_query($koneksi, "SELECT term,termstkb FROM bpu where nomorstkb = '$nomorStkb' LIMIT 1");
                                                             $bpu = mysqli_fetch_assoc($bpuQuery);
 
                                                             echo "<tr>";
@@ -326,7 +326,7 @@ $buttonAkses = unserialize($user['hak_button']);
                                                             echo "<td>" . $transfer_req_id . "</td>";
                                                             echo "<td>" . $keterangan . "</td>";
                                                             echo "<td>" . $nomorStkb . "</td>";
-                                                            echo "<td>" . $bpu['term'] . "</td>";
+                                                            echo "<td>" . $keterangan == 'STKB' ? $bpu['term'] : $bpu['termstkb'] . "</td>";
                                                             echo "<td>" . $jadwal_transfer . "</td>";
                                                             echo "<td>" . $norek . "</td>";
                                                             echo "<td>" . number_format($jumlah, 0, '', ',') . "</td>";

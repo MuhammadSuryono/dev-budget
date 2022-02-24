@@ -268,7 +268,7 @@ $update = mysqli_query($koneksiTransfer, "UPDATE data_transfer SET hasil_transfe
                                                                 $transfer_type = 'Transfer Auto';
                                                             }
 
-                                                            $bpuQuery = mysqli_query($koneksi, "SELECT term FROM bpu where nomorstkb = '$data[nomor_stkb]' LIMIT 1");
+                                                            $bpuQuery = mysqli_query($koneksi, "SELECT term,termstkb FROM bpu where nomorstkb = '$data[nomor_stkb]' LIMIT 1");
                                                             $bpu = mysqli_fetch_assoc($bpuQuery);
                                                         ?>
                                                             <tr>
@@ -278,7 +278,7 @@ $update = mysqli_query($koneksiTransfer, "UPDATE data_transfer SET hasil_transfe
                                                                 <td><?php echo $data['keterangan'] ?></td>
                                                                 <td><?php echo ($data['jadwal_transfer']) ? $data['jadwal_transfer'] : '-' ?></td>
                                                                 <td><?php echo $data['nomor_stkb'] ?></td>
-                                                                <td><?php echo $bpu['term'] ?></td>
+                                                                <td><?php echo $data['ket_transfer'] == 'STKB' ? $bpu['termstkb']:$bpu['term'] ?></td>
                                                                 <td><?php echo $data['pemilik_rekening'] ?></td>
                                                                 <td><?php echo $data['norek'] ?></td>
                                                                 <td><?php echo $data['bank'] ?></td>
