@@ -126,13 +126,13 @@ if (@unserialize($data['document'])) {
     if (is_array($document)) {
         $arrDocument = [];
         foreach ($document as $d) {
-            array_push($arrDocument, $d);
+            $arrDocument[] = $d;
         }
-        array_push($arrDocument, $name);
+        $arrDocument[] = $name;
         $document = serialize($arrDocument);
     } else {
         $arrDocument = [$document];
-        array_push($arrDocument, $name);
+        $arrDocument[] = $name;
         $document = serialize($arrDocument);
     }
 } else {
@@ -146,46 +146,12 @@ $idUsersNotification = [];
 
 $dataUserDireksi = $con->select()->from('tb_user')->where('divisi', '=', 'Direksi')->where('aktif', '=', 'Y')->first();
 if ($dataUserDireksi['phone_number']) {
-    array_push($emails, $dataUserDireksi['email']);
-    array_push($phoneNumbers, $dataUserDireksi['phone_number']);
-    array_push($namaUser, $dataUserDireksi['nama_user']);
-    array_push($idUsersNotification, $dataUserDireksi['id_user']);
+    $emails[] = $dataUserDireksi['email'];
+    $phoneNumbers[] = $dataUserDireksi['phone_number'];
+    $namaUser[] = $dataUserDireksi['nama_user'];
+    $idUsersNotification[] = $dataUserDireksi['id_user'];
 }
 
-// if ($totalbudget > 1000000) {
-//     $dataUserDireksi = $con->select()->from('tb_user')->where('divisi', '=', 'Direksi')->where('aktif', '=', 'Y')->first();
-//     if ($dataUserDireksi['phone_number']) {
-//         array_push($emails, $dataUserDireksi['email']);
-//         array_push($phoneNumbers, $dataUserDireksi['phone_number']);
-//         array_push($namaUser, $dataUserDireksi['nama_user']);
-//         array_push($idUsersNotification, $dataUserDireksi['id_user']);
-//     }
-// } else {
-//     $cuti = new Cuti();
-//     $userFinance = $con->select()->from('tb_user')
-//         ->where('divisi', '=', 'Finance')
-//         ->where('hak_akses', '=', 'Manager')
-//         ->where('aktif', '=', 'Y')
-//         ->first();
-
-//     if ($cuti->checkStatusCutiUser($userFinance['nama_user'])) {
-//         $dataUserDireksi = $con->select()->from('tb_user')->where('divisi', '=', 'Direksi')->where('aktif', '=', 'Y')->first();
-//         if ($dataUserDireksi['phone_number']) {
-//             array_push($emails, $dataUserDireksi['email']);
-//             array_push($phoneNumbers, $dataUserDireksi['phone_number']);
-//             array_push($namaUser, $dataUserDireksi['nama_user']);
-//             array_push($idUsersNotification, $dataUserDireksi['id_user']);
-//         }
-//     } else {
-//         if ($userFinance['phone_number'] && !in_array($userFinance['nama_user'], $duplciate)) {
-//             array_push($emails, $userFinance['email']);
-//             array_push($phoneNumbers, $userFinance['phone_number']);
-//             array_push($namaUser, $userFinance['nama_user']);
-//             array_push($idUsersNotification, $userFinance['id_user']);
-//             array_push($duplciate, $userFinance['phone_number']);
-//         }
-//     }
-// }
 $updatePengajuanRequest = $con->update('pengajuan_request')
     ->set_value_update('status_request', 'Di Ajukan')
     ->set_value_update('waktu', $waktu)
@@ -213,7 +179,7 @@ if ($updatePengajuanRequest) {
         for($i = 0; $i < count($phoneNumbers); $i++) {
             if ($phoneNumbers[$i] != "") {
                 $url =  $host. '/view-request.php?id='.$id.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
-                $msg = $messageHelper->messageAjukanBudget($namaUser[$i], $pengaju, $namaProject, $divisi, $totalbudget, $keterangan, $url);
+                $msg = $messageHelper->messageAjukanBudget($namaUser[$i], $pengaju, $namaProject, $jenis, $divisi, $totalbudget, $keterangan, $url);
                 $msgEmail = $messageEmail->applyBudget($namaUser[$i], $pengaju, $namaProject, $divisi, $totalbudget, $keterangan, $url);
                 $wa->sendMessage($phoneNumbers[$i], $msg);
                 $emailSender->sendEmail($msgEmail, 'Notifikasi Pengajuan Budget ' . $namaProject, $emails[$i]);
