@@ -24,10 +24,14 @@ class HTTPRequester {
      * @param       array $params
      * @return      HTTP-Response body or an empty string if the request fails or is empty
      */
-    public static function HTTPPost($url, array $params, $type = "form") {
+    public static function HTTPPost($url, array $params, $type = "form", $host = "") {
         $query = http_build_query($params);
         if ($type == "json") {
             $query = json_encode($params);
+        }
+
+        if ($host != "") {
+            self::$baseUrl = $host;
         }
         
         $ch    = curl_init();

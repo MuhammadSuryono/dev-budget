@@ -14,9 +14,9 @@ class Whastapp {
     {
         $httpRequest = new HTTPRequester();
 
-        $url = $this->host."/send-notification-message";
+        $url = "/send-notification-message";
         $body = ["msisdn" => $msisdn, "message" => $message];
-        var_dump($httpRequest->HTTPPost($url, $body));
+        var_dump($httpRequest->HTTPPost($url, $body, "form", $this->host));
         exit();
 //        return $httpRequest->HTTPPost($url, $body);
     }
