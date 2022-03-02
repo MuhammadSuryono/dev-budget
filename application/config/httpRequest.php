@@ -1,6 +1,8 @@
 <?php
 
 class HTTPRequester {
+    protected static $baseUrl = "http://mkp-operation.com:7793/budget-serv";
+
     /**
      * @description Make HTTP-GET call
      * @param       $url
@@ -9,7 +11,7 @@ class HTTPRequester {
      */
     public static function HTTPGet($url, array $params) {
         $query = http_build_query($params); 
-        $ch    = curl_init($url.'?'.$query);
+        $ch    = curl_init( self::$baseUrl.$url.'?'.$query);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HEADER, false);
         $response = curl_exec($ch);
@@ -32,14 +34,14 @@ class HTTPRequester {
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         // curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
         curl_setopt($ch, CURLOPT_HEADER, false);
-        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_URL, self::$baseUrl.$url);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $query);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
         
         $response = curl_exec($ch);
         curl_close($ch);
-        return $response;
+        return json_decode($response);
     }
     /**
      * @description Make HTTP-PUT call
@@ -52,7 +54,7 @@ class HTTPRequester {
         $ch    = \curl_init();
         \curl_setopt($ch, \CURLOPT_RETURNTRANSFER, true);
         \curl_setopt($ch, \CURLOPT_HEADER, false);
-        \curl_setopt($ch, \CURLOPT_URL, $url);
+        \curl_setopt($ch, \CURLOPT_URL, self::$baseUrl.$url);
         \curl_setopt($ch, \CURLOPT_CUSTOMREQUEST, 'PUT');
         \curl_setopt($ch, \CURLOPT_POSTFIELDS, $query);
         $response = \curl_exec($ch);
@@ -70,7 +72,7 @@ class HTTPRequester {
         $ch    = \curl_init();
         \curl_setopt($ch, \CURLOPT_RETURNTRANSFER, true);
         \curl_setopt($ch, \CURLOPT_HEADER, false);
-        \curl_setopt($ch, \CURLOPT_URL, $url);
+        \curl_setopt($ch, \CURLOPT_URL, self::$baseUrl.$url);
         \curl_setopt($ch, \CURLOPT_CUSTOMREQUEST, 'DELETE');
         \curl_setopt($ch, \CURLOPT_POSTFIELDS, $query);
         $response = \curl_exec($ch);

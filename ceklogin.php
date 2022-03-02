@@ -1,5 +1,5 @@
 <?php
-error_reporting(0);
+//error_reporting(0);
 session_start();
 require_once("application/config/session.php");
 
@@ -8,7 +8,7 @@ $session = new Session(true);
 
 if ($op == "in") {
   $username = $_POST['username'];
-  $password = md5($_POST['password']);
+  $password = $_POST['password'];
 
   $isLogin = $session->setAuthLogin($username, $password);
   if ($isLogin) {
