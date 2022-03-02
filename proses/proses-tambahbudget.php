@@ -193,7 +193,7 @@ if (isset($_POST['submit'])) {
     $con->set_host_db(DB_HOST_DIGITALISASI_MARKETING);
     $con->set_name_db(DB_DIGITAL_MARKET);
     $con->set_user_db(DB_USER_DIGITAL_MARKET);
-    $con->set_password_db(DB_PASS_DIGITAL_MARKET);
+    $con->set_password_db(DB_PASS_DIGITAK_MARKET);
     $con->init_connection();
 
     $koneksiDigitalMarket = $con->connect();
@@ -234,7 +234,7 @@ if (isset($_POST['submit'])) {
       $whatsapp = new Whastapp();
       for($i = 0; $i < count($phoneNumbers); $i++) {
         $url =  $host. '/view-request.php?id='.$idUserPICBudgetanRequest.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
-        $msg = $helper->messageCreateProject($namaUserSendNotifications[$i], $namaUserSendNotifications[0], $namaCreatorProject, $namaProject, $divisiCreatorBudget, $url, "Notifikasi Pembukaan Akses Untuk Pengajuan Budget");
+        $msg = $helper->messageCreateProject($namaUserSendNotifications[$i], $namaUserSendNotifications[0], $namaCreatorProject, $namaProject, $jenis, $divisiCreatorBudget, $url);
         $msgEmail = $messageEmail->createBudget($namaUserSendNotifications[$i], $namaUserSendNotifications[0], $namaCreatorProject, $namaProject, $divisiCreatorBudget, $url);
         if($phoneNumbers[$i] != "") $whatsapp->sendMessage($phoneNumbers[$i], $msg);
         if ($emails[$i] != "") $emailHelper->sendEmail($msgEmail, "Notifikasi Pembukaan Akses Untuk Pengajuan Budget", $emails[$i]);

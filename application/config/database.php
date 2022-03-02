@@ -15,7 +15,7 @@ defined("DB_CUTI") OR define("DB_CUTI", "db_cuti");
 defined("DB_DEVELOP") OR define("DB_DEVELOP", "develop");
 defined("DB_HOST_DIGITALISASI_MARKETING") OR define("DB_HOST_DIGITALISASI_MARKETING", MODE_APP == "dev" ? "192.168.10.240" : "192.168.10.240");
 defined("DB_USER_DIGITAL_MARKET") OR define("DB_USER_DIGITAL_MARKET", "adam");
-defined("DB_PASS_DIGITAL_MARKET") OR define("DB_PASS_DIGITAL_MARKET", "Ad@mMR!db213");
+defined("DB_PASS_DIGITAK_MARKET") OR define("DB_PASS_DIGITAK_MARKET", "Ad@mMR!db213");
 
 
 require_once 'ModelBudget.php';
