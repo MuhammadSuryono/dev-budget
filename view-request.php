@@ -711,35 +711,39 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
 
             const buttonSetujuiRequest = document.querySelector('#buttonSetujuiRequest');
             let fullcode = '';
-            buttonSetujuiRequest.addEventListener("click", function() {
-                let nama = this.getAttribute("data-code");
-                let code1 = nama.substring(0, 4);
-                let code2 = nama.substring(nama.length - 4, nama.length);
-                fullcode = `${code1}APPROVE${code2}`;
+            if (buttonSetujuiRequest !== null) {
+                buttonSetujuiRequest.addEventListener("click", function() {
+                    let nama = this.getAttribute("data-code");
+                    let code1 = nama.substring(0, 4);
+                    let code2 = nama.substring(nama.length - 4, nama.length);
+                    fullcode = `${code1}APPROVE${code2}`;
 
-                $('#kodeApprove').text(fullcode);
+                    $('#kodeApprove').text(fullcode);
 
-                let findLink = document.getElementById("buttonSubmitSetujui");
-                findLink.addEventListener("click", function() {
-                    if ($('#inputKode').val() == fullcode) {
-                        let id = buttonSetujuiRequest.getAttribute("data-id");
-                        findLink.href = "setuju-request-proses.php?id=" + id;
-                    } else {
-                        alert("Kode Approval Salah");
-                        findLink.href = "view-request.php?id=" + id;
-                    }
+                    let findLink = document.getElementById("buttonSubmitSetujui");
+                    findLink.addEventListener("click", function() {
+                        if ($('#inputKode').val() == fullcode) {
+                            let id = buttonSetujuiRequest.getAttribute("data-id");
+                            findLink.href = "setuju-request-proses.php?id=" + id;
+                        } else {
+                            alert("Kode Approval Salah");
+                            findLink.href = "view-request.php?id=" + id;
+                        }
+                    })
                 })
-            })
+            }
 
             const buttonTolakRequest = document.querySelector("#buttonTolakRequest");
-            buttonTolakRequest.addEventListener("click", function() {
-                let findLink = document.getElementById("buttonSubmitCancelAjukan");
-                findLink.addEventListener("click", function() {
-                    let alasanTolak = document.getElementById("alasanTolak").value;
-                    let id = buttonTolakRequest.getAttribute("data-id");
-                    findLink.href = "request-budget-tolak.php?id=" + id + "&alasan=" + alasanTolak;
+            if (buttonTolakRequest !== null) {
+                buttonTolakRequest.addEventListener("click", function () {
+                    let findLink = document.getElementById("buttonSubmitCancelAjukan");
+                    findLink.addEventListener("click", function () {
+                        let alasanTolak = document.getElementById("alasanTolak").value;
+                        let id = buttonTolakRequest.getAttribute("data-id");
+                        findLink.href = "request-budget-tolak.php?id=" + id + "&alasan=" + alasanTolak;
+                    })
                 })
-            })
+            }
 
             const buttonEditModal = document.querySelector("#buttonEditModal");
             buttonEditModal.addEventListener("click", function() {
