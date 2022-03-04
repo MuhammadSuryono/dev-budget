@@ -37,7 +37,7 @@ $queryUser = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE id_user = '$_SE
 $user = mysqli_fetch_assoc($queryUser);
 $buttonAkses = unserialize($user['hak_button']);
 
-$queryRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE stat = 'MRI'");
+$queryRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE stat = 'MRI' AND type_kas = 'mri-pall'");
 
 $batasWaktu = date('Y-m-d H:i:s', strtotime('-2hours'));
 $update = mysqli_query($koneksiTransfer, "UPDATE data_transfer SET hasil_transfer = 3, ket_transfer = 'Jadwal Terlewat' WHERE jadwal_transfer < '$batasWaktu' AND hasil_transfer = 1 AND ket_transfer = 'Antri'") or die(mysqli_error($koneksiTransfer));
@@ -717,7 +717,7 @@ $update = mysqli_query($koneksiTransfer, "UPDATE data_transfer SET hasil_transfe
                         $querySaldo = mysqli_query($koneksiMriTransfer, "SELECT * FROM saldo WHERE rekening = '$item[rekening]' ORDER BY saldo_id DESC LIMIT 1");
                         $getSaldo = mysqli_fetch_assoc($querySaldo);
 
-                        $countTotal = mysqli_query($koneksiTransfer, "SELECT SUM(jumlah) AS total FROM data_transfer WHERE rekening_sumber = '$item[rekening]' AND hasil_transfer = 1 AND ket_transfer = 'Antri'");
+                        $countTotal = mysqli_query($koneksiTransfer, "SELECT SUM(jumlah) AS total FROM data_transfer WHERE rekening_sumber = '$item[rekening]' AND hasil_transfer = 1 AND ket_transfer = 'Antri' AND jadwal_transfer IS not NULL");
                         $total = mysqli_fetch_assoc($countTotal);
 
                         if ($getSaldo['saldo'] < $total['total']) :

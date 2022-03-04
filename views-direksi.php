@@ -187,7 +187,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                     $selno = mysqli_query($koneksi, "SELECT no FROM selesai WHERE waktu ='$waktu'");
                     $wkwk = mysqli_fetch_assoc($selno);
                     $no = $wkwk['no'];
-                    $liatbayarth = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no'");
+                    $liatbayarth = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no' AND status_pengajuan_bpu != 2");
                     if (mysqli_num_rows($liatbayarth) == 0) {
                       echo "";
                     } else {
@@ -265,7 +265,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                         <!-- Tombol Eksternal -->
                         <?php
 
-                        $crbpu = mysqli_query($koneksi, "SELECT * FROM bpu WHERE no ='$no' AND waktu = '$waktu'");
+                        $crbpu = mysqli_query($koneksi, "SELECT * FROM bpu WHERE no ='$no' AND waktu = '$waktu' AND status_pengajuan_bpu != 2");
 
                         if ($a['status'] == 'UM' || $a['status'] == 'UM Burek') {
                         ?>
@@ -312,7 +312,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                         }
 
                         $arrCheck = [];
-                        $liatbayar = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no' ORDER BY term");
+                        $liatbayar = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no' AND status_pengajuan_bpu != 2 ORDER BY term");
                         if (mysqli_num_rows($liatbayar) == 0) {
                           echo "";
                         } else {

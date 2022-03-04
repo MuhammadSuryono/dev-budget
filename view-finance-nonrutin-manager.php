@@ -413,7 +413,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                         }
 
                         $arrCheck = [];
-                        $liatbayar = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no' ORDER BY term");
+                        $liatbayar = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no' AND status_pengajuan_bpu != 2 ORDER BY term");
                         if (mysqli_num_rows($liatbayar) == 0) {
                           echo "";
                         } else {

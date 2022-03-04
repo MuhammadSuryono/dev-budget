@@ -275,7 +275,7 @@ $helper = new Helper();
                       $selno = mysqli_query($koneksi, "SELECT no FROM selesai WHERE waktu ='$waktu'");
                       $wkwk = mysqli_fetch_assoc($selno);
                       $no = $wkwk['no'];
-                      $liatbayarth = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no'");
+                      $liatbayarth = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no' AND status_pengajuan_bpu != 2");
                       if (mysqli_num_rows($liatbayarth) == 0) {
                         echo "";
                       } else {
@@ -373,7 +373,7 @@ $helper = new Helper();
                           <?php
                           // }
                           $arrCheck = [];
-                          $liatbayar = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no'");
+                          $liatbayar = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no' AND status_pengajuan_bpu != 2");
                           if (mysqli_num_rows($liatbayar) == 0) {
                             echo "";
                           } else {
@@ -1180,8 +1180,31 @@ $helper = new Helper();
       ?>
 
       <script type="text/javascript">
+          const params = new URLSearchParams(window.location.search)
+
+          function get_query(key)
+          {
+              return params.get(key)
+          }
+
+          function get_verifikasi()
+          {
+              let isVerifikasi = get_query("action") == "verifikasi"
+              if (isVerifikasi) {
+                  let no = get_query("no")
+                  let waktu = get_query("waktu")
+                  let term = get_query("term")
+                  verifikasiBpu(no, waktu, term)
+              }
+          }
+
+          function get_approve_bpu()
+          {
+              // setujuiBpu()
+          }
         $(document).ready(function() {
           $('.umo_biaya_kode_id').select2();
+          get_verifikasi()
 
           $('#fileInputNewFileBpu').change(function() {
             readURLNewFileBpu(this);
