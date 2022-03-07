@@ -7,7 +7,6 @@ class Whastapp {
 
     public function __construct()
     {
-        
     }
 
     public function sendMessage($msisdn, $message)
