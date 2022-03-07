@@ -16,7 +16,7 @@ class Whastapp {
 
         $url = "/send-notification-message";
         $body = ["msisdn" => $msisdn, "message" => $message];
-        return $httpRequest->HTTPPost($url, $body);
+        return $httpRequest->HTTPPost($url, $body, "form", $this->host);
     }
 
     public function sendDocumentMessage($msisdn, $message, $document)
