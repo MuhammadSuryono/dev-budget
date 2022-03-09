@@ -4,6 +4,7 @@ require "application/config/database.php";
 
 $con = new Database();
 $koneksi = $con->connect();
+$con->load_database($koneksi);
 
 $con->set_name_db(DB_DEVELOP);
 $con->init_connection();
@@ -23,6 +24,8 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
     $id = $_POST['no'];
     $waktu = $_POST['waktu'];
     $term = $_POST['term'];
+
+    $dataPengajuan = $con->select("*")->from("pengajuan")->where("waktu", "=", $waktu)->first();
 
     $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE stat = 'MRI'");
 
@@ -137,6 +140,15 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
         <h5 class="alert-heading"><b>PERHATIAN !!!</b></h5>
         <p>Untuk Metode Pembayaran MRI PALL dengan status <b>URGENT</b> akan di jadwalkan 2 jam dari waktu sekarang.<br>Untuk jadwal yang melebihi pukul 14:00 akan ditransfer di kemudian hari</p>
     </div>
+    <?php if($dataPengajuan["jenis"] == "Rutin") { ?>
+    <div class="form-group">
+        <label for="mripal" class="control-label">Metode Pembayaran :</label>
+        <select class="form-control" name="metode_pembayaran">
+            <option value="MRI PAL" <?= $metode_pembayaran == "MRI PAL" ? "selected": ""?>>MRI PAL</option>
+            <option value="MRI KAS" <?= $metode_pembayaran == "MRI KAS" ? "selected": ""?>>MRI KAS</option>
+        </select>
+    </div>
+        <?php } ?>
     <div class="form-group">
         <label for="tglcair" class="control-label">Status Urgent :</label>
         <select class="form-control" name="urgent" onchange="onChangeStatusUrgent(this)">

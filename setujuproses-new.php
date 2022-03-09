@@ -52,10 +52,10 @@ $tanggalbayar = $_POST['tanggalbayar'];
 $alasanTolakBpu = $_POST['alasanTolakBpu'];
 $rekening_sumber_mri_pal = $_POST['rekening_sumber_mri_pal'];
 $rekening_sumber_mri_kas = $_POST['rekening_sumber_mri_kas'];
+$metodePembayaran = $_POST["metode_pembayaran"];
 
 $arrPengajuanJumlah = $_POST['pengajuan_jumlah'];
 $arrNoid = $_POST['noid'];
-$arrMetodePembayaran = $_POST['metode_pembayaran'];
 
 $jenisPajak = $_POST['jenispajak'];
 $nominalPajak = $_POST['nominalpajak'];
@@ -131,9 +131,12 @@ $duplicateNumber = [];
 $urlCallback = getHostUrl() . "/api/callback.php";
 
 if ($_POST['submit'] == 1) {
-    
     $index = 0;
     foreach ($dataBpuItem as $item) {
+        if ($metodePembayaran != "") {
+            $item['metode_pembayaran'] = $metodePembayaran;
+        }
+
         array_push($arrPembayaran, $item['metode_pembayaran']);
         array_push($arrPenerima, $item['namapenerima']);
         if ($item['jumlah'] != 0) {
@@ -162,7 +165,7 @@ if ($_POST['submit'] == 1) {
         }
 
         if ($isEksternalProcess) {
-            $update = mysqli_query($koneksi, "UPDATE bpu SET jumlah = '$arrPengajuanJumlah[$index]', jenis_pajak = '$jenisPajak', nominal_pajak = '$nominalPajak', checkby = '$userSetuju', tglcheck='$time' WHERE noid = '$arrNoid[$index]'");
+            $update = mysqli_query($koneksi, "UPDATE bpu SET metode_pembayaran = '$item[metode_pembayaran]' ,jumlah = '$arrPengajuanJumlah[$index]', jenis_pajak = '$jenisPajak', nominal_pajak = '$nominalPajak', checkby = '$userSetuju', tglcheck='$time' WHERE noid = '$arrNoid[$index]'");
             $item['jumlah'] = $arrPengajuanJumlah[$index];
         }
 
@@ -358,7 +361,10 @@ if ($_POST['submit'] == 1) {
         
 
     } else {
-        $update = mysqli_query($koneksi, "UPDATE bpu SET status_pengajuan_bpu =0, persetujuan = '$persetujuan', jenis_pajak = '$jenisPajak', nominal_pajak = '$nominalPajak', tanggalbayar = '$tanggalbayar', urgent = '$urgent', approveby = '$userSetuju', tglapprove = '$time'
+        if ($metodePembayaran != "") {
+            $dataBpuItem['metode_pembayaran'] = $metodePembayaran;
+        }
+        $update = mysqli_query($koneksi, "UPDATE bpu SET metode_pembayaran = '$dataBpuItem[metode_pembayaran]', status_pengajuan_bpu =0, persetujuan = '$persetujuan', jenis_pajak = '$jenisPajak', nominal_pajak = '$nominalPajak', tanggalbayar = '$tanggalbayar', urgent = '$urgent', approveby = '$userSetuju', tglapprove = '$time'
                                WHERE no='$no' AND waktu='$waktu' AND persetujuan='Belum Disetujui' AND term=$term");
         $update = mysqli_query($koneksi, "UPDATE bpu_verify SET is_need_approved = '0', status_approved = '1', is_approved = '1' WHERE id = '$bpuVerify[id]'");
     }

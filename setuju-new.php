@@ -3,6 +3,7 @@ require "application/config/database.php";
 
 $con = new Database();
 $koneksi = $con->connect();
+$con->load_database($koneksi);
 
 $con->set_name_db(DB_DEVELOP);
 $con->init_connection();
@@ -18,8 +19,10 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
     $id = $_POST['no'];
     $waktu = $_POST['waktu'];
     $term = $_POST['term'];
-
+    $dataPengajuan = $con->select("*")->from("pengajuan")->where("waktu", "=", $waktu)->first();
     $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE stat = 'MRI'");
+
+    $metodePembayaran = "";
 
     $sql = "SELECT t1.*, t2.berita_transfer, t4.nama AS nama_rekening, t3.label_kas, t3.bank AS kas_bank, b.namabank as bank FROM bpu t1 LEFT JOIN bridgetransfer.data_transfer t2 ON t1.noid = t2.noid_bpu LEFT JOIN bank b ON t1.namabank = b.kodebank LEFT JOIN develop.kas t3 ON t1.rekening_sumber = t3.rekening LEFT JOIN rekening t4 ON t4.no = t1.rekening_id WHERE t1.no = '$id' AND t1.waktu = '$waktu' AND t1.term='$term' AND t1.persetujuan IN ('Belum Disetujui','Disetujui (Direksi)') GROUP BY t1.noid";
     $result = $koneksi->query($sql); ?>
@@ -39,6 +42,7 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
             $pengaju = $baris['pengaju'];
             $ket_pembayaran = $baris['ket_pembayaran'];
             $tanggalBayar = $baris['tanggalbayar'];
+            $metodePembayaran = $baris['metode_pembayaran'];
         ?>
             <tbody>
                 <tr>
@@ -77,6 +81,15 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
         <h5 class="alert-heading"><b>PERHATIAN !!!</b></h5>
         <p>Untuk Metode Pembayaran MRI PALL dengan status <b>URGENT</b> akan di jadwalkan 2 jam dari waktu sekarang.<br>Untuk jadwal yang melebihi pukul 14:00 akan ditransfer di kemudian hari</p>
     </div>
+    <?php if($dataPengajuan["jenis"] == "Rutin") { ?>
+        <div class="form-group">
+            <label for="mripal" class="control-label">Metode Pembayaran :</label>
+            <select class="form-control" name="metode_pembayaran">
+                <option value="MRI PAL" <?= $metodePembayaran == "MRI PAL" ? "selected": ""?>>MRI PAL</option>
+                <option value="MRI KAS" <?= $metodePembayaran == "MRI KAS" ? "selected": ""?>>MRI KAS</option>
+            </select>
+        </div>
+    <?php } ?>
     <div class="form-group">
         <label for="tglcair" class="control-label">Status Urgent :</label>
         <select class="form-control" name="urgent" onchange="onChangeStatusUrgent(this)">
