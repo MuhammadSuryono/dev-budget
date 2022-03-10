@@ -411,7 +411,7 @@ if (!isset($_SESSION['nama_user'])) {
                                 echo "Tanggal Terima Uang : <b>$tglcair ";
                                 echo "</b></br>";
                                 echo "<hr/>";
-                                echo "Nominal Pajak : <br><b>Rp. " .number_format($bayar['nominal_pajak']) . " (".$bayar['jenis_pajak'].")";
+                                echo "Nominal Pajak : <br><b>Rp. " .number_format($bayar['nominal_pajak'] == null ? 0 : $bayar['nominal_pajak']) . " (".$bayar['jenis_pajak'].")";
                                 echo "</b><br>";
                                 echo ($statusPengajuanBpu != 0) ? "Request BPU : <br><b>Rp. " . number_format($total['jumlah_pengajuan'], 0, '', ',') : "Nominal Pemmbayaran : <br><b>Rp. " . number_format($total['jumlah_total'], 0, '', ',');
                                 echo "</b><br>";
