@@ -448,6 +448,8 @@ $setting = mysqli_fetch_assoc($querySetting);
                                 $color = 'orange';
                               }
 
+                              $nominalPajak = $bayar['nominal_pajak'] == null ? 0 : $bayar['nominal_pajak'];
+
                               // if ($statusPengajuanRealisasi == 1) {
                               //   $color = '#8aad70';
                               // } else if ($statusPengajuanRealisasi == 2) {
@@ -473,7 +475,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                               echo "</b></br>";
                               
                               echo "<hr/>";
-echo "Nominal Pajak :<b>Rp. " .number_format($bayar['nominal_pajak']) . " (".$bayar['jenis_pajak'].")";
+echo "Nominal Pajak :<b>Rp. " .number_format($nominalPajak) . " (".$bayar['jenis_pajak'].")";
                               echo "</b><br>";
                               echo ($statusPengajuanBpu != 0) ? "Request BPU : <br><b>Rp. " . number_format($total['jumlah_pengajuan'], 0, '', ',') : "Nominal Pembayaran : <br><b>Rp. " . number_format($total['jumlah_total'], 0, '', ',');
                               echo "</b><br>";

@@ -568,7 +568,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                               echo "<hr/>";
                               echo "Nominal Pengajuan :<br><b>Rp. " .number_format($pengajuanJumlah) ;
                                                             echo "</b><br>";
-echo "Nominal Pajak :<br><b>Rp. " .number_format($bayar['nominal_pajak']) . " (".$bayar['jenis_pajak'].")";
+echo "Nominal Pajak :<br><b>Rp. " .number_format($bayar['nominal_pajak'] == null ? 0 : $bayar['nominal_pajak']) . " (".$bayar['jenis_pajak'].")";
                               echo "</b><br>";
                               echo ($statusPengajuanBpu != 0) ? "Request BPU : <br><b>Rp. " . number_format($total['jumlah_pengajuan'], 0, '', ',') : "Nominal Pembayaran : <br><b>Rp. " . number_format($total['jumlah_total'], 0, '', ',');
                               echo "</b><br>";
