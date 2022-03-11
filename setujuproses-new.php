@@ -75,16 +75,24 @@ if ($budget['jenis'] == 'Non Rutin') {
 if ($urgent == 'Urgent') {
     $tanggalbayar = $time;
 } else {
-    $d = mktime(8, 15, 0);
-    $hour = date("H:i:s", $d);
+    $startHour = 8;
+    $maxHour = 12;
+    $startMinute = 10;
+    $maxMinute = 59;
+    $hourNow = date('H');
+    $minuteNow = date('i');
+
     $dateNow = date("Y-m-d");
 
     if ($_POST['tanggalbayar'] == $dateNow) {
-        $dateTime = date("H:i:s", time() + 7200);
-        $tanggalbayar = $_POST['tanggalbayar'] . ' ' . $dateTime;
-    } else {
-        $tanggalbayar = $_POST['tanggalbayar'] . ' ' .  $hour;
+        if ($hourNow > $startHour) {
+            $startHour = $startHour + ($hourNow - $startHour);
+        }
     }
+
+    $minute = str_pad(mt_rand($startMinute,$maxMinute), 2, "0", STR_PAD_LEFT);
+    $dateTime = mt_rand((int)$startHour,(int)$maxHour).":".$minute.":00";
+    $tanggalbayar = $_POST['tanggalbayar'] . ' ' .  $dateTime;
 
 }
 
