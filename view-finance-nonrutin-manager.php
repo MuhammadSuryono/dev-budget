@@ -6,6 +6,7 @@ require "application/config/database.php";
 
 $con = new Database();
 $koneksi = $con->connect();
+$con->load_database($koneksi);
 
 $con->set_name_db(DB_TRANSFER);
 $con->init_connection();
@@ -309,7 +310,22 @@ $setting = mysqli_fetch_assoc($querySetting);
                         <td><?php echo $a['rincian']; ?></td>
                         <td><?php echo $a['kota']; ?></td>
                         <td><?php echo $a['status']; ?></td>
-                        <td><?php echo $a['penerima']; ?></td>
+                          <td>
+                              <?php echo $a['penerima']; ?><br/>
+                              <?php
+                              if (in_array($a['status'], ["UM", "UM Burek", "Biaya Lumpsum"])) {
+                                  $listReceiver = $con->select("*")->from("tb_penerima")
+                                      ->where("item_id", "=", $a["id"])->get();
+                                  echo "<ul>";
+                                  foreach ($listReceiver as $key => $value) {
+                                      $iconValidate = $value["is_validate"] == 1 ? "<i class='fa fa-check text-success'></i>": "<i class='fa fa-exclamation text-danger'></i>";
+                                      $title = $value["is_validate"] == 1 ? "Terverifikasi oleh $value[validator]": "Belum Terverifikasi";
+                                      echo "<li>$value[nama_penerima] ($value[jabatan]) - <span class='text-center' title='$title'>$iconValidate</span></li>";
+                                  }
+                                  echo "</ul>";
+                              }
+                              ?>
+                          </td>
                         <td><?php echo 'Rp. ' . number_format($a['harga'], 0, '', ','); ?></td>
                         <td><?php echo $a['quantity']; ?></td>
                         <td><?php echo 'Rp. ' . number_format($a['total'], 0, '', ','); ?></td>
@@ -378,6 +394,8 @@ $setting = mysqli_fetch_assoc($querySetting);
                             <button type="button" class="btn btn-danger btn-small" onclick="hapus_row('<?php echo $no; ?>','<?php echo $waktu; ?>')">Hapus</button>
                             <br /><br />
                             <button type="button" class="btn btn-warning btn-small" onclick="detail_bpu('<?php echo $no; ?>','<?php echo $waktu; ?>')">Detail</button>
+                              <br /><br />
+                              <button type="button" class="btn btn-warning btn-small" onclick="">Tambah Penerima</button>
                             <!-- <br/><br/> -->
                             <!-- <button type="button" class="btn btn-success btn-small" onclick="move_budget('<?php echo $no; ?>','<?php echo $waktu; ?>')">Move</button> -->
                           </td>
