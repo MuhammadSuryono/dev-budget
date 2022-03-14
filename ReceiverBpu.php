@@ -1,5 +1,6 @@
 <?php
 require_once "application/config/database.php";
+session_start();
 
 class ReceiverBpu extends Database
 {
@@ -19,6 +20,15 @@ class ReceiverBpu extends Database
         }
 
         return $save->save_insert();
+    }
+
+    public function validate_receiver()
+    {
+        $save = $this->update("tb_penerima")
+            ->set_value_update("is_validate", true)
+            ->set_value_update("validator", $_SESSION["nama_user"])
+            ->where("id", "=", $_GET["id"]);
+        return $save->save_update();
     }
 
     public function get_receiver_validate()
@@ -54,4 +64,13 @@ if ($action == "save") {
 
 if ($action == "getReceiver") {
     echo json_encode($receiver->get_receiver_validate());
+}
+
+if ($action == "validate") {
+    $isSaved = $receiver->validate_receiver();
+    if ($isSaved) {
+        echo json_encode(["message" => "Berhasil memvalidasi data penerima"]);
+    } else {
+        echo json_encode(["message" => "Data gagal divalidasi, Coba lagi!. Jika masih menemukan kesalahan yang sama, informasikan pada tim IT."]);
+    }
 }
