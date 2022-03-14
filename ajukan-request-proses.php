@@ -1,4 +1,5 @@
 <?php
+error_reporting(0);
 session_start();
 require "application/config/database.php";
 require_once "application/config/message.php";
@@ -144,7 +145,12 @@ $emails= [];
 $namaUser = [];
 $idUsersNotification = [];
 
-$dataUserDireksi = $con->select()->from('tb_user')->where('divisi', '=', 'Direksi')->where('aktif', '=', 'Y')->first();
+$dataUserDireksi = $con->select()->from('tb_user')
+    ->where('divisi', '=', 'Finance')
+    ->where("hak_akses", "=", "Manager")
+    ->where("level", "=", "Manager")
+    ->where('aktif', '=', 'Y')->first();
+
 if ($dataUserDireksi['phone_number']) {
     $emails[] = $dataUserDireksi['email'];
     $phoneNumbers[] = $dataUserDireksi['phone_number'];
@@ -153,7 +159,7 @@ if ($dataUserDireksi['phone_number']) {
 }
 
 $updatePengajuanRequest = $con->update('pengajuan_request')
-    ->set_value_update('status_request', 'Di Ajukan')
+    ->set_value_update('status_request', 'Butuh Validasi')
     ->set_value_update('waktu', $waktu)
     ->set_value_update('submission_note', $keterangan)
     ->set_value_update('document', $document)

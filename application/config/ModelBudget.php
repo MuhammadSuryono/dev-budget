@@ -84,10 +84,14 @@ class ModelBudget
 
     public function first()
     {
-        $this->set_query_select();
-        $query = mysqli_query($this->mysql, $this->get_query());
-        $this->data = mysqli_fetch_assoc($query);
-        return $this->data;
+        try {
+            $this->set_query_select();
+            $query = mysqli_query($this->mysql, $this->get_query());
+            $this->data = mysqli_fetch_assoc($query);
+            return $this->data;
+        } catch (Exception $exception) {
+            die($exception);
+        }
     }
 
     public function get_query()
