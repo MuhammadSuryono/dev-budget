@@ -266,6 +266,11 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
                                 <th>Harga (IDR)</th>
                                 <th>Total Quantity</th>
                                 <th>Total Harga (IDR)</th>
+                                <?php
+                                if ($d['status_request'] == 'Di Ajukan' || $d['status_request'] == 'Butuh Validasi') {
+                                    echo '<th>Log</th>';
+                                }
+                                ?>
                                 <?php if ($d['jenis'] == 'Non Rutin') : ?>
                                     <th>Rencana Tanggal Pembayaran</th>
                                 <?php endif; ?>
@@ -297,6 +302,12 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
                                     <td id="quantity<?= $i ?>"><?php echo number_format($a['quantity']); ?></td>
                                     <input class="inputTHarga" type="hidden" id="inputTHarga<?= $i ?>" name="tHarga[]" value="<?= $a['total'] ?>">
                                     <td class="tHarga" id="tHarga<?= $i ?>"><?php echo 'Rp. ' . number_format($a['total']) ?></td>
+
+                                    <?php
+                                        if ($d['status_request'] == 'Di Ajukan' || $d['status_request'] == 'Butuh Validasi') {
+                                            echo '<td><button type="button" class="btn btn-primary btn-sm" data-id="'.$a["id"].'" onclick="showLog(this)"><i class="fas fa-clock"></i></button></td>';
+                                        }
+                                    ?>
 
                                     <?php if ($d['jenis'] == 'Non Rutin') :
                                         $queryTanggal = mysqli_query($koneksi, "SELECT tanggal FROM reminder_tanggal_bayar WHERE selesai_waktu = '$a[waktu]' AND selesai_no = '$a[urutan]'");
@@ -522,13 +533,13 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
                     <div class="form-group">
                         <label for="harga" class="control-label">Harga (IDR) :</label>
                         <!-- <input type="hidden" class="form-control" id="hargaEdit" value="" name="harga"> -->
-                        <input type="text" class="form-control" id="hargaEdit" name="harga" value="" onkeyup=" sum();">
+                        <input type="text" class="form-control" id="hargaEdit" name="harga" value="" onkeyup=" sum();" <?= in_array($d["status_request"], ["Di Ajukan", "Butuh Validasi"]) ? "readonly":""  ?>>
                     </div>
 
                     <div class="form-group">
                         <label for="quantity" class="control-label">Quantity :</label>
                         <!-- <input type="hidden" class="form-control" id="quantityEdit" value="" name="quantity"> -->
-                        <input type="text" class="form-control" id="quantityEdit" name="quantity" value="" onkeyup="sum();">
+                        <input type="text" class="form-control" id="quantityEdit" name="quantity" value="" onkeyup="sum();" <?= in_array($d["status_request"], ["Di Ajukan", "Butuh Validasi"]) ? "readonly":""  ?>>
                     </div>
 
                     <div class="form-group">
@@ -711,9 +722,74 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="logPerubahanItemModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    Log Perubahan Item Budget
+                </div>
+                <div class="modal-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Rincian</th>
+                                <th>Kota</th>
+                                <th>Status</th>
+                                <th>Penerima</th>
+                                <th>Harga</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableLogPerubahan">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script type="text/javascript">
         let numberClicked = '';
         let statusKodeProject = '<?= $statusKodeProject ?>';
+
+        function showLog(e) {
+            let id = e.dataset.id;
+            // LogPerubahanItemBudget.php?action=getLog&idItemRequest=175
+            $.ajax({
+                type: 'get',
+                url: `LogPerubahanItemBudget.php?action=getLog&idItemRequest=${id}`,
+                success: function(data) {
+                    let json = JSON.parse(data);
+                    $('#logPerubahanItemModal').modal('show');
+                    let html = '';
+                    var formatter = new Intl.NumberFormat('id-ID', {
+                        style: 'currency',
+                        currency: 'IDR',
+                    });
+                    json.forEach((item, index) => {
+                        html += `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${item.rincian}</td>
+                                <td>${item.kota}</td>
+                                <td>${item.status}</td>
+                                <td>${item.penerima}</td>
+                                <td>${formatter.format(item.harga)}</td>
+                                <td>${item.quantity}</td>
+                                <td>${formatter.format(item.total)}</td>
+                            </tr>
+                        `;
+                    });
+                    $('#tableLogPerubahan').html(html);
+                }
+            });
+        }
+
         $(document).ready(function() {
             $('[data-toggle="tooltip"]').tooltip()
             const arrStatus = ['Honor Jakarta', 'Honor Luar Kota', 'STKB TRK Jakarta', 'STKB TRK Luar Kota', 'STKB OPS', 'Honor Area Head'];

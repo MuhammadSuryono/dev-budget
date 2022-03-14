@@ -439,6 +439,7 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
                                 <th>Item</th>
                                 <th>Penerima</th>
                                 <th>Rekening</th>
+                                <th>Doc</th>
                                 <th>Action</th>
                                 <!-- <th>Pengajuan Request</th> -->
                             </tr>
@@ -491,6 +492,9 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
                                         <li>
                                             Norek: <?= $d['nomor_rekening'] ?>
                                         </li>
+                                    </td>
+                                    <td>
+                                        <a href="<?= $d['path'] ?>" target="_blank"><i class="fa fa-file"></i></a>
                                     </td>
                                     <td>
                                         <button class="btn btn-sm btn-primary" data-id="<?= $d["id"] ?>" onclick="validasiKonfirm(this)"><i class="fa fa-check"></i> Validate</button>
