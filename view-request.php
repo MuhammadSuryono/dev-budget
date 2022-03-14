@@ -9,9 +9,9 @@ $con = new Database();
 $koneksi = $con->connect();
 $con->load_database($koneksi);
 
-$session = $_GET['session'];
+$session = isset($_GET['session']) ? $_GET['session'] : null;
 $isSetSession = false;
-if (isset($session)) $isSetSession = true;
+if ($session != null) $isSetSession = true;
 
 $helper = new Helper($isSetSession);
 
@@ -157,7 +157,7 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
             <?php endif; ?>
            <ul class="nav navbar-nav navbar-right">
                         <li><a href="/log-notifikasi-aplikasi/index.html" target="_blank"><i class="fa fa-envelope"></i></a></li>
-                <li><a href="ubahpassword.php"><span class="glyphicon glyphicon-user"></span><?php echo $_SESSION['nama_user']; ?> (<?php echo $_SESSION['divisi']; ?>)</a></li>]; ?>)</a></li>
+                <li><a href="ubahpassword.php"><span class="glyphicon glyphicon-user"></span><?php echo $_SESSION['nama_user']; ?> (<?php echo $_SESSION['divisi']; ?>)</a></li></a></li>
                 <li><a href="logout.php"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
             </ul>
             </div>
@@ -313,7 +313,7 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
                     </table>
                 </div><!-- /.table-responsive -->
             </div>
-            <?php if ($_SESSION['divisi'] != 'Direksi' && ($d['status_request'] == 'Belum Di Ajukan' || $d['statu_request'] == 'Ditolak')) {
+            <?php if ($_SESSION['divisi'] != 'Direksi' && ($d['status_request'] == 'Belum Di Ajukan' || $d['status_request'] == 'Ditolak')) {
                 echo '<div class="alert alert-warning" role="alert">
                 <h4 class="alert-heading">PERHATIAN!!!</h4>
                 <p>Pastikan sebelum melakukan Pengajuan, <button class="btn btn-xs btn-primary" disabled>Simpan</button> terlebih dahulu data anda.</p>
