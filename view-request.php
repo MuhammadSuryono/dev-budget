@@ -1,5 +1,5 @@
 <?php
-//error_reporting(0);
+error_reporting(0);
 session_start();
 require "application/config/database.php";
 require "application/config/helper.php";
@@ -248,6 +248,11 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
             </div>
             <div id="btn-print-budget"><a href="request-budget-print.php?id=<?= $id ?>" target="_blank" class="btn btn-warning pull-right">Print <i class="fas fa-print"></i></a></div>
             <br /><br />
+            <?php if ($d['status_request'] == 'Di Ajukan') {
+                echo '<div class="alert alert-success" role="alert">
+                <p>Budget telah <button class="btn btn-xs btn-success" disabled>DI VALIDASI</button> oleh '.$d["validator"].'.</p>
+            </div>';
+            } ?>
             <div class="panel panel-warning" data-widget="{&quot;draggable&quot;: &quot;false&quot;}" data-widget-static="">
                 <div class="panel-body no-padding">
                     <table class="table table-striped table-bordered">
@@ -313,17 +318,20 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
                     </table>
                 </div><!-- /.table-responsive -->
             </div>
-            <?php if ($_SESSION['divisi'] != 'Direksi' && ($d['status_request'] == 'Belum Di Ajukan' || $d['status_request'] == 'Ditolak')) {
+            <?php if (isset($d['status_request'])) {
                 echo '<div class="alert alert-warning" role="alert">
                 <h4 class="alert-heading">PERHATIAN!!!</h4>
-                <p>Pastikan sebelum melakukan Pengajuan, <button class="btn btn-xs btn-primary" disabled>Simpan</button> terlebih dahulu data anda.</p>
+                <p>Pastikan sebelum melakukan Pengajuan/Validasi/Persetujuan, <button class="btn btn-xs btn-primary" disabled>Simpan</button> terlebih dahulu data anda.</p>
                 <hr>
-                <p><b>Note: Budget yang telah diajukan tidak bisa dirubah kembali.</b></p>
+                <p><b>Note: Budget yang telah diajukan/diseujui tidak bisa dirubah kembali.</b></p>
             </div>';
             } ?>
             
             <span data-toggle="modal" data-target="#requestModal">
                 <button type="button" class="btn btn-success btn-small pull-right" style="margin-left: 5px; display: none;" data-toggle="tooltip" data-placement="bottom" title="Harap Simpan data terlebih dahulu sebelum mengajukan permohonan budget" id="buttonAjukan" data-id="<?= $id ?>">Ajukan</button>
+            </span>
+            <span data-toggle="modal" data-target="#validasiModal">
+                <button type="button" class="btn btn-success btn-small pull-right" style="margin-left: 5px; display: none;" data-toggle="tooltip" data-placement="bottom" title="Harap Simpan data terlebih dahulu sebelum memvalidasi permohonan budget" id="buttonValidasi" data-id="<?= $id ?>">Validasi</button>
             </span>
             <input type="button" class="btn btn-primary pull-right" id="submitButton" style="margin-left: 5px;display: none;" data-toggle="modal" value="Simpan" />
             <button type="button" id="buttonTambah" class="btn btn-default btn-small pull-right" style="display: none;" onclick="tambah_budget()" margin-left: 5px;display: none;>Tambah</button>
@@ -684,6 +692,25 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
             </div>
         </div>
     </div>
+    <div class="modal fade" id="validasiModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    Konfirmasi Validasi Budget
+                </div>
+                <div class="modal-body">
+                    <p>Masukkan keterangan tambahan (jika ada) dan klik 'submit' untuk untuk melakukan pengajuan budget</p>
+                    <div class="form-group" style="margin-top: 2px;">
+                        <input type="text" id="keteranganTambahanValidasi" class="form-control" id="exampleInputEmail1" placeholder="Keterangan" autocomplete="off">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button href="" id="buttonSubmitValidasi" class="btn btn-success success">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script type="text/javascript">
         let numberClicked = '';
         let statusKodeProject = '<?= $statusKodeProject ?>';
@@ -876,6 +903,13 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
                 })
             })
 
+            const buttonValidasi = document.querySelector('#buttonSubmitValidasi');
+            buttonValidasi.addEventListener("click", function () {
+                let id = buttonAjukan.getAttribute("data-id");
+                let keterangan = document.getElementById("keteranganTambahanValidasi").value;
+                window.location.href = "ValidasiBudget.php?id=" + id + "&keterangan=" + keterangan;
+            })
+
             $('.btn-tambah-row').click(function() {
                 var count = ($('.row-tanggal-bayar-appended').length / 2) + $('.row-tanggal-bayar').length
 
@@ -950,7 +984,7 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
                 }
             })
             if (divisi == 'Direksi') {
-                $('.editButtonCol').hide();
+                $('.editButtonCol').show();
                 $('#buttonAjukan').hide();
 
                 if (jenis == 'Non Rutin') {
@@ -964,11 +998,12 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
                     $('#submitButton').hide();
                     $('#buttonTambah').hide();
                 } else if (projectStatus == 'Di Ajukan') {
+                    $('.editButtonCol').show();
                     $('#buttonSetujuiRequest').show();
                     $('#buttonTolakRequest').show();
                     $('#buttonViewCv').show();
-                    $('#submitButton').hide();
-                    $('#buttonTambah').hide();
+                    $('#submitButton').show();
+                    $('#buttonTambah').show();
                 } else if (projectStatus == 'Disetujui') {
                     $('#buttonSetujuiRequest').hide();
                     $('#buttonTolakRequest').hide();
@@ -1023,6 +1058,17 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
                     if (jenis == 'Non Rutin') {
                         $('#buttonTambahTerm').show();
                     }
+                } else if (projectStatus == 'Butuh Validasi') {
+                    $('.editButtonCol').show();
+                    $('#buttonAjukan').hide();
+                    $('#buttonValidasi').show();
+                    $('#submitButton').show();
+                    $('#buttonTambah').show();
+                    $('#buttonSetujuiRequest').hide();
+                    $('#buttonTolakRequest').hide();
+                    if (jenis == 'Non Rutin') {
+                        $('#buttonTambahTerm').show();
+                    }
                 }
             } else if (divisi == 'FINANCE' && hakAkses == 'Manager' && jenis == 'Uang Muka' && total <= 1000000) {
                 if (projectStatus == 'Belum Di Ajukan') {
@@ -1049,6 +1095,17 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
                     $('#buttonViewCv').hide();
                     $('#submitButton').hide();
                     $('#buttonTambah').hide();
+                } else if (projectStatus == 'Butuh Validasi') {
+                    $('.editButtonCol').show();
+                    $('#buttonAjukan').hide();
+                    $('#buttonValidasi').show();
+                    $('#submitButton').show();
+                    $('#buttonTambah').show();
+                    $('#buttonSetujuiRequest').hide();
+                    $('#buttonTolakRequest').hide();
+                    if (jenis == 'Non Rutin') {
+                        $('#buttonTambahTerm').show();
+                    }
                 }
             } else {
                 $('#buttonSetujuiRequest').hide();

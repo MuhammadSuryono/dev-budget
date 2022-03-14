@@ -457,6 +457,29 @@ Marketing Research Indonesia";
         
         return $msg;
     }
+
+    public function messageValidasiBudget($receiver, $dataPengajuan, $validator, $urlPengajuan)
+    {
+        $msg = "Dear $receiver,
+
+Budget telah divalidasi oleh *$validator* dengan keterangan sebagai berikut:
+Nama Project : *$dataPengajuan[nama]*
+Folder Budget: *$dataPengajuan[jenis]*
+Pengaju : *$dataPengajuan[pengaju]*
+Divisi : *$dataPengajuan[divisi]*
+Total Budget : *Rp. " . number_format($dataPengajuan['totalbudget'], 0, '', ',') . "*
+";
+        if ($dataPengajuan['ket'] != "") {
+            $msg .= "
+Keterangan: *$dataPengajuan[ket]*";
+        }
+        $msg .= "
+
+
+Selengkapnya pengajuan anda bisa dilihat dibawah ini.
+http://$urlPengajuan";
+        return $msg;
+    }
 }
 
     
