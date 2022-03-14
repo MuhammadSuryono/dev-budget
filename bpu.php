@@ -86,7 +86,7 @@ if ($_POST['no'] && $_POST['waktu']) {
       <div id="alert-more-than"></div>
       <div class="form-group">
         <label for="rincian" class="control-label">Total BPU (IDR)s :</label>
-        <input class="form-control" name="jumlah" id="id_step2-number_2" type="text">
+        <input class="form-control" name="jumlah" id="id_step2-number_2" type="text" required>
       </div>
       <?php
       $statusbpu = $baris['status'];
@@ -95,7 +95,7 @@ if ($_POST['no'] && $_POST['waktu']) {
       ?>
         <div class="form-group">
           <label for="id_rekening" class="control-label">Nama Penerima: <span data-toggle="tooltip" title="Pembuat BPU tidak bisa ditujukan sebagai penerima BPU"><i class="fa fa-question-circle"></i></span></label>
-          <select class="form-control" id="id_rekening" name="id_rekening">
+          <select class="form-control" id="namapenerima" name="namapenerima">
             <option selected disabled>Pilih Nama Penerima</option>
             <?php
             $penerima = $con->select("a.*, b.namabank")->from("tb_penerima a")
@@ -124,7 +124,8 @@ if ($_POST['no'] && $_POST['waktu']) {
 
         <div class="form-group">
           <label for="namabank" class="control-label">Nama Bank :</label>
-          <input type="text" class="form-control" id="c" name="namabank[]" readonly>
+            <input type="hidden" class="form-control" id="c" name="namabank[]" readonly>
+          <input type="text" class="form-control" id="namabank" name="namabankshow[]" readonly>
         </div>
 
         <div class="form-group">
@@ -287,7 +288,8 @@ if ($_POST['no'] && $_POST['waktu']) {
           let json = JSON.parse(e.dataset.penerima)
           $("#emailBpu").val(json.email);
           $("#d").val(json.nomor_rekening);
-          $("#c").val(json.namabank);
+          $("#c").val(json.kode_bank);
+          $("#namabank").val(json.namabank);
       }
 
       $(document).on('click', '.btn-hapus-penerima', function() {
