@@ -54,17 +54,18 @@ if (isset($_POST['submit'])) {
   $statusbpu    = $_POST['statusbpu'];
   $tanggal_bayar = $_POST['tanggal_bayar'];
   $tanggalJatuhTempo = $_POST['tanggal_jatuh_tempo'];
+  $namapenerima = $_POST['namapenerima'];
 
-  if ($statusbpu == 'UM' || $statusbpu == 'UM Burek') {
-    $queryRekening = mysqli_query($koneksi, "SELECT * FROM rekening WHERE no=$id_rekening");
-    $rekening = mysqli_fetch_assoc($queryRekening);
-
-    $queryTbUser = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE id_user = '$rekening[user_id]'");
-    $tbUser = mysqli_fetch_assoc($queryTbUser);
-    $namapenerima = $tbUser['nama_user'];
-  } else {
-    $namapenerima = $_POST['namapenerima'];
-  }
+//  if ($statusbpu == 'UM' || $statusbpu == 'UM Burek') {
+//    $queryRekening = mysqli_query($koneksi, "SELECT * FROM rekening WHERE no=$id_rekening");
+//    $rekening = mysqli_fetch_assoc($queryRekening);
+//
+//    $queryTbUser = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE id_user = '$rekening[user_id]'");
+//    $tbUser = mysqli_fetch_assoc($queryTbUser);
+//    $namapenerima = $tbUser['nama_user'];
+//  } else {
+//    $namapenerima = $_POST['namapenerima'];
+//  }
 
   for ($i = 0; $i < count($arrnorek); $i++) {
     $norek .= $arrnorek[$i];
