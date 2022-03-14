@@ -9,6 +9,7 @@ require_once "application/controllers/Cuti.php";
 
 $con = new Database();
 $koneksi = $con->connect();
+$con->load_database($koneksi);
 
 $helperMessage = new Message();
 $whatsapp = new Whastapp();
@@ -419,6 +420,89 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
                 </table>
             </div>
         </div>
+            <div class="list-group-item border" id="grandparent2" style="border: 1px solid black !important;">
+                <div id="expander" data-target="#bpuPenerimaValidasiContent" data-toggle="collapse" data-group-id="grandparent<?= $i ?>" data-role="expander">
+
+                    <ul class="list-inline row border">
+                        <li class="col-lg-11"><?= $j++ ?>. Penerima BPU yang perlu di validasi</li>
+                        <li class="col-lg-1">
+                            <span id="bpuPenerimaValidasi" style="cursor: pointer; margin: 0 10px;" class="col-lg-1"><a><i class="fas fa-eye" title="View Rincian"></i></a></span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="collapse" id="bpuPenerimaValidasiContent" aria-expanded="true">
+                    <table class="table table-striped">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr class="warning">
+                                <th>No</th>
+                                <th>Item</th>
+                                <th>Penerima</th>
+                                <th>Rekening</th>
+                                <th>Action</th>
+                                <!-- <th>Pengajuan Request</th> -->
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            <?php
+                            $i = 1;
+                            $checkUnique = [];
+                            $sql = mysqli_query($koneksi, "SELECT a.*, b.namabank as nama_bank FROM tb_penerima a LEFT JOIN bank b ON a.kode_bank = b.kodebank WHERE a.is_validate = '0'");
+                            while ($d = mysqli_fetch_array($sql)) :
+                                $dataItem = $con->select("a.rincian, a.status, b.nama, b.jenis")
+                                            ->from("selesai a")
+                                            ->join("pengajuan b", "a.waktu = b.waktu")
+                                            ->where("a.id", "=", $d["item_id"])
+                                            ->first();
+
+                                ?>
+                                <tr>
+                                    <td><?= $i++ ?></td>
+                                    <td>
+                                        <li>
+                                            Nama Project: <?= $dataItem['nama'] ?>
+                                        </li>
+                                        <li>
+                                            Folder: <?= $dataItem['jenis'] ?>
+                                        </li>
+                                        <li>
+                                            Nama Item: <?= $dataItem['rincian'] ?>
+                                        </li>
+                                    </td>
+                                    <td>
+                                        <li>
+                                            Nama Penerima: <?= $d['nama_penerima'] ?>
+                                        </li>
+                                        <li>
+                                            Email Penerima: <?= $d['email'] ?>
+                                        </li>
+                                        <li>
+                                            Jabatan Penerima: <?= $d['jabatan'] ?>
+                                        </li>
+                                    </td>
+                                    <td>
+                                        <li>
+                                            Nama Pemilik Rekening: <?= $d['nama_pemilik rekening'] ?>
+                                        </li>
+                                        <li>
+                                            Bank: <?= $d['nama_bank'] ?>
+                                        </li>
+                                        <li>
+                                            Norek: <?= $d['nomor_rekening'] ?>
+                                        </li>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary" data-id="<?= $d["id"] ?>" onclick="validasiKonfirm(this)"><i class="fa fa-check"></i> Validate</button>
+                                    </td>
+                                </tr>
+
+                            <?php endwhile; ?>
+
+                            </tbody>
+                        </table>
+                </div>
+            </div>
         <?php endif; ?>
         <?php if ($_SESSION['hak_akses'] == 'Manager' || ($_SESSION['hak_akses'] == 'Pegawai2' && $_SESSION['level'] == 'Koordinator')) { ?>
           <div class="list-group-item border" id="bpu-eksternal-need-validasi" style="border: 1px solid black !important;">
@@ -838,6 +922,24 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
     </div>
   </div>
 
+  <div class="modal fade" id="validateReceiverBpuModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  Konfirmasi Validasi
+              </div>
+              <form method="POST" id="form_validate_receiver_bpu">
+                  <div class="modal-body">
+                      <p><i class="fa fa-check text-success"></i> Apakah anda yakin ingin memvalidasi penerima ini? </p>
+                  </div>
+                  <div class="modal-footer">
+                      <button type="submit" id="buttonValidate" class="btn btn-success success"><i class="fa fa-check"></i> Validasi</button>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </div>
+
   <script type="text/javascript">
     const emailUser = <?= json_encode($emailUser); ?>;
     const idUser = <?= json_encode($idUser); ?>;
@@ -848,6 +950,31 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
     const titleBpuEksternalVerifikasi = document.getElementById('title-text-bpu-eksternal');
     const titleReminderUmJatuhTempo = document.getElementById('title-reminder-um-jatuh-tempo')
     const reminderReminderUmJatuhTempo = document.getElementById('reminder-um-jatuh-tempo')
+
+    function validasiKonfirm(e) {
+        let form = document.getElementById("form_validate_receiver_bpu")
+        form.action = `ReceiverBpu.php?action=validate&id=${e.dataset.id}`
+        $('#validateReceiverBpuModal').modal('show')
+    }
+
+    $('#form_validate_receiver_bpu').on('submit', function (e) {
+        e.preventDefault();
+        let form = $(this);
+
+        const btnSubmit = $(this).find('button[type="submit"]');
+        btnSubmit.prop('disabled', true);
+
+        $.ajax({
+            type: 'post',
+            url: form[0].action,
+            data: form.serialize(),
+            success: function(data) {
+                let json = JSON.parse(data)
+                alert(json.message)
+                window.location.reload()
+            }
+        });
+    })
 
     $(document).ready(function() {
       $('#inputImageSign').change(function() {
