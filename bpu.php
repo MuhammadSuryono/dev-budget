@@ -3,6 +3,7 @@ require "application/config/database.php";
 
 $con = new Database();
 $koneksi = $con->connect();
+$con->load_database($koneksi);
 
 error_reporting(0);
 session_start();
@@ -22,9 +23,9 @@ while ($a = mysqli_fetch_assoc($queryAplikasi)) {
 if ($_POST['no'] && $_POST['waktu']) {
   $id = $_POST['no'];
   $waktu = $_POST['waktu'];
-  $code = $_POST['id'];
+  $code = isset($_POST['id']) ? $_POST['id'] : null;
 
-  $queryBpu = "SELECT max(term) as last_term, SUM(jumlah) as total FROM bpu WHERE no = '$no' AND waktu = '$waktu'";
+  $queryBpu = "SELECT max(term) as last_term, SUM(jumlah) as total FROM bpu WHERE no = '$id' AND waktu = '$waktu'";
   $mysqlQuery = mysqli_query($koneksi, $queryBpu);
 
   $lastTerm = 0;
@@ -52,7 +53,7 @@ if ($_POST['no'] && $_POST['waktu']) {
   $result = $koneksi->query($sql);
   foreach ($result as $baris) {
 
-
+    $itemId = $baris["id"];
   $totalPengajuan = $baris['total'];
   $sisaPembayaran = $totalPengajuan - $total;
 
@@ -87,51 +88,26 @@ if ($_POST['no'] && $_POST['waktu']) {
         <label for="rincian" class="control-label">Total BPU (IDR)s :</label>
         <input class="form-control" name="jumlah" id="id_step2-number_2" type="text">
       </div>
-
-      <!-- <div class="form-group">
-              <label for="tglcair" class="control-label">Tanggal Permintaan Pencairan :</label>
-                <input type="date" class="form-control" id="b" name="tglcair"
-                                  min="<?php
-                                        // date_default_timezone_set("Asia/Bangkok");
-                                        // $currentTime = date("H:i:s");
-                                        // if (date('H') >= 16) {
-                                        // $date1 = date('Y-m-d', strtotime("+2 day")); echo $date1;
-                                        // }else{
-                                        // $date2 = date('Y-m-d', strtotime("+1 day")); echo $date2;
-                                        // }
-                                        ?>">
-            </div> -->
-
-
-
       <?php
       $statusbpu = $baris['status'];
 
-      if ($statusbpu == 'UM' || $statusbpu == 'UM Burek') {
+      if ($statusbpu == 'UM' || $statusbpu == 'UM Burek' || $statusbpu == 'Biaya Lumpsum') {
       ?>
         <div class="form-group">
           <label for="id_rekening" class="control-label">Nama Penerima: <span data-toggle="tooltip" title="Pembuat BPU tidak bisa ditujukan sebagai penerima BPU"><i class="fa fa-question-circle"></i></span></label>
-          <select class="form-control" id="id_rekening" name="id_rekening" onchange="ambil_rekening(this.value)">
+          <select class="form-control" id="id_rekening" name="id_rekening">
             <option selected disabled>Pilih Nama Penerima</option>
             <?php
-            $queryRekening = "SELECT a.*, b.namabank, c.id_user FROM rekening a JOIN bank b ON b.kodebank = a.bank JOIN tb_user c ON c.id_user = a.user_id WHERE status = 'internal' ORDER BY a.nama";
-            $run_queryRekening = $koneksi->query($queryRekening);
-            foreach ($run_queryRekening as $rq) {
+            $penerima = $con->select("a.*, b.namabank")->from("tb_penerima a")
+                ->join("bank b", "a.kode_bank = b.kodebank", "LEFT")
+                ->where("a.is_validate", "=", true)
+                ->where("a.item_id", "=", $itemId)->get();
+            foreach ($penerima as $rq) {
             ?>
-              <option value="<?php echo $rq['no']; ?>" <?= ($rq['id_user'] == $id_user) ? "disabled" : ""; ?>><?php echo $rq['nama'] . ' - ' . $rq['rekening'] . ' - ' . $rq['namabank'] ?></option>
+              <option value="<?php echo $rq['nama_penerima']; ?>" data-penerima="<?= htmlspecialchars(json_encode($rq)) ?>" onclick="ambil_rekening(this)"><?php echo $rq['nama_penerima'] . ' - ' . $rq['nomor_rekening'] . ' - ' . $rq['namabank'] ?></option>
             <?php
             }
             ?>
-            <?php if ($_POST['page'] == 'views') : ?>
-              <?php
-              // $queryAplikasi = mysqli_query($koneksi, "SELECT * FROM daftar_aplikasi_pembayaran ORDER BY nama_aplikasi");
-              // while ($a = mysqli_fetch_assoc($queryAplikasi)) :
-              foreach ($aplikasi as $a) :
-              ?>
-                <!-- <option value="">a</option> -->
-                <!-- <option value="<?= $a ?>"><?= $a ?></option> -->
-              <?php endforeach; ?>
-            <?php endif; ?>
           </select>
         </div>
 
@@ -156,6 +132,9 @@ if ($_POST['no'] && $_POST['waktu']) {
           <input type="number" class="form-control" id="d" name="norek[]" readonly>
         </div>
 
+          <?php
+          if ($statusbpu != 'Biaya Lumpsum') {
+          ?>
         <div class="form-group">
           <label for="namabank" class="control-label">Tanggal Pembayaran :</label>
           <input type="date" class="form-control" name="tanggal_bayar" id="tanggal-bayar" min="<?= date('Y-m-d', strtotime($Date . ' + 1 days')) ?>">
@@ -165,11 +144,12 @@ if ($_POST['no'] && $_POST['waktu']) {
           <label for="namabank" class="control-label">Tanggal Jatuh Tempo :</label>
           <input type="date" class="form-control" name="tanggal_jatuh_tempo" id="tanggal-jatuh-tempo" min="<?= date('Y-m-d', strtotime($Date . ' + 2 days')) ?>" required>
         </div>
+              <?php } ?>
 
         <button class="btn btn-primary" type="submit" name="submit">SUBMIT</button>
 
       <?php
-      } else if ($statusbpu == 'Biaya' || $statusbpu == 'Biaya Lumpsum') {
+      } else if ($statusbpu == 'Biaya') {
       ?>
         <div class="form-group">
           <label class="control-label">Upload File <a href="#" data-toggle="tooltip" title="Upload File Rincian BPU"><i class="fa fa-question-circle"></i></a></label>
@@ -303,34 +283,11 @@ if ($_POST['no'] && $_POST['waktu']) {
         }
       }
 
-      function ambil_rekening(id_user) {
-        $("#d").val('');
-        $("#c").val('');
-        $("#emailBpu").val('');
-        $.ajax({
-            url: 'bpuajax.php',
-            type: 'post',
-            dataType: 'json',
-            data: {
-              actions: 'ambil_rekening',
-              id_user: id_user
-            }
-          })
-          .done(function(data) {
-            console.log(data);
-            if (data != '') {
-              $("#emailBpu").val(data.email);
-              $("#d").val(data.rekening);
-              $("#c").val(data.bank);
-            } else {
-              $("#emailBpu").val('');
-              $("#d").val('');
-              $("#c").val('');
-            }
-          })
-          .fail(function() {
-            console.log('Gagal');
-          });
+      function ambil_rekening(e) {
+          let json = JSON.parse(e.dataset.penerima)
+          $("#emailBpu").val(json.email);
+          $("#d").val(json.nomor_rekening);
+          $("#c").val(json.namabank);
       }
 
       $(document).on('click', '.btn-hapus-penerima', function() {

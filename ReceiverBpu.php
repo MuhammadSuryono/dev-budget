@@ -23,12 +23,12 @@ class ReceiverBpu extends Database
 
     public function get_receiver_validate()
     {
-        return $this->select("tb_penerima")->where("is_validate", true)->where("item_id", $_GET["itemId"])->get();
+        return $this->select("*")->from("tb_penerima")->where("is_validate", "=", true)->where("item_id", "=", $_GET["itemId"])->get();
     }
 
     public function get_receiver_all()
     {
-        return $this->select("tb_penerima")->where("item_id", $_GET["itemId"])->get();
+        return $this->select("*")->from("tb_penerima")->where("item_id", "=", $_GET["itemId"])->get();
     }
 
     public function alert($message)
@@ -46,9 +46,9 @@ $action = $_GET["action"];
 if ($action == "save") {
     $isSaved = $receiver->save_receiver();
     if ($isSaved) {
-        $receiver->alert("Data berhasil disimpan");
+        echo json_encode(["message" => "Berhasil menambahkan data penerima. Data penerima akan divalidasi oleh Manager Finance"]);
     } else {
-        $receiver->alert("Data gagal disimpan");
+        echo json_encode(["message" => "Data gagal ditambahkan, Coba lagi!. Jika masih menemukan kesalahan yang sama, informasikan pada tim IT."]);
     }
 }
 

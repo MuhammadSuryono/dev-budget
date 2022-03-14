@@ -60,8 +60,8 @@ class ModelBudget
     public function join($table, $on, $type = null)
     {
         $typeJoin = ' JOIN ';
-        if ($type != null) $typeJoin = $type . $typeJoin;
-        $this->joins .= $typeJoin . $table . ' ' . $on;
+        if ($type != null) $typeJoin = " " . $type . " ". $typeJoin;
+        $this->joins .= $typeJoin . $table . ' ON ' . $on;
         return $this;
     }
 
@@ -102,6 +102,7 @@ class ModelBudget
     private function set_query_select()
     {
         $query = $this->select . ' FROM ' . $this->from;
+        if ($this->joins != null) $query .= $this->joins;
         if ($this->condition != null) $query .= ' WHERE ' . $this->condition;
         if ($this->orderColumn !== null) $query .= ' ORDER BY ' . $this->orderColumn . ' ' . $this->typeOrder;
         if ($this->limitData != 0) $query .= ' LIMIT ' . $this->limitData;
