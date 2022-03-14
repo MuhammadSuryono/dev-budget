@@ -635,6 +635,7 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
                 <th>Divisi</th>
                 <th>Action</th>
                 <th>Status</th>
+                  <th>Validasi</th>
                 <th>Keterangan</th>
                 <!-- <th>Pengajuan Request</th> -->
               </tr>
@@ -684,6 +685,15 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
                     <td><?php echo $d['divisi']; ?></td>
                     <td><a href="view-request.php?id=<?php echo $d['id']; ?>"><i class="fas fa-eye" title="View"></i></a></td>
                     <td><?php echo $d['status_request']; ?></td>
+                      <td class="text-center">
+                          <?php
+                          if ($d['status_request'] == "Butuh Validasi") {
+                              echo "<i class='fa fa-exclamation text-danger'></i>";
+                          } elseif ($d['status_request'] == "Di Ajukan" && $d["validator"] != null) {
+                              echo "<i class='fa fa-check text-success'></i>";
+                          }
+                          ?>
+                      </td>
                     <?php if ($d['status_request'] == 'Di Ajukan') : ?>
                       <td><?= ($d['submission_note']) ? $d['submission_note'] : '-' ?></td>
                     <?php else : ?>
