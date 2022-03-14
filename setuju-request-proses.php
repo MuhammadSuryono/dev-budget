@@ -1,4 +1,5 @@
 <?php
+error_reporting(0);
 session_start();
 require "application/config/database.php";
 require_once "application/config/whatsapp.php";

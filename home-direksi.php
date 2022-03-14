@@ -1,5 +1,5 @@
 <?php
-// error_reporting(0);
+ error_reporting(0);
 session_start();
 
 require "application/config/database.php";
@@ -101,6 +101,7 @@ $setting = mysqli_fetch_assoc($querySetting);
               <li><a href="antrian-transfer.php">Antrian Transfer</a></li>
             </ul>
           </li>
+          <li><a href="matriks-wewenang.php">Matriks Wewenang</a></li>
 
           <!-- <li><a href="history-direksi.php">History</a></li> -->
         </ul>
@@ -304,6 +305,7 @@ $setting = mysqli_fetch_assoc($querySetting);
               <th>Divisi</th>
               <th>Action</th>
               <th>Status</th>
+              <th>Validasi</th>
               <th>Keterangan</th>
               <!-- <th>Pengajuan Request</th> -->
             </tr>
@@ -356,6 +358,15 @@ $setting = mysqli_fetch_assoc($querySetting);
                     <a href="hapus-view-request.php?id=<?php echo $d['id']; ?>" onclick="return confirm('Anda yakin ingin menghapus data pengajuan?')"><i class="fas fa-trash" title="Delete"></i></a>
                   </td>
                   <td><?php echo $d['status_request']; ?></td>
+                    <td class="text-center">
+                        <?php
+                            if ($d['status_request'] == "Butuh Validasi") {
+                                echo "<i class='fa fa-exclamation text-danger'></i>";
+                            } elseif ($d['status_request'] == "Di Ajukan" && $d["validator"] != null) {
+                                echo "<i class='fa fa-check text-success'></i>";
+                            }
+                        ?>
+                    </td>
                   <?php if ($d['status_request'] == 'Di Ajukan') : ?>
                     <td><?= ($d['submission_note']) ? $d['submission_note'] : '-' ?></td>
                   <?php else : ?>

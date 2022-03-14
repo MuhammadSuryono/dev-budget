@@ -10,6 +10,7 @@ class ModelBudget
 
     private $data;
     private $updates;
+    private $deletes;
     private $setValueUpdate;
 
     private $queryString;
@@ -59,8 +60,8 @@ class ModelBudget
     public function join($table, $on, $type = null)
     {
         $typeJoin = ' JOIN ';
-        if ($type != null) $typeJoin = $type . $typeJoin;
-        $this->joins .= $typeJoin . $table . ' ' . $on;
+        if ($type != null) $typeJoin = " " . $type . " ". $typeJoin;
+        $this->joins .= $typeJoin . $table . ' ON ' . $on;
         return $this;
     }
 
@@ -83,10 +84,14 @@ class ModelBudget
 
     public function first()
     {
-        $this->set_query_select();
-        $query = mysqli_query($this->mysql, $this->get_query());
-        $this->data = mysqli_fetch_assoc($query);
-        return $this->data;
+        try {
+            $this->set_query_select();
+            $query = mysqli_query($this->mysql, $this->get_query());
+            $this->data = mysqli_fetch_assoc($query);
+            return $this->data;
+        } catch (Exception $exception) {
+            die($exception);
+        }
     }
 
     public function get_query()
@@ -97,6 +102,7 @@ class ModelBudget
     private function set_query_select()
     {
         $query = $this->select . ' FROM ' . $this->from;
+        if ($this->joins != null) $query .= $this->joins;
         if ($this->condition != null) $query .= ' WHERE ' . $this->condition;
         if ($this->orderColumn !== null) $query .= ' ORDER BY ' . $this->orderColumn . ' ' . $this->typeOrder;
         if ($this->limitData != 0) $query .= ' LIMIT ' . $this->limitData;
@@ -114,7 +120,7 @@ class ModelBudget
     public function set_value_update($column, $value)
     {
         $setValue = $this->setValueUpdate;
-        $setValue .= $setValue == null ? " SET " . $column . " = " . "'" . $value . "'" : ", " .$column . " = " . "'" . $value . "'";
+        $setValue .= $setValue == null ? " SET `" . $column . "` = " . "'" . $value . "'" : ", `" .$column . "` = " . "'" . $value . "'";
 
         $this->setValueUpdate = $setValue;
         return $this;
@@ -155,7 +161,7 @@ class ModelBudget
         $totalValueInsert = count($this->setValueInsert);
 
         foreach ($this->setValueInsert as $key => $val) {
-            $columns .= $index + 1 != $totalValueInsert ? $key . "," : $key ;
+            $columns .= $index + 1 != $totalValueInsert ? "`$key`" . "," : "`$key`" ;
             $value .= $index + 1 != $totalValueInsert ? "'".$val."'," : "'".$val."'";
 
             $index++;
@@ -202,5 +208,23 @@ class ModelBudget
     public function get_id_insert()
     {
         return mysqli_insert_id($this->mysql);
+    }
+
+    public function delete($table)
+    {
+        $this->reset_value();
+        $this->deletes = 'DELETE FROM ' . $table;
+        return $this;
+    }
+
+    public function save_delete()
+    {
+        $query = $this->deletes;
+        if ($this->condition != null) $query .= ' WHERE ' . $this->condition;
+        else die('Error query: not found condition' );
+
+        $this->queryString = $query;
+
+        return mysqli_query($this->mysql, $query);
     }
 }

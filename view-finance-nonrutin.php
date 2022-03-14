@@ -6,6 +6,7 @@ require "application/config/helper.php";
 
 $con = new Database();
 $koneksi = $con->connect();
+$con->load_database($koneksi);
 
 $con->set_name_db(DB_TRANSFER);
 $con->init_connection();
@@ -275,7 +276,7 @@ $helper = new Helper();
                       $selno = mysqli_query($koneksi, "SELECT no FROM selesai WHERE waktu ='$waktu'");
                       $wkwk = mysqli_fetch_assoc($selno);
                       $no = $wkwk['no'];
-                      $liatbayarth = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no'");
+                      $liatbayarth = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no' AND status_pengajuan_bpu != 2");
                       if (mysqli_num_rows($liatbayarth) == 0) {
                         echo "";
                       } else {
@@ -304,7 +305,22 @@ $helper = new Helper();
                           <td><?php echo $a['rincian']; ?></td>
                           <td><?php echo $a['kota']; ?></td>
                           <td><?php echo $a['status']; ?></td>
-                          <td><?php echo $a['penerima']; ?></td>
+                            <td>
+                                <?php echo $a['penerima']; ?><br/>
+                                <?php
+                                if (in_array($a['status'], ["UM", "UM Burek", "Biaya Lumpsum"])) {
+                                    $listReceiver = $con->select("*")->from("tb_penerima")
+                                        ->where("item_id", "=", $a["id"])->get();
+                                    echo "<ul>";
+                                    foreach ($listReceiver as $key => $value) {
+                                        $iconValidate = $value["is_validate"] == 1 ? "<i class='fa fa-check text-success'></i>": "<i class='fa fa-exclamation text-danger'></i>";
+                                        $title = $value["is_validate"] == 1 ? "Terverifikasi oleh $value[validator]": "Belum Terverifikasi";
+                                        echo "<li>$value[nama_penerima] ($value[jabatan]) - <span class='text-center' title='$title'>$iconValidate</span></li>";
+                                    }
+                                    echo "</ul>";
+                                }
+                                ?>
+                            </td>
                           <td><?php echo 'Rp. ' . number_format($a['harga'], 0, '', ','); ?></td>
                           <td><?php echo $a['quantity']; ?></td>
                           <td><?php echo 'Rp. ' . number_format($a['total'], 0, '', ','); ?></td>
@@ -348,6 +364,10 @@ $helper = new Helper();
                             // }
                             // else{
                             if ($a['status'] == 'UM' || $a['status'] == 'UM Burek' || $a['status'] == 'Finance' || $a['status'] == 'Pulsa' || $a['status'] == 'Biaya' || $a['status'] == 'Biaya Lumpsum') {
+                                if ($a['status'] == 'Biaya Lumpsum' || $a['status'] == 'UM' || $a['status'] == 'UM Burek') {
+                                    $id = $a["id"];
+                                    echo '<button type="button" class="btn btn-primary btn-small" onclick="showModalAddReceiverBpu('.$id.')">Tambah Penerima</button><br/>';
+                                }
                             ?>
                               <!-- <button type="button" class="btn btn-default btn-small" onclick="edit_budget('<?php echo $no; ?>','<?php echo $waktu; ?>')">Bayar</button> -->
                               <?php
@@ -373,7 +393,7 @@ $helper = new Helper();
                           <?php
                           // }
                           $arrCheck = [];
-                          $liatbayar = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no'");
+                          $liatbayar = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no' AND status_pengajuan_bpu != 2");
                           if (mysqli_num_rows($liatbayar) == 0) {
                             echo "";
                           } else {
@@ -1172,6 +1192,63 @@ $helper = new Helper();
           </div>
         </div>
       </div>
+        <?php
+        $queryBank = mysqli_query($koneksi, "SELECT * FROM bank");
+        ?>
+        <div class="modal fade" id="tambahPenerima" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Tambah Data Penerima</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form id="form_add_receiver_bpu" method="post">
+                            <input type="hidden" id="item_id" name="item_id">
+                            <div class="form-group">
+                                <label for="id_tb_user">Nama Penerima:</label>
+                                <input type="text" class="form-control" name="nama_penerima" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="id_tb_user">Email Penerima:</label>
+                                <input type="text" class="form-control" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="id_tb_user">Jabatan:</label>
+                                <select class="form-control" name="jabatan" required>
+                                    <option value="">Pilih Jabatan</option>
+                                    <option value="Kepala Divisi">Kepala Divisi</option>
+                                    <option value="Staff">Staff</option>
+                                    <option value="Interviewer">Interviewer</option>
+                                    <option value="Responder">Responder</option>
+                                    <option value="Translater">Translater</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="id_tb_user">Nama Penerima Sesuai Rekening:</label>
+                                <input type="text" class="form-control" name="nama_pemilik_rekening" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="status">Bank :</label>
+                                <select class="form-control" name="kode_bank" required>
+                                    <?php while ($item = mysqli_fetch_assoc($queryBank)) : ?>
+                                        <option value="<?= $item['kodebank'] ?>"><?= $item['namabank'] ?></option>
+                                    <?php endwhile; ?>
+                                </select>
+                            </div>
+
+                            <label for="status">Nomor Rekening :</label>
+                            <div class="form-group">
+                                <input type="text" name="nomor_rekening" class="form-control" required>
+                            </div>
+
+                            <button class="btn btn-primary" type="submit" name="submit" value="submit">Submit</button>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
 
       <?php
@@ -1180,8 +1257,55 @@ $helper = new Helper();
       ?>
 
       <script type="text/javascript">
+          const params = new URLSearchParams(window.location.search)
+
+          function get_query(key)
+          {
+              return params.get(key)
+          }
+
+          function get_verifikasi()
+          {
+              let isVerifikasi = get_query("action") == "verifikasi"
+              if (isVerifikasi) {
+                  let no = get_query("no")
+                  let waktu = get_query("waktu")
+                  let term = get_query("term")
+                  verifikasiBpu(no, waktu, term)
+              }
+          }
+
+          function showModalAddReceiverBpu(idItem)
+          {
+              $('#tambahPenerima').modal('show')
+              $('#form_add_receiver_bpu')[0].reset()
+              let form = document.getElementById("form_add_receiver_bpu")
+              let itemId = document.getElementById("item_id")
+              form.action = "ReceiverBpu.php?action=save"
+              itemId.value = idItem
+          }
+
+          $('#form_add_receiver_bpu').on('submit', function (e) {
+              e.preventDefault();
+              let form = $(this);
+              const btnSubmit = $(this).find('button[type="submit"]');
+              btnSubmit.prop('disabled', true);
+
+              $.ajax({
+                  type: 'post',
+                  url: form[0].action,
+                  data: form.serialize(),
+                  success: function(data) {
+                      let json = JSON.parse(data)
+                      alert(json.message)
+                      window.location.reload()
+                  }
+              });
+          })
+
         $(document).ready(function() {
           $('.umo_biaya_kode_id').select2();
+          get_verifikasi()
 
           $('#fileInputNewFileBpu').change(function() {
             readURLNewFileBpu(this);

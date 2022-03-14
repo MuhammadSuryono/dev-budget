@@ -52,10 +52,10 @@ $tanggalbayar = $_POST['tanggalbayar'];
 $alasanTolakBpu = $_POST['alasanTolakBpu'];
 $rekening_sumber_mri_pal = $_POST['rekening_sumber_mri_pal'];
 $rekening_sumber_mri_kas = $_POST['rekening_sumber_mri_kas'];
+$metodePembayaran = $_POST["metode_pembayaran"];
 
 $arrPengajuanJumlah = $_POST['pengajuan_jumlah'];
 $arrNoid = $_POST['noid'];
-$arrMetodePembayaran = $_POST['metode_pembayaran'];
 
 $jenisPajak = $_POST['jenispajak'];
 $nominalPajak = $_POST['nominalpajak'];
@@ -75,16 +75,24 @@ if ($budget['jenis'] == 'Non Rutin') {
 if ($urgent == 'Urgent') {
     $tanggalbayar = $time;
 } else {
-    $d = mktime(8, 15, 0);
-    $hour = date("H:i:s", $d);
+    $startHour = 8;
+    $maxHour = 12;
+    $startMinute = 10;
+    $maxMinute = 59;
+    $hourNow = date('H');
+    $minuteNow = date('i');
+
     $dateNow = date("Y-m-d");
 
     if ($_POST['tanggalbayar'] == $dateNow) {
-        $dateTime = date("H:i:s", time() + 7200);
-        $tanggalbayar = $_POST['tanggalbayar'] . ' ' . $dateTime;
-    } else {
-        $tanggalbayar = $_POST['tanggalbayar'] . ' ' .  $hour;
+        if ($hourNow > $startHour) {
+            $startHour = $startHour + ($hourNow - $startHour);
+        }
     }
+
+    $minute = str_pad(mt_rand($startMinute,$maxMinute), 2, "0", STR_PAD_LEFT);
+    $dateTime = mt_rand((int)$startHour,(int)$maxHour).":".$minute.":00";
+    $tanggalbayar = $_POST['tanggalbayar'] . ' ' .  $dateTime;
 
 }
 
@@ -131,9 +139,12 @@ $duplicateNumber = [];
 $urlCallback = getHostUrl() . "/api/callback.php";
 
 if ($_POST['submit'] == 1) {
-    
     $index = 0;
     foreach ($dataBpuItem as $item) {
+        if ($metodePembayaran != "") {
+            $item['metode_pembayaran'] = $metodePembayaran;
+        }
+
         array_push($arrPembayaran, $item['metode_pembayaran']);
         array_push($arrPenerima, $item['namapenerima']);
         if ($item['jumlah'] != 0) {
@@ -162,7 +173,7 @@ if ($_POST['submit'] == 1) {
         }
 
         if ($isEksternalProcess) {
-            $update = mysqli_query($koneksi, "UPDATE bpu SET jumlah = '$arrPengajuanJumlah[$index]', jenis_pajak = '$jenisPajak', nominal_pajak = '$nominalPajak', checkby = '$userSetuju', tglcheck='$time' WHERE noid = '$arrNoid[$index]'");
+            $update = mysqli_query($koneksi, "UPDATE bpu SET metode_pembayaran = '$item[metode_pembayaran]' ,jumlah = '$arrPengajuanJumlah[$index]', jenis_pajak = '$jenisPajak', nominal_pajak = '$nominalPajak', checkby = '$userSetuju', tglcheck='$time' WHERE noid = '$arrNoid[$index]'");
             $item['jumlah'] = $arrPengajuanJumlah[$index];
         }
 
@@ -257,7 +268,7 @@ if ($_POST['submit'] == 1) {
             $queryJenisPembayaran = mysqli_query($koneksiMriTransfer, "SELECT * FROM jenis_pembayaran WHERE jenispembayaran = '$item[statusbpu]'");
             $jenisPembayaran = mysqli_fetch_assoc($queryJenisPembayaran);
 
-            $typeKas = typeKas($item['statusbpu']);
+            $typeKas = typeKas($budget['jenis'], $item['statusbpu']);
             $queryKas = mysqli_query($koneksiDevelop, "SELECT rekening FROM kas WHERE label_kas = '$typeKas'");
             $kas = mysqli_fetch_assoc($queryKas);
             if ($typeKas == U_UNDEFINED_VARIABLE) {
@@ -358,7 +369,10 @@ if ($_POST['submit'] == 1) {
         
 
     } else {
-        $update = mysqli_query($koneksi, "UPDATE bpu SET status_pengajuan_bpu =0, persetujuan = '$persetujuan', jenis_pajak = '$jenisPajak', nominal_pajak = '$nominalPajak', tanggalbayar = '$tanggalbayar', urgent = '$urgent', approveby = '$userSetuju', tglapprove = '$time'
+        if ($metodePembayaran != "") {
+            $dataBpuItem['metode_pembayaran'] = $metodePembayaran;
+        }
+        $update = mysqli_query($koneksi, "UPDATE bpu SET metode_pembayaran = '$dataBpuItem[metode_pembayaran]', status_pengajuan_bpu =0, persetujuan = '$persetujuan', jenis_pajak = '$jenisPajak', nominal_pajak = '$nominalPajak', tanggalbayar = '$tanggalbayar', urgent = '$urgent', approveby = '$userSetuju', tglapprove = '$time'
                                WHERE no='$no' AND waktu='$waktu' AND persetujuan='Belum Disetujui' AND term=$term");
         $update = mysqli_query($koneksi, "UPDATE bpu_verify SET is_need_approved = '0', status_approved = '1', is_approved = '1' WHERE id = '$bpuVerify[id]'");
     }
@@ -611,16 +625,16 @@ if ($update) {
     }
 }
 
-function typeKas($statusBpu = "") {
-    $project = ["Vendor/Supplier", "Honor Area Head", "Honor Eksternal"];
+function typeKas($typeBudget, $statusBpu = "") {
+    $project = ["B1", "B2"];
     $uangMuka = ["UM", "UM Burek"];
-    $umum = [];
+    $umum = ['Rutin', 'Non Rutin'];
 
-    if (in_array($statusBpu, $project)) {
+    if (in_array($typeBudget, $project) && !in_array($statusBpu, $uangMuka)) {
         return "Kas Project";
     } else if (in_array($statusBpu, $uangMuka)) {
         return "Kas Uang Muka";
-    } else if (in_array($statusBpu, $umum)) {
+    } else if (in_array($typeBudget, $umum) && !in_array($statusBpu, $uangMuka)) {
         return "Kas Umum";
     }
 

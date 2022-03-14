@@ -37,7 +37,7 @@ $queryUser = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE id_user = '$_SE
 $user = mysqli_fetch_assoc($queryUser);
 $buttonAkses = unserialize($user['hak_button']);
 
-$queryRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE stat = 'MRI'");
+$queryRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE stat = 'MRI' AND type_kas = 'mri-pall'");
 
 $batasWaktu = date('Y-m-d H:i:s', strtotime('-2hours'));
 $update = mysqli_query($koneksiTransfer, "UPDATE data_transfer SET hasil_transfer = 3, ket_transfer = 'Jadwal Terlewat' WHERE jadwal_transfer < '$batasWaktu' AND hasil_transfer = 1 AND ket_transfer = 'Antri'") or die(mysqli_error($koneksiTransfer));
@@ -267,8 +267,7 @@ $update = mysqli_query($koneksiTransfer, "UPDATE data_transfer SET hasil_transfe
                                                             } else {
                                                                 $transfer_type = 'Transfer Auto';
                                                             }
-
-                                                            $bpuQuery = mysqli_query($koneksi, "SELECT term FROM bpu where nomorstkb = '$data[nomor_stkb]' LIMIT 1");
+                                                            $bpuQuery = mysqli_query($koneksi, "SELECT term,termstkb FROM bpu where nomorstkb = '$data[nomor_stkb]' AND noid='$data[noid_bpu]' LIMIT 1");
                                                             $bpu = mysqli_fetch_assoc($bpuQuery);
                                                         ?>
                                                             <tr>
@@ -278,7 +277,7 @@ $update = mysqli_query($koneksiTransfer, "UPDATE data_transfer SET hasil_transfe
                                                                 <td><?php echo $data['keterangan'] ?></td>
                                                                 <td><?php echo ($data['jadwal_transfer']) ? $data['jadwal_transfer'] : '-' ?></td>
                                                                 <td><?php echo $data['nomor_stkb'] ?></td>
-                                                                <td><?php echo $bpu['term'] ?></td>
+                                                                <td><?php echo $data['keterangan'] == 'STKB' ? $bpu['termstkb']:$bpu['term'] ?></td>
                                                                 <td><?php echo $data['pemilik_rekening'] ?></td>
                                                                 <td><?php echo $data['norek'] ?></td>
                                                                 <td><?php echo $data['bank'] ?></td>
@@ -326,8 +325,8 @@ $update = mysqli_query($koneksiTransfer, "UPDATE data_transfer SET hasil_transfe
                                                 $getRekening = mysqli_query($koneksiDevelop, "SELECT a.*, b.saldo, b.saldo_id FROM kas a LEFT JOIN ".DB_MRI_TRANSFER.".saldo b ON b.rekening = a.rekening WHERE a.label_kas = 'Kas Umum' order by saldo_id desc LIMIT 1") or die(mysqli_error($koneksi));
                                                 $rekening = mysqli_fetch_assoc($getRekening);
 
-                                                $queryTotalProject = mysqli_query($koneksiTransfer, "SELECT SUM(jumlah) AS total  FROM data_transfer WHERE hasil_transfer = 1 AND ket_transfer = 'Antri' AND jenis_project IN ('B1', 'B2', 'STKB OPS', 'STKB TRK Jakarta','STKB TRK Luar Kota') AND keterangan NOT IN ('UM', 'UM Burek') AND jadwal_transfer IS NOT NULL ORDER BY transfer_id desc");
-                                                $totalProject = mysqli_fetch_assoc($queryTotalProject);
+                                                $queryTotalProject = mysqli_query($koneksiTransfer, "SELECT SUM(jumlah) AS total  FROM data_transfer WHERE hasil_transfer = 1 AND ket_transfer = 'Antri' AND jenis_project IN ('Rutin', 'Non Rutin') AND keterangan NOT IN ('UM', 'UM Burek') AND jadwal_transfer IS NOT NULL ORDER BY transfer_id desc");
+                                                $totalUmum = mysqli_fetch_assoc($queryTotalProject);
                                                 ?>
 
                                                 <p><?= $rekening['label_kas'] ?>, Nomor Rekening: <?= $rekening['rekening'] ?></p>
@@ -335,7 +334,7 @@ $update = mysqli_query($koneksiTransfer, "UPDATE data_transfer SET hasil_transfe
                                                 Saldo Akhir :
                                                 <b><?php echo 'Rp. ' . number_format($rekening['saldo'], 0, '', ','); ?></b><br>
                                                 Total Biaya :
-                                                <b><?php echo 'Rp. ' . number_format($totalProject['total'], 0, '', ','); ?></b><br>
+                                                <b><?php echo 'Rp. ' . number_format($totalUmum['total'], 0, '', ','); ?></b><br>
                                             </h5>
                                         </div>
                                         <!-- /.card-header -->
@@ -718,7 +717,7 @@ $update = mysqli_query($koneksiTransfer, "UPDATE data_transfer SET hasil_transfe
                         $querySaldo = mysqli_query($koneksiMriTransfer, "SELECT * FROM saldo WHERE rekening = '$item[rekening]' ORDER BY saldo_id DESC LIMIT 1");
                         $getSaldo = mysqli_fetch_assoc($querySaldo);
 
-                        $countTotal = mysqli_query($koneksiTransfer, "SELECT SUM(jumlah) AS total FROM data_transfer WHERE rekening_sumber = '$item[rekening]' AND hasil_transfer = 1 AND ket_transfer = 'Antri'");
+                        $countTotal = mysqli_query($koneksiTransfer, "SELECT SUM(jumlah) AS total FROM data_transfer WHERE rekening_sumber = '$item[rekening]' AND hasil_transfer = 1 AND ket_transfer = 'Antri' AND jadwal_transfer IS not NULL");
                         $total = mysqli_fetch_assoc($countTotal);
 
                         if ($getSaldo['saldo'] < $total['total']) :

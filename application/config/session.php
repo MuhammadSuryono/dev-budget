@@ -1,6 +1,7 @@
 <?php
 
 require_once "database.php";
+require_once "httpRequest.php";
 
 class Session {
 
@@ -26,28 +27,23 @@ class Session {
 
     public function setAuthLogin($idUser, $password = "")
     {
-        $con = new Database();
-        $dataSession = [];
-        $queryLogin = "SELECT * FROM tb_user WHERE id_user='$idUser'";
-        if ($password != "") {
-            $queryLogin .= " AND password = '$password'";
-        }
+        $resp = HTTPRequester::HTTPPost('/auth/login', ["username" => $idUser, "password" => $password], "json");
 
-        $sql = mysqli_query($con->connect(), $queryLogin);
-        if (mysqli_num_rows($sql) == 1) {
-            $dataUser = mysqli_fetch_assoc($sql);
+        if ($resp->status == true) {
+            $dataUser = $resp->data;
             $dataSession = [
-                "nama_user" => $dataUser["nama_user"],
-                "divisi" => $dataUser["divisi"],
-                "jabatan" => $dataUser["level"],
-                "hak_akses" => $dataUser["hak_akses"],
-                "id_user" => $dataUser["id_user"],
-                "hak_page" => $dataUser["hak_page"],
+                "nama_user" => $dataUser->nama_user,
+                "divisi" => $dataUser->divisi,
+                "jabatan" => $dataUser->level,
+                "hak_akses" => $dataUser->hak_akses,
+                "id_user" => $dataUser->id_user,
+                "hak_page" => $dataUser->hak_page,
                 "is_session" => true,
-                "level" => $dataUser["level"]
+                "level" => $dataUser->level,
+                "role" => $dataUser->role
             ];
             
-            if($dataUser["aktif"] == "Y") {
+            if($dataUser->aktif == "Y") {
                 $this->setSession($dataSession);
                 return true;
             } else {

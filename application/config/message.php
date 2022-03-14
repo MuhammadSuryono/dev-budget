@@ -1,40 +1,40 @@
 <?php
+date_default_timezone_set('Asia/Jakarta');
 
 class Message {
 
     public function messageTolakPengajuanBudget($pengaju, $namaProject, $divisi, $totalbudget, $penolak, $alasan)
     {
-        $msg = "Dear $pengaju, <br><br>
-Budget dengan keterangan berikut:<br><br>
-Nama Project    : <strong>$namaProject</strong><br>
-Pengaju         : <strong>$pengaju</strong><br>
-Divisi          : <strong>$divisi</strong><br>
-Total Budget    : <strong>Rp. " . number_format($totalbudget, 0, '', ',') . "</strong><br><br>
+        return "Dear $pengaju, 
+Budget dengan keterangan berikut:
+Nama Project    : *$namaProject*
+Pengaju         : *$pengaju*
+Divisi          : *$divisi*
+Total Budget    : *Rp. " . number_format($totalbudget, 0, '', ',') . "*
 
-Telah Ditolak oleh <strong> $penolak </strong> pada <strong> " . date("d/m/Y H:i:s") . "</strong> dengan keterangan <strong>$alasan</strong><br><br>
-        ";
+Telah Ditolak oleh *$penolak* pada *" . date("d/m/Y H:i:s") . "* dengan keterangan *$alasan*
 
-        return $msg;
+
+Terimakasih";
     }
 
 
-    public function messageCreateProject($namaCreatorBudget, $namaUserPic, $pembuat, $projectName, $divisi, $urlPengajuan, $judul)
+    public function messageCreateProject($namaCreatorBudget, $namaUserPic, $pembuat, $projectName, $folderBudget, $divisi, $urlPengajuan)
     {
-        $msg = "
-*$judul*
+        return "
+*Notifikasi Pembukaan Akses Folder Budget*
         
 Dear $namaCreatorBudget,
 Akses untuk pengajuan budget telah dibuka oleh *$pembuat* pada *" . date("d/m/Y H:i:s") . "* dengan keterangan sebagai berikut:
 
-Nama Project       : *$projectName*
-PIC Budget            : *$namaUserPic*
-Divisi                        : *$divisi*
+Nama Project : *$projectName*
+Folder Budget: *$folderBudget*
+PIC Budget : *$namaUserPic*
+Divisi : *$divisi*
 Silahkan ajukan budget secepatnya.
 
 Klik link berikut untuk membuka Pengajuan Budget.
 http://$urlPengajuan";
-
-        return $msg;
     }
 
     public function alertMessage($message, $nextLink = "")
@@ -47,18 +47,20 @@ http://$urlPengajuan";
       ";
     }
 
-    public function messageAjukanBudget($creator, $pengaju, $namaProject, $divisi, $totalbudget = 0,$keterangan = "", $urlPengajuan)
+    public function messageAjukanBudget($creator, $pengaju, $namaProject, $folderBudget, $divisi, $totalbudget = 0,$keterangan = "", $urlPengajuan)
     {
         $msg = "Dear $creator,
 
 Budget telah diajukan dengan keterangan sebagai berikut:
-Nama Project       : *$namaProject*
-Pengaju                  :*$pengaju*
-Divisi                        : *$divisi*
-Total Budget         : *Rp. " . number_format($totalbudget, 0, '', ',') . "*
+Nama Project : *$namaProject*
+Folder Budget: *$folderBudget*
+Pengaju : *$pengaju*
+Divisi : *$divisi*
+Total Budget : *Rp. " . number_format($totalbudget, 0, '', ',') . "*
 ";
     if ($keterangan != "") {
-        $msg .= "Keterangan: *$keterangan*";
+        $msg .= "
+Keterangan: *$keterangan*";
     }
     $msg .= "
 
@@ -68,13 +70,14 @@ http://$urlPengajuan";
 return $msg;
     }
 
-    public function messagePersetujuanBudget($dear, $pengaju, $namaProject, $divisi, $totalbudget = 0, $penyetuju, $urlBpu)
+    public function messagePersetujuanBudget($dear, $pengaju, $namaProject, $folderBudget, $divisi, $totalbudget = 0, $penyetuju, $urlBpu)
     {
         $msg = "*Notifikasi Untuk Persetujuan Budget*
 
 Dear $dear, 
 Budget dengan keterangan berikut:
 Nama Project    : *$namaProject*
+Folder Budget : *$folderBudget*
 Pengaju         : *$pengaju*
 Divisi          : *$divisi*
 Total Budget    : *Rp. " . number_format($totalbudget, 0, '', ',') . "*
@@ -183,7 +186,7 @@ No. Rekening Anda : " . $noRekening . "
 Bank             : " . $bank . "
 Nama Penerima    : " . $penerima . "
 Jumlah Dibayarkan : Rp. " . number_format($jumlahBayar, 0, '', '.') . "
-Status           : Dibayar</strong>,  Tanggal : " . $dateBayar . "</strong>
+Status           : Dibayar*,  Tanggal : " . $dateBayar . "*
 Jika ada pertanyaan lebih lanjut, silahkan email Divisi Finance ke finance@mri-research-ind.com.
 Hormat kami,
 Finance Marketing Research Indonesia
@@ -204,10 +207,10 @@ $link
         return $msg;
     }
 
-    public function messageProcessBPUFinance($namaProject, $item, $term, $pengaju, $arrPenerima, $arrJumlah, $keterangan = "", $link)
+    public function messageProcessBPUFinance($namaProject, $verificator, $item, $term, $pengaju, $arrPenerima, $arrJumlah, $keterangan = "", $link)
     {
         $msg = "Notifikasi BPU, 
-BPU telah di *verifikasi* oleh Finance dengan keterangan sebagai berikut:
+BPU telah di *verifikasi* oleh $verificator dengan keterangan sebagai berikut:
 Nama Project   : *" . $namaProject . "*
 Item No.       : *$item*
 Term           : *$term*
@@ -227,33 +230,10 @@ $link;
         return $msg;
     }
 
-    public function messagerequestProcessBPUFinance($namaProject, $item, $term, $pengaju, $arrPenerima, $arrJumlah, $keterangan = "", $link)
+    public function messageProcessTolakBPUFinance($namaProject, $user, $item, $term, $pengaju, $arrPenerima, $arrJumlah, $keterangan = "", $link)
     {
         $msg = "Notifikasi BPU, 
-BPU telah di *verifikasi* oleh Finance dengan keterangan sebagai berikut:
-Nama Project   : *" . $namaProject . "*
-Item No.       : *$item*
-Term           : *$term*
-Nama Pengaju   : *" . $pengaju . "*
-Nama Penerima  : *" . implode(', ', $arrPenerima) . "*
-Total Diajukan : *" . implode(', ', $arrJumlah) . "*
-        ";
-    if ($keterangan != "") {
-        $msg .= "
-Keterangan:* $keterangan *";
-    }
-    $msg .="
-
-Lihat selengkapnya dibawah ini:
- ".
-$link;
-        return $msg;
-    }
-
-    public function messageProcessTolakBPUFinance($namaProject, $item, $term, $pengaju, $arrPenerima, $arrJumlah, $keterangan = "", $link)
-    {
-        $msg = "Notifikasi BPU, 
-BPU telah di *Tolak* oleh Finance dengan keterangan sebagai berikut:
+BPU telah di *Tolak* oleh $user dengan keterangan sebagai berikut:
 Nama Project   : *" . $namaProject . "*
 Item No.       : *$item*
 Term           : *$term*
@@ -326,7 +306,7 @@ $link;
     public function messageTolakPengajuanBPU($userSetuju, $namaProject, $noItem, $term, $arrPenerima, $tanggalBayar, $arrPembayaran, $arrJumlah, $keterangan, $link)
     {
         $msg = "Notifikasi BPU, 
-BPU telah di TOLAK oleh $userSetuju dengan keterangan sebagai berikut:
+BPU telah di *TOLAK* oleh $userSetuju dengan keterangan sebagai berikut:
 Nama Project       : *" . $namaProject . "*
 Item No.           : *$noItem*
 Term               : *$term*
@@ -418,16 +398,57 @@ Klik $url untuk membuka aplikasi budget.";
         $msg = "Notifikasi Informasi Pembayaran
 Berikut informasi status pembayaran Anda:
 
-Pembayaran       : *$jenisPembayaran*
-No. Rekening Anda       : *$norek*
-Nama Job       : *$job*
-Bank       : *$bank*
-Nama Penerima       : *$penerima*
-Jumlah Diajukan       : *Rp. " . number_format($pengajuanNominal, 0, '', ',') . "*
-Biaya Transfer       : *Rp. " . number_format($biayaTransfer, 0, '', ',') . "*
-".$jenisPajak != '' ? "*Rp. " . number_format($biayaPajak, 0, '', ',') . "*" : "''"."
+Pembayaran : *$jenis*
+No. Rekening Anda : *$norek*
+Nama Job : *$job*
+Nama Item : *$rincian*
+Kota : *$kota*
+Bank : *$bank*
+Nama Penerima : *$penerima*
+Jumlah Diajukan : *Rp. " . number_format($pengajuanNominal, 0, '', ',') . "*
+Biaya Transfer : *Rp. " . number_format($biayaTransfer, 0, '', ',') . "*";
+
+        if ($jenisPajak != "") {
+            $msg .= "
+$jenisPajak : *Rp. " . number_format($biayaPajak == "" ? 0 : $biayaPajak, 0, '', ',') . "*";
+        }
+
+$msg .= "
+Jumlah Dibayarkan : *Rp. " . number_format($totalTransfer, 0, '', '.') . "*
+Status : *Terbayar Lunas Tanggal:  $tanggal*
+
+Jika ada pertanyaan lebih lanjut, silahkan email Divisi Finance ke finance@mri-research-ind.com
+Hormat kami,
+Divisi Finance 
+Marketing Research Indonesia";
+
+        return $msg;
+    }
+
+    public function messageSuccessTransferVendorWA($penerima, $jenisPembayaran, $norek, $bank, $totalTransfer, $tanggal, $noInvoice, $tanggalInvoice, $startTerm, $endTerm, $rincian, $kota, $jenis, $pengajuanNominal, $biayaTransfer, $jenisPajak, $biayaPajak)
+    {
+        $msg = "Notifikasi Informasi Pembayaran
+Berikut informasi status pembayaran Anda:
+
+No. Invoice : *$noInvoice*
+Tanggal Invoice : *$tanggalInvoice*
+Nama Item : *$rincian*
+Kota : *$kota*
+Term : *$startTerm dari $endTerm*
+Jenis Pembayaran : *$jenis*
+No. Rekening Anda : *$norek*
+Bank : *$bank*
+Nama Penerima : *$penerima*
+Jumlah Diajukan : *Rp. " . number_format($pengajuanNominal, 0, '', ',') . "*
+Biaya Transfer : *Rp. " . number_format($biayaTransfer, 0, '', ',') . "*";
+
+        if ($jenisPajak != "") {
+            $msg .= "
+$jenisPajak       : *Rp. " . number_format($biayaPajak == "" ? 0 : $biayaPajak, 0, '', ',') . "*";
+        }
+$msg .= "
 Jumlah Dibayarkan       : *Rp. " . number_format($totalTransfer, 0, '', '.') . "*
-Status       : *Terbayar Lunas Tanggal:  $tanggal*
+Status       : *Terbayar Tanggal:  $tanggal*
 
 Jika ada pertanyaan lebih lanjut, silahkan email Divisi Finance ke finance@mri-research-ind.com
 Hormat kami,
@@ -437,32 +458,26 @@ Marketing Research Indonesia";
         return $msg;
     }
 
-    public function messageSuccessTransferVendorWA($penerima, $jenisPembayaran, $norek, $bank, $totalTransfer, $tanggal, $noInvoice, $tanggalInvoice, $startTerm, $endTerm, $rincian, $kota, $jenis, $pengajuanNominal, $biayaTransfer, $jenisPajak, $biayaPajak)
+    public function messageValidasiBudget($receiver, $dataPengajuan, $validator, $urlPengajuan)
     {
-        $msg = "Notifikasi Informasi Pembayaran
-Berikut informasi status pembayaran Anda:
+        $msg = "Dear $receiver,
 
-No. Invoice       : *$noInvoice*
-Tanggal Invoice       : *$tanggalInvoice*
-Nama Item       : *$rincian*
-Kota       : *$kota*
-Jenis BPU       : *$jenis*
-Term       : *$startTerm dari $endTerm*
-Jenis Pembayaran       : *$jenisPembayaran*
-No. Rekening Anda       : *$norek*
-Bank       : *$bank*
-Nama Penerima       : *$penerima*
-Jumlah Diajukan       : *Rp. " . number_format($pengajuanNominal, 0, '', ',') . "*
-Biaya Transfer       : *Rp. " . number_format($biayaTransfer, 0, '', ',') . "*
-".$jenisPajak != '' ? "*Rp. " . number_format($biayaPajak, 0, '', ',') . "*" : "''"."
-Jumlah Dibayarkan       : *Rp. " . number_format($totalTransfer, 0, '', '.') . "*
-Status       : *Terbayar Tanggal:  $tanggal*
+Budget telah divalidasi oleh *$validator* dengan keterangan sebagai berikut:
+Nama Project : *$dataPengajuan[nama]*
+Folder Budget: *$dataPengajuan[jenis]*
+Pengaju : *$dataPengajuan[pengaju]*
+Divisi : *$dataPengajuan[divisi]*
+Total Budget : *Rp. " . number_format($dataPengajuan['totalbudget'], 0, '', ',') . "*
+";
+        if ($dataPengajuan['ket'] != "") {
+            $msg .= "
+Keterangan: *$dataPengajuan[ket]*";
+        }
+        $msg .= "
 
-Jika ada pertanyaan lebih lanjut, silahkan email Divisi Finance ke finance@mri-research-ind.com
-Hormat kami,
-Divisi Finance 
-Marketing Research Indonesia";
-        
+
+Selengkapnya pengajuan anda bisa dilihat dibawah ini.
+http://$urlPengajuan";
         return $msg;
     }
 }

@@ -222,13 +222,13 @@ if ($submit == 1) {
                         $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND hak_akses='Manager'");
                         while ($e = mysqli_fetch_assoc($queryEmail)) {
                             if ($e['phone_number'] && !in_array($e['phone_number'], $duplicates)) {
-                                array_push($email, $e['phone_number']);
-                                array_push($nama, $e['nama_user']);
-                                array_push($idUsersNotification, $e['id_user']);
-                                array_push($dataDivisi, $e['divisi']);
-                                array_push($dataLevel, $e['level']);
-                                array_push($hakAkses, $e['hak_akses']);
-                                array_push($duplicates, $e['phone_number']);
+                                $email[] = $e['phone_number'];
+                                $nama[] = $e['nama_user'];
+                                $idUsersNotification[] = $e['id_user'];
+                                $dataDivisi[] = $e['divisi'];
+                                $dataLevel[] = $e['level'];
+                                $hakAkses[] = $e['hak_akses'];
+                                $duplicates[] = $e['phone_number'];
                             }
                         }
                     }
@@ -239,49 +239,19 @@ if ($submit == 1) {
                     $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='Direksi' AND aktif='Y'");
                     while ($e = mysqli_fetch_assoc($queryEmail)) {
                         if ($e['phone_number'] && !in_array($e['phone_number'], $duplicates)) {
-                            array_push($email, $e['phone_number']);
-                            array_push($nama, $e['nama_user']);
-                            array_push($idUsersNotification, $e['id_user']);
-                            array_push($dataDivisi, $e['divisi']);
-                            array_push($hakAkses, $e['hak_akses']);
-                            array_push($dataLevel, $e['level']);
-                            array_push($duplicates, $e['phone_number']);
+                            $email[] = $e['phone_number'];
+                            $nama[] = $e['nama_user'];
+                            $idUsersNotification[] = $e['id_user'];
+                            $dataDivisi[] = $e['divisi'];
+                            $hakAkses[] = $e['hak_akses'];
+                            $dataLevel[] = $e['level'];
+                            $duplicates[] = $e['phone_number'];
                         }
                     }
                 }
             }
         }
     }
-
-    // if ($bpu['statusbpu'] == "UM" || $bpu['statusbpu'] == "UM Burek") {
-    //     if (count($arrPenerima) > 0) {
-    //         for ($i=0; $i < count($arrPenerima); $i++) { 
-    //             $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$arrPenerima[$i]' AND aktif='Y'");
-    //             $emailUser = mysqli_fetch_assoc($queryEmail);
-    //             if ($emailUser) {
-    //                 array_push($email, $emailUser['phone_number']);
-    //                 array_push($nama, $emailUser['nama_user']);
-    //                 array_push($idUsersNotification, $emailUser['id_user']);
-    //                 array_push($dataDivisi, $emailUser['divisi']);
-    //                 array_push($dataLevel, $emailUser['level']);
-    //                 array_push($hakAkses, $e['hak_akses']);
-    //             }
-    //         }
-    //     }
-    //     $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('2', '3')");
-    //     while ($e = mysqli_fetch_assoc($queryEmail)) {
-    //         if ($e['phone_number']) {
-    //             array_push($email, $e['phone_number']);
-    //             array_push($nama, $e['nama_user']);
-    //             array_push($idUsersNotification, $e['id_user']);
-    //             array_push($dataDivisi, $e['divisi']);
-    //             array_push($dataLevel, $e['level']);
-    //             array_push($hakAkses, $e['hak_akses']);
-    //         }
-    //     }
-            
-        
-    // }
 
     if ($email) {
         for($i = 0; $i < count($email); $i++) {
@@ -317,7 +287,7 @@ if ($submit == 1) {
                 }
     
               $url =  $host. $path.'?code='.$kode.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
-              $msg = $messageHelper->messageProcessBPUFinance($pengajuan["nama"], $no, $term, $bpu["pengaju"], $arrPenerima, $arrJumlah, $keterangan, $url);
+              $msg = $messageHelper->messageProcessBPUFinance($pengajuan["nama"], $user, $no, $term, $bpu["pengaju"], $arrPenerima, $arrJumlah, $keterangan, $url);
               if($email[$i] != "") $whatsapp->sendMessage($email[$i], $msg);
             }
             
@@ -423,7 +393,7 @@ if ($submit == 1) {
                     if ($i < count($email) - 1) $notification .= ', ';
                     else $notification .= '.';
                     $url =  $host. $path.'?code='.$kode.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
-                    $msg = $messageHelper->messageProcessTolakBPUFinance($pengajuan["nama"], $no, $term, $bpu["pengaju"], $arrPenerima, $arrJumlah, $keterangan, $url);
+                    $msg = $messageHelper->messageProcessTolakBPUFinance($pengajuan["nama"], $user, $no, $term, $bpu["pengaju"], $arrPenerima, $arrJumlah, $keterangan, $url);
                     if($email[$i] != "") $whatsapp->sendMessage($email[$i], $msg);
                 }
                 

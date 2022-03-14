@@ -63,7 +63,8 @@ if ($action == 'get-data-validasi') {
         if ($_SESSION['hak_akses'] == 'Level 2' && $_SESSION['level'] == 'Manager') {
             if (strpos(strtolower($row['rincian']), 'kas negara') !== false 
             || strpos(strtolower($row['rincian']), 'penerimaan negara') !== false
-            || strpos(strtolower($row['rincian']), 'pph') !== false) {
+            || strpos(strtolower($row['rincian']), 'pph') !== false
+                || strpos(strtolower($row['rincian']), 'ppn') !== false) {
                 if ($row['nama'] != null) {
                     $data[] = $row;
                 }

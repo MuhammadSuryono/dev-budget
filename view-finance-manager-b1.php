@@ -8,6 +8,7 @@ $helper = new Helper();
 
 $con = new Database();
 $koneksi = $con->connect();
+$con->load_database($koneksi);
 
 $con->set_name_db(DB_TRANSFER);
 $con->init_connection();
@@ -307,7 +308,22 @@ $setting = mysqli_fetch_assoc($querySetting);
                         <td><?php echo $a['rincian']; ?></td>
                         <td><?php echo $a['kota']; ?></td>
                         <td><?php echo $a['status']; ?></td>
-                        <td><?php echo $a['penerima']; ?></td>
+                          <td>
+                              <?php echo $a['penerima']; ?><br/>
+                              <?php
+                              if (in_array($a['status'], ["UM", "UM Burek", "Biaya Lumpsum"])) {
+                                  $listReceiver = $con->select("*")->from("tb_penerima")
+                                      ->where("item_id", "=", $a["id"])->get();
+                                  echo "<ul>";
+                                  foreach ($listReceiver as $key => $value) {
+                                      $iconValidate = $value["is_validate"] == 1 ? "<i class='fa fa-check text-success'></i>": "<i class='fa fa-exclamation text-danger'></i>";
+                                      $title = $value["is_validate"] == 1 ? "Terverifikasi oleh $value[validator]": "Belum Terverifikasi";
+                                      echo "<li>$value[nama_penerima] ($value[jabatan]) - <span class='text-center' title='$title'>$iconValidate</span></li>";
+                                  }
+                                  echo "</ul>";
+                              }
+                              ?>
+                          </td>
                         <td><?php echo 'Rp. ' . number_format($a['harga'], 0, '', ','); ?></td>
                         <td><?php echo $a['quantity']; ?></td>
                         <td><?php echo 'Rp. ' . number_format($a['total'], 0, '', ','); ?></td>
@@ -406,6 +422,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                               $batasTanggalBayar = $bayar['batas_tanggal_bayar'];
                               // $metodePembayaran = $bayar['metode_pembayaran'];
                               $bankAccountName       = $bayar['bank_account_name'];
+                              $termStkb = $bayar['termstkb'];
 
                               $tglcair = $tglcair == "0000-00-00" ? "-" : $tglcair;
 
@@ -473,6 +490,8 @@ $setting = mysqli_fetch_assoc($querySetting);
                               echo "</b><br>";
                               echo "No. STKB :<b> $noStkb";
                               echo "</b><br>";
+                                echo "Term STKB :<b> $termStkb";
+                                echo "</b><br>";
                               echo "Tanggal : <br><b> " . $statusPengajuanBpu . date('Y-m-d', strtotime($waktustempel));
                               echo "</b><br>";
                               echo "Jam : <b>" . date('H:i:s', strtotime($waktustempel));
@@ -481,7 +500,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                               echo "</b></br>";
                               
                               echo "<hr/>";
-echo "Nominal Pajak :<b>Rp. " .number_format($bayar['nominal_pajak']) . " (".$bayar['jenis_pajak'].")";
+echo "Nominal Pajak :<b>Rp. " .number_format($bayar['nominal_pajak'] == null ? 0 : $bayar['nominal_pajak']) . " (".$bayar['jenis_pajak'].")";
                               echo "</b><br>";
                               echo ($statusPengajuanBpu != 0) ? "Request BPU : <br><b>Rp. " . number_format($total['jumlah_pengajuan'], 0, '', ',') : "Nominal Pembayaran : <br><b>Rp. " . number_format($total['jumlah_total'], 0, '', ',');
                               echo "</b><br>";

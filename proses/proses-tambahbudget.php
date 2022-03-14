@@ -1,5 +1,5 @@
 <?php
-error_reporting(0);
+//error_reporting(0);
 session_start();
 require_once "../application/config/database.php";
 require_once "../application/config/whatsapp.php";
@@ -22,9 +22,14 @@ if (isset($_POST['submit'])) {
   $status            = $_POST['status'];
   $idUserPICBudget   = $_POST['idUser'];
   $katnon            = $_POST['katnon'];
+  $action = $_POST['action'];
   $namaCreatorProject           = $_SESSION['nama_user'];
   $idProject = $_POST['project'];
   $table = $_POST['table'];
+
+  if ($action == 'api') {
+      $namaCreatorProject = $_POST['created_by'];
+  }
 
   $arrNamaB1 = ['Honor Jakarta', 'Honor Luar Kota', 'STKB Transaksi Jakarta', 'STKB Transaksi Luar Kota', 'STKB OPS', 'Honor Area Head Jakarta', 'Honor Area Head Luar Kota'];
   $arrKotaB1 = ['Jabodetabek', 'Luar kota', 'Jabodetabek', 'Luar Kota', 'Jabodetabek dan Luar Kota', 'Jabodetabek', 'Luar Kota'];
@@ -37,6 +42,10 @@ if (isset($_POST['submit'])) {
   $arrPenerimaB2 = ['Responden', 'Interviewer'];
 
   if (!$idUserPICBudget) {
+      if ($action == "api") {
+          echo json_encode(["status" => "error", "message" => "PIC Budget belum dipilih"]);
+          exit();
+      }
     if ($_SESSION['divisi'] == 'Direksi') {
       echo $helper->alertMessage("Pembuatan Budget Gagal, Data PIC Tidak ada","../home-direksi.php");
     } else if ($_SESSION['divisi'] == 'FINANCE' && $_SESSION['hak_akses']) {
@@ -49,6 +58,10 @@ if (isset($_POST['submit'])) {
 
   if ($jenis == 'B1') {
     if (!$namaProject || !$tahun || !$status || !$idUserPICBudget) {
+        if ($action == "api") {
+            echo  json_encode(["status" => "error", "message" => "Harap mengisi semua data"]);
+            exit();
+        }
       if ($_SESSION['divisi'] == 'Direksi') {
         echo $helper->alertMessage("Pembuatan Budget Gagal, Harap mengisi semua data.","../home-direksi.php");
       } else if ($_SESSION['divisi'] == 'FINANCE' && $_SESSION['hak_akses']) {
@@ -70,7 +83,7 @@ if (isset($_POST['submit'])) {
   $namaCreatorBudget           = $dataCreatorBudget['nama_user'];
   $divisiCreatorBudget            = $dataCreatorBudget['divisi'];
 
-  array_push($phoneNumbers, $dataCreatorBudget['phone_number']);
+  array_push($phoneNumbers, $dataCreatorBudget["phone_number"]);
   array_push($namaUserSendNotifications, $dataCreatorBudget['nama_user']);
   array_push($idUsersNotification, $idUserPICBudget);
   array_push($emails, $dataCreatorBudget['email']);
@@ -221,12 +234,14 @@ if (isset($_POST['submit'])) {
       $whatsapp = new Whastapp();
       for($i = 0; $i < count($phoneNumbers); $i++) {
         $url =  $host. '/view-request.php?id='.$idUserPICBudgetanRequest.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
-        $msg = $helper->messageCreateProject($namaUserSendNotifications[$i], $namaUserSendNotifications[0], $namaCreatorProject, $namaProject, $divisiCreatorBudget, $url, "Notifikasi Pembukaan Akses Untuk Pengajuan Budget");
+        $msg = $helper->messageCreateProject($namaUserSendNotifications[$i], $namaUserSendNotifications[0], $namaCreatorProject, $namaProject, $jenis, $divisiCreatorBudget, $url);
         $msgEmail = $messageEmail->createBudget($namaUserSendNotifications[$i], $namaUserSendNotifications[0], $namaCreatorProject, $namaProject, $divisiCreatorBudget, $url);
         if($phoneNumbers[$i] != "") $whatsapp->sendMessage($phoneNumbers[$i], $msg);
         if ($emails[$i] != "") $emailHelper->sendEmail($msgEmail, "Notifikasi Pembukaan Akses Untuk Pengajuan Budget", $emails[$i]);
       }
     }
+
+
 
 
     $notification = "Pembuatan Permohonan Budget Berhasil. Pemberitahuan via whatsapp sedang dikirimkan ke $namaCreatorBudget ($phoneNumbers[0])";
@@ -236,6 +251,11 @@ if (isset($_POST['submit'])) {
         if ($i < count($phoneNumbers) - 1) $notification .= ', ';
         else $notification .= '.';
       }
+    }
+
+    if ($action == "api") {
+        echo json_encode(["status" => "success", "message" => $notification]);
+        exit();
     }
 
     if ($_SESSION['divisi'] == 'Direksi') {

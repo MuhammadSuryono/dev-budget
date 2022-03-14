@@ -6,7 +6,6 @@ $port = $_SERVER['SERVER_PORT'];
 $url = explode('/', $url);
 $hostProtocol = $url[0];
 
-echo $hostProtocol;
 
 if ($hostProtocol == "180.211.92.131")
 {

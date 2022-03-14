@@ -5,6 +5,7 @@ require "application/config/database.php";
 
 $con = new Database();
 $koneksi = $con->connect();
+$con->load_database($koneksi);
 if (!isset($_SESSION['nama_user'])) {
   header("location:login.php");
   // die('location:login.php');//jika belum login jangan lanjut
@@ -174,7 +175,7 @@ if (!isset($_SESSION['nama_user'])) {
                       $selno = mysqli_query($koneksi, "SELECT no FROM selesai WHERE waktu ='$waktu'");
                       $wkwk = mysqli_fetch_assoc($selno);
                       $no = $wkwk['no'];
-                      $liatbayarth = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no'");
+                      $liatbayarth = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no' AND status_pengajuan_bpu != 2");
                       if (mysqli_num_rows($liatbayarth) == 0) {
                         echo "";
                       } else {
@@ -202,7 +203,22 @@ if (!isset($_SESSION['nama_user'])) {
                           <td><?php echo $a['rincian']; ?></td>
                           <td><?php echo $a['kota']; ?></td>
                           <td><?php echo $a['status']; ?></td>
-                          <td><?php echo $a['penerima']; ?></td>
+                            <td>
+                                <?php echo $a['penerima']; ?><br/>
+                                <?php
+                                if (in_array($a['status'], ["UM", "UM Burek", "Biaya Lumpsum"])) {
+                                    $listReceiver = $con->select("*")->from("tb_penerima")
+                                        ->where("item_id", "=", $a["id"])->get();
+                                    echo "<ul>";
+                                    foreach ($listReceiver as $key => $value) {
+                                        $iconValidate = $value["is_validate"] == 1 ? "<i class='fa fa-check text-success'></i>": "<i class='fa fa-exclamation text-danger'></i>";
+                                        $title = $value["is_validate"] == 1 ? "Terverifikasi oleh $value[validator]": "Belum Terverifikasi";
+                                        echo "<li>$value[nama_penerima] ($value[jabatan]) - <span class='text-center' title='$title'>$iconValidate</span></li>";
+                                    }
+                                    echo "</ul>";
+                                }
+                                ?>
+                            </td>
                           <td><?php echo 'Rp. ' . number_format($a['harga'], 0, '', ','); ?></td>
                           <td>
                             <center><?php echo $a['quantity']; ?></center>
@@ -268,7 +284,7 @@ if (!isset($_SESSION['nama_user'])) {
 
                           <?php
                           $arrCheck = [];
-                          $liatbayar = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no' ORDER BY term");
+                          $liatbayar = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no' AND status_pengajuan_bpu != 2 ORDER BY term");
                           if (mysqli_num_rows($liatbayar) == 0) {
                             echo "";
                           } else {
@@ -411,7 +427,7 @@ if (!isset($_SESSION['nama_user'])) {
                                 echo "Tanggal Terima Uang : <b>$tglcair ";
                                 echo "</b></br>";
                                 echo "<hr/>";
-                                echo "Nominal Pajak : <br><b>Rp. " .number_format($bayar['nominal_pajak']) . " (".$bayar['jenis_pajak'].")";
+                                echo "Nominal Pajak : <br><b>Rp. " .number_format($bayar['nominal_pajak'] == null ? 0 : $bayar['nominal_pajak']) . " (".$bayar['jenis_pajak'].")";
                                 echo "</b><br>";
                                 echo ($statusPengajuanBpu != 0) ? "Request BPU : <br><b>Rp. " . number_format($total['jumlah_pengajuan'], 0, '', ',') : "Nominal Pemmbayaran : <br><b>Rp. " . number_format($total['jumlah_total'], 0, '', ',');
                                 echo "</b><br>";
