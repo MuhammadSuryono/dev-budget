@@ -278,7 +278,12 @@ if (!isset($_SESSION['nama_user'])) {
                             <td>
                               <!-- <button type="button" class="btn btn-info btn-small" onclick="realisasi('<?php echo $no; ?>','<?php echo $waktu; ?>')">Realisasi</button> -->
                             </td>
-                          <?php } else { ?>
+                          <?php } else {
+                              if ($a['status'] == 'Biaya Lumpsum' || $a['status'] == 'UM' || $a['status'] == 'UM Burek') {
+                                  $id = $a["id"];
+                                  echo '<button type="button" class="btn btn-primary btn-small" onclick="showModalAddReceiverBpu('.$id.')">Tambah Penerima</button><br/>';
+                              }
+                              ?>
                             <td></td>
                           <?php } ?>
 
@@ -1015,6 +1020,63 @@ if (!isset($_SESSION['nama_user'])) {
           </div>
         </div>
       </div>
+        <?php
+        $queryBank = mysqli_query($koneksi, "SELECT * FROM bank");
+        ?>
+        <div class="modal fade" id="tambahPenerima" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Tambah Data Penerima</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form id="form_add_receiver_bpu" method="post">
+                            <input type="hidden" id="item_id" name="item_id">
+                            <div class="form-group">
+                                <label for="id_tb_user">Nama Penerima:</label>
+                                <input type="text" class="form-control" name="nama_penerima" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="id_tb_user">Email Penerima:</label>
+                                <input type="text" class="form-control" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="id_tb_user">Jabatan:</label>
+                                <select class="form-control" name="jabatan" required>
+                                    <option value="">Pilih Jabatan</option>
+                                    <option value="Kepala Divisi">Kepala Divisi</option>
+                                    <option value="Staff">Staff</option>
+                                    <option value="Interviewer">Interviewer</option>
+                                    <option value="Responder">Responder</option>
+                                    <option value="Translater">Translater</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="id_tb_user">Nama Penerima Sesuai Rekening:</label>
+                                <input type="text" class="form-control" name="nama_pemilik_rekening" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="status">Bank :</label>
+                                <select class="form-control" name="kode_bank" required>
+                                    <?php while ($item = mysqli_fetch_assoc($queryBank)) : ?>
+                                        <option value="<?= $item['kodebank'] ?>"><?= $item['namabank'] ?></option>
+                                    <?php endwhile; ?>
+                                </select>
+                            </div>
+
+                            <label for="status">Nomor Rekening :</label>
+                            <div class="form-group">
+                                <input type="text" name="nomor_rekening" class="form-control" required>
+                            </div>
+
+                            <button class="btn btn-primary" type="submit" name="submit" value="submit">Submit</button>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
       <div class="modal fade" id="myModal4" role="dialog">
         <div class="modal-dialog" role="document">
@@ -1080,6 +1142,34 @@ if (!isset($_SESSION['nama_user'])) {
                     reader.readAsDataURL(input.files[0]); // convert to base64 string
                   }
                 }
+
+                function showModalAddReceiverBpu(idItem)
+                {
+                    $('#tambahPenerima').modal('show')
+                    $('#form_add_receiver_bpu')[0].reset()
+                    let form = document.getElementById("form_add_receiver_bpu")
+                    let itemId = document.getElementById("item_id")
+                    form.action = "ReceiverBpu.php?action=save"
+                    itemId.value = idItem
+                }
+
+                $('#form_add_receiver_bpu').on('submit', function (e) {
+                    e.preventDefault();
+                    let form = $(this);
+                    const btnSubmit = $(this).find('button[type="submit"]');
+                    btnSubmit.prop('disabled', true);
+
+                    $.ajax({
+                        type: 'post',
+                        url: form[0].action,
+                        data: form.serialize(),
+                        success: function(data) {
+                            let json = JSON.parse(data)
+                            alert(json.message)
+                            window.location.reload()
+                        }
+                    });
+                })
 
 
                 function RemoveRougeChar(convertString) {
