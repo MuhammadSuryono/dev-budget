@@ -170,6 +170,13 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
         $id = $_GET['id'];
         $select = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE id='$id'");
         $d = mysqli_fetch_assoc($select);
+
+        if ($d["validator"] == null) {
+            $con->update("pengajuan_request")->set_value_update("status_request", "Butuh Validasi")->where("id", "=", $d["id"])->save_update();
+            $select = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE id='$id'");
+            $d = mysqli_fetch_assoc($select);
+        }
+
         $statusKodeProject = ($d['kode_project']) ? 1 : 0;
         $queryTotalBudget = mysqli_query($koneksi, "SELECT sum(total) as total_budget FROM selesai_request WHERE waktu = '$d[waktu]'");
                             $dataTotalBudget = mysqli_fetch_assoc($queryTotalBudget);
@@ -250,7 +257,13 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
             <br /><br />
             <?php if ($d['status_request'] == 'Di Ajukan') {
                 echo '<div class="alert alert-success" role="alert">
-                <p>Budget telah <button class="btn btn-xs btn-success" disabled>DI VALIDASI</button> oleh '.$d["validator"].'.</p>
+                <p>Budget belum <button class="btn btn-xs btn-success" disabled>DI VALIDASI</button> oleh '.$d["validator"].'.</p>
+            </div>';
+            } ?>
+
+            <?php if ($d['status_request'] == 'Butuh Validasi') {
+                echo '<div class="alert alert-danger" role="alert">
+                <p>Budget telah <button class="btn btn-xs btn-danger" disabled>DI VALIDASI</button> oleh '.$d["validator"].'.</p>
             </div>';
             } ?>
             <div class="panel panel-warning" data-widget="{&quot;draggable&quot;: &quot;false&quot;}" data-widget-static="">
@@ -304,8 +317,11 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
                                     <td class="tHarga" id="tHarga<?= $i ?>"><?php echo 'Rp. ' . number_format($a['total']) ?></td>
 
                                     <?php
-                                        if ($d['status_request'] == 'Di Ajukan' || $d['status_request'] == 'Butuh Validasi') {
+                                        $dataLog = $con->select("count(*) as totalLog")->from("log_item_request")->where("id_item_request", "=", $a['id'])->first();
+                                        if (($d['status_request'] == 'Di Ajukan' || $d['status_request'] == 'Butuh Validasi') && $dataLog["totalLog"] > 0) {
                                             echo '<td><button type="button" class="btn btn-primary btn-sm" data-id="'.$a["id"].'" onclick="showLog(this)"><i class="fas fa-clock"></i></button></td>';
+                                        } else {
+                                            echo "<td>-</td>";
                                         }
                                     ?>
 
