@@ -48,6 +48,15 @@ class ReceiverBpu extends Database
              document.location.href='".$_SERVER['HTTP_REFERER']."'
       </script>";
     }
+
+    public function handle_upload_file()
+    {
+        $extension = pathinfo($_FILES["document"]["name"], PATHINFO_EXTENSION);
+        $nama_gambar = time() . "." . $extension;
+        $target_file = "uploads/" . $nama_gambar;
+        $isUploaded = move_uploaded_file($_FILES["document"]["tmp_name"], $target_file);
+        return ["isUploaded" => $isUploaded, "path" => $target_file];
+    }
 }
 
 $receiver = new ReceiverBpu();
@@ -72,5 +81,14 @@ if ($action == "validate") {
         echo json_encode(["message" => "Berhasil memvalidasi data penerima"]);
     } else {
         echo json_encode(["message" => "Data gagal divalidasi, Coba lagi!. Jika masih menemukan kesalahan yang sama, informasikan pada tim IT."]);
+    }
+}
+
+if ($action == "uploadDocument") {
+    $upload = $receiver->handle_upload_file();
+    if ($upload["isUploaded"]) {
+        echo json_encode(["message" => "Berhasil menambahkan dokumen", "path" => $upload["path"]]);
+    } else {
+        echo json_encode(["message" => "Gagal menambahkan dokumen, Coba lagi!. Jika masih menemukan kesalahan yang sama, informasikan pada tim IT."]);
     }
 }

@@ -315,7 +315,7 @@ $helper = new Helper();
                                     foreach ($listReceiver as $key => $value) {
                                         $iconValidate = $value["is_validate"] == 1 ? "<i class='fa fa-check text-success'></i>": "<i class='fa fa-exclamation text-danger'></i>";
                                         $title = $value["is_validate"] == 1 ? "Terverifikasi oleh $value[validator]": "Belum Terverifikasi";
-                                        echo "<li>$value[nama_penerima] ($value[jabatan]) - <span class='text-center' title='$title'>$iconValidate</span></li>";
+                                        echo "<li>$value[nama_penerima] ($value[jabatan]) - <span class='text-center' title='$title'>$iconValidate</span> <a href='$value[path]' target='_blank'><i class='fa fa-file'></i></a> </li>";
                                     }
                                     echo "</ul>";
                                 }
@@ -1211,7 +1211,7 @@ $helper = new Helper();
                             </div>
                             <div class="form-group">
                                 <label for="id_tb_user">Email Penerima:</label>
-                                <input type="text" class="form-control" name="email" required>
+                                <input type="email" class="form-control" name="email" required>
                             </div>
                             <div class="form-group">
                                 <label for="id_tb_user">Jabatan:</label>
@@ -1240,6 +1240,11 @@ $helper = new Helper();
                             <label for="status">Nomor Rekening :</label>
                             <div class="form-group">
                                 <input type="text" name="nomor_rekening" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="status">Document Pendukung :</label>
+                                <input type="hidden" name="path" id="path" class="form-control" required>
+                                <input type="file" name="document" class="form-control" onchange="onUpload(this)" required>
                             </div>
 
                             <button class="btn btn-primary" type="submit" name="submit" value="submit">Submit</button>
@@ -1273,6 +1278,23 @@ $helper = new Helper();
                   let term = get_query("term")
                   verifikasiBpu(no, waktu, term)
               }
+          }
+
+          function onUpload(e) {
+              let formData = new FormData()
+              formData.append("document", e.files[0])
+
+              $.ajax({
+                  type: 'post',
+                  url: "ReceiverBpu.php?action=uploadDocument",
+                  data: formData,
+                  processData: false,  // tell jQuery not to process the data
+                  contentType: false,  // tell jQuery not to set contentType
+                  success: function(data) {
+                      let json = JSON.parse(data)
+                      $("#path").val(json.path)
+                  }
+              });
           }
 
           function showModalAddReceiverBpu(idItem)
