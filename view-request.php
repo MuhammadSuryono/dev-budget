@@ -171,7 +171,7 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
         $select = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE id='$id'");
         $d = mysqli_fetch_assoc($select);
 
-        if ($d["validator"] == null) {
+        if ($d["validator"] == null && $d["status_request"] == "Di Ajukan") {
             $con->update("pengajuan_request")->set_value_update("status_request", "Butuh Validasi")->where("id", "=", $d["id"])->save_update();
             $select = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE id='$id'");
             $d = mysqli_fetch_assoc($select);
@@ -257,13 +257,13 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
             <br /><br />
             <?php if ($d['status_request'] == 'Di Ajukan') {
                 echo '<div class="alert alert-success" role="alert">
-                <p>Budget belum <button class="btn btn-xs btn-success" disabled>DI VALIDASI</button> oleh '.$d["validator"].'.</p>
+                <p>Budget telah <button class="btn btn-xs btn-success" disabled>DI VALIDASI</button> oleh '.$d["validator"].'.</p>
             </div>';
             } ?>
 
             <?php if ($d['status_request'] == 'Butuh Validasi') {
                 echo '<div class="alert alert-danger" role="alert">
-                <p>Budget telah <button class="btn btn-xs btn-danger" disabled>DI VALIDASI</button> oleh '.$d["validator"].'.</p>
+                <p>Budget belum <button class="btn btn-xs btn-danger" disabled>DI VALIDASI</button> oleh Kadiv Finance.</p>
             </div>';
             } ?>
             <div class="panel panel-warning" data-widget="{&quot;draggable&quot;: &quot;false&quot;}" data-widget-static="">
