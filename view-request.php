@@ -345,6 +345,7 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
                     </table>
                 </div><!-- /.table-responsive -->
             </div>
+
             <?php if (isset($d['status_request'])) {
                 echo '<div class="alert alert-warning" role="alert">
                 <h4 class="alert-heading">PERHATIAN!!!</h4>
@@ -357,9 +358,13 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
             <span data-toggle="modal" data-target="#requestModal">
                 <button type="button" class="btn btn-success btn-small pull-right" style="margin-left: 5px; display: none;" data-toggle="tooltip" data-placement="bottom" title="Harap Simpan data terlebih dahulu sebelum mengajukan permohonan budget" id="buttonAjukan" data-id="<?= $id ?>">Ajukan</button>
             </span>
-            <span data-toggle="modal" data-target="#validasiModal">
+            <?php
+            if ($_SESSION['hak_akses'] == 'Manager' && $_SESSION["divisi"] == "FINANCE") {
+                echo '<span data-toggle="modal" data-target="#validasiModal">
                 <button type="button" class="btn btn-success btn-small pull-right" style="margin-left: 5px; display: none;" data-toggle="tooltip" data-placement="bottom" title="Harap Simpan data terlebih dahulu sebelum memvalidasi permohonan budget" id="buttonValidasi" data-id="<?= $id ?>">Validasi</button>
-            </span>
+            </span>';
+            }
+            ?>
             <input type="button" class="btn btn-primary pull-right" id="submitButton" style="margin-left: 5px;display: none;" data-toggle="modal" value="Simpan" />
             <button type="button" id="buttonTambah" class="btn btn-default btn-small pull-right" style="display: none;" onclick="tambah_budget()" margin-left: 5px;display: none;>Tambah</button>
            

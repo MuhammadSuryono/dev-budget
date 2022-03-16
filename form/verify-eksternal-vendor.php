@@ -217,7 +217,7 @@ if ($penerima == "") {
             }
 
             // IBBKIDJA
-            if (e.valu.length === 10 && (thirdCharacter === "223" || thirdCharacter === "221") && element.value === "IBBKIDJA") {
+            if (e.value.length === 10 && (thirdCharacter === "223" || thirdCharacter === "221") && element.value === "IBBKIDJA") {
                 element.selected = true
             }
 

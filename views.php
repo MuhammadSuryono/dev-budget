@@ -213,6 +213,7 @@ if (!isset($_SESSION['nama_user'])) {
                                     foreach ($listReceiver as $key => $value) {
                                         $iconValidate = $value["is_validate"] == 1 ? "<i class='fa fa-check text-success'></i>": "<i class='fa fa-exclamation text-danger'></i>";
                                         $title = $value["is_validate"] == 1 ? "Terverifikasi oleh $value[validator]": "Belum Terverifikasi";
+
                                         echo "<li>$value[nama_penerima] ($value[jabatan]) - <span class='text-center' title='$title'>$iconValidate</span> <a href='$value[path]' target='_blank'><i class='fa fa-file'></i></a></li>";
                                     }
                                     echo "</ul>";
@@ -274,18 +275,16 @@ if (!isset($_SESSION['nama_user'])) {
                               ?>
                             </td>
                           <?php } ?>
-                          <?php if (($a['status'] == 'UM' || $a['status'] == 'UM Burek') && ($_SESSION['divisi'] == 'Direksi') && $_SESSION['divisi'] == 'FINANCE') { ?>
                             <td>
-                              <!-- <button type="button" class="btn btn-info btn-small" onclick="realisasi('<?php echo $no; ?>','<?php echo $waktu; ?>')">Realisasi</button> -->
-                            </td>
+                          <?php if (($a['status'] == 'UM' || $a['status'] == 'UM Burek') && ($_SESSION['divisi'] == 'Direksi') && $_SESSION['divisi'] == 'FINANCE') { ?>
                           <?php } else {
                               if ($a['status'] == 'Biaya Lumpsum' || $a['status'] == 'UM' || $a['status'] == 'UM Burek') {
                                   $id = $a["id"];
                                   echo '<button type="button" class="btn btn-primary btn-small" onclick="showModalAddReceiverBpu('.$id.')">Tambah Penerima</button><br/>';
                               }
                               ?>
-                            <td></td>
                           <?php } ?>
+                                </td>
 
                           <?php
                           $arrCheck = [];
@@ -1057,26 +1056,26 @@ if (!isset($_SESSION['nama_user'])) {
                                 <input type="text" class="form-control" name="nama_pemilik_rekening" required>
                             </div>
                             <div class="form-group">
+                                <label for="status">Nomor Rekening :</label>
+                                <input type="text" name="nomor_rekening" class="form-control" onchange="onChangeNomorRekening(this)" required>
+                            </div>
+                            <div class="form-group">
                                 <label for="status">Bank :</label>
-                                <select class="form-control" name="kode_bank" required>
+                                <select class="form-control" name="kode_bank" id="bank" required readonly="">
+                                    <option value="">Pilih Bank</option>
                                     <?php while ($item = mysqli_fetch_assoc($queryBank)) : ?>
                                         <option value="<?= $item['kodebank'] ?>"><?= $item['namabank'] ?></option>
                                     <?php endwhile; ?>
                                 </select>
                             </div>
 
-                            <label for="status">Nomor Rekening :</label>
-                            <div class="form-group">
-                                <input type="text" name="nomor_rekening" class="form-control" required>
-                            </div>
-                            s
                             <div class="form-group">
                                 <label for="status">Document Pendukung :</label>
                                 <input type="hidden" name="path" id="path" class="form-control" required>
                                 <input type="file" name="document" class="form-control" onchange="onUpload(this)" required>
                             </div>
 
-                            <button class="btn btn-primary" type="submit" name="submit" value="submit">Submit</button>
+                            <button class="btn btn-primary" type="submit" name="submit" id="submitPenerimaBpu" value="submit" disabled>Submit</button>
 
                         </form>
                     </div>
@@ -1155,6 +1154,8 @@ if (!isset($_SESSION['nama_user'])) {
                     $('#form_add_receiver_bpu')[0].reset()
                     let form = document.getElementById("form_add_receiver_bpu")
                     let itemId = document.getElementById("item_id")
+                    const btnSubmit = document.getElementById("submitPenerimaBpu")
+                    btnSubmit.setAttribute('disabled', true);
                     form.action = "ReceiverBpu.php?action=save"
                     itemId.value = idItem
                 }
@@ -1171,6 +1172,8 @@ if (!isset($_SESSION['nama_user'])) {
                         contentType: false,  // tell jQuery not to set contentType
                         success: function(data) {
                             let json = JSON.parse(data)
+                            const btnSubmit = document.getElementById("submitPenerimaBpu")
+                            btnSubmit.removeAttribute('disabled');
                             $("#path").val(json.path)
                         }
                     });
@@ -1193,6 +1196,76 @@ if (!isset($_SESSION['nama_user'])) {
                         }
                     });
                 })
+
+                function onChangeNomorRekening(e) {
+                    let optionBank = document.getElementById('bank')
+                    let fifthCharacter = ""
+                    let fourthCharacter = ""
+                    let secondCharacter = ""
+                    let thirdCharacter = ""
+
+                    if (e.value.length > 4) {
+                        fifthCharacter = e.value.substring(0, 5)
+                    }
+
+                    if (e.value.length > 3) {
+                        fourthCharacter = e.value.substring(0, 4)
+                    }
+
+                    if (e.value.length > 1) {
+                        secondCharacter = e.value.substring(0, 1)
+                    }
+
+                    if (e.value.length > 2) {
+                        thirdCharacter = e.value.substring(0, 3)
+                    }
+
+                    for (let index = 0; index < optionBank.childElementCount; index++) {
+                        const element = optionBank.children[index];
+
+                        if (e.value.length === 13 && element.value === "BMRIIDJA") {
+                            element.selected = true
+                        }
+
+                        if (e.value.length === 16 && fifthCharacter === "88708" && element.value === "BMRIIDJA") {
+                            element.selected = true
+                        }
+
+                        if (e.value.length === 10 && (fourthCharacter === "0427" || secondCharacter === "002") && element.value === "BNINIDJA") {
+                            element.selected = true
+                        }
+
+                        // IBBKIDJA
+                        if (e.value.length === 10 && (thirdCharacter === "223" || thirdCharacter === "221") && element.value === "IBBKIDJA") {
+                            element.selected = true
+                        }
+
+                        if (e.value.length === 10 && element.value === "CENAIDJA") {
+                            element.selected = true
+                        }
+
+                        if (e.value.length === 15 && fifthCharacter === "88708" && element.value === "BMRIIDJA") {
+                            element.selected = true
+                        }
+
+                        if (e.value.length === 18 && element.value === "BMRIIDJA") {
+                            element.selected = true
+                        }
+
+                        if (e.value.length === 15 && (thirdCharacter === "025" || thirdCharacter === "225" || thirdCharacter === "018") && element.value === "BMRIIDJA") {
+                            element.selected = true
+                        }
+
+                        if (e.value.length === 15 && element.value === "BRINIDJA") {
+                            element.selected = true
+                        }
+
+                        if ((e.value.length !== 13 || e.value.length !== 16 || e.value.length !== 10 || e.value.length !== 15) && element.value === "") {
+                            element.selected = true
+                        }
+
+                    }
+                }
 
 
                 function RemoveRougeChar(convertString) {
