@@ -24,7 +24,7 @@ $namaProject = $data['nama'];
 $divisi = $data['divisi'];
 $totalbudget = $data['totalbudget'];
 
-$updatePengajuanRequest = mysqli_query($koneksi, "UPDATE pengajuan_request SET status_request='Ditolak', waktu='$waktu', declined_note='$alasan' WHERE waktu='$waktu'") or die(mysqli_error($koneksi));
+$updatePengajuanRequest = mysqli_query($koneksi, "UPDATE pengajuan_request SET status_request='Ditolak', waktu='$waktu', declined_note='$alasan', validator = '' WHERE waktu='$waktu'") or die(mysqli_error($koneksi));
 
 $queryGetAllId = mysqli_query($koneksi, "SELECT id FROM pengajuan_request WHERE waktu='$waktu'");
 while ($row = mysqli_fetch_array($queryGetAllId)) {
@@ -52,24 +52,7 @@ if ($updatePengajuanRequest) {;
 
     $message = $messageHelpepr->messageTolakPengajuanBudget($pengaju, $namaProject, $divisi, $totalbudget, $pembuat, $alasan);
 
-    // $msg = "Dear $pengaju, <br><br>
-    //     Budget dengan keterangan berikut:<br><br>
-    //     Nama Project    : <strong>$namaProject</strong><br>
-    //     Pengaju         : <strong>$pengaju</strong><br>
-    //     Divisi          : <strong>$divisi</strong><br>
-    //     Total Budget    : <strong>Rp. " . number_format($totalbudget, 0, '', ',') . "</strong><br><br>
-        
-    //     Telah Ditolak oleh <strong> $pembuat </strong> pada <strong> " . date("d/m/Y H:i:s") . "</strong> dengan keterangan <strong>$alasan</strong><br><br>
-    //     ";
-
-    // $msg .= "Klik <a href='$url'>Disini</a> untuk membuka aplikasi budget.";
-
-    // $subject = "Notifikasi Untuk Penolakan Budget";
-    // if ($email) {
-    //     $message = sendEmail($msg, $subject, $email, $name, $address = "multiple");
-    // }
-
-    $notification = 'Budget Berhasil Ditolak. Pemberitahuan via email telah terkirim ke ';
+    $notification = 'Budget Berhasil Ditolak. Pemberitahuan via whatsapp telah terkirim ke ';
     for ($i = 0; $i < count($phoneNumber); $i++) {
         $notification .= ($nama[$i] . ' (' . $phoneNumber[$i] . ')');
 
@@ -80,8 +63,6 @@ if ($updatePengajuanRequest) {;
         if ($i < count($phoneNumber) - 1) $notification .= ', ';
         else $notification .= '.';
     }
-
-    // $notification = "Budget Berhasil Ditolak. Pemberitahuan via email telah terkirim ke $pengaju ($email)";
 
     if ($_SESSION['divisi'] == 'FINANCE') {
         echo "<script language='javascript'>";

@@ -58,10 +58,12 @@ class ValidasiBudget extends Database
         $whatsapp->sendMessage($direksi["phone_number"], $msg);
         $this->notifPenerima .= sprintf("%s (%s),", $direksi["nama_user"], $direksi["phone_number"]);
 
-        $url =  $host. '/view-request.php?id='.$id.'&session='.base64_encode(json_encode(["id_user" => $creator["id_user"], "timeout" => time()]));
-        $msg = $message->messageValidasiBudget($creator["nama_user"], $dataSubmission, $_SESSION["nama_user"], $url);
-        $whatsapp->sendMessage($creator["phone_number"], $msg);
-        $this->notifPenerima .= sprintf("%s (%s),", $creator["nama_user"], $creator["phone_number"]);
+        if ($creator["nama_user"] != $_SESSION["nama_user"]) {
+            $url =  $host. '/view-request.php?id='.$id.'&session='.base64_encode(json_encode(["id_user" => $creator["id_user"], "timeout" => time()]));
+            $msg = $message->messageValidasiBudget($creator["nama_user"], $dataSubmission, $_SESSION["nama_user"], $url);
+            $whatsapp->sendMessage($creator["phone_number"], $msg);
+            $this->notifPenerima .= sprintf("%s (%s),", $creator["nama_user"], $creator["phone_number"]);
+        }
 
         $url =  $host. '/view-request.php?id='.$id.'&session='.base64_encode(json_encode(["id_user" => $pengaju["id_user"], "timeout" => time()]));
         $msg = $message->messageValidasiBudget($pengaju["nama_user"], $dataSubmission, $_SESSION["nama_user"], $url);

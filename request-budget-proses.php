@@ -6,6 +6,7 @@ require "application/config/database.php";
 
 $con = new Database();
 $koneksi = $con->connect();
+$con->load_database($koneksi);
 
 if ($_SESSION['divisi'] == 'Direksi') {
     $url = "home-direksi.php";
@@ -119,13 +120,12 @@ if ($jenis == 'B1' && $_POST['kodeProject'] != 'undefined') {
 }
 
 if ($id) {
-    $queryWaktu = mysqli_query($koneksi, "SELECT waktu FROM pengajuan_request WHERE id=$id") or die(mysqli_error($koneksi));
-    $waktu = mysqli_fetch_array($queryWaktu)[0];
+    $queryWaktu = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE id=$id") or die(mysqli_error($koneksi));
+    $dataPengajuan = mysqli_fetch_assoc($queryWaktu);
+    $waktu = $dataPengajuan["waktu"];
     $updatePengajuaRequest = mysqli_query($koneksi, "UPDATE pengajuan_request SET totalbudget='$totalKategori', waktu='$waktuG' WHERE id='$id'") or die(mysqli_error($koneksi));
 
     mysqli_query($koneksi, "DELETE FROM reminder_tanggal_bayar WHERE selesai_waktu = '$waktuG'");
-    // var_dump($arrIdData);
-    // die;
     if ($updatePengajuaRequest) {
         for ($i = 0; $i < count($arrNama); $i++) {
             $nama = $arrNama[$i];
@@ -138,11 +138,24 @@ if ($id) {
 
             if ($arrIdData[$i]) {
                 $idData = $arrIdData[$i];
-                $querySelesaiReq = mysqli_query($koneksi, "SELECT urutan, waktu FROM selesai_request WHERE id=$idData") or die(mysqli_error($koneksi));
+                $querySelesaiReq = mysqli_query($koneksi, "SELECT * FROM selesai_request WHERE id=$idData") or die(mysqli_error($koneksi));
                 $data = mysqli_fetch_assoc($querySelesaiReq);
                 $urutan = $data['urutan'];
 
                 $insertSelesaiRequest = mysqli_query($koneksi, "UPDATE selesai_request SET rincian = '$nama', kota = '$kota', status = '$status', penerima = '$pUang', harga = '$harga', quantity = '$quantity', total = '$tHarga', waktu='$waktuG' WHERE id_pengajuan_request='$id' AND urutan='$urutan'") or die(mysqli_error($koneksi));
+                if ($dataPengajuan["status_request"] == "Butuh Validasi" || $dataPengajuan["status_request"] == "Di Ajukan") {
+                    if ($data["rincian"] != $nama || $data["kota"] != $kota || $data["status"] != $status || $data["penerima"] != $pUang) {
+                        $con->insert("log_item_request")
+                            ->set_value_insert("id_item_request", $idData)
+                            ->set_value_insert("rincian", $data["rincian"])
+                            ->set_value_insert("kota", $data["kota"])
+                            ->set_value_insert("status", $data["status"])
+                            ->set_value_insert("penerima", $data["penerima"])
+                            ->set_value_insert("harga", $data["harga"])
+                            ->set_value_insert("quantity", $data["quantity"])
+                            ->set_value_insert("total", $data["total"])->save_insert();
+                    }
+                }
 
                 $arrTanggal = explode(',', $tanggalPembayaran[$i]);
                 foreach ($arrTanggal as $at) {
