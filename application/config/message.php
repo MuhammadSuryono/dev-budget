@@ -495,6 +495,22 @@ Data yang sudah divalidasi tidak dapat diubah kembali dan data yang sudah divali
 Terimakasih";
         return $msg;
     }
+
+    public function messageValidasiPenerimaBpuDiTolak($receiver, $dataPenerima, $item, $validator, $reason)
+    {
+        $msg = "Dear $receiver,
+
+Penerima BPU telah *Ditolak* oleh *$validator* dengan keterangan sebagai berikut:
+Nama Penerima : *$dataPenerima[nama_penerima]*
+Jabatan: *$dataPenerima[jabatan]*
+Email : *$dataPenerima[email]*
+Item Budget : *$item*
+Alasan: *$reason*
+
+Data yang sudah gagal divalidasi tidak dapat diubah kembali, data akan terhapus pada daftar penerima di item yang bersangkutan. Mohon lakukan pengajuan data penerima kembali dengan data yang sesuai.
+Terimakasih";
+        return $msg;
+    }
 }
 
     
