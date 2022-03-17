@@ -1035,12 +1035,12 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
         });
       }
       
-      // if (phoneNumber == null || phoneNumber == "") {
-        //     $('#phoneNumberModal').modal({
-          //       backdrop: 'static',
-          //       keyboard: false
-          //     });
-          //   }
+      if (phoneNumber == null || phoneNumber == "") {
+        $('#phoneNumberModal').modal({
+            backdrop: 'static',
+            keyboard: false
+          });
+        }
           
           $('#buttonSubmitPhonneNumber').click(function() {
             let phoneNumber = $('#phone_number').val();

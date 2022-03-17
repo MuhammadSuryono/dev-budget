@@ -727,12 +727,12 @@ $typeBudget = count($splitDivisi) > 1 ? $splitDivisi[1] : $splitDivisi[0];
           });
         }
         
-        // if (phoneNumber == null || phoneNumber == "") {
-        //   $('#phoneNumberModal').modal({
-        //     backdrop: 'static',
-        //     keyboard: false
-        //   });
-        // }
+        if (phoneNumber == null || phoneNumber == "") {
+          $('#phoneNumberModal').modal({
+            backdrop: 'static',
+            keyboard: false
+          });
+        }
 
         $('#buttonSubmitPhonneNumber').click(function() {
           let phoneNumber = $('#phone_number').val();
