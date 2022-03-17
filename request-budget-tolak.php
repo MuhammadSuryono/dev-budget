@@ -24,7 +24,7 @@ $namaProject = $data['nama'];
 $divisi = $data['divisi'];
 $totalbudget = $data['totalbudget'];
 
-$updatePengajuanRequest = mysqli_query($koneksi, "UPDATE pengajuan_request SET status_request='Ditolak', waktu='$waktu', declined_note='$alasan', WHERE waktu='$waktu'") or die(mysqli_error($koneksi));
+$updatePengajuanRequest = mysqli_query($koneksi, "UPDATE pengajuan_request SET status_request='Ditolak', waktu='$waktu', declined_note='$alasan' WHERE waktu='$waktu'") or die(mysqli_error($koneksi));
 
 $queryGetAllId = mysqli_query($koneksi, "SELECT id FROM pengajuan_request WHERE waktu='$waktu'");
 while ($row = mysqli_fetch_array($queryGetAllId)) {
