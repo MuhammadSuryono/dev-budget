@@ -480,6 +480,21 @@ Selengkapnya pengajuan anda bisa dilihat dibawah ini.
 http://$urlPengajuan";
         return $msg;
     }
+
+    public function messageValidasiPenerimaBpu($receiver, $dataPenerima, $item, $validator)
+    {
+        $msg = "Dear $receiver,
+
+Penerima BPU telah divalidasi oleh *$validator* dengan keterangan sebagai berikut:
+Nama Penerima : *$dataPenerima[nama_penerima]*
+Jabatan: *$dataPenerima[jabatan]*
+Email : *$dataPenerima[email]*
+Item Budget : *$item*
+
+Data yang sudah divalidasi tidak dapat diubah kembali dan data yang sudah divalidasi dapat di pilih pada pengajuan BPU
+Terimakasih";
+        return $msg;
+    }
 }
 
     
