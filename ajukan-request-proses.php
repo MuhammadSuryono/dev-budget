@@ -159,10 +159,10 @@ if ($dataPengajuan["status_request"] == "Ditolak") {
     }
 
     $updatePengajuanRequest = $con->update('pengajuan_request')
+        ->set_value_update('status_request', 'DiAjukan')
         ->where('waktu','=', $waktu)
         ->save_update();
 } else {
-
     $dataUserDireksi = $con->select()->from('tb_user')
         ->where('divisi', '=', 'Finance')
         ->where("hak_akses", "=", "Manager")
@@ -185,7 +185,7 @@ if ($dataPengajuan["status_request"] == "Ditolak") {
         ->save_update();
 }
 
-//saveDoc($koneksi, $id, $name);
+saveDoc($koneksi, $id, $name);
 $updateSelesaiRequest = $con->update('selesai_request')->set_value_update('waktu', $waktu)->where('id_pengajuan_request', '=', $id)->save_update();
 
 $url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
