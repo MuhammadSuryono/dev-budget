@@ -279,11 +279,6 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
                                 <th>Harga (IDR)</th>
                                 <th>Total Quantity</th>
                                 <th>Total Harga (IDR)</th>
-                                <?php
-                                if ($d['status_request'] == 'Di Ajukan' || $d['status_request'] == 'Butuh Validasi') {
-                                    echo '<th>Log</th>';
-                                }
-                                ?>
                                 <?php if ($d['jenis'] == 'Non Rutin') : ?>
                                     <th>Rencana Tanggal Pembayaran</th>
                                 <?php endif; ?>
@@ -306,7 +301,23 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
                                     <input type="hidden" id="inputKota<?= $i ?>" name="kota[]" value="<?= $a['kota'] ?>">
                                     <td id="kota<?= $i ?>"><?php echo $a['kota']; ?></td>
                                     <input type="hidden" id="inputStatus<?= $i ?>" name="status[]" value="<?= $a['status']; ?>">
-                                    <td id="status<?= $i ?>"><?php echo $a['status']; ?></td>
+                                    <td id="status<?= $i ?>">
+                                        <?php
+                                        $logs = $con->select("*")->from("log_item_request")->where("id_item_request", "=", $a['id'])->order_by("id", "DESC")->get();
+                                        $label = count($logs) > 0 ? '<i class="fa fa-check text-success"></i>':'';
+                                        echo $a['status'] . " ".$label;
+                                        ?>
+                                        <?php
+                                            if (count($logs) > 0) {
+                                                echo '<ul>';
+                                                foreach ($logs as $log) {
+                                                    echo '<li>'.$log['status'].' <i class="fa fa-times text-danger"></i></li>';
+                                                }
+                                                echo '</ul>';
+
+                                            }
+                                        ?>
+                                    </td>
                                     <input type="hidden" id="inputPUang<?= $i ?>" name="pUang[]" value="<?= $a['penerima'] ?>">
                                     <td id="pUang<?= $i ?>"><?php echo $a['penerima']; ?></td>
                                     <input type="hidden" id="inputHarga<?= $i ?>" name="harga[]" value="<?= $a['harga'] ?>">
@@ -315,16 +326,6 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
                                     <td id="quantity<?= $i ?>"><?php echo number_format($a['quantity']); ?></td>
                                     <input class="inputTHarga" type="hidden" id="inputTHarga<?= $i ?>" name="tHarga[]" value="<?= $a['total'] ?>">
                                     <td class="tHarga" id="tHarga<?= $i ?>"><?php echo 'Rp. ' . number_format($a['total']) ?></td>
-
-                                    <?php
-                                        $dataLog = $con->select("count(*) as totalLog")->from("log_item_request")->where("id_item_request", "=", $a['id'])->first();
-                                        if (($d['status_request'] == 'Di Ajukan' || $d['status_request'] == 'Butuh Validasi') && $dataLog["totalLog"] > 0) {
-                                            echo '<td><button type="button" class="btn btn-primary btn-sm" data-id="'.$a["id"].'" onclick="showLog(this)"><i class="fas fa-clock"></i></button></td>';
-                                        } else {
-                                            echo "<td>-</td>";
-                                        }
-                                    ?>
-
                                     <?php if ($d['jenis'] == 'Non Rutin') :
                                         $queryTanggal = mysqli_query($koneksi, "SELECT tanggal FROM reminder_tanggal_bayar WHERE selesai_waktu = '$a[waktu]' AND selesai_no = '$a[urutan]'");
                                         $strTanggal = '';
