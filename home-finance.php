@@ -484,7 +484,7 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
                                     </td>
                                     <td>
                                         <li>
-                                            Nama Pemilik Rekening: <?= $d['nama_pemilik rekening'] ?>
+                                            Nama Pemilik Rekening: <?= $d['nama_pemilik_rekening'] ?>
                                         </li>
                                         <li>
                                             Bank: <?= $d['nama_bank'] ?>

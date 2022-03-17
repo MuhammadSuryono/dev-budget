@@ -1,10 +1,13 @@
 <?php
 require_once "application/config/database.php";
+require_once "application/config/whatsapp.php";
+require_once "application/config/message.php";
 session_start();
 
 class ReceiverBpu extends Database
 {
     protected $koneksi;
+    public $dataPenerima;
     public function __construct($fromInit = true)
     {
         parent::__construct($fromInit);
@@ -57,6 +60,35 @@ class ReceiverBpu extends Database
         $isUploaded = move_uploaded_file($_FILES["document"]["tmp_name"], $target_file);
         return ["isUploaded" => $isUploaded, "path" => $target_file];
     }
+
+    public function send_notification_to_user()
+    {
+        $wa = new Whastapp();
+        $msg = new Message();
+
+        $dataPengajuan = $this->select("a.*, b.rincian, c.pengaju, c.pembuat")->from("tb_penerima a")
+            ->join("selesai b", "a.item_id = b.id")->join("pengajuan c", "b.waktu = c.waktu")
+            ->where("a.id", "=", $_GET["id"])->first();
+        $penerimaNotif = [];
+        $userPengaju = $this->get_user_by_name($dataPengajuan["pengaju"]);
+        $userPembuat = $this->get_user_by_name($dataPengajuan["pembuat"]);
+
+        $penerimaNotif[] = $userPengaju;
+
+        if ($userPembuat["nama_user"] != $_SESSION["nama_user"]) {
+            $penerimaNotif[] = $userPembuat;
+        }
+
+        foreach ($penerimaNotif as $key => $value) {
+            $this->dataPenerima[] = $value["nama_user"];
+            $wa->sendMessage($value["phone_number"], $msg->messageValidasiPenerimaBpu($value["nama_user"], $dataPengajuan, $dataPengajuan["rincian"], $_SESSION["nama_user"]));
+        }
+    }
+
+    public function get_user_by_name($name)
+    {
+        return $this->select("*")->from("tb_user")->where("nama_user", "=", $name)->first();
+    }
 }
 
 $receiver = new ReceiverBpu();
@@ -78,7 +110,9 @@ if ($action == "getReceiver") {
 if ($action == "validate") {
     $isSaved = $receiver->validate_receiver();
     if ($isSaved) {
-        echo json_encode(["message" => "Berhasil memvalidasi data penerima"]);
+        $receiver->send_notification_to_user();
+        $penerimaNotif = implode(", ", $receiver->dataPenerima);
+        echo json_encode(["message" => "Berhasil memvalidasi data penerima. Pemberitahuan telha dikirimkan ke $penerimaNotif melalui pesan whatsapp"]);
     } else {
         echo json_encode(["message" => "Data gagal divalidasi, Coba lagi!. Jika masih menemukan kesalahan yang sama, informasikan pada tim IT."]);
     }
