@@ -1,5 +1,7 @@
 <?php
-
+require_once "application/config/database.php";
+$con = new Database();
+$koneksi = $con->connect();
 if ($_POST['save'] == "save") {
 
 	$id_user      = $_POST['id_user'];
@@ -14,32 +16,16 @@ if ($_POST['save'] == "save") {
 
 		$updatepass = mysqli_query($koneksi, "UPDATE tb_user SET password='$passwordbaru' WHERE id_user='$id_user'");
 
-		echo "<div class='register-logo'><b>Ubah Password Berhasil</b></div>
-  			<div class='box box-primary'>
-  				<div class='register-box-body'>
-  					<p>Password berhasil di ubah !!</p>
-  					<div class='row'>
-  						<div class='col-xs-8'></div>
-  						<div class='col-xs-4'>
-  							<button type='button' onclick=location.href='login.php' class='btn btn-block btn-warning'>Back</button>
-  						</div>
-  					</div>
-  				</div>
-  			</div>";
+        echo '<script>
+alert("Berhasil mengubah password anda");
+window.location.href="ubahpassword.php";
+</script>';
 	} else {
 
-		echo "<div class='register-logo'><b>Oops!</b> Rubah password GAGAL!!</div>
-  			<div class='box box-primary'>
-  				<div class='register-box-body'>
-  					<p>Password lama anda salah. Silahkan masukkan password lama dengan benar</p>
-  					<div class='row'>
-  						<div class='col-xs-8'></div>
-  						<div class='col-xs-4'>
-  							<button type='button' onclick=location.href='ubahpassword.php' class='btn btn-block btn-warning'>Back</button>
-  						</div>
-  					</div>
-  				</div>
-  			</div>";
+		echo '<script>
+alert("Password lama tidak sesuai");
+window.location.href="ubahpassword.php";
+</script>';
 	}
 }
 ?>
