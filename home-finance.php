@@ -935,8 +935,14 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
               <form method="POST" id="form_validate_receiver_bpu">
                   <div class="modal-body">
                       <p><i class="fa fa-check text-success"></i> Apakah anda yakin ingin memvalidasi penerima ini? </p>
+                      <div class="form-group">
+                          <label for="validate_receiver_bpu">Keterangan Penolakan</label>
+                          <textarea class="form-control" name="keterangan" id="reason_decline" rows="3"></textarea>
+                          <small>* Abaikan saja jika data penerima disetujui</small>
+                      </div>
                   </div>
                   <div class="modal-footer">
+                      <button type="button" id="buttonValidateDecline" class="btn btn-danger danger" onclick="validateDecline(this)"><i class="fa fa-times"></i> Tolak</button>
                       <button type="submit" id="buttonValidate" class="btn btn-success success"><i class="fa fa-check"></i> Validasi</button>
                   </div>
               </form>
@@ -957,7 +963,7 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
 
     function validasiKonfirm(e) {
         let form = document.getElementById("form_validate_receiver_bpu")
-        form.action = `ReceiverBpu.php?action=validate&id=${e.dataset.id}`
+        form.action = `ReceiverBpu.php?id=${e.dataset.id}`
         $('#validateReceiverBpuModal').modal('show')
     }
 
@@ -970,7 +976,7 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
 
         $.ajax({
             type: 'post',
-            url: form[0].action,
+            url: form[0].action + "&action=validate",
             data: form.serialize(),
             success: function(data) {
                 let json = JSON.parse(data)
@@ -979,6 +985,23 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
             }
         });
     })
+
+    function validateDecline(e) {
+        let form = document.getElementById("form_validate_receiver_bpu")
+        let reason = $('#reason_decline').val()
+        let url = form.action + "&action=decline&reason=" + reason
+
+        $.ajax({
+            type: 'post',
+            url: url,
+            success: function(data) {
+                let json = JSON.parse(data)
+                alert(json.message)
+                window.location.reload()
+            }
+        });
+
+    }
 
     $(document).ready(function() {
       $('#inputImageSign').change(function() {

@@ -34,6 +34,34 @@ class ReceiverBpu extends Database
         return $save->save_update();
     }
 
+    public function decline_receiver()
+    {
+        $wa = new Whastapp();
+        $msg = new Message();
+        $dataPengajuan = $this->select("a.*, b.rincian, c.pengaju, c.pembuat")->from("tb_penerima a")
+            ->join("selesai b", "a.item_id = b.id")->join("pengajuan c", "b.waktu = c.waktu")
+            ->where("a.id", "=", $_GET["id"])->first();
+
+        $penerimaNotif = [];
+        $userPengaju = $this->get_user_by_name($dataPengajuan["pengaju"]);
+        $userPembuat = $this->get_user_by_name($dataPengajuan["pembuat"]);
+
+        $penerimaNotif[] = $userPengaju;
+
+        if ($userPembuat["nama_user"] != $_SESSION["nama_user"]) {
+            $penerimaNotif[] = $userPembuat;
+        }
+
+        foreach ($penerimaNotif as $key => $value) {
+            $this->dataPenerima[] = $value["nama_user"];
+            $wa->sendMessage($value["phone_number"], $msg->messageValidasiPenerimaBpuDiTolak($value["nama_user"], $dataPengajuan, $dataPengajuan["rincian"], $_SESSION["nama_user"], $_GET["reason"]));
+        }
+
+        $save = $this->delete("tb_penerima")
+            ->where("id", "=", $_GET["id"]);
+        return $save->save_delete();
+    }
+
     public function get_receiver_validate()
     {
         return $this->select("*")->from("tb_penerima")->where("is_validate", "=", true)->where("item_id", "=", $_GET["itemId"])->get();
@@ -113,6 +141,16 @@ if ($action == "validate") {
         $receiver->send_notification_to_user();
         $penerimaNotif = implode(", ", $receiver->dataPenerima);
         echo json_encode(["message" => "Berhasil memvalidasi data penerima. Pemberitahuan telha dikirimkan ke $penerimaNotif melalui pesan whatsapp"]);
+    } else {
+        echo json_encode(["message" => "Data gagal divalidasi, Coba lagi!. Jika masih menemukan kesalahan yang sama, informasikan pada tim IT."]);
+    }
+}
+
+if ($action == "decline") {
+    $isSaved = $receiver->decline_receiver();
+    if ($isSaved) {
+        $penerimaNotif = implode(", ", $receiver->dataPenerima);
+        echo json_encode(["message" => "Data penerima telah anda tolak. Pemberitahuan telah dikirimkan ke $penerimaNotif melalui pesan whatsapp"]);
     } else {
         echo json_encode(["message" => "Data gagal divalidasi, Coba lagi!. Jika masih menemukan kesalahan yang sama, informasikan pada tim IT."]);
     }
