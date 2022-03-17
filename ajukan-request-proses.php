@@ -145,28 +145,47 @@ $emails= [];
 $namaUser = [];
 $idUsersNotification = [];
 
-$dataUserDireksi = $con->select()->from('tb_user')
-    ->where('divisi', '=', 'Finance')
-    ->where("hak_akses", "=", "Manager")
-    ->where("level", "=", "Manager")
-    ->where('aktif', '=', 'Y')->first();
+$dataPengajuan = $con->select()->from('pengajuan_request')->where('waktu','=', $waktu)->first();
+if ($dataPengajuan["status_request"] == "Ditolak") {
+    $dataUserDireksi = $con->select()->from('tb_user')
+        ->where('divisi', '=', 'Direksi')
+        ->where('aktif', '=', 'Y')->first();
 
-if ($dataUserDireksi['phone_number']) {
-    $emails[] = $dataUserDireksi['email'];
-    $phoneNumbers[] = $dataUserDireksi['phone_number'];
-    $namaUser[] = $dataUserDireksi['nama_user'];
-    $idUsersNotification[] = $dataUserDireksi['id_user'];
+    if ($dataUserDireksi['phone_number']) {
+        $emails[] = $dataUserDireksi['email'];
+        $phoneNumbers[] = $dataUserDireksi['phone_number'];
+        $namaUser[] = $dataUserDireksi['nama_user'];
+        $idUsersNotification[] = $dataUserDireksi['id_user'];
+    }
+
+    $updatePengajuanRequest = $con->update('pengajuan_request')
+        ->where('waktu','=', $waktu)
+        ->save_update();
+} else {
+
+    $dataUserDireksi = $con->select()->from('tb_user')
+        ->where('divisi', '=', 'Finance')
+        ->where("hak_akses", "=", "Manager")
+        ->where("level", "=", "Manager")
+        ->where('aktif', '=', 'Y')->first();
+
+    if ($dataUserDireksi['phone_number']) {
+        $emails[] = $dataUserDireksi['email'];
+        $phoneNumbers[] = $dataUserDireksi['phone_number'];
+        $namaUser[] = $dataUserDireksi['nama_user'];
+        $idUsersNotification[] = $dataUserDireksi['id_user'];
+    }
+
+    $updatePengajuanRequest = $con->update('pengajuan_request')
+        ->set_value_update('status_request', 'Butuh Validasi')
+        ->set_value_update('waktu', $waktu)
+        ->set_value_update('submission_note', $keterangan)
+        ->set_value_update('document', $document)
+        ->where('waktu','=', $waktu)
+        ->save_update();
 }
 
-$updatePengajuanRequest = $con->update('pengajuan_request')
-    ->set_value_update('status_request', 'Butuh Validasi')
-    ->set_value_update('waktu', $waktu)
-    ->set_value_update('submission_note', $keterangan)
-    ->set_value_update('document', $document)
-    ->where('waktu','=', $waktu)
-    ->save_update();
-
-saveDoc($koneksi, $id, $name);
+//saveDoc($koneksi, $id, $name);
 $updateSelesaiRequest = $con->update('selesai_request')->set_value_update('waktu', $waktu)->where('id_pengajuan_request', '=', $id)->save_update();
 
 $url = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
