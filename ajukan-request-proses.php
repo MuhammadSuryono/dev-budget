@@ -159,7 +159,7 @@ if ($dataPengajuan["status_request"] == "Ditolak") {
     }
 
     $updatePengajuanRequest = $con->update('pengajuan_request')
-        ->set_value_update('status_request', 'DiAjukan')
+        ->set_value_update('status_request', 'Di Ajukan')
         ->where('waktu','=', $waktu)
         ->save_update();
 } else {
