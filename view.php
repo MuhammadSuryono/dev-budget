@@ -211,7 +211,7 @@ if (!isset($_SESSION['nama_user'])) {
 
                           <?php
                           $arrCheck = [];
-                          $liatbayar = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no' ORDER BY term");
+                          $liatbayar = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no' AND (status_pengajuan_bpu != 2 or status_pengajuan_bpu is NULL) ORDER BY term");
                           if (mysqli_num_rows($liatbayar) == 0) {
                             echo "";
                           } else {
@@ -334,7 +334,7 @@ if (!isset($_SESSION['nama_user'])) {
                                 echo "</b><br>";
                                 echo "Jenis Pajak :<b>" .isset($bayar['jenis_pajak']) ? $bayar['jenis_pajak'] : "-";
                                 echo "</b><br>";
-                                echo "Nominal Pajak :<b>Rp. " .number_format($bayar['nominal_pajak']);
+                                echo "Nominal Pajak :<b>Rp. " .number_format($bayar['nominal_pajak'] == null ? 0 : $bayar['nominal_pajak']);
                                 echo "</b><br>";
                                 echo ($statusPengajuanBpu != 0) ? "Request BPU : <br><b>Rp. " . number_format($total['jumlah_pengajuan'], 0, '', ',') : "Nominal Pembayaran : <br><b>Rp. " . number_format($total['jumlah_total'], 0, '', ',');
                                 echo "</b><br>";
