@@ -293,7 +293,7 @@ if (!isset($_SESSION['nama_user'])) {
                           <?php
                         }
 
-                        $liatbayar = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no' AND status_pengajuan_bpu != 2 ORDER BY term");
+                        $liatbayar = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no' AND (status_pengajuan_bpu != 2 or status_pengajuan_bpu is NULL) ORDER BY term");
                         if (mysqli_num_rows($liatbayar) == 0) {
                           echo "";
                         } else {
