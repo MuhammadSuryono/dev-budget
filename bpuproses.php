@@ -15,13 +15,10 @@ $mssageEmail = new MessageEmail();
 
 $con = new Database();
 $koneksi = $con->connect();
-// require "vendor/email/send-email.php";
 
-//error_reporting(0);
 session_start();
 if (!isset($_SESSION['nama_user'])) {
   header("location:login.php");
-  // die('location:login.php');//jika belum login jangan lanjut
 }
 
 $querySetting = mysqli_query($koneksi, "SELECT * FROM setting_budget WHERE keterangan = 'approval_bpu'") or die(mysqli_error($koneksi));
@@ -38,7 +35,6 @@ $hostProtocol = $hostProtocol . ":" . $port;
 $host = $hostProtocol. '/'. $url[1];
 //periksa apakah udah submit
 if (isset($_POST['submit'])) {
-
   $no           = $_POST['no'];
   $jumlah       = $_POST['jumlah'];
   $jumlah = (int) filter_var($jumlah, FILTER_SANITIZE_NUMBER_INT);
@@ -56,16 +52,16 @@ if (isset($_POST['submit'])) {
   $tanggalJatuhTempo = $_POST['tanggal_jatuh_tempo'];
   $namapenerima = $_POST['namapenerima'];
 
-//  if ($statusbpu == 'UM' || $statusbpu == 'UM Burek') {
-//    $queryRekening = mysqli_query($koneksi, "SELECT * FROM rekening WHERE no=$id_rekening");
-//    $rekening = mysqli_fetch_assoc($queryRekening);
-//
-//    $queryTbUser = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE id_user = '$rekening[user_id]'");
-//    $tbUser = mysqli_fetch_assoc($queryTbUser);
-//    $namapenerima = $tbUser['nama_user'];
-//  } else {
-//    $namapenerima = $_POST['namapenerima'];
-//  }
+  if ($statusbpu == 'UM' || $statusbpu == 'UM Burek') {
+    $queryRekening = mysqli_query($koneksi, "SELECT * FROM rekening WHERE no=$id_rekening");
+    $rekening = mysqli_fetch_assoc($queryRekening);
+
+    $queryTbUser = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE id_user = '$rekening[user_id]'");
+    $tbUser = mysqli_fetch_assoc($queryTbUser);
+    $namapenerima = $tbUser['nama_user'];
+  } else {
+    $namapenerima = $_POST['namapenerima'];
+  }
 
   for ($i = 0; $i < count($arrnorek); $i++) {
     $norek .= $arrnorek[$i];
@@ -77,10 +73,14 @@ if (isset($_POST['submit'])) {
     if ($i < count($arrnamabank) - 1)
       $namabank .= ', ';
   }
+
+  $duplicateEmail = array();
   for ($i = 0; $i < count($arremailpenerima); $i++) {
-    $emailpenerima .= $arremailpenerima[$i];
-    if ($i < count($arremailpenerima) - 1)
-      $emailpenerima .= ', ';
+    if ($i < count($arremailpenerima) - 1 && !in_array($arremailpenerima[$i], $duplicateEmail)) {
+        $emailpenerima .= $arremailpenerima[$i];
+        $emailpenerima .= ', ';
+        $duplicateEmail[] = $arremailpenerima[$i];
+    }
   }
 
   $extension = pathinfo($_FILES["gambar"]["name"], PATHINFO_EXTENSION);
@@ -228,8 +228,6 @@ if (isset($_POST['submit'])) {
       $termterm = $m['MAX(term)'];
       $termfinal = $termterm + 1;
 
-      // var_dump($isNonRutin );
-      // die;
       $phoneNumbers = [];
       $nama = [];
       $idUsersNotification = [];
@@ -260,18 +258,6 @@ if (isset($_POST['submit'])) {
             }
           }
         }
-
-        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$uc[pembuat]' AND aktif='Y'");
-        $emailUser = mysqli_fetch_assoc($queryEmail);
-        if ($emailUser && !in_array($e["phone_number"], $duplicates)) {
-          array_push($phoneNumbers, $e['phone_number']);
-          array_push($nama, $e['nama_user']);
-          array_push($idUsersNotification, $e['id_user']);
-          array_push($dataLevel, $e['level']);
-          array_push($dataDivisi, $e['divisi']);
-          array_push($emails, $e['email']);
-          array_push($duplicates, $e['phone_number']);
-        }
       } else {
         $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,namabank,norek,namapenerima,bank_account_name, pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload, status_pengajuan_bpu,batas_tanggal_bayar,emailpenerima, rekening_id,tanggalbayar,created_at) VALUES
                                                 ('$no','$jumlah','$namabank','$norek','$namapenerima', '$namapenerima', '$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar', '3', '$tanggalBatasBayar', '$emailpenerima', '$id_rekening', '$tanggal_bayar' ,'$time')") or die(mysqli_error($koneksi));
@@ -295,6 +281,18 @@ if (isset($_POST['submit'])) {
             }
           }
         }
+
+          $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$uc[pembuat]' AND aktif='Y'");
+          $emailUser = mysqli_fetch_assoc($queryEmail);
+          if ($emailUser && !in_array($e["phone_number"], $duplicates)) {
+              array_push($phoneNumbers, $e['phone_number']);
+              array_push($nama, $e['nama_user']);
+              array_push($idUsersNotification, $e['id_user']);
+              array_push($dataLevel, $e['level']);
+              array_push($dataDivisi, $e['divisi']);
+              array_push($emails, $e['email']);
+              array_push($duplicates, $e['phone_number']);
+          }
 
         // $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$pengaju' AND aktif='Y'");
         // $emailUser = mysqli_fetch_assoc($queryEmail);
@@ -404,11 +402,27 @@ if (isset($_POST['submit'])) {
       $termfinal = $termterm + 1;
 
       if ($divisi == 'FINANCE') {
-        $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,namabank,norek,namapenerima,bank_account_name,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload, status_pengajuan_bpu, batas_tanggal_bayar,emailpenerima, rekening_id, created_at) VALUES
-      ('$no','$jumlah','$namabank','$norek','$namapenerima', '$namapenerima', '$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar', '1', '$tanggalBatasBayar', '$emailpenerima', '$id_rekening' ,'$time')") or die(mysqli_error($koneksi));
-        $idBpu = mysqli_insert_id($koneksi);
-      
-        $insert = mysqli_query($koneksi, "INSERT INTO tb_jatuh_tempo (id_bpu, tanggal_jatuh_tempo) VALUES ('$idBpu', '$tanggalJatuhTempo')") or die(mysqli_error($koneksi));
+
+          if ($statusbpu == "Biaya Lumpsum") {
+              $jumlah = $_POST["jumlah"];
+              $namapenerima = $_POST["namapenerima"];
+              $email = $_POST["email"];
+              $norek = $_POST["norek"];
+              $namabank = $_POST["namabank"];
+              $bank_account_name = $_POST["bank_account_name"];
+
+              for ($i = 0; $i < count($_POST["jumlah"]); $i++) {
+                  $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,namabank,norek,namapenerima,bank_account_name,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload, status_pengajuan_bpu, batas_tanggal_bayar,emailpenerima, rekening_id, created_at) VALUES
+                    ('$no','$jumlah[$i]','$namabank[$i]','$norek[$i]','$namapenerima[$i]', '$bank_account_name[$i]', '$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar', '1', '$tanggalBatasBayar', '$email[$i]', '$id_rekening' ,'$time')") or die(mysqli_error($koneksi));
+              }
+          } else {
+              $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,namabank,norek,namapenerima,bank_account_name,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload, status_pengajuan_bpu, batas_tanggal_bayar,emailpenerima, rekening_id, created_at) VALUES
+                ('$no','$jumlah','$namabank','$norek','$namapenerima', '$namapenerima', '$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar', '1', '$tanggalBatasBayar', '$emailpenerima', '$id_rekening' ,'$time')") or die(mysqli_error($koneksi));
+              $idBpu = mysqli_insert_id($koneksi);
+
+              $insert = mysqli_query($koneksi, "INSERT INTO tb_jatuh_tempo (id_bpu, tanggal_jatuh_tempo) VALUES ('$idBpu', '$tanggalJatuhTempo')") or die(mysqli_error($koneksi));
+          }
+
         $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1', '3')");
         while ($e = mysqli_fetch_assoc($queryEmail)) {
           if (@unserialize($e['hak_button'])) {
@@ -440,9 +454,25 @@ if (isset($_POST['submit'])) {
             array_push($duplicates, $emailUser['phone_number']);
         }
       } else {
-        $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,namabank,norek,namapenerima,bank_account_name,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload, status_pengajuan_bpu, batas_tanggal_bayar,emailpenerima, rekening_id,created_at) VALUES
-                                                ('$no','$jumlah','$namabank','$norek','$namapenerima', '$namapenerima', '$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar', '3', '$tanggalBatasBayar', '$emailpenerima', '$id_rekening' ,'$time')") or die(mysqli_error($koneksi));
-        $idBpu = mysqli_insert_id($koneksi);
+          if ($statusbpu == "Biaya Lumpsum") {
+              $jumlah = $_POST["jumlah"];
+              $namapenerima = $_POST["namapenerima"];
+              $email = $_POST["email"];
+              $norek = $_POST["norek"];
+              $namabank = $_POST["namabank"];
+              $bank_account_name = $_POST["bank_account_name"];
+
+              for ($i = 0; $i < count($_POST["jumlah"]); $i++) {
+                  $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,namabank,norek,namapenerima,bank_account_name,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload, status_pengajuan_bpu, batas_tanggal_bayar,emailpenerima, rekening_id, created_at) VALUES
+                    ('$no','$jumlah[$i]','$namabank[$i]','$norek[$i]','$namapenerima[$i]', '$bank_account_name[$i]', '$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar', '1', '$tanggalBatasBayar', '$email[$i]', '$id_rekening' ,'$time')") or die(mysqli_error($koneksi));
+              }
+          } else {
+              $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,namabank,norek,namapenerima,bank_account_name,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload, status_pengajuan_bpu, batas_tanggal_bayar,emailpenerima, rekening_id, created_at) VALUES
+                ('$no','$jumlah','$namabank','$norek','$namapenerima', '$namapenerima', '$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar', '1', '$tanggalBatasBayar', '$emailpenerima', '$id_rekening' ,'$time')") or die(mysqli_error($koneksi));
+              $idBpu = mysqli_insert_id($koneksi);
+
+              $insert = mysqli_query($koneksi, "INSERT INTO tb_jatuh_tempo (id_bpu, tanggal_jatuh_tempo) VALUES ('$idBpu', '$tanggalJatuhTempo')") or die(mysqli_error($koneksi));
+          }
 
         $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1','2', '3')");
         while ($e = mysqli_fetch_assoc($queryEmail)) {
@@ -462,7 +492,7 @@ if (isset($_POST['submit'])) {
           }
         }
         
-        $insert = mysqli_query($koneksi, "INSERT INTO tb_jatuh_tempo (id_bpu, tanggal_jatuh_tempo) VALUES ('$idBpu', '$tanggalJatuhTempo')") or die(mysqli_error($koneksi));
+//        $insert = mysqli_query($koneksi, "INSERT INTO tb_jatuh_tempo (id_bpu, tanggal_jatuh_tempo) VALUES ('$idBpu', '$tanggalJatuhTempo')") or die(mysqli_error($koneksi));
         // $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$pengaju' AND aktif='Y'");
         // $emailUser = mysqli_fetch_assoc($queryEmail);
         // if ($emailUser) {
@@ -586,12 +616,12 @@ if (isset($_POST['submit'])) {
 }
 
 
-function random_bytes($length = 6)
-{
-  $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  $characters_length = strlen($characters);
-  $output = '';
-  for ($i = 0; $i < $length; $i++)
-    $output .= $characters[rand(0, $characters_length - 1)];
-  return $output;
-}
+//function random_bytes($length = 6)
+//{
+//  $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+//  $characters_length = strlen($characters);
+//  $output = '';
+//  for ($i = 0; $i < $length; $i++)
+//    $output .= $characters[rand(0, $characters_length - 1)];
+//  return $output;
+//}
