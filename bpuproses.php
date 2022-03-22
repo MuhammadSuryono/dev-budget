@@ -464,7 +464,7 @@ if (isset($_POST['submit'])) {
 
               for ($i = 0; $i < count($_POST["jumlah"]); $i++) {
                   $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,namabank,norek,namapenerima,bank_account_name,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload, status_pengajuan_bpu, batas_tanggal_bayar,emailpenerima, rekening_id, created_at) VALUES
-                    ('$no','$jumlah[$i]','$namabank[$i]','$norek[$i]','$namapenerima[$i]', '$bank_account_name[$i]', '$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar', '1', '$tanggalBatasBayar', '$email[$i]', '$id_rekening' ,'$time')") or die(mysqli_error($koneksi));
+                    ('$no','$jumlah[$i]','$namabank[$i]','$norek[$i]','$namapenerima[$i]', '$bank_account_name[$i]', '$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar', '3', '$tanggalBatasBayar', '$email[$i]', '$id_rekening' ,'$time')") or die(mysqli_error($koneksi));
               }
           } else {
               $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,namabank,norek,namapenerima,bank_account_name,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload, status_pengajuan_bpu, batas_tanggal_bayar,emailpenerima, rekening_id, created_at) VALUES
