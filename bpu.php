@@ -274,6 +274,11 @@ if ($_POST['no'] && $_POST['waktu']) {
                   </div>
               </div>
           </div>
+          <div class="form-group">
+              <label class="control-label">Upload File <a href="#" data-toggle="tooltip" title="Upload File Rincian BPU"><i class="fa fa-question-circle"></i></a></label>
+              <input type="file" class="form-control" accept="image/*,application/pdf" name="gambar" id="fileInputBpu" required>
+              <img class="img-responsive" style="display: block; margin-left: auto;  margin-right: auto; background-repeat: no-repeat; background-size: cover; background-attachment: fixed;" src="" alt="" id="imageBpu">
+          </div>
           <button class="btn btn-primary" type="submit" name="submit">SUBMIT</button>
       <?php } else {
       ?>
