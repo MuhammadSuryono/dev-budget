@@ -320,7 +320,7 @@ $helper = new Helper();
                                 <!-- <?php if ($a['status'] == 'UM' || $a['status'] == 'Pulsa' || $a['status'] == 'Biaya External' || $a['status'] == 'Biaya' || $a['status'] == 'UM Burek' || $a['status'] == 'Biaya Lumpsum') {
                                       if ($a['status'] == 'Biaya Lumpsum' || $a['status'] == 'UM' || $a['status'] == 'UM Burek') {
                                           $id = $a["id"];
-                                          echo '<button type="button" class="btn btn-primary btn-small" onclick="showModalAddReceiverBpu('.$id.')">Tambah Penerima</button><br/>';
+                                          echo '<button type="button" class="btn btn-primary btn-small" onclick="showModalAddReceiverBpu('.$id.')" disabled>Tambah Penerima</button><br/>';
                                       }
                                     ?> -->
 

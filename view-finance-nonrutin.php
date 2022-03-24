@@ -366,7 +366,7 @@ $helper = new Helper();
                             if ($a['status'] == 'UM' || $a['status'] == 'UM Burek' || $a['status'] == 'Finance' || $a['status'] == 'Pulsa' || $a['status'] == 'Biaya' || $a['status'] == 'Biaya Lumpsum') {
                                 if ($a['status'] == 'Biaya Lumpsum' || $a['status'] == 'UM' || $a['status'] == 'UM Burek') {
                                     $id = $a["id"];
-                                    echo '<button type="button" class="btn btn-primary btn-small" onclick="showModalAddReceiverBpu('.$id.')">Tambah Penerima</button><br/>';
+                                    echo '<button type="button" class="btn btn-primary btn-small" onclick="showModalAddReceiverBpu('.$id.')" disabled>Tambah Penerima</button><br/>';
                                 }
                             ?>
                               <!-- <button type="button" class="btn btn-default btn-small" onclick="edit_budget('<?php echo $no; ?>','<?php echo $waktu; ?>')">Bayar</button> -->
@@ -418,7 +418,7 @@ $helper = new Helper();
                                   $statusbayar = 'Telah Di Bayar';
                                 }
 
-                                $showButtonBayar =  mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) AS count FROM bpu WHERE waktu='$waktu' AND no='$no' AND term = '$bayar[term]'  AND status = 'Belum Di Bayar' AND metode_pembayaran = 'MRI Kas'"))['count'];
+                                $showButtonBayar =  mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) AS count FROM bpu WHERE waktu='$waktu' AND no='$no' AND term = '$bayar[term]'  AND status = 'Belum Di Bayar' AND (metode_pembayaran = 'MRI Kas' OR metode_pembayaran = '')"))['count'];
                                 $noidbpu          = $bayar['noid'];
                                 $jumlbayar          = $bayar['jumlah'];
                                 $pengajuanJumlah = $bayar['pengajuan_jumlah'];
@@ -670,10 +670,12 @@ $helper = new Helper();
 
                                 if ($statusPengajuanBpu == 2 && $pengaju == $_SESSION['nama_user']) { ?>
                                   <button type="button" style="margin-bottom: 5px; margin-top: 10px;" class="btn btn-info" onclick="ajukanBpu('<?php echo $no; ?>','<?php echo $waktu; ?>', '<?= $termm ?>', '<?= $pengajuanJumlah ?>', '<?= $namapenerima ?>', '<?= $norek ?>', '<?= $namabank ?>', '<?= $fileupload ?>', '<?= $alasanTolakBpu ?>', '<?= $statusbpu ?>')">Ajukan Kembali</button>
-                                <?php  }
+                                <?php
+                                }
 
                                 if (($a['status'] == 'UM' || $a['status'] == 'UM Burek' || $a['status'] == 'Finance' || $a['status'] == 'Pulsa' || $a['status'] == 'Biaya' || $a['status'] == 'Biaya Lumpsum' || $a['status'] == 'Vendor/Supplier' || $a['status'] == 'Honor Eksternal') && ($statusbayar == 'Belum Di Bayar' && ($persetujuan == 'Disetujui (Direksi)' || $persetujuan == 'Disetujui (Sri Dewi Marpaung)' || $persetujuan == 'Disetujui oleh sistem')) && $showButtonBayar && $metodePembayaran != "MRI PAL") {
-                                ?>
+
+                                    ?>
                                   <?php if (is_null($batasTanggalBayar)) { ?>
                                     <button style="margin:3px 0" type="button" class="btn btn-info btn-small" onclick="bayarBpu('<?php echo $no; ?>','<?php echo $waktu; ?>','<?= $termm ?>')">Bayar</button>
                                     <?php } else {
