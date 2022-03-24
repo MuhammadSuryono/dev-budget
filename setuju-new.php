@@ -70,11 +70,10 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
     <input type="hidden" name="waktu" value="<?php echo $waktu ?>">
     <input type="hidden" name="term" value="<?php echo $term ?>">
     <input type="hidden" name="persetujuan" value="Sudah Disetujui">
-
     <p>Apakah anda ingin menyetujui <b>BPU</b> di Nomor <b><?= $baris['no']; ?></b>?</p>
     <div class="form-group">
         <label for="tglbayar" class="control-label">Tanggal Pembayaran :</label>
-        <input type="date" class="form-control" id="tglbayar" name="tanggalbayar" value="<?= $tanggalBayar ?>" min="<?= date('Y-m-d', strtotime($Date . ' + 2 days')) ?>">
+        <input type="date" class="form-control" id="tglbayar" name="tanggalbayar" value="<?= $tanggalBayar ?>" min="<?= $_SESSION['divisi'] == 'Direksi' ? '':date('Y-m-d', strtotime($tanggalBayar . ' + 2 days')) ?>">
     </div>
     
     <div class="alert alert-warning" role="alert">
