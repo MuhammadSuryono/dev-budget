@@ -366,7 +366,7 @@ $helper = new Helper();
                             if ($a['status'] == 'UM' || $a['status'] == 'UM Burek' || $a['status'] == 'Finance' || $a['status'] == 'Pulsa' || $a['status'] == 'Biaya' || $a['status'] == 'Biaya Lumpsum') {
                                 if ($a['status'] == 'Biaya Lumpsum' || $a['status'] == 'UM' || $a['status'] == 'UM Burek') {
                                     $id = $a["id"];
-                                    echo '<button type="button" class="btn btn-primary btn-small" onclick="showModalAddReceiverBpu('.$id.')">Tambah Penerima</button><br/>';
+                                    echo '<button type="button" class="btn btn-primary btn-small" onclick="showModalAddReceiverBpu('.$id.')" disabled>Tambah Penerima</button><br/>';
                                 }
                             ?>
                               <!-- <button type="button" class="btn btn-default btn-small" onclick="edit_budget('<?php echo $no; ?>','<?php echo $waktu; ?>')">Bayar</button> -->

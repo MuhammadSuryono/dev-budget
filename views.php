@@ -280,7 +280,7 @@ if (!isset($_SESSION['nama_user'])) {
                           <?php } else {
                               if ($a['status'] == 'Biaya Lumpsum' || $a['status'] == 'UM' || $a['status'] == 'UM Burek') {
                                   $id = $a["id"];
-                                  echo '<button type="button" class="btn btn-primary btn-small" onclick="showModalAddReceiverBpu('.$id.')">Tambah Penerima</button><br/>';
+                                  echo '<button type="button" class="btn btn-primary btn-small" onclick="showModalAddReceiverBpu('.$id.')" disabled>Tambah Penerima</button><br/>';
                               }
                               ?>
                           <?php } ?>
