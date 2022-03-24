@@ -400,16 +400,16 @@ $helper = new Helper();
                             while ($bayar = mysqli_fetch_array($liatbayar)) {
                               $queryTotal = mysqli_query($koneksi, "SELECT SUM(jumlah) AS jumlah_total, SUM(pengajuan_jumlah) AS jumlah_pengajuan FROM bpu WHERE waktu='$waktu' AND no='$no' AND term = '$bayar[term]'");
                               $total = mysqli_fetch_assoc($queryTotal);
-
+                                $metodePembayaran = $bayar["metode_pembayaran"] == "" ? "MRI Kas" : $bayar["metode_pembayaran"];
                               if (!in_array($waktu . $no . $bayar['term'], $arrCheck)) :
 
                                 $checkMetodePembayaran = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) AS count FROM bpu WHERE waktu='$waktu' AND no='$no' AND term = '$bayar[term]' AND metode_pembayaran = 'MRI Kas'"));
 
-                                if ($checkMetodePembayaran['count']) {
-                                  $metodePembayaran = 'MRI Kas';
-                                } else {
-                                  $metodePembayaran = 'MRI PAL';
-                                }
+//                                if ($checkMetodePembayaran['count']) {
+//                                  $metodePembayaran = 'MRI Kas';
+//                                } else {
+//                                  $metodePembayaran = 'MRI PAL';
+//                                }
 
                                 $checkPembayaran = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) AS count FROM bpu WHERE waktu='$waktu' AND no='$no' AND term = '$bayar[term]'  AND status = 'Belum Di Bayar'"));
                                 if ($checkPembayaran['count']) {
