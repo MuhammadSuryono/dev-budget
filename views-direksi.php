@@ -988,7 +988,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                 <div class="fetched-data">
                   <div class="form-group">
                     <label for="rincian" class="control-label">Total BPU:</label>
-                    <input type="text" class="form-control" id="hasil" name="totalbpu" readonly>
+                    <input type="text" class="form-control" id="hasil" name="totalbpu" value="0" readonly>
                   </div>
 
                   <div class="form-group">
@@ -1266,6 +1266,11 @@ $setting = mysqli_fetch_assoc($querySetting);
 
       <script type="text/javascript">
 
+          $(document).ready(function() {
+              let totalBpu = document.getElementById("hasil")
+              totalBpu.value = 0
+          })
+
         $("table").on("scroll", function () {
           console.log($("table").width())
             $("table > *").width($("table").width() + $("table").scrollLeft());
@@ -1383,6 +1388,7 @@ $setting = mysqli_fetch_assoc($querySetting);
             success: function(data) {
               $("#isi_form").html(data);
               // $('.fetched-data').html(data);//menampilkan data ke dalam modal
+                document.getElementById("hasil").value = 0;
               $('#myModal4').modal();
             }
           });
