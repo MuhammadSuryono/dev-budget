@@ -245,7 +245,8 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
       </div><!-- /.table-responsive -->
     </div>
                 
-    <?php $j = 1;?>
+    <?php
+    $j = 1;?>
     <h5>Daftar BPU yang perlu follow up</h5>
     <div class="panel panel-warning" data-widget="{&quot;draggable&quot;: &quot;false&quot;}" data-widget-static="">
       <div class="panel-body no-padding">
@@ -318,6 +319,108 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
           </div>
         </div>
         <?php if ($_SESSION['hak_akses'] == 'Manager') : ?>
+            <div class="list-group-item border" id="grandparent2" style="border: 1px solid black !important;">
+                <div id="expander" data-target="#grandparentContentBudgetValidasi" data-toggle="collapse" data-group-id="grandparent<?= $i ?>" data-role="expander">
+
+                    <ul class="list-inline row border">
+                        <li class="col-lg-11"><?= $j++ ?>. Budget Yang Perlu Divalidasi</li>
+                        <li class="col-lg-1">
+                            <span id="grandparentIcon1" style="cursor: pointer; margin: 0 10px;" class="col-lg-1"><a><i class="fas fa-eye" title="View Rincian"></i></a></span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="collapse" id="grandparentContentBudgetValidasi" aria-expanded="true">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr class="warning">
+                            <th>No</th>
+                            <th>Nama Project</th>
+                            <th>Doc</th>
+                            <th>Jenis</th>
+                            <th>Tahun</th>
+                            <th>Nama Yang Mengajukan</th>
+                            <th>Divisi</th>
+                            <th>Action</th>
+                            <th>Status</th>
+                            <th>Validasi</th>
+                            <th>Keterangan</th>
+                            <!-- <th>Pengajuan Request</th> -->
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        <?php
+                        $i = 1;
+                        $checkWaktu = [];
+                        $sql = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE status_request != 'Butuh Validasi' order by id desc");
+                        while ($d = mysqli_fetch_array($sql)) {
+                            if (!in_array($d['waktu'], $checkWaktu)) :
+
+                                $arrDocument = [];
+                                $document = unserialize($d['document']);
+                                if (!is_array($document)) {
+                                    array_push($arrDocument, $document);
+                                } else {
+                                    $arrDocument = $document;
+                                }
+                                ?>
+                                <tr>
+                                    <th scope="row"><?php echo $i++; ?></th>
+                                    <td><?php echo $d['nama']; ?></td>
+                                    <td>
+                                        <?php if ($arrDocument[0]) : ?>
+                                            <?php
+                                            $j = 0;
+                                            foreach ($arrDocument as $ad) :
+                                                ?>
+                                                <?php if ($d['on_revision_status'] == 1) : ?>
+                                                <?php if ($j == count($arrDocument) - 1) : ?>
+                                                    <a target="_blank" href='document/<?= $ad ?>.pdf'><i class='fa fa-file' style="color: red;"></i></a>
+                                                <?php else : ?>
+                                                    <a target="_blank" href='document/<?= $ad ?>.pdf'><i class='fa fa-file'></i></a>
+                                                <?php endif; ?>
+                                            <?php else : ?>
+                                                <a target="_blank" href='document/<?= $ad ?>.pdf'><i class='fa fa-file'></i></a>
+                                            <?php endif;
+                                                $j++; ?>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td><?php echo $d['jenis']; ?></td>
+                                    <td><?php echo $d['tahun']; ?></td>
+                                    <td><?php echo $d['pengaju']; ?></td>
+                                    <td><?php echo $d['divisi']; ?></td>
+                                    <td><a href="view-request.php?id=<?php echo $d['id']; ?>"><i class="fas fa-eye" title="View"></i></a></td>
+                                    <td><?php echo $d['status_request']; ?></td>
+                                    <td class="text-center">
+                                        <?php
+                                        if ($d['status_request'] == "Butuh Validasi") {
+                                            echo "<i class='fa fa-exclamation text-danger'></i>";
+                                        } elseif ($d['status_request'] == "Di Ajukan" && $d["validator"] != null) {
+                                            echo "<i class='fa fa-check text-success'></i>";
+                                        }
+                                        ?>
+                                    </td>
+                                    <?php if ($d['status_request'] == 'Di Ajukan') : ?>
+                                        <td><?= ($d['submission_note']) ? $d['submission_note'] : '-' ?></td>
+                                    <?php else : ?>
+                                        <td>-</td>
+                                    <?php endif; ?>
+                                    <?php $code = strtoupper(md5($d['nama'])); ?>
+                                    <!-- <td>
+                    <a href='#requestModal' class='btn btn-default btn-small buttonAjukan' id="buttonRequestAjukan" data-toggle='modal' data-id="<?= $d['id'] ?>" data-code="<?= $code ?>">Setujui</a>
+                    <a href='#cancelModal' class='btn btn-danger btn-small buttonCancel' id="buttonTolakAjukan" data-toggle='modal' data-id="<?= $d['id'] ?>" data-code="<?= $code ?>">Tolak</a>
+                     <a href='#sendCodeModal' class='btn btn-primary btn-small buttonAjukan' id="buttonRequestAjukan" data-toggle='modal' data-id="<?= $d['id'] ?>" data-code="<?= $code ?>">Send Code</a>
+                  </td> -->
+
+                                </tr>
+                                <?php array_push($checkWaktu, $d['waktu']); ?>
+                            <?php endif; ?>
+                        <?php } ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
           <div class="list-group-item border" id="grandparent2" style="border: 1px solid black !important;">
             <div id="expander" data-target="#grandparentContent2" data-toggle="collapse" data-group-id="grandparent<?= $i ?>" data-role="expander">
 
@@ -707,7 +810,8 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
     </div>
     <br>
 
-    <?php if ($_SESSION['hak_akses'] == 'Manager') : ?>
+    <?php
+    if ($_SESSION['hak_akses'] == 'Manager') : ?>
       <h5>Daftar Permohonan Budget</h5>
       <div class="panel panel-warning">
         <div class="panel-body no-padding">
