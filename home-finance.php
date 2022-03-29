@@ -370,11 +370,11 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
                                     <td>
                                         <?php if ($arrDocument[0]) : ?>
                                             <?php
-                                            $j = 0;
+                                            $docNumber = 0;
                                             foreach ($arrDocument as $ad) :
                                                 ?>
                                                 <?php if ($d['on_revision_status'] == 1) : ?>
-                                                <?php if ($j == count($arrDocument) - 1) : ?>
+                                                <?php if ($docNumber == count($arrDocument) - 1) : ?>
                                                     <a target="_blank" href='document/<?= $ad ?>.pdf'><i class='fa fa-file' style="color: red;"></i></a>
                                                 <?php else : ?>
                                                     <a target="_blank" href='document/<?= $ad ?>.pdf'><i class='fa fa-file'></i></a>
@@ -382,7 +382,7 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
                                             <?php else : ?>
                                                 <a target="_blank" href='document/<?= $ad ?>.pdf'><i class='fa fa-file'></i></a>
                                             <?php endif;
-                                                $j++; ?>
+                                                $docNumber++; ?>
                                             <?php endforeach; ?>
                                         <?php endif; ?>
                                     </td>
