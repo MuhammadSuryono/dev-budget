@@ -362,7 +362,7 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
             <?php
             if ($_SESSION['hak_akses'] == 'Manager' && $_SESSION["divisi"] == "FINANCE") {
                 echo '<span data-toggle="modal" data-target="#validasiModal">
-                <button type="button" class="btn btn-success btn-small pull-right" style="margin-left: 5px; display: none;" data-toggle="tooltip" data-placement="bottom" title="Harap Simpan data terlebih dahulu sebelum memvalidasi permohonan budget" id="buttonValidasi" data-id="<?= $id ?>">Validasi</button>
+                <button type="button" class="btn btn-success btn-small pull-right" style="margin-left: 5px;" data-toggle="tooltip" data-placement="bottom" title="Harap Simpan data terlebih dahulu sebelum memvalidasi permohonan budget" id="buttonValidasi" data-id="<?= $id ?>">Validasi</button>
             </span>';
             }
             ?>
@@ -1115,6 +1115,17 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
                     $('#submitButton').hide();
                     $('#buttonTambah').hide();
                 }
+            } else if (divisi == 'FINANCE' && hakAkses == 'Manager' && projectStatus == 'Butuh Validasi') {
+                    $('.editButtonCol').show();
+                    $('#buttonAjukan').hide();
+                    $('#buttonValidasi').show();
+                    $('#submitButton').show();
+                    $('#buttonTambah').show();
+                    $('#buttonSetujuiRequest').hide();
+                    $('#buttonTolakRequest').hide();
+                    if (jenis == 'Non Rutin') {
+                        $('#buttonTambahTerm').show();
+                    }
             } else if (divisi == 'FINANCE' && hakAkses == 'Manager' && jenis == 'Non Rutin' || total <= 1000000) {
                 if (projectStatus == 'Belum Di Ajukan') {
                     $('.editButtonCol').show();
@@ -1156,17 +1167,6 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
                     if (jenis == 'Non Rutin') {
                         $('#buttonTambahTerm').show();
                     }
-                } else if (projectStatus == 'Butuh Validasi') {
-                    $('.editButtonCol').show();
-                    $('#buttonAjukan').hide();
-                    $('#buttonValidasi').show();
-                    $('#submitButton').show();
-                    $('#buttonTambah').show();
-                    $('#buttonSetujuiRequest').hide();
-                    $('#buttonTolakRequest').hide();
-                    if (jenis == 'Non Rutin') {
-                        $('#buttonTambahTerm').show();
-                    }
                 }
             } else if (divisi == 'FINANCE' && hakAkses == 'Manager' && jenis == 'Uang Muka' && total <= 1000000) {
                 if (projectStatus == 'Belum Di Ajukan') {
@@ -1193,17 +1193,6 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
                     $('#buttonViewCv').hide();
                     $('#submitButton').hide();
                     $('#buttonTambah').hide();
-                } else if (projectStatus == 'Butuh Validasi') {
-                    $('.editButtonCol').show();
-                    $('#buttonAjukan').hide();
-                    $('#buttonValidasi').show();
-                    $('#submitButton').show();
-                    $('#buttonTambah').show();
-                    $('#buttonSetujuiRequest').hide();
-                    $('#buttonTolakRequest').hide();
-                    if (jenis == 'Non Rutin') {
-                        $('#buttonTambahTerm').show();
-                    }
                 }
             } else {
                 $('#buttonSetujuiRequest').hide();
