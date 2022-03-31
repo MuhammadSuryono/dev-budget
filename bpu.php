@@ -100,20 +100,18 @@ if ($_POST['no'] && $_POST['waktu']) {
       ?>
         <div class="form-group">
           <label for="id_rekening" class="control-label">Nama Penerima: <span data-toggle="tooltip" title="Pembuat BPU tidak bisa ditujukan sebagai penerima BPU"><i class="fa fa-question-circle"></i></span></label>
-          <select class="form-control" id="namapenerima" name="namapenerima">
-            <option selected disabled>Pilih Nama Penerima</option>
-            <?php
-            $penerima = $con->select("a.*, b.namabank")->from("rekening a")
-                ->join("bank b", "a.kode_bank = b.kodebank", "LEFT")
-                ->where("a.is_validate", "=", true)
-                ->where("a.item_id", "=", $itemId)->get();
-            foreach ($penerima as $rq) {
-            ?>
-              <option value="<?php echo $rq['nama_penerima']; ?>" data-penerima="<?= htmlspecialchars(json_encode($rq)) ?>" onclick="ambil_rekening(this)"><?php echo $rq['nama_penerima'] . ' - ' . $rq['nomor_rekening'] . ' - ' . $rq['namabank'] ?></option>
-            <?php
-            }
-            ?>
-          </select>
+            <select class="form-control" id="id_rekening" name="id_rekening" onchange="ambil_rekening(this.value)">
+                <option selected disabled>Pilih Nama Penerima</option>
+                <?php
+                $queryRekening = "SELECT a.*, b.namabank, c.id_user FROM rekening a JOIN bank b ON b.kodebank = a.bank JOIN tb_user c ON c.id_user = a.user_id WHERE status = 'internal' ORDER BY a.nama";
+                $run_queryRekening = $koneksi->query($queryRekening);
+                foreach ($run_queryRekening as $rq) {
+                    ?>
+                    <option value="<?php echo $rq['no']; ?>" <?= ($rq['id_user'] == $id_user) ? "disabled" : ""; ?>><?php echo $rq['nama'] . ' - ' . $rq['rekening'] . ' - ' . $rq['namabank'] ?></option>
+                    <?php
+                }
+                ?>
+            </select>
         </div>
 
         <div class="form-group">
@@ -127,16 +125,16 @@ if ($_POST['no'] && $_POST['waktu']) {
           <img class="img-responsive" style="display: block; margin-left: auto;  margin-right: auto; background-repeat: no-repeat; background-size: cover; background-attachment: fixed;" src="" alt="" id="imageBpu">
         </div>
 
-        <div class="form-group">
-          <label for="namabank" class="control-label">Nama Bank :</label>
-            <input type="hidden" class="form-control" id="c" name="namabank[]" readonly>
-          <input type="text" class="form-control" id="namabank" name="namabankshow[]" readonly>
-        </div>
+          <div class="form-group">
+              <label for="namabank" class="control-label">Nama Bank :</label>
+              <input type="text" class="form-control" id="namabank" name="bank" readonly>
+              <input type="hidden" class="form-control" id="c" name="namabank[]" >
+          </div>
 
-        <div class="form-group">
-          <label for="norek" class="control-label">Nomor Rekening :</label>
-          <input type="number" class="form-control" id="d" name="norek[]" readonly>
-        </div>
+          <div class="form-group">
+              <label for="norek" class="control-label">Nomor Rekening :</label>
+              <input type="number" class="form-control" id="d" name="norek[]" readonly>
+          </div>
 
           <?php
           if ($statusbpu != 'Biaya Lumpsum') {
@@ -387,12 +385,43 @@ if ($_POST['no'] && $_POST['waktu']) {
         }
       }
 
-      function ambil_rekening(e) {
+      function ambil_rekening_a(e) {
           let json = JSON.parse(e.dataset.penerima)
           $("#emailBpu").val(json.email);
           $("#d").val(json.nomor_rekening);
           $("#c").val(json.kode_bank);
           $("#namabank").val(json.namabank);
+      }
+
+      function ambil_rekening(id_user) {
+          $("#d").val('');
+          $("#c").val('');
+          $("#emailBpu").val('');
+          $.ajax({
+              url: 'bpuajax.php',
+              type: 'post',
+              dataType: 'json',
+              data: {
+                  actions: 'ambil_rekening',
+                  id_user: id_user
+              }
+          })
+              .done(function(data) {
+                  console.log(data);
+                  if (data != '') {
+                      $("#emailBpu").val(data.email);
+                      $("#d").val(data.rekening);
+                      $("#c").val(data.bank);
+                      $("#namabank").val(data.namabank);
+                  } else {
+                      $("#emailBpu").val('');
+                      $("#d").val('');
+                      $("#c").val('');
+                  }
+              })
+              .fail(function() {
+                  console.log('Gagal');
+              });
       }
 
       $(document).on('click', '.btn-hapus-penerima', function() {

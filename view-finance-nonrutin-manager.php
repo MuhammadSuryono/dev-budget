@@ -389,13 +389,15 @@ $setting = mysqli_fetch_assoc($querySetting);
                         if ($a['status'] == 'UM' || $a['status'] == 'UM Burek') {
                         ?>
                           <td>
+                              <button type="button" style="margin-top: 5px;" class="btn btn-default btn-small" onclick="bpu_budget('<?php echo $no; ?>','<?php echo $waktu; ?>')">BPU</button>
+                              <br/><br/>
                             <button type="button" class="btn btn-default btn-small" onclick="edit_row('<?php echo $no; ?>','<?php echo $waktu; ?>')">Edit</button>
                             <br /><br />
                             <button type="button" class="btn btn-danger btn-small" onclick="hapus_row('<?php echo $no; ?>','<?php echo $waktu; ?>')">Hapus</button>
                             <br /><br />
                             <button type="button" class="btn btn-warning btn-small" onclick="detail_bpu('<?php echo $no; ?>','<?php echo $waktu; ?>')">Detail</button>
                               <br /><br />
-                              <button type="button" class="btn btn-warning btn-small" onclick="">Tambah Penerima</button>
+<!--                              <button type="button" class="btn btn-warning btn-small" onclick="">Tambah Penerima</button>-->
                             <!-- <br/><br/> -->
                             <!-- <button type="button" class="btn btn-success btn-small" onclick="move_budget('<?php echo $no; ?>','<?php echo $waktu; ?>')">Move</button> -->
                           </td>
@@ -403,6 +405,8 @@ $setting = mysqli_fetch_assoc($querySetting);
                         } else if ($a['status'] == 'Biaya External' || $a['status'] == 'Biaya' || $a['status'] == 'Pulsa' || $a['status'] == 'Biaya Lumpsum') {
                         ?>
                           <td>
+                              <button type="button" style="margin-top: 5px;" class="btn btn-default btn-small" onclick="bpu_budget('<?php echo $no; ?>','<?php echo $waktu; ?>')">BPU</button>
+                              <br/><br/>
                             <button type="button" class="btn btn-default btn-small" onclick="edit_row('<?php echo $no; ?>','<?php echo $waktu; ?>')">Edit</button>
                             <br /><br />
                             <button type="button" class="btn btn-danger btn-small" onclick="hapus_row('<?php echo $no; ?>','<?php echo $waktu; ?>')">Hapus</button>
@@ -442,12 +446,10 @@ $setting = mysqli_fetch_assoc($querySetting);
                             if (!in_array($waktu . $no . $bayar['term'], $arrCheck)) :
 
                               $checkMetodePembayaran = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) AS count FROM bpu WHERE waktu='$waktu' AND no='$no' AND term = '$bayar[term]' AND metode_pembayaran = 'MRI Kas'"));
-
-                              if ($checkMetodePembayaran['count']) {
-                                $metodePembayaran = 'MRI Kas';
-                              } else {
-                                $metodePembayaran = 'MRI PAL';
-                              }
+                                $metodePembayaran = $bayar["metode_pembayaran"];
+                                if ($metodePembayaran == "") {
+                                  $metodePembayaran = "MRI Kas";
+                                }
 
                               $checkPembayaran = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) AS count FROM bpu WHERE waktu='$waktu' AND no='$no' AND term = '$bayar[term]'  AND status = 'Belum Di Bayar'"));
                               if ($checkPembayaran['count']) {
@@ -1470,6 +1472,20 @@ echo "Nominal Pajak :<br><b>Rp. " .number_format($bayar['nominal_pajak'] == null
 
 
     <script type="text/javascript">
+        function bpu_budget(no, waktu) {
+            $.ajax({
+                type: 'post',
+                url: 'bpu.php',
+                data: {
+                    no: no,
+                    waktu: waktu
+                },
+                success: function(data) {
+                    $('.fetched-data').html(data); //menampilkan data ke dalam modal
+                    $('#myModal').modal();
+                }
+            });
+        }
       $(document).ready(function() {
         $('.umo_biaya_kode_id').select2();
 
@@ -1477,11 +1493,6 @@ echo "Nominal Pajak :<br><b>Rp. " .number_format($bayar['nominal_pajak'] == null
           readURLNewFileBpu(this);
         })
       })
-
-      // $('input[type=text][name=berita_transfer]').tooltip({
-      //   placement: "top",
-      //   trigger: "focus"
-      // });
 
       function readURLNewFileBpu(input) {
         if (input.files && input.files[0]) {
