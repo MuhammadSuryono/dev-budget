@@ -446,12 +446,10 @@ $setting = mysqli_fetch_assoc($querySetting);
                             if (!in_array($waktu . $no . $bayar['term'], $arrCheck)) :
 
                               $checkMetodePembayaran = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) AS count FROM bpu WHERE waktu='$waktu' AND no='$no' AND term = '$bayar[term]' AND metode_pembayaran = 'MRI Kas'"));
-
-                              if ($checkMetodePembayaran['count']) {
-                                $metodePembayaran = 'MRI Kas';
-                              } else {
-                                $metodePembayaran = 'MRI PAL';
-                              }
+                                $metodePembayaran = $bayar["metode_pembayaran"];
+                                if ($metodePembayaran == "") {
+                                  $metodePembayaran = "MRI Kas";
+                                }
 
                               $checkPembayaran = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) AS count FROM bpu WHERE waktu='$waktu' AND no='$no' AND term = '$bayar[term]'  AND status = 'Belum Di Bayar'"));
                               if ($checkPembayaran['count']) {
