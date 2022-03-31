@@ -194,6 +194,9 @@ if (!isset($_SESSION['nama_user'])) {
                     $waktu = $d['waktu'];
                     $checkName = [];
                     $sql = mysqli_query($koneksi, "SELECT * FROM selesai WHERE waktu='$waktu' ORDER BY no");
+                    if ($sql->num_rows == 0) {
+                        echo "<tr><td colspan='12' align='center'><b>Tidak ada data</b><br/>Jika dipengajuan data item sudah terisi namun setelah budget disetujui item menjadi hilang. <br/>Silahkan klik button dibawah untuk mensinkronkan ulang item budget anda <br/><button class='btn btn-primary mb-5' data-waktu='$waktu' id='btn-pull-item'>Tarik Data Item Budget</button></td></tr>";
+                    }
                     $totalBiaya = 0;
                     while ($a = mysqli_fetch_array($sql)) {
                       if (!in_array($a["rincian"], $checkName)) :
@@ -1397,6 +1400,27 @@ if (!isset($_SESSION['nama_user'])) {
           $('#fileInputPengajuanBpuEdit').change(function() {
             readURL3(this);
           })
+        })
+
+        const btnPullItemBudget = document.getElementById('btn-pull-item')
+        $('#btn-pull-item').click(function(e) {
+            e.target.disabled = true;
+            e.target.innerHTML = "Sedang menarik data..."
+            $.ajax({
+                type: 'post',
+                url: 'PullItemBudget.php',
+                data: {
+                    waktu: e.target.dataset.waktu,
+                },
+                success: function(data) {
+                    setInterval(function() {
+                        e.target.disabled = false;
+                        e.target.innerHTML = "Tarik Data Item Budget"
+                        if (data === "OK") window.location.reload()
+                    }, 3000)
+
+                }
+            });
         })
 
         function readURL(input) {
