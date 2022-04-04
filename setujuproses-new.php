@@ -137,12 +137,15 @@ $duplicateNumber = [];
 
 
 $urlCallback = getHostUrl() . "/api/callback.php";
-
 if ($_POST['submit'] == 1) {
     $index = 0;
     foreach ($dataBpuItem as $item) {
-        if ($metodePembayaran != "") {
-            $item['metode_pembayaran'] = $metodePembayaran;
+        if (is_array($metodePembayaran)) {
+            $item['metode_pembayaran'] = $metodePembayaran[0];
+        } else {
+            if ($metodePembayaran != "") {
+                $item['metode_pembayaran'] = $metodePembayaran;
+            }
         }
 
         array_push($arrPembayaran, $item['metode_pembayaran']);
@@ -480,7 +483,6 @@ else if ($submit == 0) {
 
     // $email = array_unique($email);
     // $nama = array_unique($nama);
-
     if ($bpuItem['status'] == "UM" || $bpuItem['status'] == "UM Burek") {
         if (count($arrPenerima) > 0) {
             for ($i=0; $i < count($arrPenerima); $i++) { 
@@ -568,23 +570,23 @@ if ($update) {
                 echo "<script language='javascript'>";
                 echo "alert('$notification')";
                 echo "</script>";
-                echo "<script> document.location.href='view-finance" . $isNonRutin  . "-manager.php?code=" . $idBudget . "'; </script>";
+                echo "<script> document.location.href='.$_SERVER[HTTP_REFERER].'; </script>";
             } else {
                 echo "<script language='javascript'>";
                 echo "alert('$notification')";
                 echo "</script>";
-                echo "<script> document.location.href='view-finance" . $isNonRutin  . ".php?code=" . $idBudget . "'; </script>";
+                echo "<script> document.location.href='.$_SERVER[HTTP_REFERER].'; </script>";
             }
         } else if ($aksesSes == 'HRD') {
             echo "<script language='javascript'>";
             echo "alert('$notification')";
             echo "</script>";
-            echo "<script> document.location.href='views-direksi.php?code=" . $idBudget . "'; </script>";
+            echo "<script> document.location.href='.$_SERVER[HTTP_REFERER].'; </script>";
         } else {
             echo "<script language='javascript'>";
             echo "alert('$notification')";
             echo "</script>";
-            echo "<script> document.location.href='views.php?code=" . $idBudget . "'; </script>";
+            echo "<script> document.location.href='.$_SERVER[HTTP_REFERER].'; </script>";
         }
     } else {
         echo "<script language='javascript'>";
