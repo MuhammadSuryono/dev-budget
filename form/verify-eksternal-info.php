@@ -108,7 +108,7 @@ if (!$dataVerify["is_approved"] && $dataVerify["is_need_approved"] && $_SESSION[
     <button class="btn btn-success btn-flat" onclick="setujuiBpu('<?=$bpuNo?>', '<?=$waktu?>', '<?=$term?>')">Setujui</button>
 <?php }
 
-if (!$dataVerify["is_approved"] && $dataVerify["is_need_approved"] && $dataBpu['pengajuan_jumlah'] < 1000000 && $dataPengajuan['jenis'] != 'Rutin' && $_SESSION['hak_akses'] == 'Pegawai2' && $_SESSION['level'] == 'Koordinator') { ?>
+if (!$dataVerify["is_approved"] && $dataVerify["is_need_approved"] && ($dataPengajuan['jenis'] == 'Rutin' || $dataPengajuan['jenis'] == 'Non Rutin') && $_SESSION['hak_akses'] == 'Pegawai2' && $_SESSION['level'] == 'Koordinator') { ?>
     <button class="btn btn-success btn-flat" onclick="setujuiBpu('<?=$bpuNo?>', '<?=$waktu?>', '<?=$term?>')">Setujui</button>
 <?php }
 ?>
