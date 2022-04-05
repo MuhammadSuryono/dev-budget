@@ -326,23 +326,6 @@ Lihat selengkapnya dibawah ini:".
         return $msg;
     }
 
-    public function messageDissaproveBudget($pengaju, $namaProject, $divisi, $totalbudget, $alasanTolak, $pembuat, $url)
-    {
-        $msg = "Dear $pengaju, 
-Budget dengan keterangan berikut:
-Nama Project    : *$namaProject*
-Pengaju         : *$pengaju*
-Divisi          : *$divisi*
-Total Budget    : *Rp. " . number_format($totalbudget, 0, '', ',') . "*
-
-Telah Ditolak oleh *$pembuat* pada *" . date("d/m/Y H:i:s") . "* dengan keterangan *$alasanTolak* 
-";
-
-    $msg .= "
-Klik $url untuk membuka aplikasi budget.";
-        return $msg;
-    }
-
     public function messageSuccessTransferNonVendor($penerima, $jenisPembayaran, $norek, $job, $bank, $totalTransfer, $tanggal, $rincian, $kota, $jenis)
     {
         $msg = "Kepada $penerima <br><br>
