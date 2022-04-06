@@ -14,6 +14,10 @@ $con->set_name_db(DB_TRANSFER);
 $con->init_connection();
 $koneksiBridge = $con->connect();
 
+$con->set_name_db(DB_JAY);
+$con->init_connection();
+$koneksiJay2 = $con->connect();
+
 
 $querySetting = mysqli_query($koneksi, "SELECT * FROM setting_budget WHERE keterangan = 'approval_bpu'") or die(mysqli_error($koneksi));
 $setting = mysqli_fetch_assoc($querySetting);
@@ -274,6 +278,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                     <th>Harga Satuan (IDR)</th>
                     <th>Quantity</th>
                     <th>Total Harga (IDR)</th>
+                      <th>Total DiBayarkan (IDR)</th>
                     <th>Sisa Pembayaran</th>
                     <th>Action</th>
 
@@ -347,10 +352,34 @@ $setting = mysqli_fetch_assoc($querySetting);
                         $jadinya = ($hargaah - $total) + $total16
                         ?>
                         <td><?php echo 'Rp. ' . number_format($jadinya, 0, '', ','); ?></td>
+                          <td><?php echo 'Rp. ' . number_format($total, 0, '', ','); ?></td>
                         <!-- //Sisa Pembayaran -->
 
                         <!-- Tombol Eksternal -->
                         <td>
+                            <?php
+                            if ($a['status'] == "Honor Jakarta") {
+                                $queryCheckTotal = mysqli_query($koneksiJay2, "SELECT sum(total) AS totalHonor FROM honor WHERE project='$d[kodeproject]'");
+                                $rowCheckTotal = mysqli_fetch_assoc($queryCheckTotal);
+                                if ($total + $total16 == $rowCheckTotal["totalHonor"]) { ?>
+                                    <button type="button" class="btn btn-success btn-small" onclick="eksternal('<?php echo $no; ?>','<?php echo $waktu; ?>')">Eksternal</button>
+                              <br /><br />
+                                <?php }
+                            }
+                            ?>
+
+                            <?php
+                            if ($a['status'] == "Honor Luar Kota") {
+                                $queryCheckTotal = mysqli_query($koneksiJay2, "SELECT sum(total) AS totalHonor FROM honorlk WHERE project='$d[kodeproject]'");
+                                $rowCheckTotal = mysqli_fetch_assoc($queryCheckTotal);
+                                if ($total + $total16 == $rowCheckTotal["totalHonor"]) { ?>
+                                    <button type="button" class="btn btn-success btn-small" onclick="eksternal('<?php echo $no; ?>','<?php echo $waktu; ?>')">Eksternal</button>
+                              <br /><br />
+
+                                <?php }
+                            }
+                            ?>
+
                           <?php if ($a['status'] == 'UM') : ?>
                             <button type="button" class="btn btn-info btn-small" onclick="realisasi('<?php echo $no; ?>','<?php echo $waktu; ?>')">Realisasi</button>
                           <?php endif; ?>
@@ -1135,6 +1164,23 @@ echo "Nominal Pajak :<b>Rp. " .number_format($bayar['nominal_pajak'] == null ? 0
         </div>
       </div>
 
+        <div class="modal fade" id="myModal3" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h3 class="modal-title text-center">BPU Eksternal</h3>
+                    </div>
+                    <div class="modal-body">
+                        <div class="fetched-data"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Keluar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
       <?php
       $noid = isset($_GET['no']) && $_GET['no'] ? $_GET['no'] : NULL;
       $waktu = isset($_GET['waktu']) && $_GET['waktu'] ? $_GET['waktu'] : NULL;
@@ -1142,6 +1188,21 @@ echo "Nominal Pajak :<b>Rp. " .number_format($bayar['nominal_pajak'] == null ? 0
       ?>
 
       <script type="text/javascript">
+          function eksternal(no, waktu) {
+              // alert(noid+' - '+waktu);
+              $.ajax({
+                  type: 'post',
+                  url: 'eksternal-new.php',
+                  data: {
+                      no: no,
+                      waktu: waktu
+                  },
+                  success: function(data) {
+                      $('#myModal3 .fetched-data').html(data); //menampilkan data ke dalam modal
+                      $('#myModal3').modal();
+                  }
+              });
+          }
         $(document).ready(function() {
           $('.umo_biaya_kode_id').select2();
         })
