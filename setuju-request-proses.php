@@ -195,7 +195,7 @@ if ($updatePengajuanRequest) {
                         $path = '/views-direksi.php';
                     }
                     $url =  $host. $path.'?code='.$idPengajuan.'&session='.base64_encode(json_encode(["id_user" => $idUsersNotification[$i], "timeout" => time()]));
-                    $msg = $helper->messagePersetujuanBudget($namaUserSendNotifications[$i], $pengaju, $gNamaProject, $divisi, $gTotalBudget, $gPembuat, $url);
+                    $msg = $helper->messagePersetujuanBudget($namaUserSendNotifications[$i], $pengaju, $gNamaProject, $divisi, $gTotalBudget, $gPembuat, $_SESSION['nama_user'], $url);
                     $msgEmail = $messageEmail->approvedBudget($namaUserSendNotifications[$i], $pengaju, $gNamaProject, $divisi, $gTotalBudget, $gPembuat, $url);
                     if($phoneNumbers[$i] != "") $whatsapp->sendMessage($phoneNumbers[$i], $msg);
                     if ($emails[$i] != "") $emailSender->sendEmail($msgEmail, "Notifikasi Persetujuan Budget", $emails[$i]);
