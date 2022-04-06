@@ -71,7 +71,7 @@ if (isset($_POST['submit'])) {
     }
 
     if ($action == 'tambah') {
-        $insert = mysqli_query($koneksi, "INSERT INTO rekening VALUES('', '$id_tb_user', '$nama', '$norek','$bank', '$status')") or die(mysqli_error($koneksi));
+        $insert = mysqli_query($koneksi, "INSERT INTO rekening VALUES('', '$id_tb_user', '$nama', '$norek','$bank', '$status', '')") or die(mysqli_error($koneksi));
         // die;
         if ($insert) {
             echo "<script language='javascript'>";

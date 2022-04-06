@@ -359,7 +359,15 @@ $setting = mysqli_fetch_assoc($querySetting);
                         <td>
                             <?php
                             if ($a['status'] == "Honor Jakarta") {
-                                $queryCheckTotal = mysqli_query($koneksiJay2, "SELECT sum(total) AS totalHonor FROM honor WHERE project='$d[kodeproject]'");
+                                $queryTypeProject = mysqli_query($koneksiJay2, "SELECT type FROM project WHERE kode = '$d[kodeproject]'");
+                                $typeProject = mysqli_fetch_assoc($queryTypeProject);
+
+                                if ($typeProject["type"] == "i") {
+                                    $queryCheckTotal = mysqli_query($koneksiJay2, "SELECT sum(total) AS totalHonor FROM honorlk WHERE project='$d[kodeproject]'");
+                                } else {
+                                    $queryCheckTotal = mysqli_query($koneksiJay2, "SELECT sum(total) AS totalHonor FROM honor WHERE project='$d[kodeproject]'");
+                                }
+
                                 $rowCheckTotal = mysqli_fetch_assoc($queryCheckTotal);
                                 if ($total + $total16 == $rowCheckTotal["totalHonor"]) { ?>
                                     <button type="button" class="btn btn-success btn-small" onclick="eksternal('<?php echo $no; ?>','<?php echo $waktu; ?>')">Eksternal</button>
