@@ -150,7 +150,7 @@ if (isset($_POST['submit'])) {
     $m = mysqli_fetch_assoc($selterm);
     $termterm = $m['MAX(term)'];
     $termfinal = $termterm + 1;
-
+    $namapenerima = $koneksi->real_escape_string($namapenerima);
     if ($divisi == 'FINANCE') {
       $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,namabank,norek,namapenerima,bank_account_name,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload, status_pengajuan_bpu,batas_tanggal_bayar,emailpenerima, rekening_id,tanggalbayar,created_at) VALUES
                                                 ('$no','$jumlah','$namabank','$norek',`$namapenerima`, `$namapenerima`,'$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar', '1', '$tanggalBatasBayar', '$emailpenerima', '$id_rekening', '$tanggal_bayar' ,'$time')") or die(mysqli_error($koneksi));
@@ -224,6 +224,7 @@ if (isset($_POST['submit'])) {
         echo "<script> document.location.href='views.php?code=" . $numb . "'; </script>";
       }
     } else {
+        $namapenerima = $koneksi->real_escape_string($namapenerima);
       $selterm = mysqli_query($koneksi, "SELECT MAX(term) FROM bpu WHERE no='$no' AND waktu='$waktu'");
       $m = mysqli_fetch_assoc($selterm);
       $termterm = $m['MAX(term)'];
