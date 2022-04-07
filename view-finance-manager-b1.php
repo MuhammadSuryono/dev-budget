@@ -647,19 +647,19 @@ echo "Nominal Pajak :<b>Rp. " .number_format($bayar['nominal_pajak'] == null ? 0
                                   <button type="button" class="btn btn-success btn-small" onclick="setujuiBpu('<?php echo $no; ?>','<?php echo $waktu; ?>', '<?= $term ?>')">Setujui</button>
                                   </br>
                                 <?php endif; ?>
-                                <button type="button" class="btn btn-warning btn-small" onclick="editharga('<?php echo $no; ?>','<?php echo $waktu; ?>')">Edit</button>
+                                <button type="button" class="btn btn-warning btn-small" onclick="editharga('<?php echo $no; ?>','<?php echo $waktu; ?>','<?php echo $bayar[noid]; ?>','<?php echo $term; ?>')">Edit</button>
                                 </br>
-                                <button type="button" class="btn btn-danger btn-small" onclick="hapus_bpu('<?php echo $no; ?>','<?php echo $waktu; ?>')">Hapus</button>
+                                <button type="button" class="btn btn-danger btn-small" onclick="hapus_bpu('<?php echo $no; ?>','<?php echo $waktu; ?>','<?php echo $term; ?>')">Hapus</button>
                               <?php
                               } else if (($persetujuan == 'Disetujui (Direksi)' || $persetujuan == 'Disetujui (Sri Dewi Marpaung)' || $persetujuan == 'Disetujui oleh sistem') and $statusbayar == 'Belum Di Bayar') {
                               ?>
-                                <button type="button" class="btn btn-warning btn-small" onclick="editharga('<?php echo $no; ?>','<?php echo $waktu; ?>')">Edit</button>
+                                <button type="button" class="btn btn-warning btn-small" onclick="editharga('<?php echo $no; ?>','<?php echo $waktu; ?>','<?php echo $bayar[noid]; ?>','<?php echo $term; ?>')">Edit</button>
                                 </br>
                                 <button type="button" class="btn btn-danger btn-small" onclick="hapus_bpu('<?php echo $no; ?>','<?php echo $waktu; ?>','<?php echo $term; ?>')">Hapus</button>
                               <?php
                               } else {
                               ?>
-                                <button type="button" class="btn btn-warning btn-small" onclick="editharga('<?php echo $no; ?>','<?php echo $waktu; ?>')">Edit</button>
+                                <button type="button" class="btn btn-warning btn-small" onclick="editharga('<?php echo $no; ?>','<?php echo $waktu; ?>','<?php echo $bayar[noid]; ?>','<?php echo $term; ?>')">Edit</button>
                                 </br>
                                 <button type="button" class="btn btn-danger btn-small" onclick="hapus_bpu('<?php echo $no; ?>','<?php echo $waktu; ?>','<?php echo $term; ?>')">Hapus</button>
                               <?php
@@ -1297,14 +1297,16 @@ echo "Nominal Pajak :<b>Rp. " .number_format($bayar['nominal_pajak'] == null ? 0
           });
         }
 
-        function editharga(no, waktu) {
+        function editharga(no, waktu, noid, term) {
           // alert(noid+' - '+waktu);
           $.ajax({
             type: 'post',
             url: 'editdireksi.php',
             data: {
               no: no,
-              waktu: waktu
+              waktu: waktu,
+                noidbpu : noid,
+                term: term
             },
             success: function(data) {
               $('.fetched-data').html(data); //menampilkan data ke dalam modal
