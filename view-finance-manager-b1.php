@@ -351,8 +351,8 @@ $setting = mysqli_fetch_assoc($querySetting);
 
                         $jadinya = ($hargaah - $total) + $total16
                         ?>
-                        <td><?php echo 'Rp. ' . number_format($jadinya, 0, '', ','); ?></td>
                           <td><?php echo 'Rp. ' . number_format($total, 0, '', ','); ?></td>
+                        <td><?php echo 'Rp. ' . number_format($jadinya, 0, '', ','); ?></td>
                         <!-- //Sisa Pembayaran -->
 
                         <!-- Tombol Eksternal -->
@@ -1319,7 +1319,7 @@ echo "Nominal Pajak :<b>Rp. " .number_format($bayar['nominal_pajak'] == null ? 0
           // alert(noid+' - '+waktu);
           $.ajax({
             type: 'post',
-            url: 'eksternal.php',
+            url: 'eksternal-new.php',
             data: {
               no: no,
               waktu: waktu
