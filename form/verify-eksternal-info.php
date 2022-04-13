@@ -95,6 +95,7 @@ $dataSelesai = mysqli_fetch_assoc($querySelesai);
 $bpuNo = $dataBpu["no"];
 $waktu = $dataBpu["waktu"];
 $term = $dataBpu["term"];
+$totalJumlah = $row['jumlah'] == 0 ?$row['pengajuan_jumlah'] : $row['jumlah'];
 
 if (!$dataVerify["is_approved"] && $dataVerify["is_need_approved"] && ($_SESSION["hak_akses"] == "Manager" || ($dataPengajuan['jenis'] == 'Rutin' && $_SESSION['hak_akses'] == 'Pegawai2' && $_SESSION['level'] == 'Koordinator'))) { ?>
     <button class="btn btn-success btn-flat" onclick="setujuiBpu('<?=$bpuNo?>', '<?=$waktu?>', '<?=$term?>')">Setujui</button>
@@ -108,9 +109,12 @@ if (!$dataVerify["is_approved"] && $dataVerify["is_need_approved"] && $_SESSION[
     <button class="btn btn-success btn-flat" onclick="setujuiBpu('<?=$bpuNo?>', '<?=$waktu?>', '<?=$term?>')">Setujui</button>
 <?php }
 
-if (!$dataVerify["is_approved"] && $dataVerify["is_need_approved"] && ($dataPengajuan['jenis'] == 'Rutin' || $dataPengajuan['jenis'] == 'Non Rutin') && $_SESSION['hak_akses'] == 'Pegawai2' && $_SESSION['level'] == 'Koordinator') { ?>
+if (!$dataVerify["is_approved"] && $dataVerify["is_need_approved"] && $_SESSION['hak_akses'] == 'Pegawai2' && $_SESSION['level'] == 'Koordinator') {
+    if ($dataPengajuan['jenis'] == 'Rutin' || $dataPengajuan['jenis'] == 'Non Rutin') { ?>
+        <button class="btn btn-success btn-flat" onclick="setujuiBpu('<?=$bpuNo?>', '<?=$waktu?>', '<?=$term?>')">Setujui</button>
+    <?php } else if (in_array($dataPengajuan['jenis'], ['B1', 'B2']) && $totalJumlah < 1000000) { ?>
     <button class="btn btn-success btn-flat" onclick="setujuiBpu('<?=$bpuNo?>', '<?=$waktu?>', '<?=$term?>')">Setujui</button>
-<?php }
+<?php  } }
 ?>
 
 <div class="modal fade" id="verifikasiBpuModal" role="dialog" aria-labelledby="verifikasiBpuModalLabel">
