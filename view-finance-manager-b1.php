@@ -369,11 +369,16 @@ $setting = mysqli_fetch_assoc($querySetting);
                                 }
 
                                 $rowCheckTotal = mysqli_fetch_assoc($queryCheckTotal);
-                                if ($total + $total16 == $rowCheckTotal["totalHonor"]) { ?>
+                                if ($total + $total16 == $rowCheckTotal["totalHonor"] || $a['status'] == "STKB OPS") { ?>
                                     <button type="button" class="btn btn-success btn-small" onclick="eksternal('<?php echo $no; ?>','<?php echo $waktu; ?>')">Eksternal</button>
                               <br /><br />
                                 <?php }
                             }
+
+                            if ($a['status'] == "STKB OPS") { ?>
+                                <button type="button" class="btn btn-success btn-small" onclick="eksternal('<?php echo $no; ?>','<?php echo $waktu; ?>')">Eksternal</button>
+                                <br /><br />
+                            <?php }
                             ?>
 
                             <?php
