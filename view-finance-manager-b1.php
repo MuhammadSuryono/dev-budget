@@ -373,13 +373,29 @@ $setting = mysqli_fetch_assoc($querySetting);
                                     <button type="button" class="btn btn-success btn-small" onclick="eksternal('<?php echo $no; ?>','<?php echo $waktu; ?>')">Eksternal</button>
                               <br /><br />
                                 <?php }
-                            }
+                            } ?>
+                            <?php
+                            if ($a['status'] == "STKB OPS") {
+                                if ($d['tahun'] >= 2022) {
+                                    $bpus = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no'");
+                                    $nomorStkbs = [];
+                                    foreach ($bpus as $bpu) {
+                                        $nomorStkbs[] = $bpu['nomorstkb'];
+                                    }
+                                    $nomorStkbs = array_unique($nomorStkbs);
+                                    $stkbPembayaranOps = mysqli_query($koneksiJay2, "SELECT sum(jumlahops) AS totalStkbOps FROM stkb_pembayaran WHERE nomorstkb IN ('" . implode("','", $nomorStkbs) . "')");
+                                    $totalStkbOpsJay = mysqli_fetch_assoc($stkbPembayaranOps);
+                                    if ($total + $total16 == $totalStkbOpsJay["totalStkbOps"]) { ?>
+                                        <button type="button" class="btn btn-success btn-small" onclick="eksternal('<?php echo $no; ?>//','<?php echo $waktu; ?>//')">Eksternal</button>
+                                        <br /><br />
 
-                            if ($a['status'] == "STKB OPS") { ?>
-                                <button type="button" class="btn btn-success btn-small" onclick="eksternal('<?php echo $no; ?>','<?php echo $waktu; ?>')">Eksternal</button>
-                                <br /><br />
-                            <?php }
-                            ?>
+                                        <?php
+                                    }
+                                } else if ($d['tahun'] <= 2021) { ?>
+                                    <button type="button" class="btn btn-success btn-small" onclick="eksternal('<?php echo $no; ?>//','<?php echo $waktu; ?>//')">Eksternal</button>
+                                    <br /><br />
+                              <?php }
+                            } ?>
 
                             <?php
                             if ($a['status'] == "Honor Luar Kota") {
@@ -398,6 +414,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                           <?php endif; ?>
                         </td>
                         <?php
+
                         $arrCheck = [];
                         $liatbayar = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no'");
                         if (mysqli_num_rows($liatbayar) == 0) {
@@ -406,6 +423,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                           while ($bayar = mysqli_fetch_array($liatbayar)) {
                             $queryTotal = mysqli_query($koneksi, "SELECT SUM(jumlah) AS jumlah_total, SUM(pengajuan_jumlah) AS jumlah_pengajuan FROM bpu WHERE waktu='$waktu' AND no='$no' AND term = '$bayar[term]'");
                             $total = mysqli_fetch_assoc($queryTotal);
+                            $noStkb = $bayar['nomorstkb'];
 
                             if (!in_array($waktu . $no . $bayar['term'], $arrCheck)) :
 
