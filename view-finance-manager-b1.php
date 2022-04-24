@@ -376,7 +376,6 @@ $setting = mysqli_fetch_assoc($querySetting);
                             } ?>
                             <?php
                             if ($a['status'] == "STKB OPS") {
-                                if ($d['tahun'] >= 2022) {
                                     $bpus = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no'");
                                     $nomorStkbs = [];
                                     foreach ($bpus as $bpu) {
@@ -391,10 +390,7 @@ $setting = mysqli_fetch_assoc($querySetting);
 
                                         <?php
                                     }
-                                } else if ($d['tahun'] <= 2021) { ?>
-                                    <button type="button" class="btn btn-success btn-small" onclick="eksternal('<?php echo $no; ?>//','<?php echo $waktu; ?>//')">Eksternal</button>
-                                    <br /><br />
-                              <?php }
+
                             } ?>
 
                             <?php
