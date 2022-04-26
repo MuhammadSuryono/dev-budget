@@ -394,7 +394,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                                         $nomorStkbs[] = $bpu['nomorstkb'];
                                     }
                                     $nomorStkbs = array_unique($nomorStkbs);
-                                    $stkbPembayaranOps = mysqli_query($koneksiJay2, "SELECT sum(jumlahops) AS totalStkbOps FROM stkb_pembayaran WHERE nomorstkb IN ('" . implode("','", $nomorStkbs) . "') AND statusbayar = 'Paid'");
+                                    $stkbPembayaranOps = mysqli_query($koneksiJay2, "SELECT (sum(jumlahops)+sum(perdin)+sum(akomodasi)+sum(bpjs)) AS totalStkbOps FROM stkb_pembayaran WHERE nomorstkb IN ('" . implode("','", $nomorStkbs) . "') AND statusbayar = 'Paid'");
                                     $totalStkbOpsJay = mysqli_fetch_assoc($stkbPembayaranOps);
                                     if ($total + $total16 == $totalStkbOpsJay["totalStkbOps"]) { ?>
                                         <button type="button" class="btn btn-success btn-small" onclick="eksternal('<?php echo $no; ?>//','<?php echo $waktu; ?>//')">Eksternal</button>
@@ -407,9 +407,16 @@ $setting = mysqli_fetch_assoc($querySetting);
 
                             <?php
                             if ($a['status'] == "Honor Luar Kota") {
-                                $queryCheckTotal = mysqli_query($koneksiJay2, "SELECT sum(total) AS totalHonor FROM honorlk WHERE project='$d[kodeproject]'");
-                                $rowCheckTotal = mysqli_fetch_assoc($queryCheckTotal);
-                                if ($total + $total16 == $rowCheckTotal["totalHonor"]) { ?>
+                                $queryTypeProject = mysqli_query($koneksiJay2, "SELECT type, kode FROM project WHERE kode IN ($implodeKodeProjects)");
+                                $totalHonor = 0;
+
+                                while ($rowTypeProject = mysqli_fetch_array($queryTypeProject)) {
+                                    $queryCheckTotal = mysqli_query($koneksiJay2, "SELECT sum(total) AS totalHonor FROM honorlk WHERE project='$rowTypeProject[kode]'");
+                                    $rowCheckTotal = mysqli_fetch_assoc($queryCheckTotal);
+                                    $totalHonor += $rowCheckTotal['totalHonor'];
+                                }
+
+                                if ($total + $total16 == $totalHonor) { ?>
                                     <button type="button" class="btn btn-success btn-small" onclick="eksternal('<?php echo $no; ?>','<?php echo $waktu; ?>')">Eksternal</button>
                               <br /><br />
 
