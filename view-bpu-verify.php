@@ -205,11 +205,12 @@ $dataPengajuan = mysqli_fetch_assoc($pengajuanQuery);
                   echo '<div class="form-group">
                   <label>File Pendukung:</label>
                   <input type="file" class="form-control" accept="image/*" id="inputImage" required/>
-                  <small>Maksimal size upload file 1Mb. File yang didukung <i>(.png,.jpg,.jpeg,.pdf,.doc,.docx)</i></small>
+                  <small>Maksimal size upload file 1Mb. File yang didukung <i>(.png,.jpg,.jpeg,.pdf,.doc,.docx)</i></small><br/>
+                  <input type="checkbox" name="fileLarge" id="fileLarge" value="1"/>
+                  <label for="fileLarge">Upload file lebih dari 1Mb</label>
                 </div>';
                 }
               }
-                
               ?>
 
             </form>
@@ -285,22 +286,23 @@ $dataPengajuan = mysqli_fetch_assoc($pengajuanQuery);
   function submit() {
     let idBpuVerify = getParameterByName('id')
     let idBpu = getParameterByName('bpu')
+      let isFileLarge = document.getElementById('fileLarge').checked
     let stateNominal = window.localStorage.getItem('stateNominal');
     const nominal = $('#nominal-verify').val()
     const input = document.getElementById('inputImage');
 		let file = input.files[0];
 
-    if (file !== undefined && file.size > 1000000) {
+    if (file !== undefined && file.size > 1000000 && !isFileLarge) {
       notifErrorForm.innerHTML = alertError("danger", "Ukuran file melebihi maksimal file upload 1Mb")
       setTimeout(() => {
         notifErrorForm.innerHTML = ""
       }, 3000)
       return
     }
-    
+
     if ((file === undefined || nominal.length < 3) || stateNominal !== nominal) {
       notifErrorForm.innerHTML = alertError("danger", "Periksa kembali data yang akan di verifikasi")
-      
+
       setTimeout(() => {
         notifErrorForm.innerHTML = ""
       }, 3000)
@@ -311,7 +313,6 @@ $dataPengajuan = mysqli_fetch_assoc($pengajuanQuery);
         window.location.reload()
       })
     }
-    
     
   }
 

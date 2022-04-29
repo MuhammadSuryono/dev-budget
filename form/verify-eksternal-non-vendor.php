@@ -111,7 +111,7 @@ if ($tanggalCair == "0000-00-00") {
     <?php if ($dataPengajuan['jenis'] == 'Rutin' && $_SESSION['hak_akses'] == 'Level 2' && $_SESSION['level'] == 'Koordinator') { ?>
         <button class="btn btn-primary" type="submit" name="submit">Simpan</button>
     <?php } ?>
-    <?php if ($dataBpu['pengajuan_jumlah'] >= 1000000 && $dataPengajuan['jenis'] != 'Rutin' && $_SESSION['hak_akses'] == 'Pegawai2' && $_SESSION['level'] == 'Koordinator') { ?>
+    <?php if ($dataPengajuan['jenis'] != 'Rutin' && $_SESSION['hak_akses'] == 'Pegawai2' && $_SESSION['level'] == 'Koordinator') { ?>
         <button class="btn btn-primary" type="submit" name="submit">Simpan</button>
     <?php } ?>
 </form>
