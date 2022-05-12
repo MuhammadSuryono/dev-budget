@@ -52,7 +52,8 @@ $setting = mysqli_fetch_assoc($querySetting);
                         <li><a href="home-direksi.php">Home</a></li>
                         <li><a href="list-direksi.php">List</a></li>
                         <li><a href="saldobpu.php">Saldo BPU</a></li>
-                        <!--<li><a href="summary.php">Summary</a></li>-->
+                        <!--<li><a href="summary.php">Summary</a></li>
+              <li><a href="bank.php">Bank</a></li>-->
                         <li><a href="listfinish-direksi.php">Budget Finish</a></li>
                     <?php } else { ?>
                         <li><a href="home-finance.php">Home</a></li>

@@ -128,6 +128,7 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
           <li><a href="history-finance.php">History</a></li>
           <li><a href="list.php">Personal</a></li>
           <li><a href="summary-finance.php">Summary</a></li>
+            <li><a href="bank.php">Bank</a></li>
           <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">Rekap
               <span class="caret"></span></a>
