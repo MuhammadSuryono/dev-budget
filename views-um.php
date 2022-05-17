@@ -1,5 +1,5 @@
 <?php
-// error_reporting(0);
+ error_reporting(0);
 session_start();
 require "application/config/database.php";
 
@@ -141,7 +141,7 @@ $totalOut = mysqli_fetch_assoc($queryTotalOut);
                 $totalBelumTerbayar = 0;
                 $totalRealisasi = 0;
                 while ($item = mysqli_fetch_assoc($query)) :
-                    $queryBpu = mysqli_query($koneksi, "SELECT SUM(a.jumlah) AS total_pengajuan FROM bpu a JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no WHERE b.status IN ('UM', 'UM Burek') AND a.namapenerima = '$code' AND a.waktu = '$item[waktu]' AND a.uangkembali = '0' AND a.status IN ('Telah Di Bayar', 'Belum Di Bayar', 'Realisasi (Direksi)')") or die(mysqli_error($koneksi));
+                    $queryBpu = mysqli_query($koneksi, "SELECT SUM(a.jumlah) AS total_pengajuan FROM bpu a JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no WHERE b.status IN ('UM', 'UM Burek') AND a.namapenerima = '$code' AND a.waktu = '$item[waktu]' AND a.realisasi + a.uangkembali != a.jumlah AND a.status IN ('Telah Di Bayar', 'Belum Di Bayar', 'Realisasi (Direksi)')") or die(mysqli_error($koneksi));
                     $pengajuan = mysqli_fetch_assoc($queryBpu);
                     
                     $queryBpuTerbayar = mysqli_query($koneksi, "SELECT SUM(a.jumlah) AS total_pengajuan FROM bpu a JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no WHERE b.status IN ('UM', 'UM Burek') AND a.namapenerima = '$code' AND a.waktu = '$item[waktu]' AND a.status IN ('Telah Di Bayar','Realisasi (Direksi)')") or die(mysqli_error($koneksi));

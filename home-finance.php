@@ -838,7 +838,7 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
               <?php
               $i = 1;
               $checkWaktu = [];
-              $sql = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE status_request!='Dihapus' AND status_request!='Disetujui' order by id desc");
+              $sql = mysqli_query($koneksi, "SELECT * FROM pengajuan_request WHERE status_request = 'Butuh Validasi' order by id desc");
               while ($d = mysqli_fetch_array($sql)) {
                 if (!in_array($d['waktu'], $checkWaktu)) :
 
