@@ -53,7 +53,7 @@ if (isset($_POST['submit'])) {
         Divisi          : <strong>$divisi</strong><br>
         Total Budget    : <strong>Rp. " . number_format($totalbudget, 0, '', ',') . "</strong><br><br>
         
-        Telah Ditolak oleh <strong> $pembuat </strong> pada <strong> " . date("d/m/Y H:i:s") . "</strong> dengan keterangan <strong>$alasanTolak</strong> <br><br>
+        Telah Ditolak oleh <strong> $_SESSION[nama_user] </strong> pada <strong> " . date("d/m/Y H:i:s") . "</strong> dengan keterangan <strong>$alasanTolak</strong> <br><br>
         ";
 
     $msg .= "Klik <a href='$url'>Disini</a> untuk membuka aplikasi budget.";
