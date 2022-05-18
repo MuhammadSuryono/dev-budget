@@ -19,8 +19,8 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
 
     // mengambil data berdasarkan id
     // dan menampilkan data ke dalam form modal bootstrap
-    $sql = "SELECT a.namapenerima, a.jumlah, a.namabank, a.norek, b.jenis FROM bpu a LEFT JOIN pengajuan b ON a.waktu = b.qrcode WHERE a.no = '$id' AND a.waktu = '$waktu' AND a.term = '$term' AND a. metode_pembayaran = 'MRI Kas' AND a.status = 'Belum Di Bayar'";
-    $result = $koneksi->query($sql); ?>
+    $result = $koneksi->query("SELECT * from bpu where no = '$id' AND waktu = '$waktu' AND term = '$term' AND (metode_pembayaran = 'MRI Kas' OR metode_pembayaran = '') AND status = 'Belum Di Bayar'");
+    ?>
 
     <table class="table table-bordered">
         <thead>

@@ -459,7 +459,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                                 $statusbayar = 'Telah Di Bayar';
                               }
 
-                              $showButtonBayar =  mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) AS count FROM bpu WHERE waktu='$waktu' AND no='$no' AND term = '$bayar[term]'  AND status = 'Belum Di Bayar' AND metode_pembayaran = 'MRI Kas'"))['count'];
+                              $showButtonBayar =  mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) AS count FROM bpu WHERE waktu='$waktu' AND no='$no' AND term = '$bayar[term]'  AND status = 'Belum Di Bayar' AND (metode_pembayaran = 'MRI Kas' OR metode_pembayaran = '')"))['count'];
                               $noidbpu          = $bayar['noid'];
                               $noidbpu          = $bayar['noid'];
                               $jumlbayar        = $bayar['jumlah'];
@@ -750,15 +750,15 @@ echo "Nominal Pajak :<br><b>Rp. " .number_format($bayar['nominal_pajak'] == null
                                 <button type="button" style="margin-bottom: 5px; margin-top: 10px;" class="btn btn-info" onclick="verifikasiBpu('<?php echo $no; ?>','<?php echo $waktu; ?>', '<?= $term ?>')">Verifikasi BPU</button>
                                 <?php
                               endif;
-
                               if (($a['status'] == 'UM' || $a['status'] == 'UM Burek' || $a['status'] == 'Finance' || $a['status'] == 'Pulsa' || $a['status'] == 'Biaya' || $a['status'] == 'Biaya Lumpsum' || $a['status'] == 'Vendor/Supplier' || $a['status'] == 'Honor Eksternal') && ($statusbayar == 'Belum Di Bayar' && ($persetujuan == 'Disetujui (Direksi)' || $persetujuan == 'Disetujui (Sri Dewi Marpaung)' || $persetujuan == 'Disetujui oleh sistem')) && $showButtonBayar && $metodePembayaran != "MRI PAL") {
                                 if (!is_null($batasTanggalBayar)) {
                                   if ((int) date('H') < 15) $thisDay = date('Y-m-d');
                                   else $thisDay = date('Y-m-d', strtotime('+ 1 days'));
-                                  if ($thisDay >= $batasTanggalBayar) {
+
                                 ?>
+                                    <button style="margin:3px 0" type="button" class="btn btn-info btn-small" onclick="bayarBpu('<?php echo $no; ?>','<?php echo $waktu; ?>','<?= $term ?>')">Bayar</button>
                                     <button style="margin:3px 0" type="button" class="btn btn-info btn-small" data-toggle="modal" data-target="#aksesBayarModal" id="btn-akses-bpu" onclick="aksesBpu('<?php echo $no; ?>','<?php echo $waktu; ?>', '<?= $termm ?>', '<?= $code ?>')">Buka Akses Bayar</button>
-                                  <?php }
+                                  <?php
                                 }
                               }
 
@@ -1447,6 +1447,29 @@ echo "Nominal Pajak :<br><b>Rp. " .number_format($bayar['nominal_pajak'] == null
       </div>
     </div>
 
+      <div class="modal fade" id="bayarBpuModal" role="dialog" aria-labelledby="bayarBpuModalLabel">
+          <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      <h3 class="modal-title text-center" id="bayarBpuModalLabel">Bayar BPU</h3>
+                  </div>
+                  <form action="bayarbudgetproses-new.php" method="post" name="Form" enctype="multipart/form-data">
+                      <div class="modal-body">
+
+                          <div class="fetched-data"></div>
+
+                      </div>
+                      <div class="modal-footer">
+                          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                          <button type="submit" class="btn btn-primary" value="1" name="submit">Bayar</button>
+                      </div>
+                  </form>
+
+              </div>
+          </div>
+      </div>
+
     <div class="modal fade" id="setujuiBpuModal" role="dialog" aria-labelledby="setujuiBpuModalLabel">
       <div class="modal-dialog modal-lg" role="document" style="width: 1200px">
         <div class="modal-content">
@@ -1494,6 +1517,23 @@ echo "Nominal Pajak :<br><b>Rp. " .number_format($bayar['nominal_pajak'] == null
           readURLNewFileBpu(this);
         })
       })
+
+        function bayarBpu(no, waktu, term) {
+            // alert(noid+' - '+waktu);
+            $.ajax({
+                type: 'post',
+                url: 'bayarbudget-new.php',
+                data: {
+                    no: no,
+                    waktu: waktu,
+                    term: term
+                },
+                success: function(data) {
+                    $('#bayarBpuModal .fetched-data').html(data); //menampilkan data ke dalam modal
+                    $('#bayarBpuModal').modal();
+                }
+            });
+        }
 
       function readURLNewFileBpu(input) {
         if (input.files && input.files[0]) {
