@@ -688,13 +688,12 @@ $helper = new Helper();
                                     else
                                       $thisDay = date('Y-m-d', strtotime('+ 1 days'));
 
-                                    if ($thisDay < $batasTanggalBayar) {
+//                                    if ($batasTanggalBayar) {
                                     ?>
                                       <button style="margin:3px 0" type="button" class="btn btn-info btn-small" onclick="bayarBpu('<?php echo $no; ?>','<?php echo $waktu; ?>','<?= $termm ?>')">Bayar</button>
-                                    <?php } else { ?>
-                                      <button style="margin:3px 0" title="Telah melebih waktu pembayaran" type="button" class="btn btn-info btn-small" onclick="edit_budget('<?php echo $no; ?>','<?php echo $waktu; ?>','<?= $termm ?>')" disabled>Bayar</button>
 
-                                  <?php }
+
+                                  <?php
                                   } ?>
                                 <?php
                                 }
