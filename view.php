@@ -488,10 +488,13 @@ if (!isset($_SESSION['nama_user'])) {
             </div>
 
             <br /><br />
-
+              <?php
+              $queryTotal = mysqli_query($koneksi, "SELECT sum(total) as total FROM budget.selesai where waktu = '$d[waktu]'");
+              $dataTotal = mysqli_fetch_array($queryTotal);
+              ?>
             <div class="row">
               <div class="col-xs-3">Total Budget Keseluruhan</div>
-              <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></b></div>
+              <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($dataTotal["total"], 0, '', ','); ?></b></div>
             </div>
 
             <div class="row">
@@ -512,7 +515,7 @@ if (!isset($_SESSION['nama_user'])) {
             <div class="row">
               <div class="col-xs-3">Total Yang Belum Di bayarkan</div>
               <?php
-              $aaaa = $d['totalbudget'];
+              $aaaa = $dataTotal["total"];
               $bbbb = $row2['sum'];
               $belumbayar = $aaaa - $bbbb;
 
