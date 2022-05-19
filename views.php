@@ -1117,6 +1117,28 @@ if (!isset($_SESSION['nama_user'])) {
                 </div>
               </form>
               <script>
+
+                  const btnPullItemBudget = document.getElementById('btn-pull-item')
+                  $('#btn-pull-item').click(function(e) {
+                      e.target.disabled = true;
+                      e.target.innerHTML = "Sedang menarik data..."
+                      $.ajax({
+                          type: 'post',
+                          url: 'PullItemBudget.php',
+                          data: {
+                              waktu: e.target.dataset.waktu,
+                          },
+                          success: function(data) {
+                              setInterval(function() {
+                                  e.target.disabled = false;
+                                  e.target.innerHTML = "Tarik Data Item Budget"
+                                  if (data === "OK") window.location.reload()
+                              }, 3000)
+
+                          }
+                      });
+                  })
+
                 $(document).ready(function() {
                   $('#fileInputPengajuanBpu').change(function() {
                     readURL(this);
