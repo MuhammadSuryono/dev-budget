@@ -409,7 +409,11 @@ $setting = mysqli_fetch_assoc($querySetting);
 
                             } ?>
 
-                            <?php
+                            <?
+
+                            if ($a['status'] == "Honor Eksternal") { ?>
+                                <button type="button" class="btn btn-success btn-small" onclick="eksternal('<?php echo $no; ?>','<?php echo $waktu; ?>')">Eksternal</button>
+                            <?php }
                             if ($a['status'] == "Honor Luar Kota") {
                                 $queryTypeProject = mysqli_query($koneksiJay2, "SELECT type, kode FROM project WHERE kode IN ($implodeKodeProjects)");
                                 $totalHonor = 0;
