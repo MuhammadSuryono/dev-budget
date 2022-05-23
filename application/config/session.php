@@ -27,7 +27,7 @@ class Session {
 
     public function setAuthLogin($idUser, $password = "")
     {
-        $resp = HTTPRequester::HTTPPost('/auth/login', ["username" => $idUser, "password" => $password], "json");
+        $resp = HTTPRequester::HTTPPost('/auth/login', ["username" => $idUser, "password" => $password], "json", "", true);
 
         if ($resp->status == true) {
             $dataUser = $resp->data;

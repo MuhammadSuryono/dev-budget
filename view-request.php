@@ -266,6 +266,13 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
                 <p>Budget belum <button class="btn btn-xs btn-danger" disabled>DI VALIDASI</button> oleh Kadiv Finance.</p>
             </div>';
             } ?>
+
+            <?php if ($d['status_request'] == 'Validasi Di Tolak') {
+                echo '<div class="alert alert-danger" role="alert">
+                <h4 class="alert-heading">DITOLAK VALIDASI</h4>
+                <p>Budget telah <button class="btn btn-xs btn-danger" disabled>DI TOLAK VALIDASI</button> oleh Kadiv Finance. Dengan keterangan: <i>'.$d["declined_note"].'</i></p>
+            </div>';
+            } ?>
             <div class="panel panel-warning" data-widget="{&quot;draggable&quot;: &quot;false&quot;}" data-widget-static="">
                 <div class="panel-body no-padding">
                     <table class="table table-striped table-bordered">
@@ -360,7 +367,10 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
                 <button type="button" class="btn btn-success btn-small pull-right" style="margin-left: 5px; display: none;" data-toggle="tooltip" data-placement="bottom" title="Harap Simpan data terlebih dahulu sebelum mengajukan permohonan budget" id="buttonAjukan" data-id="<?= $id ?>">Ajukan</button>
             </span>
             <?php
-            if ($_SESSION['hak_akses'] == 'Manager' && $_SESSION["divisi"] == "FINANCE") {
+            if ($_SESSION['hak_akses'] == 'Manager' && $_SESSION["divisi"] == "FINANCE" && $d['status_request'] == 'Butuh Validasi') {
+                echo '<span data-toggle="modal" data-target="#tolakValidasiModal">
+                <button type="button" class="btn btn-danger btn-small pull-right" style="margin-left: 5px;" data-toggle="tooltip" data-placement="bottom" id="buttonTolakValidasi" data-id="<?= $id ?>">Tolak Validasi</button>
+            </span>';
                 echo '<span data-toggle="modal" data-target="#validasiModal">
                 <button type="button" class="btn btn-success btn-small pull-right" style="margin-left: 5px;" data-toggle="tooltip" data-placement="bottom" title="Harap Simpan data terlebih dahulu sebelum memvalidasi permohonan budget" id="buttonValidasi" data-id="<?= $id ?>">Validasi</button>
             </span>';
@@ -745,6 +755,26 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
         </div>
     </div>
 
+    <div class="modal fade" id="tolakValidasiModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    Konfirmasi Tolak Validasi Budget
+                </div>
+                <div class="modal-body">
+                    <p>Masukkan keterangan tambahan (jika ada) dan klik 'submit' untuk untuk melakukan <b class="text-danger">PENOLAKAN</b> validasi budget</p>
+                    <div class="form-group" style="margin-top: 2px;">
+                        <input type="text" id="keteranganTambahanTolakValidasi" class="form-control" id="exampleInputEmail1" placeholder="Keterangan" autocomplete="off">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button href="" id="buttonSubmitTolakValidasi" class="btn btn-success success">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="logPerubahanItemModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -1006,6 +1036,14 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
                 let id = buttonAjukan.getAttribute("data-id");
                 let keterangan = document.getElementById("keteranganTambahanValidasi").value;
                 window.location.href = "ValidasiBudget.php?id=" + id + "&keterangan=" + keterangan;
+            })
+
+            // buttonSubmitTolakValidasi
+            const buttonTolakValidasi = document.querySelector('#buttonSubmitTolakValidasi');
+            buttonTolakValidasi.addEventListener("click", function () {
+                let id = buttonAjukan.getAttribute("data-id");
+                let keterangan = document.getElementById("keteranganTambahanTolakValidasi").value;
+                window.location.href = "ValidasiBudget.php?id=" + id + "&tolak&keterangan=" + keterangan;
             })
 
             $('.btn-tambah-row').click(function() {

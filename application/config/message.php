@@ -464,6 +464,29 @@ http://$urlPengajuan";
         return $msg;
     }
 
+    public function messagePenolakanValidasiBudget($receiver, $dataPengajuan, $validator, $urlPengajuan)
+    {
+        $msg = "Dear $receiver,
+
+Budget telah *DITOLAK VALIDASI* oleh *$validator* dengan keterangan sebagai berikut:
+Nama Project : *$dataPengajuan[nama]*
+Folder Budget: *$dataPengajuan[jenis]*
+Pengaju : *$dataPengajuan[pengaju]*
+Divisi : *$dataPengajuan[divisi]*
+Total Budget : *Rp. " . number_format($dataPengajuan['totalbudget'], 0, '', ',') . "*
+";
+        if ($dataPengajuan['declined_note'] != "") {
+            $msg .= "
+Keterangan: *$dataPengajuan[declined_note]*";
+        }
+        $msg .= "
+
+
+Selengkapnya pengajuan anda bisa dilihat dibawah ini.
+http://$urlPengajuan";
+        return $msg;
+    }
+
     public function messageValidasiPenerimaBpu($receiver, $dataPenerima, $item, $validator)
     {
         $msg = "Dear $receiver,

@@ -1,7 +1,7 @@
 <?php
 
 class HTTPRequester {
-    protected static $baseUrl = "http://mkp-operation.com:7793/budget-serv";
+    protected static $baseUrl = "http://mkp-operation.com:7793/budget-online-service";
 
     /**
      * @description Make HTTP-GET call
@@ -24,7 +24,7 @@ class HTTPRequester {
      * @param       array $params
      * @return      HTTP-Response body or an empty string if the request fails or is empty
      */
-    public static function HTTPPost($url, array $params, $type = "form", $host = "") {
+    public static function HTTPPost($url, array $params, $type = "form", $host = "", $callback500 = false) {
         $query = http_build_query($params);
         if ($type == "json") {
             $query = json_encode($params);
@@ -45,6 +45,13 @@ class HTTPRequester {
         
         $response = curl_exec($ch);
         curl_close($ch);
+        if ($callback500) {
+            if (strpos($response, "Apache/2.4.7 (Ubuntu) Server at")) {
+                $message = "&message=Internal Server Error. Budget Online Service is not response";
+                header("location: login.php?error=true$message", true, 301);
+                exit();
+            }
+        }
         return json_decode($response);
     }
     /**

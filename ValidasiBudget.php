@@ -28,17 +28,36 @@ class ValidasiBudget extends Database
         $this->alert($message);
     }
 
-    protected function update_submission()
+    public function reject_validasi_budget()
+    {
+        $isUpdated = $this->update_submission("Validasi Di Tolak");
+        if (!$isUpdated) {
+            $message = "Budget tidak dapat di validasi, terjadi kesalahan ketika menyimpan data. Mohon coba lagi, jika masih terjaid masalah yang sama silahkan hubungi Tim IT.";
+            $this->alert($message);
+        }
+
+        $this->send_notification_penolakan();
+        $message = "Budget telah di validasi oleh $_SESSION[nama_user] dan notifikasi telah dikirimkan ke " . $this->notifPenerima;
+        $this->alert($message);
+    }
+
+    protected function update_submission($status = "Di Ajukan")
     {
         $id = $_GET["id"];
         $keterangan = $_GET["keterangan"];
         $validator = $_SESSION["nama_user"];
 
-        return $this->update("pengajuan_request")->set_value_update("status_request", "Di Ajukan")
+        $update = $this->update("pengajuan_request")->set_value_update("status_request", $status)
             ->set_value_update("on_revision_status", 1)
-            ->set_value_update("validator", $validator)
-            ->set_value_update("ket", $keterangan)
-            ->where("id", "=", $id)->save_update();
+            ->set_value_update("validator", $validator);
+
+        if ($status != "Di Ajukan") {
+            $update = $update->set_value_update("declined_note", $keterangan);
+        } else {
+            $update = $update->set_value_update("ket", $keterangan);
+        }
+
+        return $update->where("id", "=", $id)->save_update();
     }
 
     protected function send_notification()
@@ -72,6 +91,31 @@ class ValidasiBudget extends Database
 
     }
 
+    protected function send_notification_penolakan()
+    {
+        $whatsapp = new Whastapp();
+        $message = new Message();
+        $host = $this->host_url();
+        $id = $_GET["id"];
+
+        $dataSubmission = $this->get_submission();
+        $creator = $this->select("*")->from("tb_user")->where("nama_user", "=", $dataSubmission["pembuat"])->first();
+        $pengaju = $this->select("*")->from("tb_user")->where("nama_user", "=", $dataSubmission["pengaju"])->first();
+
+        if ($creator["nama_user"] != $_SESSION["nama_user"]) {
+            $url =  $host. '/view-request.php?id='.$id.'&session='.base64_encode(json_encode(["id_user" => $creator["id_user"], "timeout" => time()]));
+            $msg = $message->messagePenolakanValidasiBudget($creator["nama_user"], $dataSubmission, $_SESSION["nama_user"], $url);
+            $whatsapp->sendMessage($creator["phone_number"], $msg);
+            $this->notifPenerima .= sprintf("%s (%s),", $creator["nama_user"], $creator["phone_number"]);
+        }
+
+        $url =  $host. '/view-request.php?id='.$id.'&session='.base64_encode(json_encode(["id_user" => $pengaju["id_user"], "timeout" => time()]));
+        $msg = $message->messagePenolakanValidasiBudget($pengaju["nama_user"], $dataSubmission, $_SESSION["nama_user"], $url);
+        $whatsapp->sendMessage($pengaju["phone_number"], $msg);
+        $this->notifPenerima .= sprintf("%s (%s)", $pengaju["nama_user"], $pengaju["phone_number"]);
+
+    }
+
     protected function get_submission()
     {
         return $this->select("*")->from("pengajuan_request")->where("id", "=", $_GET["id"])->first();
@@ -99,4 +143,8 @@ class ValidasiBudget extends Database
 }
 
 $validasi = new ValidasiBudget();
-$validasi->validasi_budget();
+if (isset($_GET['tolak'])) {
+    $validasi->reject_validasi_budget();
+} else {
+    $validasi->validasi_budget();
+}
