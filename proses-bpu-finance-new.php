@@ -1,4 +1,5 @@
 <?php
+error_reporting(0);
 require "application/config/database.php";
 require_once "application/config/message.php";
 require_once "application/config/whatsapp.php";
@@ -102,7 +103,6 @@ if ($submit == 1) {
         $bpuVerify = mysqli_fetch_assoc($queryBpuVerify);
 
         $nm_project = '"' . $pengajuan['nama'] . '", "item ke ' . $bpu['no'] . '", "BPU ke ' . $bpu['term'] . '"';
-
         if ($metode_pembayaran[$i] == 'MRI PAL') {
             $rekening_sumber = $rekening_sumber_mri_pal;
 

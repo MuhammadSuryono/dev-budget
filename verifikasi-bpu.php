@@ -28,7 +28,7 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
     // dan menampilkan data ke dalam form modal bootstrap
     $sql = "SELECT a.*, b.jenis FROM bpu a JOIN pengajuan b ON a.waktu = b.waktu WHERE a.no = '$id' AND a.waktu = '$waktu' AND a.term = '$term' GROUP BY a.noid";
   
-    $result = $koneksi->query($sql); ?>
+    $result = $koneksi->query($sql);?>
     <table class="table table-bordered">
         <thead>
             <th>Nama Penerima</th>
@@ -46,14 +46,22 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                 $statusBpu = $baris['statusbpu'];
                 $jenis = $baris['jenis'];
                 $fileupload = $baris['fileupload'];
+                $jenisPembayaran = $statusBpu;
+                if (in_array($statusBpu, ["Honor Luar Kota", "Honor Jakarta"])) {
+                    $jenisPembayaran = "Honor Eksternal";
+                }
 
-                $query = mysqli_query($koneksiMriTransfer, "SELECT * FROM jenis_pembayaran WHERE jenispembayaran = '$statusBpu'") or die(mysqli_error($koneksiMriTransfer));
+                $query = mysqli_query($koneksiMriTransfer, "SELECT * FROM jenis_pembayaran WHERE jenispembayaran = '$jenisPembayaran'") or die(mysqli_error($koneksiMriTransfer));
                 $result = mysqli_fetch_assoc($query);
 
-                if ($baris['pengajuan_jumlah'] < $result['max_transfer']) {
-                    $metode_pembayaran = "MRI PAL";
-                } else {
+                if ($statusBpu == "UM" || $statusBpu == "UM Burek") {
                     $metode_pembayaran = "MRI Kas";
+                } else {
+                    if ($baris['pengajuan_jumlah'] < $result['max_transfer']) {
+                        $metode_pembayaran = "MRI PAL";
+                    } else {
+                        $metode_pembayaran = "MRI Kas";
+                    }
                 }
 
             ?>
@@ -77,31 +85,15 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
                 3 -> MRI Kas (UM)
                 4 -> MRI Kas (Project/Umum)
             */
-                if ($baris['pengajuan_jumlah'] < $result['max_transfer']) {
-                    if ($statusBpu == 'UM' || $statusBpu == 'UM Burek') {
-                        array_push($arrCode, '1');
-                        // $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'Kas Uang Muka'");
-                    } else {
-                        array_push($arrCode, '2');
-                        if ($jenis == 'B1' || $jenis == 'B2') {
-                            // $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'Kas Project'");
-                        } else {
-                            // $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'Kas Umum'");
-                        }
-                    }
+                if ($statusBpu == "UM" || $statusBpu == "UM Burek") {
+                    array_push($arrCode, '3');
+                    // $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas");
                 } else {
-                    if ($statusBpu == 'UM' || $statusBpu == 'UM Burek') {
-                        array_push($arrCode, '3');
-                        // $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'Kas Uang Muka'");
+                    if ($baris['pengajuan_jumlah'] < $result['max_transfer']) {
+                            array_push($arrCode, '2');
                     } else {
                         array_push($arrCode, '4');
-                        if ($jenis == 'B1' || $jenis == 'B2') {
-                            // $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'Kas Project'");
-                        } else {
-                            // $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas WHERE label_kas = 'Kas Umum'");
-                        }
                     }
-                    // $getRekening = mysqli_query($koneksiDevelop, "SELECT * FROM kas");
                 }
 
             endforeach;

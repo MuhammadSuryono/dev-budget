@@ -69,6 +69,7 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
     <input type="hidden" name="no" value="<?php echo $id ?>">
     <input type="hidden" name="waktu" value="<?php echo $waktu ?>">
     <input type="hidden" name="term" value="<?php echo $term ?>">
+    <input type="hidden" name="metode_pembayaran" value="<?php echo $metodePembayaran ?>">
     <input type="hidden" name="persetujuan" value="Sudah Disetujui">
     <p>Apakah anda ingin menyetujui <b>BPU</b> di Nomor <b><?= $baris['no']; ?></b>?</p>
     <div class="form-group">
