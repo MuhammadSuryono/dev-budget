@@ -400,11 +400,19 @@ $setting = mysqli_fetch_assoc($querySetting);
                                     $nomorStkbs = array_unique($nomorStkbs);
                                     $stkbPembayaranOps = mysqli_query($koneksiJay2, "SELECT (sum(jumlahops)+sum(perdin)+sum(akomodasi)+sum(bpjs)) AS totalStkbOps FROM stkb_pembayaran WHERE nomorstkb IN ('" . implode("','", $nomorStkbs) . "') AND statusbayar = 'Paid'");
                                     $totalStkbOpsJay = mysqli_fetch_assoc($stkbPembayaranOps);
-                                    if ($total + $total16 == $totalStkbOpsJay["totalStkbOps"] || $total + $total16 < $totalStkbOpsJay["totalStkbOps"]) { ?>
+                                    if ($total + $total16 == $totalStkbOpsJay["totalStkbOps"]) { ?>
                                         <button type="button" class="btn btn-success btn-small" onclick="eksternal('<?php echo $no; ?>//','<?php echo $waktu; ?>//')">Eksternal</button>
                                         <br /><br />
 
                                         <?php
+                                    }
+
+                                    if ($total + $total16 < $totalStkbOpsJay["totalStkbOps"]) {
+                                      echo '<div class="alert alert-warning" role="alert">
+                                      Total STKB melebihi pembayaran Budget Item. Silahkan lakukan pengecheckan terlebih dahulu.<br/>
+                                      Total STKB : Rp. ' . number_format($totalStkbOpsJay["totalStkbOps"], 0, '', ',') . '<br/>
+                                      Total Pembayaran : Rp. ' . number_format($total + $total16, 0, '', ',') . '
+                                    </div>';
                                     }
 
                             } ?>
