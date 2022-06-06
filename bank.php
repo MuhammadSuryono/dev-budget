@@ -18,7 +18,7 @@ if (isset($_POST["action"])) {
 
         if ($save) {
             echo '<script>alert("Berhasil simpan data")</script>';
-            echo "<script> document.location.href='/bank.php'; </script>";
+            echo "<script> document.location.href='bank.php'; </script>";
         } else {
             echo '<script>alert("Gagal simpan data")</script>';
             echo "<script> document.location.href='".$_SERVER['HTTP_REFERER']."'; </script>";
@@ -32,7 +32,7 @@ if (isset($_POST["action"])) {
 
         if ($save) {
             echo '<script>alert("Berhasil simpan data")</script>';
-            echo "<script> document.location.href='/bank.php'; </script>";
+            echo "<script> document.location.href='bank.php'; </script>";
         } else {
             echo '<script>alert("Gagal simpan data")</script>';
             echo "<script> document.location.href='".$_SERVER['HTTP_REFERER']."'; </script>";
@@ -49,7 +49,7 @@ if (isset($_GET['action'])) {
         $delete = $con->delete('bank')->where("no", "=", $_GET["id"])->save_delete();
         if ($delete) {
             echo '<script>alert("Berhasil simpan data")</script>';
-            echo "<script> document.location.href='/bank.php'; </script>";
+            echo "<script> document.location.href='bank.php'; </script>";
         } else {
             echo '<script>alert("Gagal simpan data")</script>';
             echo "<script> document.location.href='".$_SERVER['HTTP_REFERER']."'; </script>";
@@ -201,7 +201,7 @@ if (isset($_GET['action'])) {
                 } else {
                     $no = 1;
                     foreach ($banks as $bank) {
-                        echo '<tr><td>'.$no++.'</td><td>'.$bank["namabank"].'</td><td>'.$bank["kodebank"].'</td><td><a href="/bank.php?id='.$bank[no].'&action=edit" class="btn btn-sm btn-primary">Edit</a>&nbsp;<a href="/bank.php?id='.$bank[no].'&action=delete" class="btn btn-sm btn-danger">Hapus</a> </td></tr>';
+                        echo '<tr><td>'.$no++.'</td><td>'.$bank["namabank"].'</td><td>'.$bank["kodebank"].'</td><td><a href="bank.php?id='.$bank[no].'&action=edit" class="btn btn-sm btn-primary">Edit</a>&nbsp;<a href="bank.php?id='.$bank[no].'&action=delete" class="btn btn-sm btn-danger">Hapus</a> </td></tr>';
                     }
                 }
                 ?>
