@@ -362,7 +362,7 @@ $buttonAkses = unserialize($user['hak_button']);
                         <a class='Print btn btn-sm text-primary no-background' target='_blank' href='bukti-transfer-print.php?id=" . $data['transfer_req_id'] . "'><i class='fa fa-print'></i> print</a>";
                                                             }
                                                             if (($data['hasil_transfer'] == 3) && in_array("ulang_transfer", $buttonAkses)) {
-                                                                echo "<br><button type='button' class='Edit btn btn-sm text-primary no-background' data-id='" . $data['transfer_id'] . "' data-button='antri' data-from='" . $url . "'><i class='fa fa-sync'></i> ulang</button>
+                                                                echo "<br><button type='button' class='Edit btn btn-sm text-primary no-background' data-id='" . $data['transfer_id'] . "' data-transfer='".json_encode($data)."' data-button='antri-laporan' data-from='" . $url . "'><i class='fa fa-sync'></i> ulang</button>
                                                         ";
                                                             }
                                                             echo "</td>";
@@ -540,7 +540,7 @@ $buttonAkses = unserialize($user['hak_button']);
                         <a class='Print btn btn-sm text-primary no-background' target='_blank' href='bukti-transfer-print.php?id=" . $data['transfer_req_id'] . "'><i class='fa fa-print'></i> print</a>";
                                                             }
                                                             if (($data['hasil_transfer'] == 3) && in_array("ulang_transfer", $buttonAkses)) {
-                                                                echo "<br><button type='button' class='Edit btn btn-sm text-primary no-background' data-id='" . $data['transfer_id'] . "' data-button='antri' data-from='" . $url . "'><i class='fa fa-sync'></i> ulang</button>
+                                                                echo "<br><button type='button' class='Edit btn btn-sm text-primary no-background' data-id='" . $data['transfer_id'] . "' data-transfer='".json_encode($data)."' data-button='antri-laporan' data-from='" . $url . "'><i class='fa fa-sync'></i> ulang</button>
                                                         ";
                                                             }
                                                             echo "</td>";
@@ -718,7 +718,7 @@ $buttonAkses = unserialize($user['hak_button']);
                         <a class='Print btn btn-sm text-primary no-background' target='_blank' href='bukti-transfer-print.php?id=" . $data['transfer_req_id'] . "'><i class='fa fa-print'></i> print</a>";
                                                             }
                                                             if (($data['hasil_transfer'] == 3) && in_array("ulang_transfer", $buttonAkses)) {
-                                                                echo "<br><button type='button' class='Edit btn btn-sm text-primary no-background' data-id='" . $data['transfer_id'] . "' data-button='antri' data-from='" . $url . "'><i class='fa fa-sync'></i> ulang</button>
+                                                                echo "<br><button type='button' class='Edit btn btn-sm text-primary no-background' data-id='" . $data['transfer_id'] . "' data-transfer='".json_encode($data)."' data-button='antri-laporan' data-from='" . $url . "'><i class='fa fa-sync'></i> ulang</button>
                                                         ";
                                                             }
                                                             echo "</td>";
@@ -894,6 +894,28 @@ $buttonAkses = unserialize($user['hak_button']);
                             <input type="datetime-local" class="form-control" name="jadwaltransfer" required>
                         </div>
 
+                        <div class="form-group">
+                            <label for="kode_bank">Data Bank</label>
+                            <select class="form-control" name="bank">
+                                <?php
+                                $query = mysqli_query($koneksi, "SELECT * FROM bank") ;
+                                while ($data = mysqli_fetch_array($query)) {
+                                    echo "<option value='$data[kodebank]'>$data[namabank] - $data[kodebank]</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="norek">Nomor Rekening</label>
+                            <input type="text" class="form-control" name="norek" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="bank_account_name">Nama Penerima</label>
+                            <input type="text" class="form-control" name="bank_account_name" required>
+                        </div>
+
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-primary">Submit</button>
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -998,10 +1020,18 @@ $buttonAkses = unserialize($user['hak_button']);
                 var id = $(this).attr('data-id');
                 var button = $(this).attr('data-button');
                 var from = $(this).attr('data-from');
+                var data = $(this).attr('data-transfer');
+                
 
                 $('input[name=id]').val(id);
                 $('input[name=button]').val(button);
                 $('input[name=from]').val(from);
+
+                var data = JSON.parse(data);
+                $('input[name=norek]').val(data.norek);
+                $('input[name=bank_account_name]').val(data.pemilik_rekening);
+                $('select[name=bank]').val(data.kode_bank);
+
                 return false;
             })
         })

@@ -17,7 +17,7 @@ $id = $_POST['id'];
 $button = $_POST['button'];
 $from = $_POST['from'];
 $ket_tambahan = $_POST['ket_tambahan'];
-$jadwal_transfer = date('Y-m-d H:i:s', strtotime($_POST['jadwal_transfer']));
+$jadwal_transfer = date('Y-m-d H:i:s', strtotime($_POST['jadwaltransfer']));
 // var_dump($jadwal_transfer);
 // die;
 
@@ -43,6 +43,29 @@ if ($button == 'antri') {
     $formatId = $date . sprintf('%04d', $count + 1);
 
     $update = mysqli_query($koneksiTransfer, "UPDATE data_transfer SET ket_transfer = 'Antri', updated_at='$time', updated_by='$user', transfer_req_id = '$formatId', jadwal_transfer = '$jadwal_transfer', hasil_transfer = '1' WHERE transfer_id = '$id'");
+}
+
+if ($button == 'antri-laporan') {
+    $querybank = mysqli_query($koneksi, "SELECT * FROM bank WHERE kodebank = '$_POST[bank]'");
+    $bank = mysqli_fetch_assoc($querybank);
+
+    $date = date('my');
+    $countQuery = mysqli_query($koneksiTransfer, "SELECT * FROM data_transfer WHERE transfer_req_id LIKE '$date%' ORDER BY transfer_req_id DESC LIMIT 1");
+    $transfer = mysqli_fetch_assoc($countQuery);
+    $count = (int)substr($transfer['transfer_req_id'], -4);
+
+    $jadwal = date('Y-m-d', strtotime($_POST['jadwaltransfer']));
+    if ($transfer["multiple_bpu"] != null) {
+        $explode = explode("|", $transfer["multiple_bpu"]);
+        foreach($explode as $key => $value) {
+            $queryBpu = mysqli_query($koneksi, "UPDATE bpu SET namabank = '$_POST[bank]', namapenerima = '$_POST[bank_account_name]', tanggalbayar='$jadwal' WHERE noid = '$value'");
+        }
+    } else {
+        $queryBpu = mysqli_query($koneksi, "UPDATE bpu SET namabank = '$_POST[bank]', namapenerima = '$_POST[bank_account_name]', tanggalbayar='$jadwal' WHERE noid = '$transfer[noid_bpu]'");
+    }
+
+    $formatId = $date . sprintf('%04d', $count + 1);
+    $update = mysqli_query($koneksiTransfer, "UPDATE data_transfer SET ket_transfer = 'Antri', updated_at='$time', bank='$bank[namabank]', kode_bank='$_POST[bank]', pemilik_rekening='$_POST[bank_account_name]', updated_by='$user', transfer_req_id = '$formatId', jadwal_transfer = '$jadwal_transfer', hasil_transfer = '1' WHERE transfer_id = '$id'");
 }
 if ($update) {
     echo "<script language='javascript'>";
