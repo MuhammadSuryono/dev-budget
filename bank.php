@@ -168,7 +168,7 @@ if (isset($_GET['action'])) {
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-4">
-            <form method="post" action="/bank.php?action<?= isset($bank) ? '=update&id='.$bank[no] : '' ?>">
+            <form method="post" action="bank.php?action<?= isset($bank) ? '=update&id='.$bank[no] : '' ?>">
                 <input name="action" value="<?= isset($bank) ? 'update' : 'create' ?>" type="hidden">
                 <div class="form-group">
                     <label>Nama Bank</label>

@@ -41,7 +41,7 @@ $koneksi = $con->connect();
                 // $sisaRealisasi = mysqli_fetch_assoc($qSisaRealisasi);
 
 
-                $queryBpuRealisasi = mysqli_query($koneksi, "SELECT SUM(a.realisasi) AS total_realisasi FROM bpu a JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no WHERE b.status IN ('UM', 'UM Burek') AND a.namapenerima = '$d[namapenerima]' AND a.realisasi + a.uangkembali != a.jumlah AND a.status IN ('Telah Di Bayar','Realisasi (Direksi)')") or die(mysqli_error($koneksi));
+                $queryBpuRealisasi = mysqli_query($koneksi, "SELECT SUM(a.realisasi) + SUM(a.uangkembali) AS total_realisasi FROM bpu a JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no WHERE b.status IN ('UM', 'UM Burek') AND a.namapenerima = '$d[namapenerima]' AND a.realisasi + a.uangkembali = a.jumlah AND a.status IN ('Telah Di Bayar','Realisasi (Direksi)')") or die(mysqli_error($koneksi));
                 $pengajuanRealisasi = mysqli_fetch_assoc($queryBpuRealisasi);
                 
                 $totalSaldoOutstanding = ($terbayar['total_pengajuan'] + $belumTerbayar['total_pengajuan']) - $pengajuanRealisasi['total_realisasi'];
