@@ -1,5 +1,5 @@
 <?php
-//error_reporting(0);
+error_reporting(0);
 session_start();
 
 require "application/config/database.php";
@@ -14,7 +14,6 @@ $koneksiBridge = $con->connect();
 
 if (!isset($_SESSION['nama_user'])) {
   header("location:login.php");
-  // die('location:login.php');//jika belum login jangan lanjut
 }
 
 $querySetting = mysqli_query($koneksi, "SELECT * FROM setting_budget WHERE keterangan = 'approval_bpu'") or die(mysqli_error($koneksi));
@@ -1004,69 +1003,6 @@ $setting = mysqli_fetch_assoc($querySetting);
                   <button class="btn btn-primary" type="submit" name="submit">OK</button>
                 </div>
               </form>
-              <script>
-                // $(document).ready(function() {
-                //   $("#id_step2-number_2").keyup(function(event) {
-                //     // skip for arrow keys
-                //     if (event.which >= 37 && event.which <= 40) {
-                //       event.preventDefault();
-                //     }
-                //     var $this = $(this);
-                //     var num = $this.val().replace(/,/gi, "").split("").reverse().join("");
-
-                //     var num2 = RemoveRougeChar(num.replace(/(.{3})/g, "$1,").split("").reverse().join(""));
-
-                //     console.log(num2);
-
-
-                //     // the following line has been simplified. Revision history contains original.
-                //     $this.val(num2);
-                //   });
-                // });
-
-                // function RemoveRougeChar(convertString) {
-
-
-                //   if (convertString.substring(0, 1) == ",") {
-
-                //     return convertString.substring(1, convertString.length)
-
-                //   }
-                //   return convertString;
-
-                // }
-
-                // $(document).ready(function() {
-                //   $("#id_step3-number_3").keyup(function(event) {
-                //     // skip for arrow keys
-                //     if (event.which >= 37 && event.which <= 40) {
-                //       event.preventDefault();
-                //     }
-                //     var $this = $(this);
-                //     var num = $this.val().replace(/,/gi, "").split("").reverse().join("");
-
-                //     var num2 = RemoveRougeChar(num.replace(/(.{3})/g, "$1,").split("").reverse().join(""));
-
-                //     console.log(num2);
-
-
-                //     // the following line has been simplified. Revision history contains original.
-                //     $this.val(num2);
-                //   });
-                // });
-
-                // function RemoveRougeChar(convertString) {
-
-
-                //   if (convertString.substring(0, 1) == ",") {
-
-                //     return convertString.substring(1, convertString.length)
-
-                //   }
-                //   return convertString;
-
-                // }
-              </script>
 
             </div>
             <div class="modal-footer">

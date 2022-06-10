@@ -167,7 +167,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                                         <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
                                         </font>
                                     </td>
-                                    <td bgcolor="#fea700"><a href="view-direksi.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
+                                    <td bgcolor="#fea700"><a href="views-direksi.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
                                     <td bgcolor="#fea700">
                                         <center>--</center>
                                     </td>
@@ -217,7 +217,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                                     <td>
                                         <font color="#1bd34f"><?php echo 'Rp. ' . number_format($bbbb - $row3['ready_to_pay'], 0, '', ','); ?></font>
                                     </td>
-                                    <td><a href="view-direksi.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
+                                    <td><a href="views-direksi.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
                                     <?php echo "<td><a href='#myModal' class='btn btn-default btn-small' id='custId' data-toggle='modal' data-id=" . $d['noid'] . ">Setujui</a></td>"; ?>
                                     <td><?php echo $d['status']; ?></td>
                                     <?php
@@ -381,7 +381,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                                     <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
                                     </font>
                                 </td>
-                                <td bgcolor="#ff99a1"><a href="view-direksi.php?code=<?php echo $e['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
+                                <td bgcolor="#ff99a1"><a href="views-direksi.php?code=<?php echo $e['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
                                 <td bgcolor="#ff99a1">
                                     <center>--</center>
                                 </td>
@@ -431,7 +431,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                                 <td>
                                     <font color="#1bd34f"><?php echo 'Rp. ' . number_format($bbbb - $row3['ready_to_pay'], 0, '', ','); ?></font>
                                 </td>
-                                <td><a href="view-direksi.php?code=<?php echo $e['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
+                                <td><a href="views-direksi.php?code=<?php echo $e['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
                                 <?php echo "<td><a href='#myModal' class='btn btn-default btn-small' id='custId' data-toggle='modal' data-id=" . $e['noid'] . ">Setujui</a></td>"; ?>
                                 <td><?php echo $e['status']; ?></td>
                                 <?php
@@ -574,7 +574,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                                     <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
                                     </font>
                                 </td>
-                                <td bgcolor="#ff99a1"><a href="view-direksi.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
+                                <td bgcolor="#ff99a1"><a href="views-direksi.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
                                 <td bgcolor="#ff99a1">
                                     <center>--</center>
                                 </td>
@@ -617,7 +617,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                                 <td><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
                                     </font>
                                 </td>
-                                <td><a href="view-direksi.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
+                                <td><a href="views-direksi.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
                                 <td>
                                     <?php
                                     echo "<a href='#myModal' class='btn btn-default btn-small' id='custId' data-toggle='modal' data-id=" . $d['noid'] . ">Setujui</a>";
@@ -767,7 +767,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                                     <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
                                     </font>
                                 </td>
-                                <td bgcolor="#ff99a1"><a href="view-direksi.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
+                                <td bgcolor="#ff99a1"><a href="views-direksi.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
                                 <td bgcolor="#ff99a1">
                                     <center>--</center>
                                 </td>
@@ -811,7 +811,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                                 <td><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
                                     </font>
                                 </td>
-                                <td><a href="view-direksi.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
+                                <td><a href="views-direksi.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
                                 <td>
                                     <?php
                                     echo "<a href='#myModal' class='btn btn-default btn-small' id='custId' data-toggle='modal' data-id=" . $d['noid'] . ">Setujui</a>";

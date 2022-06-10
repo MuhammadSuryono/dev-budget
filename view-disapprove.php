@@ -789,38 +789,6 @@ if (!isset($_SESSION['nama_user'])) {
             });
           });
         }
-        // $(document).ready(function(){
-        //     $('#myModal').on('show.bs.modal', function (e) {
-        //         var rowid = $(e.relatedTarget).data('id');
-        //         //menggunakan fungsi ajax untuk pengambilan data
-        //         $.ajax({
-        //             type : 'post',
-        //             url : 'editbudget.php',
-        //             data :  'rowid='+ rowid,
-        //             success : function(data){
-        //             $('.fetched-data').html(data);//menampilkan data ke dalam modal
-        //             }
-        //         });
-        //      });
-        //
-        //      $('.edit_budget').on('click', function (e) {
-        //          var noid = '<?php //echo $noid; 
-                                ?>';
-        //          var waktu = '<?php //echo $waktu; 
-                                  ?>';
-        //          //menggunakan fungsi ajax untuk pengambilan data
-        //          $.ajax({
-        //              type : 'post',
-        //              url : 'editbudget.php',
-        //              data :  {noid:noid, waktu:waktu},
-        //              success : function(data){
-        //                $('.fetched-data').html(data);//menampilkan data ke dalam modal
-        //                $('#myModal').modal();
-        //              }
-        //          });
-        //       });
-        //
-        // });
 
         function edit_budget(no, waktu) {
           // alert(noid+' - '+waktu);
