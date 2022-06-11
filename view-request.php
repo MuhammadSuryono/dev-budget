@@ -1235,7 +1235,7 @@ $hasRoleBudget = $role->get_role_budget($_SESSION['id_user'], "", "");
             } else {
                 $('#buttonSetujuiRequest').hide();
                 $('#buttonTolakRequest').hide();
-                if (projectStatus == 'Belum Di Ajukan') {
+                if (projectStatus == 'Belum Di Ajukan' || projectStatus == 'Validasi Di Tolak') {
                     $('.editButtonCol').show();
                     $('#buttonAjukan').show();
                     $('#submitButton').show();
