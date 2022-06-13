@@ -4,6 +4,8 @@ session_start();
 require "application/config/database.php";
 
 $con = new Database();
+$con->set_name_db(DB_MRI_TRANSFER);
+$con->init_connection();
 $koneksi = $con->connect();
 $con->load_database($koneksi);
 
@@ -13,12 +15,12 @@ $helper = new Helper();
 if (isset($_POST["action"])) {
     if ($_POST["action"] == "create") {
         $save = $con
-            ->insert('bank')->set_value_insert('namabank', $_POST['bank_name'])
-            ->set_value_insert('kodebank', $_POST['code_bank'])->save_insert();
+            ->insert('jenis_pembayaran')->set_value_insert('jenispembayaran', $_POST['jenis_pembayaran'])
+            ->set_value_insert('max_transfer', $_POST['maksimal_transfer'])->save_insert();
 
         if ($save) {
             echo '<script>alert("Berhasil simpan data")</script>';
-            echo "<script> document.location.href='bank.php'; </script>";
+            echo "<script> document.location.href='limitasi-transfer.php'; </script>";
         } else {
             echo '<script>alert("Gagal simpan data")</script>';
             echo "<script> document.location.href='".$_SERVER['HTTP_REFERER']."'; </script>";
@@ -27,12 +29,12 @@ if (isset($_POST["action"])) {
 
     if ($_POST["action"] == "update") {
         $save = $con
-            ->update('bank')->set_value_update('namabank', $_POST['bank_name'])
-            ->set_value_update('kodebank', $_POST['code_bank'])->where('no', '=', $_GET['id'])->save_update();
+            ->update('jenis_pembayaran')->set_value_update('jenispembayaran', $_POST['jenis_pembayaran'])
+            ->set_value_update('max_transfer', $_POST['maksimal_transfer'])->where('jenispembayaranid', '=', $_GET['id'])->save_update();
 
         if ($save) {
             echo '<script>alert("Berhasil simpan data")</script>';
-            echo "<script> document.location.href='bank.php'; </script>";
+            echo "<script> document.location.href='limitasi-transfer.php'; </script>";
         } else {
             echo '<script>alert("Gagal simpan data")</script>';
             echo "<script> document.location.href='".$_SERVER['HTTP_REFERER']."'; </script>";
@@ -42,16 +44,16 @@ if (isset($_POST["action"])) {
 
 if (isset($_GET['action'])) {
     if ($_GET['action'] == 'edit') {
-        $bank = $con->select('*')->from('bank')->where("no", "=", $_GET["id"])->first();
+        $bank = $con->select('*')->from('jenis_pembayaran')->where("jenispembayaranid", "=", $_GET["id"])->first();
     }
 
     if ($_GET['action'] == 'delete') {
-        $delete = $con->delete('bank')->where("no", "=", $_GET["id"])->save_delete();
+        $delete = $con->delete('jenis_pembayaran')->where("jenispembayaranid", "=", $_GET["id"])->save_delete();
         if ($delete) {
-            echo '<script>alert("Berhasil simpan data")</script>';
-            echo "<script> document.location.href='bank.php'; </script>";
+            echo '<script>alert("Berhasil hapus data")</script>';
+            echo "<script> document.location.href='limitasi-transfer.php.php'; </script>";
         } else {
-            echo '<script>alert("Gagal simpan data")</script>';
+            echo '<script>alert("Gagal hapus data")</script>';
             echo "<script> document.location.href='".$_SERVER['HTTP_REFERER']."'; </script>";
         }
     }
@@ -169,28 +171,28 @@ if (isset($_GET['action'])) {
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-4">
-            <form method="post" action="bank.php?action<?= isset($bank) ? '=update&id='.$bank[no] : '' ?>">
+            <form method="post" action="limitasi-transfer.php?action<?= isset($bank) ? '=update&id='.$bank[jenispembayaranid] : '' ?>">
                 <input name="action" value="<?= isset($bank) ? 'update' : 'create' ?>" type="hidden">
                 <div class="form-group">
-                    <label>Nama Bank</label>
-                    <input class="form-control" type="text" name="bank_name" value="<?= isset($bank) ? $bank['namabank'] : '' ?>" required>
+                    <label>Jenis Pembayaran <small class="text-danger">Mohon disamakan dengan jenis item budget</small></label>
+                    <input class="form-control" type="text" name="jenis_pembayaran" value="<?= isset($bank) ? $bank['jenispembayaran'] : '' ?>" required>
                 </div>
                 <div class="form-group">
-                    <label>Swift Code Bank</label>
-                    <input class="form-control" type="text" name="code_bank" value="<?= isset($bank) ? $bank['kodebank'] : '' ?>" required>
+                    <label>Maksimal Transfer</label>
+                    <input class="form-control" type="number" name="maksimal_transfer" value="<?= isset($bank) ? $bank['max_transfer'] : '' ?>" required>
                 </div>
                 <button type="submit" class="btn btn-primary btn-sm">Simpan</button>
             </form>
         </div>
         <div class="col-lg-8">
             <?php
-            $banks = $con->select("*")->order_by('no', 'desc')->get('bank');
+            $banks = $con->select("*")->order_by('jenispembayaranid', 'desc')->get('jenis_pembayaran');
             ?>
             <table id="example" class="table table-hover table-striped">
                 <thead class="bg-success" style="height: 50px">
                     <th class="text-center" width="5%">No</th>
-                    <th class="text-center">Nama Bank</th>
-                    <th class="text-center">Swift Code Bank</th>
+                    <th class="text-center">Jenis Pembayaran</th>
+                    <th class="text-center">Maksimal Transfer</th>
                     <th class="text-center">Aksi</th>
                 </thead>
                 <tbody>
@@ -202,7 +204,7 @@ if (isset($_GET['action'])) {
                 } else {
                     $no = 1;
                     foreach ($banks as $bank) {
-                        echo '<tr><td>'.$no++.'</td><td>'.$bank["namabank"].'</td><td>'.$bank["kodebank"].'</td><td><a href="bank.php?id='.$bank[no].'&action=edit" class="btn btn-sm btn-primary">Edit</a>&nbsp;<a href="bank.php?id='.$bank[no].'&action=delete" class="btn btn-sm btn-danger">Hapus</a> </td></tr>';
+                        echo '<tr><td>'.$no++.'</td><td>'.$bank["jenispembayaran"].'</td><td>Rp. '.number_format($bank["max_transfer"]).'</td><td><a href="limitasi-transfer.php?id='.$bank[jenispembayaranid].'&action=edit" class="btn btn-sm btn-primary">Edit</a>&nbsp;<a href="limitasi-transfer.php?id='.$bank[jenispembayaranid].'&action=delete" class="btn btn-sm btn-danger">Hapus</a> </td></tr>';
                     }
                 }
                 ?>
