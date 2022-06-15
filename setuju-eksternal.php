@@ -158,6 +158,14 @@ if ($_POST['no'] && $_POST['waktu'] && $_POST['term']) {
     </div>
 
     <div class="form-group">
+        <label for="tglcair" class="control-label">Biaya Transfer DiBebankan Kepada :</label>
+        <select class="form-control" name="biaya_transfer">
+            <option value="pengirim" selected>Pengirim</option>
+            <option value="penerima">Penerima</option>
+        </select>
+    </div>
+
+    <div class="form-group">
         <label for="alasanTolakBpu" class="control-label">Alasan Penolakan (Jika ditolak):</label>
         <input type="text" class="form-control" name="alasanTolakBpu" id="alasanTolakBpu">
     </div>
