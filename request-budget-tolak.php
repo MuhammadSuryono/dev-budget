@@ -50,7 +50,7 @@ if ($updatePengajuanRequest) {;
     $url = explode('/', $url);
     $url = $url[0] . '/' . $url[1] . '/' . 'login.php';
 
-    $message = $messageHelpepr->messageTolakPengajuanBudget($pengaju, $namaProject, $divisi, $totalbudget, $pembuat, $alasan);
+    $message = $messageHelpepr->messageTolakPengajuanBudget($pengaju, $namaProject, $divisi, $totalbudget, $_SESSION['nama_user'], $alasan);
 
     $notification = 'Budget Berhasil Ditolak. Pemberitahuan via whatsapp telah terkirim ke ';
     for ($i = 0; $i < count($phoneNumber); $i++) {
