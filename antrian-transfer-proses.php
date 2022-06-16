@@ -17,7 +17,7 @@ $id = $_POST['id'];
 $button = $_POST['button'];
 $from = $_POST['from'];
 $ket_tambahan = $_POST['ket_tambahan'];
-$jadwal_transfer = date('Y-m-d H:i:s', strtotime($_POST['jadwaltransfer']));
+$jadwal_transfer = date('Y-m-d H:i:s', strtotime($_POST['jadwal_transfer']));
 // var_dump($jadwal_transfer);
 // die;
 
@@ -33,7 +33,7 @@ if ($button == 'cancel') {
 }
 
 if ($button == 'antri') {
-    $jadwal_transfer = $_POST['jadwaltransfer'];
+    $jadwal_transfer = $_POST['jadwal_transfer'];
 
     $date = date('my');
     $countQuery = mysqli_query($koneksiTransfer, "SELECT transfer_req_id FROM data_transfer WHERE transfer_req_id LIKE '$date%' ORDER BY transfer_req_id DESC LIMIT 1");
@@ -54,7 +54,7 @@ if ($button == 'antri-laporan') {
     $transfer = mysqli_fetch_assoc($countQuery);
     $count = (int)substr($transfer['transfer_req_id'], -4);
 
-    $jadwal = date('Y-m-d', strtotime($_POST['jadwaltransfer']));
+    $jadwal = date('Y-m-d', strtotime($_POST['jadwal_transfer']));
     if ($transfer["multiple_bpu"] != null) {
         $explode = explode("|", $transfer["multiple_bpu"]);
         foreach($explode as $key => $value) {
