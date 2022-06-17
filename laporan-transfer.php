@@ -891,7 +891,7 @@ $buttonAkses = unserialize($user['hak_button']);
 
                         <div class="form-group">
                             <label for="jadwaltransfer">Jadwal Transfer</label>
-                            <input type="datetime-local" class="form-control" name="jadwaltransfer" required>
+                            <input type="datetime-local" class="form-control" name="jadwal_transfer" required>
                         </div>
 
                         <div class="form-group">
