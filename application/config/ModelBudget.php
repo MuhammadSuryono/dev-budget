@@ -20,6 +20,9 @@ class ModelBudget
     private $orderColumn;
     private $typeOrder = 'asc';
     private $limitData;
+    private $groupColumn;
+
+    private $whereRaw;
 
     public function load_database($mysql)
     {
@@ -104,6 +107,7 @@ class ModelBudget
         $query = $this->select . ' FROM ' . $this->from;
         if ($this->joins != null) $query .= $this->joins;
         if ($this->condition != null) $query .= ' WHERE ' . $this->condition;
+        if ($this->groupColumn != null) $query .= ' GROUP BY ' . $this->groupColumn;
         if ($this->orderColumn !== null) $query .= ' ORDER BY ' . $this->orderColumn . ' ' . $this->typeOrder;
         if ($this->limitData != 0) $query .= ' LIMIT ' . $this->limitData;
 
@@ -185,6 +189,12 @@ class ModelBudget
         return $this;
     }
 
+    public function group_by($column)
+    {
+        $this->groupColumn = $column;
+        return $this;
+    }
+
     private function reset_value()
     {
         $this->select = null;
@@ -203,6 +213,7 @@ class ModelBudget
         $this->orderColumn = null;
         $this->typeOrder = 'asc';
         $this->limitData = 0;
+        $this->groupColumn = null;
     }
 
     public function get_id_insert()
@@ -226,5 +237,11 @@ class ModelBudget
         $this->queryString = $query;
 
         return mysqli_query($this->mysql, $query);
+    }
+
+    public function whereRaw($value)
+    {
+        $this->condition .= " " .$value. " ";
+        return $this;
     }
 }

@@ -131,6 +131,10 @@ $helper = new Helper();
     $select = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE noid='$code'");
     $d = mysqli_fetch_assoc($select);
 
+    $con->update('bpu')->set_value_update('status','Telah Di Bayar')->where('waktu', '=', $d['waktu'])
+        ->where('persetujuan', 'LIKE', 'Disetujui%')
+        ->whereRaw("AND novoucher != '-'")->save_update();
+
     $queryUser = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE id_user = '$_SESSION[id_user]'");
     $user = mysqli_fetch_assoc($queryUser);
     $buttonAkses = unserialize($user['hak_button']);
@@ -748,9 +752,7 @@ $helper = new Helper();
                 <font color='#f23f2b'>Sisa Budget
               </div>
               <?php
-              $aaaa = $dataTotalBudget['total_budget'];
-              $bbbb = $row2['total_pembayaran'];
-              $belumbayar = $aaaa - ($tysb - $row3['sumi']);
+              $belumbayar = $dataTotalBudget['total_budget'] - ($tysb - $row3['sumi']) - $row3['sumi'];
               ?>
               <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font></b></div>
             </div>

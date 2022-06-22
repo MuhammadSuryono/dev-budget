@@ -80,6 +80,9 @@ $setting = mysqli_fetch_assoc($querySetting);
   $code = $_GET['code'];
   $select = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE noid='$code'");
   $d = mysqli_fetch_assoc($select);
+  $con->update('bpu')->set_value_update('status','Telah Di Bayar')->where('waktu', '=', $d['waktu'])
+      ->where('persetujuan', 'LIKE', 'Disetujui%')
+      ->whereRaw("AND novoucher != '-'")->save_update();
   ?>
 
   <center>
@@ -721,9 +724,7 @@ $setting = mysqli_fetch_assoc($querySetting);
               <font color='#f23f2b'>Sisa Budget
             </div>
             <?php
-            $aaaa = $d['totalbudget'];
-            $bbbb = $row2['sum'];
-            $belumbayar = $aaaa - ($tysb - $row3['sumi']);
+            $belumbayar = $dataTotalBudget['total_budget'] - ($tysb - $row3['sumi']) - $row3['sumi'];
             ?>
             <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font></b></div>
           </div>

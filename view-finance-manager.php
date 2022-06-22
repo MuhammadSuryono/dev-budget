@@ -132,6 +132,10 @@ $setting = mysqli_fetch_assoc($querySetting);
   $select = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE noid='$code'");
   $d = mysqli_fetch_assoc($select);
 
+  $con->update('bpu')->set_value_update('status','Telah Di Bayar')->where('waktu', '=', $d['waktu'])
+      ->where('persetujuan', 'LIKE', 'Disetujui%')
+      ->whereRaw("AND novoucher != '-'")->save_update();
+
   $queryUser = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE id_user = '$_SESSION[id_user]'");
   $user = mysqli_fetch_assoc($queryUser);
   if (@unserialize($user['hak_button'])) {
@@ -750,9 +754,7 @@ echo "Nominal Pajak :<b>Rp. " .number_format($nominalPajak) . " (".$bayar['jenis
               <font color='#f23f2b'>Total Yang Belum Di bayarkan
             </div>
             <?php
-            $aaaa = $dataTotalBudget['total_budget'];
-            $bbbb = $row2['total_pembayaran'];
-            $belumbayar = $aaaa - ($tysb - $row3['ready_to_pay']);
+            $belumbayar = $dataTotalBudget['total_budget'] - ($tysb - $row3['ready_to_pay']) - $row3['ready_to_pay'];
             ?>
             <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font></b></div>
           </div>
