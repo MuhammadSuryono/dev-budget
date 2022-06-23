@@ -8,7 +8,6 @@ error_reporting(0);
 session_start();
 if (!isset($_SESSION['nama_user'])) {
   header("location:login.php");
-  // die('location:login.php');//jika belum login jangan lanjut
 }
 
 //periksa apakah udah submit
@@ -64,8 +63,6 @@ if (isset($_POST['submit'])) {
     $update = mysqli_query($koneksi, "UPDATE selesai SET rincian = '$rincian', kota = '$kota', status = '$status', penerima = '$penerima', harga = '$harga', quantity = '$quantity',
                                                 total= $harga * $quantity WHERE no ='$no' AND waktu='$waktu'");
   } else {
-
-
     if ($totalselesai == $totalQuantityKaliHarga) {
 
       $update = mysqli_query($koneksi, "UPDATE selesai SET rincian = '$rincian', kota = '$kota', status = '$status', penerima = '$penerima', harga = '$harga', quantity = '$quantity',
@@ -75,34 +72,12 @@ if (isset($_POST['submit'])) {
       echo "alert('GAGAL!! , Total Item Budget Lebih kecil Dari BPU yang sudah dibuat')";
       echo "</script>";
       echo "<script> document.location.href='views-direksi.php?code=" . $numb . "'; </script>";
-    }
-//    else if ($totalNominalDiganti > $totalBudgetSekarang) {
-//      echo "<script language='javascript'>";
-//      echo "alert('GAGAL!! , Total Budget Lebih Besar Dari Yang Disetujui')";
-//      echo "</script>";
-//      echo "<script> document.location.href='views-direksi.php?code=" . $numb . "'; </script>";
-//    }
-    // }else{
-
-
-    // if($divisi == 'FINANCE'){
-    //   echo "<script language='javascript'>";
-    //   echo "alert('Gagal!!, Untuk Edit Budget Harap Hubungi Ibu Ina')";
-    //   echo "</script>";
-    //   echo "<script> document.location.href='views-direksi.php?code=".$numb."'; </script>";
-    //   }
-
-    else {
-
+    }else {
       $update = mysqli_query($koneksi, "UPDATE selesai SET rincian = '$rincian', kota = '$kota', status = '$status', penerima = '$penerima', harga = '$harga', quantity = '$quantity',
                                                 total= $harga * $quantity WHERE no ='$no' AND waktu='$waktu'");
-
-      // }
     }
   }
-  // }
 
-  //jika sudah berhasil
   if ($update) {
     $query = "SELECT sum(total) AS sum FROM selesai WHERE waktu='$waktu'";
     $result = mysqli_query($koneksi, $query);
