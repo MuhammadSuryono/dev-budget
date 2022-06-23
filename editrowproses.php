@@ -28,17 +28,18 @@ if (isset($_POST['submit'])) {
   $queryCountData = mysqli_query($koneksi, "SELECT COUNT(noid) FROM pengajuan WHERE waktu='$waktu'");
   $countData = mysqli_fetch_array($queryCountData)[0];
 
-  $totaludah = $harga * $quantity;
+  $totalQuantityKaliHarga = $harga * $quantity;
+  if ($totalQuantityKaliHarga == 0) {
+      $quantity = 0;
+  }
   $checktotal = mysqli_query($koneksi, "SELECT sum(total) AS sumt FROM selesai WHERE waktu='$waktu' AND no !='$no'");
   $st = mysqli_fetch_array($checktotal);
-  $tn = $st['sumt'];
-  $jadi = ($totaludah + $tn) / $countData;
-
-
+  $totalNominalItem = $st['sumt'];
+  $totalNominalDiganti = ($totalQuantityKaliHarga + $totalNominalItem) / $countData;
 
   $cekbudgettotal = mysqli_query($koneksi, "SELECT totalbudgetnow FROM pengajuan WHERE waktu='$waktu'");
   $cb = mysqli_fetch_assoc($cekbudgettotal);
-  $totbud = $cb['totalbudgetnow'];
+  $totalBudgetSekarang = $cb['totalbudgetnow'];
 
   $sel1 = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE waktu='$waktu'");
   $uc = mysqli_fetch_assoc($sel1);
@@ -65,27 +66,22 @@ if (isset($_POST['submit'])) {
   } else {
 
 
-    if ($totalselesai == $totaludah) {
+    if ($totalselesai == $totalQuantityKaliHarga) {
 
       $update = mysqli_query($koneksi, "UPDATE selesai SET rincian = '$rincian', kota = '$kota', status = '$status', penerima = '$penerima', harga = '$harga', quantity = '$quantity',
                                                   total= $harga * $quantity WHERE no ='$no' AND waktu='$waktu'");
-    } else if ($totalbpunya > $totaludah) {
+    } else if ($totalbpunya > $totalQuantityKaliHarga) {
       echo "<script language='javascript'>";
       echo "alert('GAGAL!! , Total Item Budget Lebih kecil Dari BPU yang sudah dibuat')";
       echo "</script>";
       echo "<script> document.location.href='views-direksi.php?code=" . $numb . "'; </script>";
-    } else if ($jadi > $totbud) {
-      // if($divisi == 'FINANCE'){
-      // echo "<script language='javascript'>";
-      // echo "alert('GAGAL!! , Total Budget Lebih Besar Dari Yang Disetujui')";
-      // echo "</script>";
-      // echo "<script> document.location.href='view-finance-manager.php?code=".$numb."'; </script>";
-      // }else{
-      echo "<script language='javascript'>";
-      echo "alert('GAGAL!! , Total Budget Lebih Besar Dari Yang Disetujui')";
-      echo "</script>";
-      echo "<script> document.location.href='views-direksi.php?code=" . $numb . "'; </script>";
     }
+//    else if ($totalNominalDiganti > $totalBudgetSekarang) {
+//      echo "<script language='javascript'>";
+//      echo "alert('GAGAL!! , Total Budget Lebih Besar Dari Yang Disetujui')";
+//      echo "</script>";
+//      echo "<script> document.location.href='views-direksi.php?code=" . $numb . "'; </script>";
+//    }
     // }else{
 
 
@@ -114,7 +110,6 @@ if (isset($_POST['submit'])) {
 
     $totaljadi = $total = $row[0];
     $totaljadi /= $countData;
-
     $updatetotal = mysqli_query($koneksi, "UPDATE pengajuan SET totalbudget = $totaljadi WHERE waktu='$waktu'");
   }
 
