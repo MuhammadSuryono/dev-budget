@@ -54,6 +54,7 @@ $rekening_sumber_mri_pal = $_POST['rekening_sumber_mri_pal'];
 $rekening_sumber_mri_kas = $_POST['rekening_sumber_mri_kas'];
 $metodePembayaran = $_POST["metode_pembayaran"];
 $bebanBiayaTransfer = $_POST['biaya_transfer'];
+if ($bebanBiayaTransfer == null) $bebanBiayaTransfer = "pengirim";
 
 $arrPengajuanJumlah = $_POST['pengajuan_jumlah'];
 $arrNoid = $_POST['noid'];
@@ -589,7 +590,7 @@ if ($update) {
             echo "<script language='javascript'>";
             echo "alert('$notification')";
             echo "</script>";
-            echo "<script> document.location.href='.$_SERVER[HTTP_REFERER].'; </script>";
+            echo "<script> document.location.href='views-direksi.php?code=" . $idBudget . "'; </script>";
         } else {
             echo "<script language='javascript'>";
             echo "alert('$notification')";
