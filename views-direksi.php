@@ -83,6 +83,11 @@ $setting = mysqli_fetch_assoc($querySetting);
   $con->update('bpu')->set_value_update('status','Telah Di Bayar')->where('waktu', '=', $d['waktu'])
       ->where('persetujuan', 'LIKE', 'Disetujui%')
       ->whereRaw("AND novoucher != '-'")->save_update();
+
+  $cariselisih = mysqli_query($koneksi, "SELECT totalbudget,totalbudgetnow FROM pengajuan WHERE waktu='$d[waktu]'");
+  $cs = mysqli_fetch_array($cariselisih);
+  $totalbudget      = $cs['totalbudget'];
+  $totalbudgetnow   = $cs['totalbudgetnow'];
   ?>
 
   <center>
@@ -139,6 +144,19 @@ $setting = mysqli_fetch_assoc($querySetting);
   </div>
 
   <br><br>
+<div class="row">
+    <div class="col-12 m-3">
+        <?php
+        $queryTotalBudget = mysqli_query($koneksi, "SELECT sum(total) as total_budget FROM selesai WHERE waktu = '$d[waktu]'");
+        $dataTotalBudget = mysqli_fetch_assoc($queryTotalBudget);
+        if ($dataTotalBudget['total_budget'] < $totalbudget) {
+        ?>
+        <div class="alert alert-info text-center" role="alert">
+            <b>Total Nominal Item Budget Lebih Kecil Dari Total Budget Yang Disetujui. Total nominal item anda Rp. <?= number_format($dataTotalBudget['total_budget']) ?> dan total budget anda Rp. <?= number_format($totalbudget) ?>  Harap menambah nominal di salah 1 item agar total budget kembali sama</b>
+        </div>
+        <?php } ?>
+    </div>
+</div>
   <div class="but_list">
     <div class="bs-example bs-example-tabs" role="tabpanel" data-example-id="togglable-tabs">
 
@@ -672,10 +690,9 @@ $setting = mysqli_fetch_assoc($querySetting);
           <div class="row">
             <div class="col-xs-3">Total Budget Keseluruhan</div>
             <?php
-              $queryTotalBudget = mysqli_query($koneksi, "SELECT sum(total) as total_budget FROM selesai WHERE waktu = '$d[waktu]'");
-              $dataTotalBudget = mysqli_fetch_assoc($queryTotalBudget);
+              $totalBudgetKeseluruhan = $totalbudgetnow == "" ? $totalbudget : $totalbudgetnow;
             ?>
-            <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($dataTotalBudget['total_budget'], 0, '', ','); ?></b></div>
+            <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($totalBudgetKeseluruhan, 0, '', ','); ?></b></div>
           </div>
 
           <div class="row">
@@ -724,7 +741,7 @@ $setting = mysqli_fetch_assoc($querySetting);
               <font color='#f23f2b'>Sisa Budget
             </div>
             <?php
-            $belumbayar = $dataTotalBudget['total_budget'] - ($tysb - $row3['sumi']) - $row3['sumi'];
+            $belumbayar = $totalBudgetKeseluruhan - ($tysb - $row3['sumi']) - $row3['sumi'];
             ?>
             <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font></b></div>
           </div>
@@ -1113,10 +1130,6 @@ $setting = mysqli_fetch_assoc($querySetting);
             <div class="modal-body">
 
               <?php
-              $cariselisih = mysqli_query($koneksi, "SELECT totalbudget,totalbudgetnow FROM pengajuan WHERE waktu='$waktu'");
-              $cs = mysqli_fetch_array($cariselisih);
-              $totalbudget      = $cs['totalbudget'];
-              $totalbudgetnow   = $cs['totalbudgetnow'];
 
               if ($totalbudget < $totalbudgetnow) {
               ?>
