@@ -73,6 +73,7 @@ if ($updatePengajuanRequest) {
                 ->set_value_insert('status', 'Disetujui')
                 ->set_value_insert('kodeproject', $kodepro)
                 ->set_value_insert('totalbudget', $totalbudget)
+                ->set_value_insert('totalbudgetnow', $totalbudget)
                 ->set_value_insert('pembuat', $pembuat)
                 ->set_value_insert('waktu', $waktunya)
                 ->set_value_insert('penyetuju', $user)
