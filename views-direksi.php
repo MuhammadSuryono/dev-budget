@@ -151,8 +151,8 @@ $setting = mysqli_fetch_assoc($querySetting);
         $dataTotalBudget = mysqli_fetch_assoc($queryTotalBudget);
         if ($dataTotalBudget['total_budget'] < $totalbudget) {
         ?>
-        <div class="alert alert-info text-center" role="alert">
-            <b>Total Nominal Item Budget Lebih Kecil Dari Total Budget Yang Disetujui. Total nominal item anda Rp. <?= number_format($dataTotalBudget['total_budget']) ?> dan total budget anda Rp. <?= number_format($totalbudget) ?>  Harap menambah nominal di salah 1 item agar total budget kembali sama</b>
+        <div class="alert alert-info text-center" role="alert" style="padding: 50px">
+            <b>Total Nominal Item Budget Lebih Kecil Dari Total Budget Yang Disetujui. Selisih kekurangannya adalah Rp.<?= number_format($totalbudget - $dataTotalBudget['total_budget']) ?> dari Total nominal item anda Rp. <?= number_format($dataTotalBudget['total_budget']) ?> dan total budget anda Rp. <?= number_format($totalbudget) ?>  Harap menambah nominal di salah 1 item agar total budget kembali sama</b>
         </div>
         <?php } ?>
     </div>
@@ -686,11 +686,24 @@ $setting = mysqli_fetch_assoc($querySetting);
           <!-- <button type="button" class="btn btn-info btn-small" onclick="tambah_budget('<?php echo $waktu; ?>')">Tambah Item</button> -->
 
           <br /><br>
-
+            <div class="row">
+                <div class="col-xs-3">Total Budget Yang Disetujui</div>
+                <?php
+                $totalBudgetKeseluruhan = $totalbudget;
+                ?>
+                <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($totalBudgetKeseluruhan, 0, '', ','); ?></b></div>
+            </div>
+            <div class="row">
+                <div class="col-xs-3">Total Perubahan Budget</div>
+                <?php
+                $totalBudgetBerubah = max($totalbudgetnow - $totalbudget, 0);
+                ?>
+                <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($totalBudgetBerubah, 0, '', ','); ?></b></div>
+            </div>
           <div class="row">
             <div class="col-xs-3">Total Budget Keseluruhan</div>
             <?php
-              $totalBudgetKeseluruhan = $totalbudgetnow == "" ? $totalbudget : $totalbudgetnow;
+              $totalBudgetKeseluruhan = $totalBudgetKeseluruhan + $totalBudgetBerubah;
             ?>
             <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($totalBudgetKeseluruhan, 0, '', ','); ?></b></div>
           </div>

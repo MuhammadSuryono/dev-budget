@@ -13,7 +13,7 @@ if ($_POST['rowid']) {
   $result = $koneksi->query($sql);
   foreach ($result as $baris) { ?>
 
-    <p>Apakah anda ingin membuat status budget menjadi <b>Disaaprove</b>?</p>
+    <p>Apakah anda ingin membuat status budget menjadi <b>Disapprove</b>?</p>
 
     <form action="disapprove_proses.php" method="post">
 
@@ -23,7 +23,7 @@ if ($_POST['rowid']) {
       </div>
       <input type="hidden" name="noid" value="<?php echo $baris['noid']; ?>">
       <input type="hidden" name="status" value="Disapprove">
-      <button class="btn btn-primary" type="submit" name="submit">Disaaprove</button>
+      <button class="btn btn-primary" type="submit" name="submit">Disapprove</button>
     </form>
 
 <?php }
