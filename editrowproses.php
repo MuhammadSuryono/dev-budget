@@ -41,9 +41,12 @@ if (isset($_POST['submit'])) {
   $totalNominalDiganti = ($totalQuantityKaliHarga + $totalNominalItem) / $countData;
 
   // Ambil total budget Now
-  $cekbudgettotal = mysqli_query($koneksi, "SELECT totalbudgetnow FROM pengajuan WHERE waktu='$waktu'");
+  $cekbudgettotal = mysqli_query($koneksi, "SELECT totalbudgetnow,totalbudget FROM pengajuan WHERE waktu='$waktu'");
   $cb = mysqli_fetch_assoc($cekbudgettotal);
   $totalBudgetSekarang = $cb['totalbudgetnow'];
+  $totalBudget = $cb['totalbudget'];
+
+  if ($totalBudgetSekarang == '') $totalBudgetSekarang = $totalBudget;
 
   // Ambil data pengajuan
   $sel1 = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE waktu='$waktu'");
@@ -69,7 +72,7 @@ if (isset($_POST['submit'])) {
 
   if ($totalBudgetSekarang < $totalNominalDiganti ) {
       echo "<script language='javascript'>";
-      echo "alert('Total budget yang diganti melebihi Pagu. Total yang diganti $totalNominalDiganti, Total yang di setujui $totalBudgetSekarang')";
+      echo "alert('Total budget yang diganti melebihi Pagu. Selisih perubahannya Rp. ".number_format($totalNominalDiganti - $totalBudgetSekarang)." Total yang diganti Rp. ".number_format($totalNominalDiganti).", Total yang di setujui Rp. ".number_format($totalBudgetSekarang)."')";
       echo "</script>";
       echo "<script> document.location.href='views-direksi.php?code=" . $numb . "'; </script>";
   }elseif ($jenis == 'Rutin') {
@@ -93,17 +96,17 @@ if (isset($_POST['submit'])) {
     }
   }
 
+//  if ($update) {
+//    $query = "SELECT sum(total) AS sum FROM selesai WHERE waktu='$waktu'";
+//    $result = mysqli_query($koneksi, $query);
+//    $row = mysqli_fetch_array($result);
+//
+//    $totaljadi = $total = $row[0];
+//    $totaljadi /= $countData;
+//    $updatetotal = mysqli_query($koneksi, "UPDATE pengajuan SET totalbudget = $totalBudgetSekarang WHERE waktu='$waktu'");
+//  }
+
   if ($update) {
-    $query = "SELECT sum(total) AS sum FROM selesai WHERE waktu='$waktu'";
-    $result = mysqli_query($koneksi, $query);
-    $row = mysqli_fetch_array($result);
-
-    $totaljadi = $total = $row[0];
-    $totaljadi /= $countData;
-    $updatetotal = mysqli_query($koneksi, "UPDATE pengajuan SET totalbudget = $totalBudgetSekarang WHERE waktu='$waktu'");
-  }
-
-  if ($updatetotal) {
 
       if ($totalNominalDiganti < $totalBudgetSekarang) {
           echo "<script language='javascript'>";
