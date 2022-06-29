@@ -28,6 +28,11 @@ if ($_POST['no'] && $_POST['waktu']) {
   if ($alreadyDataTransfer) {
     $otherWarning = "Terdeteksi beberapa data BPU dalam proses antrian Transfer untuk pembayaran MRI PALL, jika anda menghapus item ini maka akan menyebabkan transaksi yang dalam antrian dan yang akan diproses ikut terhapus.";
   }
+
+  if (count($res) > 0) {
+      $otherWarning = "Item tidak dapat dihapus. Terdeteksi item telah memiliki BPU. Jika anda ingin menghapus item, silahkapan periksa kembali BPU anda";
+      echo "<p>$otherWarning</p>";
+  } else {
   // mengambil data berdasarkan id
   // dan menampilkan data ke dalam form modal bootstrap
   $sql = "SELECT * FROM selesai WHERE no = '$id' AND waktu = '$waktu'";
@@ -43,6 +48,7 @@ if ($_POST['no'] && $_POST['waktu']) {
     </form>
     <?php break; ?>
 <?php }
+}
 }
 $koneksi->close();
 ?>
