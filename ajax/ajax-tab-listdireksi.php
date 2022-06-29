@@ -19,8 +19,8 @@ if (strpos($tab, 'B1') !== false) : ?>
                         <th>Nama Yang Mengajukan</th>
                         <th>Divisi</th>
                         <th>Total Budget Disetujui</th>
-                        <th>Total Budget Berubah</th>
-                        <th>Selisih Budget Berubah</th>
+                        <th>Total Budget Baru</th>
+                        <th>Selisih Perubahan Budget</th>
                         <th>Total Biaya dan Uang Muka</th>
                         <th>Sisa Budget</th>
                         <th>View</th>
@@ -73,7 +73,7 @@ if (strpos($tab, 'B1') !== false) : ?>
 
                             $totuangkembali = $reallah - $uangkembaliused;
 
-                            $belumbayar = ($d['totalbudget'] + ($d['totalbudgetnow'] - $d['totalbudget'])) - ($tysb - $row3['sumi']) - $row3['sumi'];
+                            $belumbayar = ($d['totalbudget'] + (max($d['totalbudgetnow'] - $d['totalbudget'], 0))) - ($tysb - $row3['sumi']) - $row3['sumi'];
 
                             $arrDocument = [];
                             $document = unserialize($d['document']);
@@ -112,8 +112,8 @@ if (strpos($tab, 'B1') !== false) : ?>
                                     <td bgcolor="#fcfaa4"><?php echo $d['divisi']; ?></td>
 
                                     <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
-                                    <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($d['totalbudgetnow'], 0, '', ','); ?></td>
-                                    <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($d['totalbudgetnow'] - $d['totalbudget'], 0, '', ','); ?></td>
+                                    <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($d['totalbudgetnow'] == $d['totalbudget'] ? 0 : $d['totalbudgetnow'], 0, '', ','); ?></td>
+                                    <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format(max($d['totalbudgetnow'] - $d['totalbudget'], 0), 0, '', ','); ?></td>
                                     <td bgcolor="#fcfaa4">
                                         <font color="#1bd34f"><?php echo 'Rp. ' . number_format($tysb - $row3['sumi'], 0, '', ','); ?></font>
                                     </td>
@@ -167,8 +167,8 @@ if (strpos($tab, 'B1') !== false) : ?>
                                     <td bgcolor="#fea700"><?php echo $d['pengaju']; ?></td>
                                     <td bgcolor="#fea700"><?php echo $d['divisi']; ?></td>
                                     <td bgcolor="#fea700"><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
-                                    <td bgcolor="#fea700"><?php echo 'Rp. ' . number_format($d['totalbudgetnow'], 0, '', ','); ?></td>
-                                    <td bgcolor="#fea700"><?php echo 'Rp. ' . number_format($d['totalbudgetnow'] - $d['totalbudget'], 0, '', ','); ?></td>
+                                    <td bgcolor="#fea700"><?php echo 'Rp. ' . number_format($d['totalbudgetnow'] == $d['totalbudget'] ? 0 : $d['totalbudgetnow'], 0, '', ','); ?></td>
+                                    <td bgcolor="#fea700"><?php echo 'Rp. ' . number_format(max($d['totalbudgetnow'] - $d['totalbudget'], 0), 0, '', ','); ?></td>
                                     <td bgcolor="#fea700">
                                         <font color="#1bd34f"><?php echo 'Rp. ' . number_format($tysb - $row3['sumi'], 0, '', ','); ?></font>
                                     </td>
@@ -218,18 +218,15 @@ if (strpos($tab, 'B1') !== false) : ?>
                                     <td><?php echo $d['tahun']; ?></td>
                                     <td><?php echo $d['pengaju']; ?></td>
                                     <td><?php echo $d['divisi']; ?></td>
-                                    <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
-                                    <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($d['totalbudgetnow'], 0, '', ','); ?></td>
-                                    <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($d['totalbudgetnow'] - $d['totalbudget'], 0, '', ','); ?></td>
-                                    <td bgcolor="#fcfaa4">
+                                    <td ><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
+                                    <td ><?php echo 'Rp. ' . number_format($d['totalbudgetnow'] == $d['totalbudget'] ? 0 : $d['totalbudgetnow'], 0, '', ','); ?></td>
+                                    <td ><?php echo 'Rp. ' . number_format(max($d['totalbudgetnow'] - $d['totalbudget'], 0), 0, '', ','); ?></td>
+                                    <td >
                                         <font color="#1bd34f"><?php echo 'Rp. ' . number_format($tysb - $row3['sumi'], 0, '', ','); ?></font>
                                     </td>
-                                    <td bgcolor="#fcfaa4">
+                                    <td >
                                         <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
                                         </font>
-                                    </td>
-                                    <td>
-                                        <font color="#1bd34f"><?php echo 'Rp. ' . number_format($totuangkembali, 0, '', ','); ?></font>
                                     </td>
                                     <td><a href="views-direksi.php?code=<?php echo $d['noid']; ?>"><i class="fas fa-eye" title="VIEW"></i></a></td>
                                     <?php echo "<td><a href='#myModal' class='btn btn-default btn-small' id='custId' data-toggle='modal' data-id=" . $d['noid'] . ">Setujui</a></td>"; ?>
@@ -262,8 +259,8 @@ if (strpos($tab, 'B1') !== false) : ?>
                         <th>Nama Yang Mengajukan</th>
                         <th>Divisi</th>
                         <th>Total Budget Disetujui</th>
-                        <th>Total Budget Berubah</th>
-                        <th>Selisih Budget Berubah</th>
+                        <th>Total Budget Baru</th>
+                        <th>Selisih Perubahan Budget</th>
                         <th>Sisa Budget</th>
                         <th>Total Biaya dan Uang Muka</th>
                         <th>View</th>
@@ -351,8 +348,8 @@ if (strpos($tab, 'B1') !== false) : ?>
                                 <td bgcolor="#fcfaa4"><?php echo $e['pengaju']; ?></td>
                                 <td bgcolor="#fcfaa4"><?php echo $e['divisi']; ?></td>
                                 <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($e['totalbudget'], 0, '', ','); ?></td>
-                                <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($e['totalbudgetnow'], 0, '', ','); ?></td>
-                                <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($e['totalbudgetnow'] - $e['totalbudget'], 0, '', ','); ?></td>
+                                <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($e['totalbudgetnow'] == $e['totalbudget'] ? 0 : $e['totalbudgetnow'], 0, '', ','); ?></td>
+                                <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format(max($e['totalbudgetnow'] - $e['totalbudget'], 0), 0, '', ','); ?></td>
                                 <td bgcolor="#fcfaa4">
                                     <font color="#1bd34f"><?php echo 'Rp. ' . number_format($tysb - $row3['sumi'], 0, '', ','); ?></font>
                                 </td>
@@ -406,8 +403,8 @@ if (strpos($tab, 'B1') !== false) : ?>
                                 <td bgcolor="#ff99a1"><?php echo $e['pengaju']; ?></td>
                                 <td bgcolor="#ff99a1"><?php echo $e['divisi']; ?></td>
                                 <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($e['totalbudget'], 0, '', ','); ?></td>
-                                <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($e['totalbudgetnow'], 0, '', ','); ?></td>
-                                <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($e['totalbudgetnow'] - $e['totalbudget'], 0, '', ','); ?></td>
+                                <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($e['totalbudgetnow'] == $e['totalbudget'] ? 0 : $e['totalbudgetnow'], 0, '', ','); ?></td>
+                                <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format(max($e['totalbudgetnow'] - $e['totalbudget'], 0), 0, '', ','); ?></td>
                                 <td bgcolor="#fcfaa4">
                                     <font color="#1bd34f"><?php echo 'Rp. ' . number_format($tysb - $row3['sumi'], 0, '', ','); ?></font>
                                 </td>
@@ -458,8 +455,8 @@ if (strpos($tab, 'B1') !== false) : ?>
                                 <td><?php echo $e['pengaju']; ?></td>
                                 <td><?php echo $e['divisi']; ?></td>
                                 <td ><?php echo 'Rp. ' . number_format($e['totalbudget'], 0, '', ','); ?></td>
-                                <td ><?php echo 'Rp. ' . number_format($e['totalbudgetnow'], 0, '', ','); ?></td>
-                                <td ><?php echo 'Rp. ' . number_format($e['totalbudgetnow'] - $e['totalbudget'], 0, '', ','); ?></td>
+                                <td ><?php echo 'Rp. ' . number_format($e['totalbudgetnow'] == $e['totalbudget'] ? 0 : $e['totalbudgetnow'], 0, '', ','); ?></td>
+                                <td ><?php echo 'Rp. ' . number_format(max($e['totalbudgetnow'] - $e['totalbudget'], 0), 0, '', ','); ?></td>
                                 <td >
                                     <font color="#1bd34f"><?php echo 'Rp. ' . number_format($tysb - $row3['sumi'], 0, '', ','); ?></font>
                                 </td>
