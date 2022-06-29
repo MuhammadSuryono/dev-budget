@@ -686,20 +686,25 @@ $setting = mysqli_fetch_assoc($querySetting);
           <!-- <button type="button" class="btn btn-info btn-small" onclick="tambah_budget('<?php echo $waktu; ?>')">Tambah Item</button> -->
 
           <br /><br>
-            <div class="row">
-                <div class="col-xs-3">Total Budget Yang Disetujui</div>
-                <?php
-                $totalBudgetKeseluruhan = $totalbudget;
-                ?>
-                <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($totalBudgetKeseluruhan, 0, '', ','); ?></b></div>
-            </div>
-            <div class="row">
-                <div class="col-xs-3">Total Perubahan Budget</div>
-                <?php
-                $totalBudgetBerubah = max($totalbudgetnow - $totalbudget, 0);
-                ?>
-                <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($totalBudgetBerubah, 0, '', ','); ?></b></div>
-            </div>
+            <?php
+            $totalBudgetBerubah = 0;
+            $totalBudgetKeseluruhan = $totalbudget;
+            if($totalbudgetnow - $totalbudget != 0){
+            ?>
+                <div class="row">
+                    <div class="col-xs-3">Total Budget Yang Disetujui</div>
+                    <?php
+                    ?>
+                    <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($totalBudgetKeseluruhan, 0, '', ','); ?></b></div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-3">Total Perubahan Budget</div>
+                    <?php
+                    $totalBudgetBerubah = max($totalbudgetnow - $totalbudget, 0);
+                    ?>
+                    <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($totalBudgetBerubah, 0, '', ','); ?></b></div>
+                </div>
+            <?php } ?>
           <div class="row">
             <div class="col-xs-3">Total Budget Keseluruhan</div>
             <?php

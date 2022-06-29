@@ -1,5 +1,5 @@
 <?php
-//error_reporting(0);
+error_reporting(0);
 require "application/config/database.php";
 
 $con = new Database();
@@ -30,8 +30,8 @@ if (isset($_POST['submit'])) {
     $countData = mysqli_fetch_array($queryCountData)[0];
 
     $totaljadi = $total = $row[0];
-    $totaljadi /= $countData;
-    $updatetotal = mysqli_query($koneksi, "UPDATE pengajuan SET totalbudget = $totaljadi WHERE waktu='$waktu'");
+//    $totaljadi /= $countData;
+    $updatetotal = mysqli_query($koneksi, "UPDATE pengajuan SET totalbudgetnow = $totaljadi WHERE waktu='$waktu'");
 
     $sel1 = mysqli_query($koneksi, "SELECT noid,status FROM pengajuan WHERE waktu='$waktu'");
     $uc = mysqli_fetch_assoc($sel1);
@@ -43,8 +43,7 @@ if (isset($_POST['submit'])) {
     $row = mysqli_fetch_array($result);
 
     $totaljadi =  $row[0] - $total;
-    var_dump($totaljadi);
-    $updatetotal = mysqli_query($koneksi, "UPDATE pengajuan SET totalbudget = $totaljadi WHERE waktu='$waktu'");
+    $updatetotal = mysqli_query($koneksi, "UPDATE pengajuan SET totalbudgetnow = $totaljadi  WHERE waktu='$waktu'");
 
     $sel1 = mysqli_query($koneksi, "SELECT noid,status FROM pengajuan WHERE waktu='$waktu'");
     $uc = mysqli_fetch_assoc($sel1);
