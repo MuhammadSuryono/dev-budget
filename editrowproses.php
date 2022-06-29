@@ -72,7 +72,7 @@ if (isset($_POST['submit'])) {
 
   if ($totalBudgetSekarang < $totalNominalDiganti ) {
       echo "<script language='javascript'>";
-      echo "alert('Total budget yang diganti melebihi Pagu. Selisih perubahannya Rp. ".number_format($totalNominalDiganti - $totalBudgetSekarang)." Total yang diganti Rp. ".number_format($totalNominalDiganti).", Total yang di setujui Rp. ".number_format($totalBudgetSekarang)."')";
+      echo "alert('Update nominal gagal!! Total budget yang diganti melebihi Pagu. Selisih perubahannya Rp. ".number_format($totalNominalDiganti - $totalBudgetSekarang)." Total yang diganti Rp. ".number_format($totalNominalDiganti).", Total yang di setujui Rp. ".number_format($totalBudgetSekarang)."')";
       echo "</script>";
       echo "<script> document.location.href='views-direksi.php?code=" . $numb . "'; </script>";
   }elseif ($jenis == 'Rutin') {
