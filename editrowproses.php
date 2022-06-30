@@ -25,8 +25,8 @@ if (isset($_POST['submit'])) {
   $divisi    = $_POST['divisi'];
 
   // Pengambilan total pengajuan yang sama
-  $queryCountData = mysqli_query($koneksi, "SELECT COUNT(noid) FROM pengajuan WHERE waktu='$waktu'");
-  $countData = mysqli_fetch_array($queryCountData)[0];
+//  $queryCountData = mysqli_query($koneksi, "SELECT COUNT(noid) FROM pengajuan WHERE waktu='$waktu'");
+//  $countData = mysqli_fetch_array($queryCountData)[0];
 
   // Menghitung total dikali harga yang berubah
   $totalQuantityKaliHarga = $harga * $quantity;
@@ -38,7 +38,7 @@ if (isset($_POST['submit'])) {
   $checktotal = mysqli_query($koneksi, "SELECT sum(total) AS sumt FROM selesai WHERE waktu='$waktu' AND no !='$no'");
   $st = mysqli_fetch_array($checktotal);
   $totalNominalItem = $st['sumt'];
-  $totalNominalDiganti = ($totalQuantityKaliHarga + $totalNominalItem) / $countData;
+  $totalNominalDiganti = ($totalQuantityKaliHarga + $totalNominalItem);
 
   // Ambil total budget Now
   $cekbudgettotal = mysqli_query($koneksi, "SELECT totalbudgetnow,totalbudget FROM pengajuan WHERE waktu='$waktu'");
@@ -66,9 +66,9 @@ if (isset($_POST['submit'])) {
   $result10 = mysqli_query($koneksi, $query10);
   $row10 = mysqli_fetch_array($result10);
   $totalbpunya = $row10[0];
-  $totalbpunya /= $countData;
+//  $totalbpunya /= $countData;
 
-  $totalHarga = $totalQuantityKaliHarga / $countData;
+  $totalHarga = $totalQuantityKaliHarga;
 
   if ($totalBudgetSekarang < $totalNominalDiganti ) {
       echo "<script language='javascript'>";

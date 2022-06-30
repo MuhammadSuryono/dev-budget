@@ -229,7 +229,7 @@ $setting = mysqli_fetch_assoc($querySetting);
 
                   while ($a = mysqli_fetch_array($sql)) {
                     if (!in_array($a["rincian"], $checkName)) :
-                      $querySumTotalBayar = mysqli_query($koneksi, "SELECT SUM(jumlahbayar) as total_bayar FROM bpu where no = '$a[no]' AND waktu = '$waktu'");
+                      $querySumTotalBayar = mysqli_query($koneksi, "SELECT SUM(jumlah) as total_bayar FROM bpu where no = '$a[no]' AND waktu = '$waktu' AND status = 'Telah Di Bayar'");
                       $totalBayar = mysqli_fetch_assoc($querySumTotalBayar);
                   ?>
                       <tr>
@@ -265,7 +265,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                         $pilihtotal = mysqli_query($koneksi, "SELECT total FROM selesai WHERE no='$no' AND waktu='$waktu'");
                         $aw = mysqli_fetch_assoc($pilihtotal);
                         $hargaah = $aw['total'];
-                        $query = "SELECT sum(jumlah) AS sum FROM bpu WHERE no='$no' AND waktu='$waktu'";
+                        $query = "SELECT sum(jumlah) AS sum FROM bpu WHERE no='$no' AND waktu='$waktu' AND status = 'Telah Di Bayar'";
                         $result = mysqli_query($koneksi, $query);
                         $row = mysqli_fetch_array($result);
                         $total = $row[0];
@@ -720,36 +720,27 @@ $setting = mysqli_fetch_assoc($querySetting);
             </div>
 
             <?php
-            // echo $waktu . "\n";
-            $query2 = "SELECT sum(jumlah) AS sum FROM bpu WHERE waktu='$waktu'";
-            $result2 = mysqli_query($koneksi, $query2);
-            $row2 = mysqli_fetch_array($result2);
-
-            $q_real = "SELECT sum(realisasi) AS sum FROM bpu WHERE waktu='$waktu'";
-            $r_real = mysqli_query($koneksi, $q_real);
-            $g_real = mysqli_fetch_array($r_real);
-
-            $query10 = "SELECT sum(uangkembali) AS sum FROM bpu WHERE waktu='$waktu'";
-            $result10 = mysqli_query($koneksi, $query10);
-            $row10 = mysqli_fetch_array($result10);
-
             $useduangkemb = mysqli_query($koneksi, "SELECT SUM(total) AS sumused FROM selesai WHERE waktu='$waktu' AND uangkembaliused='Y'");
             $uak = mysqli_fetch_array($useduangkemb);
             $uangkembaliused = $uak['sumused'];
+
+            $query3 = "SELECT (SUM(jumlah) - SUM(uangkembali)) as penggunaan FROM bpu WHERE waktu = '$waktu' AND
+(persetujuan = 'Disetujui (Direksi)' OR persetujuan = 'Disetujui (Sri Dewi Marpaung)')";
+            $result3 = mysqli_query($koneksi, $query3);
+            $penggunaan = mysqli_fetch_array($result3);
 
             $query3 = "SELECT sum(jumlah) AS sumi FROM bpu WHERE waktu='$waktu' AND persetujuan='Disetujui (Direksi)' AND status='Belum Di Bayar'";
             $result3 = mysqli_query($koneksi, $query3);
             $row3 = mysqli_fetch_array($result3);
 
+            $penggunaanBudget = ($penggunaan['penggunaan'] + $uangkembaliused);
 
-            $totlah = $row2['sum']; // total bayar
-            $reallah = $row10['sum'];
-            $tysb = $totlah - $reallah;
-
-            $totuangkembali = $reallah - $uangkembaliused;
+            $queryTotalUangKembali = "SELECT SUM(uangkembali) as uangkembali FROM bpu WHERE waktu = '$waktu'";
+            $resUangKembali = mysqli_query($koneksi, $queryTotalUangKembali);
+            $dataUangKembali = mysqli_fetch_array($resUangKembali);
             ?>
 
-            <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($tysb - $row3['sumi'], 0, '', ','); ?></font></b></div>
+            <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($penggunaanBudget, 0, '', ','); ?></font></b></div>
           </div>
 
 
@@ -759,7 +750,7 @@ $setting = mysqli_fetch_assoc($querySetting);
               <font color='#f23f2b'>Sisa Budget
             </div>
             <?php
-            $belumbayar = $totalBudgetKeseluruhan - ($tysb - $row3['sumi']) - $row3['sumi'];
+            $belumbayar = $totalBudgetKeseluruhan - $penggunaanBudget - $row3['sumi'] - $totalBudgetBerubah;
             ?>
             <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font></b></div>
           </div>
@@ -777,7 +768,7 @@ $setting = mysqli_fetch_assoc($querySetting);
           <!-- Note : -->
           <div class="row">
             <div class="col-xs-3">Total Uang Kembali Realisasi</div>
-            <div class="col-xs-3">: <button type="button" class="btn" onclick="uang_kembali('<?php echo $waktu; ?>','<?php echo $no ?>')"><?php echo 'Rp. ' . number_format($totuangkembali, 0, '', ','); ?></button></div>
+            <div class="col-xs-3">: <button type="button" class="btn" onclick="uang_kembali('<?php echo $waktu; ?>','<?php echo $no ?>')"><?php echo 'Rp. ' . number_format($dataUangKembali['uangkembali'], 0, '', ','); ?></button></div>
           </div>
           <br><br>
 
