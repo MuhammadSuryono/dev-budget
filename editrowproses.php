@@ -74,7 +74,7 @@ if (isset($_POST['submit'])) {
       echo "<script language='javascript'>";
       echo "alert('Update nominal gagal!! Total budget yang diganti melebihi Pagu. Selisih perubahannya Rp. ".number_format($totalNominalDiganti - $totalBudgetSekarang)." Total yang diganti Rp. ".number_format($totalNominalDiganti).", Total yang di setujui Rp. ".number_format($totalBudgetSekarang)."')";
       echo "</script>";
-      echo "<script> document.location.href='views-direksi.php?code=" . $numb . "'; </script>";
+      echo "<script> document.location.href='$_SERVER[HTTP_REFERER]'; </script>";
   }elseif ($jenis == 'Rutin') {
 
     $update = mysqli_query($koneksi, "UPDATE selesai SET rincian = '$rincian', kota = '$kota', status = '$status', penerima = '$penerima', harga = '$harga', quantity = '$quantity',
@@ -112,17 +112,17 @@ if (isset($_POST['submit'])) {
           echo "<script language='javascript'>";
           echo "alert('Total budget lebih kecil dari Pagu')";
           echo "</script>";
-          echo "<script> document.location.href='views-direksi.php?code=" . $numb . "'; </script>";
+          echo "<script> document.location.href='$_SERVER[HTTP_REFERER]'; </script>";
       }elseif ($divisi == 'FINANCE') {
       echo "<script language='javascript'>";
       echo "alert('Edit Budget Berhasil')";
       echo "</script>";
-      echo "<script> document.location.href='view-finance-manager.php?code=" . $numb . "'; </script>";
+      echo "<script> document.location.href='$_SERVER[HTTP_REFERER]'; </script>";
     } else {
       echo "<script language='javascript'>";
       echo "alert('Edit Budget Berhasil')";
       echo "</script>";
-      echo "<script> document.location.href='views-direksi.php?code=" . $numb . "'; </script>";
+      echo "<script> document.location.href='$_SERVER[HTTP_REFERER]'; </script>";
     }
   } else {
     echo "Edit Budget Gagal";

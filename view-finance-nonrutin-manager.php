@@ -395,7 +395,9 @@ $setting = mysqli_fetch_assoc($querySetting);
                           <td>
                               <button type="button" style="margin-top: 5px;" class="btn btn-default btn-small" onclick="bpu_budget('<?php echo $no; ?>','<?php echo $waktu; ?>')">BPU</button>
                               <br/><br/>
-
+                            <button type="button" class="btn btn-default btn-small" onclick="edit_row('<?php echo $no; ?>','<?php echo $waktu; ?>')">Edit</button>
+                            <br /><br />
+                            <button type="button" class="btn btn-danger btn-small" onclick="hapus_row('<?php echo $no; ?>','<?php echo $waktu; ?>')">Hapus</button>
                             <br /><br />
                             <button type="button" class="btn btn-warning btn-small" onclick="detail_bpu('<?php echo $no; ?>','<?php echo $waktu; ?>')">Detail</button>
                               <br /><br />
@@ -409,7 +411,9 @@ $setting = mysqli_fetch_assoc($querySetting);
                           <td>
                               <button type="button" style="margin-top: 5px;" class="btn btn-default btn-small" onclick="bpu_budget('<?php echo $no; ?>','<?php echo $waktu; ?>')">BPU</button>
                               <br/><br/>
-
+                            <button type="button" class="btn btn-default btn-small" onclick="edit_row('<?php echo $no; ?>','<?php echo $waktu; ?>')">Edit</button>
+                            <br /><br />
+                            <button type="button" class="btn btn-danger btn-small" onclick="hapus_row('<?php echo $no; ?>','<?php echo $waktu; ?>')">Hapus</button>
                             <br /><br />
                             <button type="button" class="btn btn-warning btn-small" onclick="detail_bpu('<?php echo $no; ?>','<?php echo $waktu; ?>')">Detail</button>
                             <!-- <br/><br/> -->
@@ -423,7 +427,9 @@ $setting = mysqli_fetch_assoc($querySetting);
                               <button type="button" class="btn btn-success btn-small" onclick="eksternal('<?php echo $no; ?>','<?php echo $waktu; ?>')">Eksternal</button>
                               <br /><br />
                             <?php endif; ?>
-
+                            <button type="button" class="btn btn-default btn-small" onclick="edit_row('<?php echo $no; ?>','<?php echo $waktu; ?>')">Edit</button>
+                            <br /><br />
+                            <button type="button" class="btn btn-danger btn-small" onclick="hapus_row('<?php echo $no; ?>','<?php echo $waktu; ?>')">Hapus</button>
                             <br /><br />
                             <button type="button" class="btn btn-warning btn-small" onclick="detail_bpu('<?php echo $no; ?>','<?php echo $waktu; ?>')">Detail</button>
                             <!-- <br/><br/> -->
@@ -707,7 +713,7 @@ echo "Nominal Pajak :<br><b>Rp. " .number_format($bayar['nominal_pajak'] == null
                                 echo "Komentar : <br><b> $alasan ";
                                 echo "</b><br/>";
                           ?>
-                                <?php if ($total['jumlah_total'] <= $setting['plafon']) : ?>
+                                <?php if (true) : ?>
                                   <button type="button" class="btn btn-success btn-small" onclick="setujuiBpu('<?php echo $no; ?>','<?php echo $waktu; ?>', '<?= $term ?>')">Setujui</button>
                                   </br>
                                 <?php endif; ?>
