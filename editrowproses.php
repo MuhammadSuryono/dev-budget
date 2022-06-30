@@ -70,7 +70,7 @@ if (isset($_POST['submit'])) {
 
   $totalHarga = $totalQuantityKaliHarga;
 
-  if ($totalBudgetSekarang < $totalNominalDiganti ) {
+  if ($totalBudgetSekarang < $totalNominalDiganti && !in_array($jenis, ['Rutin'])) {
       echo "<script language='javascript'>";
       echo "alert('Update nominal gagal!! Total budget yang diganti melebihi Pagu. Selisih perubahannya Rp. ".number_format($totalNominalDiganti - $totalBudgetSekarang)." Total yang diganti Rp. ".number_format($totalNominalDiganti).", Total yang di setujui Rp. ".number_format($totalBudgetSekarang)."')";
       echo "</script>";
@@ -96,15 +96,14 @@ if (isset($_POST['submit'])) {
     }
   }
 
-//  if ($update) {
-//    $query = "SELECT sum(total) AS sum FROM selesai WHERE waktu='$waktu'";
-//    $result = mysqli_query($koneksi, $query);
-//    $row = mysqli_fetch_array($result);
-//
-//    $totaljadi = $total = $row[0];
-//    $totaljadi /= $countData;
-//    $updatetotal = mysqli_query($koneksi, "UPDATE pengajuan SET totalbudget = $totalBudgetSekarang WHERE waktu='$waktu'");
-//  }
+  if ($update && $jenis == 'Rutin') {
+    $query = "SELECT sum(total) AS sum FROM selesai WHERE waktu='$waktu'";
+    $result = mysqli_query($koneksi, $query);
+    $row = mysqli_fetch_array($result);
+
+    $totaljadi = $total = $row[0];
+    $updatetotal = mysqli_query($koneksi, "UPDATE pengajuan SET totalbudget = $totalBudgetSekarang WHERE waktu='$waktu'");
+  }
 
   if ($update) {
 
