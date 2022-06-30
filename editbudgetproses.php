@@ -1,5 +1,5 @@
 <?php
-//error_reporting(0);
+error_reporting(0);
 require "application/config/database.php";
 
 $con = new Database();
@@ -32,9 +32,9 @@ if (isset($_POST['submit'])) {
     $queryCountData = mysqli_query($koneksi, "SELECT COUNT(noid) FROM pengajuan WHERE waktu='$waktu'");
     $countData = mysqli_fetch_array($queryCountData)[0];
 
-    $sum /= $countData;
+//    $sum /= $countData;
 
-    $updatetotal = mysqli_query($koneksi, "UPDATE pengajuan SET totalbudget ='$sum' WHERE waktu='$waktu'");
+    $updatetotal = mysqli_query($koneksi, "UPDATE pengajuan SET totalbudgetnow ='$sum' WHERE waktu='$waktu'");
 
     $sel1 = mysqli_query($koneksi, "SELECT noid FROM pengajuan WHERE waktu='$waktu'");
     $uc = mysqli_fetch_assoc($sel1);
