@@ -1,5 +1,5 @@
 <?php
- error_reporting(0);
+error_reporting(0);
 session_start();
 require "application/config/database.php";
 
@@ -16,8 +16,9 @@ $query = mysqli_query($koneksi, "SELECT a.nama, a.waktu, a.noid, a.jenis FROM pe
 $queryUser = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$code'");
 $tb_user = mysqli_fetch_assoc($queryUser);
 
-$queryTotalOut = mysqli_query($koneksi, "SELECT SUM(jumlah) AS total_pengajuan FROM (SELECT DISTINCT a.* FROM bpu a JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no LEFT JOIN tb_user c ON c.nama_user = a.namapenerima WHERE b.status IN ('UM', 'UM Burek') AND a.status IN ('Telah Di Bayar', 'Belum Di Bayar') AND a.namapenerima = '$code') AS t") or die(mysqli_error($koneksi));
-$totalOut = mysqli_fetch_assoc($queryTotalOut);
+//$queryTotalOut = mysqli_query($koneksi, "SELECT SUM(jumlah) AS total_pengajuan FROM (SELECT DISTINCT a.* FROM bpu a JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no LEFT JOIN tb_user c ON c.nama_user = a.namapenerima WHERE b.status IN ('UM', 'UM Burek') AND a.status IN ('Telah Di Bayar', 'Belum Di Bayar') AND a.namapenerima = '$code') AS t") or die(mysqli_error($koneksi));
+//$totalOut = mysqli_fetch_assoc($queryTotalOut);
+$totalOut = 0;
 ?>
 
 <!DOCTYPE html>
@@ -114,14 +115,6 @@ $totalOut = mysqli_fetch_assoc($queryTotalOut);
     </center>
 
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-xs-1">Limit </div>
-            <div class="col-xs-3">: Rp. <?= number_format($tb_user['saldo']) ?></b></div>
-        </div>
-        <div class="row">
-            <div class="col-xs-1">Sisa Limit </div>
-            <div class="col-xs-3">: Rp. <?= number_format($tb_user['saldo'] - $totalOut['total_pengajuan']) ?></b></div>
-        </div>
         <br>
         <div class="panel panel-warning" data-widget="{&quot;draggable&quot;: &quot;false&quot;}" data-widget-static="">
             <div class="panel-body no-padding">
@@ -143,10 +136,12 @@ $totalOut = mysqli_fetch_assoc($queryTotalOut);
                 while ($item = mysqli_fetch_assoc($query)) :
                     $queryBpu = mysqli_query($koneksi, "SELECT SUM(a.jumlah) AS total_pengajuan FROM bpu a JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no WHERE b.status IN ('UM', 'UM Burek') AND a.namapenerima = '$code' AND a.waktu = '$item[waktu]' AND a.realisasi + a.uangkembali != a.jumlah AND a.status IN ('Telah Di Bayar', 'Belum Di Bayar', 'Realisasi (Direksi)')") or die(mysqli_error($koneksi));
                     $pengajuan = mysqli_fetch_assoc($queryBpu);
-                    
+
+                    // Pengajuan yang sudha dibayar dan sudah di realisasi
                     $queryBpuTerbayar = mysqli_query($koneksi, "SELECT SUM(a.jumlah) AS total_pengajuan FROM bpu a JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no WHERE b.status IN ('UM', 'UM Burek') AND a.namapenerima = '$code' AND a.waktu = '$item[waktu]' AND a.status IN ('Telah Di Bayar','Realisasi (Direksi)')") or die(mysqli_error($koneksi));
                     $pengajuanTerbayar = mysqli_fetch_assoc($queryBpuTerbayar);
-                    
+
+                    // Pengajuan yang belum dibayar
                     $queryBpuBelumTerbayar = mysqli_query($koneksi, "SELECT SUM(a.jumlah) AS total_pengajuan FROM bpu a JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no WHERE b.status IN ('UM', 'UM Burek') AND a.namapenerima = '$code' AND a.waktu = '$item[waktu]' AND a.status = 'Belum Di Bayar'") or die(mysqli_error($koneksi));
                     $pengajuanBelumTerbayar = mysqli_fetch_assoc($queryBpuBelumTerbayar);
                     
@@ -158,7 +153,9 @@ $totalOut = mysqli_fetch_assoc($queryTotalOut);
                         $total += $pengajuan['total_pengajuan'];
                         $totalRealisasi += $pengajuanRealisasi['total_realisasi'];
                         $totalTerbayar += $pengajuanTerbayar['total_pengajuan'];
+                        $totalBelumTerbayar +=  $pengajuanBelumTerbayar['total_pengajuan'];
                         $totalSaldoOutstanding = ($pengajuanTerbayar['total_pengajuan'] + $pengajuanBelumTerbayar['total_pengajuan']) -  $pengajuanRealisasi['total_realisasi'];
+                        $totalOut += $totalSaldoOutstanding;
                 ?>
                         <div class="list-group-item" id="grandparent<?= $i ?>" style="border: 1px solid black !important;">
                             <div id="expander" data-target="#grandparentContent<?= $i ?>" data-toggle="collapse" data-group-id="grandparent<?= $i ?>" data-role="expander">
@@ -309,10 +306,22 @@ $totalOut = mysqli_fetch_assoc($queryTotalOut);
                 <p>Total Uang Muka Keseluruhan: </p> -->
             </div><!-- /.table-responsive -->
         </div>
+
+        <div class="panl panel-danger">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-xs-1">Limit </div>
+                    <div class="col-xs-3">: <b>Rp. <?= number_format($tb_user['saldo']) ?></b></div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-1">Sisa Limit </div>
+                    <div class="col-xs-3" id="coba">: <b>Rp. <?= number_format($tb_user['saldo'] - $totalOut) ?></b></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script type="text/javascript">
-
     </script>
 
 </body>
