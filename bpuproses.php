@@ -34,6 +34,7 @@ if ($port != "") {
 $hostProtocol = $hostProtocol . ":" . $port;
 }
 $host = $hostProtocol. '/'. $url[1];
+
 //periksa apakah udah submit
 if (isset($_POST['submit'])) {
   $no           = $_POST['no'];
@@ -125,16 +126,48 @@ if (isset($_POST['submit'])) {
 
   $caribayar = mysqli_query($koneksi, "SELECT status FROM bpu WHERE waktu='$waktu' AND no='$no' AND status='Belum Di Bayar'");
 
-  $saldo = mysqli_query($koneksi, "SELECT saldo FROM tb_user WHERE nama_user='$namapenerima'");
+  $saldo = mysqli_query($koneksi, "SELECT saldo FROM tb_user WHERE nama_user='$namapenerima'  AND aktif = 'Y'");
   $sld = mysqli_fetch_assoc($saldo);
   $saldobpu = $sld['saldo'];
+    $totalUm = 0;
 
-  $query2 = "SELECT sum(jumlah) AS sumi FROM bpu WHERE namapenerima='$namapenerima' AND statusbpu IN ('UM', 'UM Burek') AND status IN ('Telah Di Bayar', 'Belum Di Bayar')";
-  $result2 = mysqli_query($koneksi, $query2);
-  $row2 = mysqli_fetch_array($result2);
-  $totalUm = $row2['sumi'];
+    if (mysqli_num_rows($saldo) > 0) {
+        $user = mysqli_fetch_assoc($saldo);
 
-  $saldosisa = $saldobpu - $totalUm;
+        $query = mysqli_query($koneksi, "SELECT a.nama, a.waktu, a.noid, a.jenis FROM pengajuan a JOIN bpu b ON a.waktu = b.waktu JOIN selesai c ON b.waktu = c.waktu where b.namapenerima = '$namapenerima' GROUP BY nama");
+
+        $totalTerbayar = 0;
+        $totalRealisasi = 0;
+        $totalSaldoOutstanding = 0;
+        $totalBelumTerbayar = 0;
+        $code = $namapenerima;
+        $total = 0;
+        while ($item = mysqli_fetch_assoc($query)) {
+            $queryBpu = mysqli_query($koneksi, "SELECT SUM(a.jumlah) AS total_pengajuan FROM bpu a JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no WHERE b.status IN ('UM', 'UM Burek') AND a.namapenerima = '$code' AND a.waktu = '$item[waktu]' AND a.realisasi + a.uangkembali != a.jumlah AND a.status IN ('Telah Di Bayar', 'Belum Di Bayar', 'Realisasi (Direksi)')") or die(mysqli_error($koneksi));
+            $pengajuan = mysqli_fetch_assoc($queryBpu);
+
+            // Pengajuan yang sudha dibayar dan sudah di realisasi
+            $queryBpuTerbayar = mysqli_query($koneksi, "SELECT SUM(a.jumlah) AS total_pengajuan FROM bpu a JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no WHERE b.status IN ('UM', 'UM Burek') AND a.namapenerima = '$code' AND a.waktu = '$item[waktu]' AND a.status IN ('Telah Di Bayar','Realisasi (Direksi)')") or die(mysqli_error($koneksi));
+            $pengajuanTerbayar = mysqli_fetch_assoc($queryBpuTerbayar);
+
+            // Pengajuan yang belum dibayar
+            $queryBpuBelumTerbayar = mysqli_query($koneksi, "SELECT SUM(a.jumlah) AS total_pengajuan FROM bpu a JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no WHERE b.status IN ('UM', 'UM Burek') AND a.namapenerima = '$code' AND a.waktu = '$item[waktu]' AND a.status = 'Belum Di Bayar'") or die(mysqli_error($koneksi));
+            $pengajuanBelumTerbayar = mysqli_fetch_assoc($queryBpuBelumTerbayar);
+
+            $queryBpuRealisasi = mysqli_query($koneksi, "SELECT SUM(a.realisasi) + SUM(a.uangkembali) AS total_realisasi FROM bpu a JOIN selesai b ON a.waktu = b.waktu AND a.no = b.no WHERE b.status IN ('UM', 'UM Burek') AND a.namapenerima = '$code' AND a.waktu = '$item[waktu]' AND a.realisasi + a.uangkembali = a.jumlah AND a.status IN ('Telah Di Bayar','Realisasi (Direksi)')") or die(mysqli_error($koneksi));
+            $pengajuanRealisasi = mysqli_fetch_assoc($queryBpuRealisasi);
+            if ($pengajuan['total_pengajuan'] != null) {
+                $total += $pengajuan['total_pengajuan'];
+                $totalRealisasi += $pengajuanRealisasi['total_realisasi'];
+
+                $totalTerbayar += $pengajuanTerbayar['total_pengajuan'];
+                $totalBelumTerbayar += $pengajuanBelumTerbayar['total_pengajuan'];
+                $totalSaldoOutstanding += ($pengajuanTerbayar['total_pengajuan'] + $pengajuanBelumTerbayar['total_pengajuan']) - $pengajuanRealisasi['total_realisasi'];
+            }
+        }
+    }
+
+  $saldosisa = $saldobpu - $totalSaldoOutstanding;
 
   $carium = "SELECT * FROM bpu WHERE namapenerima='$namapenerima' AND status='Telah Di Bayar' AND statusbpu='UM'";
   $run_carium = mysqli_query($koneksi, $carium);
@@ -152,13 +185,13 @@ if (isset($_POST['submit'])) {
     $termfinal = $termterm + 1;
     if ($divisi == 'FINANCE') {
       $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,namabank,norek,namapenerima,bank_account_name,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload, status_pengajuan_bpu,batas_tanggal_bayar,emailpenerima, rekening_id,tanggalbayar,created_at) VALUES
-                                                ('$no','$jumlah','$namabank','$norek','$namapenerima', '$namapenerima','$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar', '1', '$tanggalBatasBayar', '$emailpenerima', '$id_rekening', '$tanggal_bayar' ,'$time')") or die(mysqli_error($koneksi));
+                                                ('$no','$jumlah','$namabank','$norek','$namapenerima', '$namapenerima','$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar', '1', '$tanggalBatasBayar', '$emailpenerima', '$id_rekening', '$tanggal_bayar' ,'$time')") or die("Erorr: " . mysqli_error($koneksi));
       $idBpu = mysqli_insert_id($koneksi);
       
       $insert = mysqli_query($koneksi, "INSERT INTO tb_jatuh_tempo (id_bpu, tanggal_jatuh_tempo) VALUES ('$idBpu', '$tanggalJatuhTempo')") or die(mysqli_error($koneksi));
     } else {
       $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,namabank,norek,namapenerima,bank_account_name,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload, status_pengajuan_bpu,batas_tanggal_bayar,emailpenerima, rekening_id,tanggalbayar,created_at) VALUES
-                                                ('$no','$jumlah','$namabank','$norek','$namapenerima', '$namapenerima','$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar', '3', '$tanggalBatasBayar', '$emailpenerima', '$id_rekening','$tanggal_bayar' ,'$time')") or die(mysqli_error($koneksi));
+                                                ('$no','$jumlah','$namabank','$norek','$namapenerima', '$namapenerima','$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar', '3', '$tanggalBatasBayar', '$emailpenerima', '$id_rekening','$tanggal_bayar' ,'$time')") or die("Erorr213: " .mysqli_error($koneksi));
       $idBpu = mysqli_insert_id($koneksi);
       $insert = mysqli_query($koneksi, "INSERT INTO tb_jatuh_tempo (id_bpu, tanggal_jatuh_tempo) VALUES ('$idBpu', '$tanggalJatuhTempo')") or die(mysqli_error($koneksi));
     }
@@ -237,7 +270,7 @@ if (isset($_POST['submit'])) {
 
       if ($divisi == 'FINANCE') {
         $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,pengajuan_jumlah,namabank,norek,namapenerima,bank_account_name,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,fileupload, status_pengajuan_bpu,batas_tanggal_bayar,emailpenerima, rekening_id,tanggalbayar,created_at) VALUES
-                                                  ('$no','$jumlah','$namabank','$norek','$namapenerima', '$namapenerima','$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar', '1', '$tanggalBatasBayar', '$emailpenerima', '$id_rekening', '$tanggal_bayar' ,'$time')") or die(mysqli_error($koneksi));
+                                                  ('$no','$jumlah','$namabank','$norek','$namapenerima', '$namapenerima','$pengaju','$divisi','$waktu','Belum Di Bayar','Belum Disetujui','$termfinal','$statusbpu','$nama_gambar', '1', '$tanggalBatasBayar', '$emailpenerima', '$id_rekening', '$tanggal_bayar' ,'$time')") or die("Error 2134: ". mysqli_error($koneksi));
         $idBpu = mysqli_insert_id($koneksi);
         
         $insert = mysqli_query($koneksi, "INSERT INTO tb_jatuh_tempo (id_bpu, tanggal_jatuh_tempo) VALUES ('$idBpu', '$tanggalJatuhTempo')") or die(mysqli_error($koneksi));
