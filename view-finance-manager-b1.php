@@ -183,9 +183,7 @@ $setting = mysqli_fetch_assoc($querySetting);
   $select = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE noid='$code'");
   $d = mysqli_fetch_assoc($select);
 
-  $con->update('bpu')->set_value_update('status','Telah Di Bayar')->where('waktu', '=', $d['waktu'])
-      ->where('persetujuan', 'LIKE', 'Disetujui%')
-      ->whereRaw("AND novoucher != '-'")->save_update();
+
 
   $queryProjects = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE waktu='$d[waktu]'");
   $kodeProjects = [];
@@ -357,7 +355,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                         $pilihtotal = mysqli_query($koneksi, "SELECT total FROM selesai WHERE no='$no' AND waktu='$waktu'");
                         $aw = mysqli_fetch_assoc($pilihtotal);
                         $hargaah = $aw['total'];
-                        $query = "SELECT sum(jumlah) AS sum FROM bpu WHERE no='$no' AND waktu='$waktu'";
+                        $query = "SELECT sum(jumlah) AS sum FROM bpu WHERE no='$no' AND waktu='$waktu' and is_locked = 0";
                         $result = mysqli_query($koneksi, $query);
                         $row = mysqli_fetch_array($result);
                         $total = $row[0];
@@ -577,7 +575,9 @@ $setting = mysqli_fetch_assoc($querySetting);
                               //   $color = '#9932CC';
                               // }
 
-                              echo "<td bgcolor=' $color '>";
+                                $isLockedStyle = $bayar['is_locked'] == true ? 'filter: blur(1px); cursor: not-allowed; background: url("https://www.freeiconspng.com/thumbs/lock-icon/lock-icon-11.png") no-repeat; background-size: contain; background-position-y: center;':'';
+
+                              echo "<td bgcolor=' $color ' style='border: 1px black solid;$isLockedStyle'>";
                               // echo "</b><br>";
                               echo "No. BPU :<b> $noidbpu";
                               echo "</b><br>";
@@ -792,7 +792,7 @@ echo "Nominal Pajak :<b>Rp. " .number_format($bayar['nominal_pajak'] == null ? 0
             </div>
 
             <?php
-            $query2 = "SELECT sum(jumlah) AS total_pembayaran FROM bpu WHERE waktu='$waktu'";
+            $query2 = "SELECT sum(jumlah) AS total_pembayaran FROM bpu WHERE waktu='$waktu' and is_locked = 0";
             $result2 = mysqli_query($koneksi, $query2);
             $row2 = mysqli_fetch_array($result2);
 
@@ -801,7 +801,7 @@ echo "Nominal Pajak :<b>Rp. " .number_format($bayar['nominal_pajak'] == null ? 0
             $row10 = mysqli_fetch_array($result10);
             $tysb = $row2['total_pembayaran'] - $row10['total_kembalian'];
 
-            $query3 = "SELECT sum(jumlah) AS ready_to_pay FROM bpu WHERE waktu='$waktu' AND persetujuan='Disetujui (Direksi)' AND status='Belum Di Bayar'";
+            $query3 = "SELECT sum(jumlah) AS ready_to_pay FROM bpu WHERE waktu='$waktu' AND persetujuan='Disetujui (Direksi)' AND status='Belum Di Bayar' and is_locked = 0";
             $result3 = mysqli_query($koneksi, $query3);
             $row3 = mysqli_fetch_array($result3);
             ?>
