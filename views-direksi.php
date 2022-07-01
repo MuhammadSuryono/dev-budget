@@ -80,9 +80,7 @@ $setting = mysqli_fetch_assoc($querySetting);
   $code = $_GET['code'];
   $select = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE noid='$code'");
   $d = mysqli_fetch_assoc($select);
-  $con->update('bpu')->set_value_update('status','Telah Di Bayar')->where('waktu', '=', $d['waktu'])
-      ->where('persetujuan', 'LIKE', 'Disetujui%')
-      ->whereRaw("AND novoucher != '-'")->save_update();
+
 
   $cariselisih = mysqli_query($koneksi, "SELECT totalbudget,totalbudgetnow FROM pengajuan WHERE waktu='$d[waktu]'");
   $cs = mysqli_fetch_array($cariselisih);
