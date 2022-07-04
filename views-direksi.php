@@ -627,7 +627,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                                 echo "</b><br/>";
                           ?>
 
-                                <?php if ($total['jumlah_total'] > $setting['plafon']) : ?>
+                                <?php if (($total['jumlah_total'] > $setting['plafon']) && $bayar['is_locked'] == 0) : ?>
                                   <button type="button" class="btn btn-success btn-small" onclick="setujuiBpu('<?php echo $no; ?>','<?php echo $waktu; ?>', '<?= $term ?>')">Setujui</button>
                                   </br>
                                 <?php endif; ?>
@@ -635,14 +635,14 @@ $setting = mysqli_fetch_assoc($querySetting);
                                 </br>
                                 <button type="button" class="btn btn-danger btn-small" style="margin-bottom: 3px;" onclick="hapus_bpu('<?php echo $no; ?>','<?php echo $waktu; ?>','<?php echo $term; ?>')">Hapus</button>
                               <?php
-                              } else if (($persetujuan == 'Disetujui (Direksi)' || $persetujuan == 'Disetujui (Sri Dewi Marpaung)' || $persetujuan == 'Disetujui oleh sistem') and $statusbayar == 'Belum Di Bayar') {
+                              } else if (($persetujuan == 'Disetujui (Direksi)' || $persetujuan == 'Disetujui (Sri Dewi Marpaung)' || $persetujuan == 'Disetujui oleh sistem') and $statusbayar == 'Belum Di Bayar' && $bayar['is_locked'] == 0) {
                               ?>
                                 <button type="button" class="btn btn-warning btn-small" style="margin-bottom: 3px;" onclick="editharga('<?php echo $noidbpu; ?>','<?php echo $no; ?>','<?php echo $waktu; ?>','<?php echo $term; ?>')">Edit</button>
                                 </br>
                                 <button type="button" class="btn btn-danger btn-small" style="margin-bottom: 3px;" onclick="hapus_bpu('<?php echo $no; ?>','<?php echo $waktu; ?>','<?php echo $term; ?>')">Hapus</button>
 
                               <?php
-                              } else if ($statusbayar == 'Realisasi (Finance)' || $statusbayar == 'Realisasi (Direksi)' || $uangkembali != 0) {
+                              } else if (($statusbayar == 'Realisasi (Finance)' || $statusbayar == 'Realisasi (Direksi)' || $uangkembali != 0) && $bayar['is_locked'] == 0) {
                                 echo "Uang Kembali :<br><b> Rp. " . number_format($uangkembali, 0, '', ',');
                                 echo "</b><br/>";
                               ?>
@@ -650,7 +650,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                                 </br>
                                 <button type="button" class="btn btn-danger btn-small" style="margin-bottom: 3px;" onclick="hapus_bpu('<?php echo $no; ?>','<?php echo $waktu; ?>','<?php echo $term; ?>')">Hapus</button>
                               <?php
-                              } else {
+                              } else if ($bayar['is_locked'] == 0) {
                               ?>
                                 <button type="button" class="btn btn-warning btn-small" style="margin-bottom: 3px;" onclick="editharga('<?php echo $noidbpu; ?>','<?php echo $no; ?>','<?php echo $waktu; ?>','<?php echo $term; ?>')">Edit</button>
                                 </br>
