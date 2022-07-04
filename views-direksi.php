@@ -228,11 +228,12 @@ $setting = mysqli_fetch_assoc($querySetting);
                   $waktu = $d['waktu'];
                   $checkName = [];
                   $sql = mysqli_query($koneksi, "SELECT * FROM selesai WHERE waktu='$waktu' ORDER BY no");
-
+                    $totalPembayaran = 0;
                   while ($a = mysqli_fetch_array($sql)) {
                     if (!in_array($a["rincian"], $checkName)) :
-                      $querySumTotalBayar = mysqli_query($koneksi, "SELECT SUM(jumlah) as total_bayar FROM bpu where no = '$a[no]' AND waktu = '$waktu' AND status = 'Telah Di Bayar'");
+                      $querySumTotalBayar = mysqli_query($koneksi, "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as total_bayar FROM bpu where no = '$a[no]' AND waktu = '$waktu' AND is_locked = 0");
                       $totalBayar = mysqli_fetch_assoc($querySumTotalBayar);
+                      $totalPembayaran = $totalBayar['total_bayar'];
                   ?>
                       <tr>
                         <th scope="row"> <?php echo $i++; ?></th>
@@ -258,7 +259,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                         <td><?php echo 'Rp. ' . number_format($a['harga'], 0, '', ','); ?></td>
                         <td><?php echo $a['quantity']; ?></td>
                         <td><?php echo 'Rp. ' . number_format($a['total'], 0, '', ','); ?></td>
-                        <td>Rp. <?= number_format($totalBayar['total_bayar']) ?></td>
+                        <td>Rp. <?= number_format($totalPembayaran) ?></td>
 
                         <!-- Sisa Pembayaran -->
                         <?php
@@ -267,16 +268,8 @@ $setting = mysqli_fetch_assoc($querySetting);
                         $pilihtotal = mysqli_query($koneksi, "SELECT total FROM selesai WHERE no='$no' AND waktu='$waktu'");
                         $aw = mysqli_fetch_assoc($pilihtotal);
                         $hargaah = $aw['total'];
-                        $query = "SELECT sum(jumlah) AS sum FROM bpu WHERE no='$no' AND waktu='$waktu' AND status = 'Telah Di Bayar'";
-                        $result = mysqli_query($koneksi, $query);
-                        $row = mysqli_fetch_array($result);
-                        $total = $row[0];
-                        $query16 = "SELECT sum(uangkembali) AS sum FROM bpu WHERE no='$no' AND waktu='$waktu'";
-                        $result16 = mysqli_query($koneksi, $query16);
-                        $row16 = mysqli_fetch_array($result16);
-                        $total16 = $row16[0];
 
-                        $jadinya = $hargaah - $total;
+                        $jadinya = $hargaah - $totalPembayaran;
                         ?>
                         <td><?php echo 'Rp. ' . number_format($jadinya, 0, '', ','); ?></td>
                         <!-- //Sisa Pembayaran -->
@@ -334,7 +327,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                         } else {
                         ?>
                           <td>
-                            <?php if($a['total'] > 1000000) { ?>
+                            <?php if($jadinya != 0) { ?>
                             <button type="button" class="btn btn-success btn-small" onclick="eksternal('<?php echo $no; ?>','<?php echo $waktu; ?>')">Eksternal</button>
                             <br /><br />
                             <?php } ?>
@@ -726,7 +719,7 @@ $setting = mysqli_fetch_assoc($querySetting);
             $uak = mysqli_fetch_array($useduangkemb);
             $uangkembaliused = $uak['sumused'];
 
-            $query3 = "SELECT CASE WHEN jumlah > 0 THEN SUM(jumlah) ELSE SUM(pengajuan_jumlah) END as penggunaan, SUM(uangkembali) as uangkembali FROM bpu WHERE waktu = '$waktu' AND is_locked = 0";
+            $query3 = "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as penggunaan, SUM(uangkembali) as uangkembali FROM bpu WHERE waktu = '$waktu' AND is_locked = 0";
             $result3 = mysqli_query($koneksi, $query3);
             $penggunaan = mysqli_fetch_array($result3);
 

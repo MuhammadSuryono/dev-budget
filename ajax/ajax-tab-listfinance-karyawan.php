@@ -1,4 +1,5 @@
 <?php
+error_reporting(0);
 require "../application/config/database.php";
 
 $con = new Database();
@@ -19,8 +20,11 @@ if (strpos($tab, 'B1') !== false) : ?>
                   <th>Tahun</th>
                   <th>Nama Yang Mengajukan</th>
                   <th>Divisi</th>
-                  <th>Total</th>
-                  <th>Total Biaya dan Uang Muka</th>
+                    <th>Total Budget Disetujui</th>
+                    <th class="text-primary">Total Budget Baru</th>
+                    <th style="color: orange">Selisih Perubahan Budget</th>
+                  <th style="color: #1bd34f">Total BPU</th>
+                    <th class="text-warning">Total RTP</th>
                   <th>Sisa Budget</th>
                   <th>View</th>
                   <th>Persetujuan</th>
@@ -40,22 +44,27 @@ if (strpos($tab, 'B1') !== false) : ?>
                     $query2 = "SELECT sum(jumlah) AS sumasum FROM bpu WHERE waktu='$waktu'";
                     $result2 = mysqli_query($koneksi, $query2);
                     $row2 = mysqli_fetch_array($result2);
+                      $useduangkemb = mysqli_query($koneksi, "SELECT SUM(total) AS sumused FROM selesai WHERE waktu='$waktu' AND uangkembaliused='Y'");
+                      $uak = mysqli_fetch_array($useduangkemb);
+                      $uangkembaliused = $uak['sumused'];
 
-                    $query3 = "SELECT sum(jumlah) AS ready_to_pay FROM bpu WHERE waktu='$waktu' AND persetujuan='Disetujui (Direksi)' AND status='Belum Di Bayar'";
-                  $result3 = mysqli_query($koneksi, $query3);
-                  $row3 = mysqli_fetch_array($result3);
-  
-                    $query10 = "SELECT sum(uangkembali) AS sum FROM bpu WHERE waktu='$waktu'";
-                    $result10 = mysqli_query($koneksi, $query10);
-                    $row10 = mysqli_fetch_array($result10);
-                    $tysb = $row2['sumasum'] - $row10['sum'];
+                      $query3 = "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as penggunaan, SUM(uangkembali) as uangkembali FROM bpu WHERE waktu = '$waktu' AND is_locked = 0";
+                      $result3 = mysqli_query($koneksi, $query3);
+                      $penggunaan = mysqli_fetch_array($result3);
+
+                      $query4 = "SELECT sum(jumlah) AS sumi FROM bpu WHERE waktu='$waktu' AND persetujuan='Disetujui (Direksi)' AND status='Belum Di Bayar'";
+                      $result4 = mysqli_query($koneksi, $query4);
+                      $row3 = mysqli_fetch_array($result4);
+
+                      $penggunaanBudget = (($penggunaan['penggunaan'] - $penggunaan['uangkembali']) + $uangkembaliused) - $row3['sumi'];
+                      $belumbayar = $d['totalbudget'] - $penggunaanBudget - $row3['sumi'];
 
                     $queryTotalBudget = mysqli_query($koneksi, "SELECT sum(total) as total_budget FROM selesai WHERE waktu = '$d[waktu]'");
                             $dataTotalBudget = mysqli_fetch_assoc($queryTotalBudget);
-  
+
                     $aaaa = $dataTotalBudget['total_budget'];
                     $bbbb = $row2['sumasum'];
-                    $belumbayar = $aaaa - ($bbbb - $row3['ready_to_pay']);
+//                    $belumbayar = $aaaa - ($bbbb - $row3['ready_to_pay']);
 
                     if ($d['status'] == "Disetujui") {
                 ?>
@@ -66,9 +75,14 @@ if (strpos($tab, 'B1') !== false) : ?>
                         <td bgcolor="#fcfaa4"><?php echo $d['pengaju']; ?></td>
                         <td bgcolor="#fcfaa4"><?php echo $d['divisi']; ?></td>
 
-                          <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($dataTotalBudget['total_budget'], 0, '', ','); ?></td>
+                          <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
+                          <td bgcolor="#fcfaa4" class="text-primary"><?php echo 'Rp. ' . number_format($d['totalbudgetnow'] == $d['totalbudget'] ? 0 : $d['totalbudgetnow'], 0, '', ','); ?></td>
+                          <td bgcolor="#fcfaa4" style="color: orange"><?php echo 'Rp. ' . number_format(max($d['totalbudgetnow'] - $d['totalbudget'], 0), 0, '', ','); ?></td>
                           <td bgcolor="#fcfaa4">
-                              <font color="#1bd34f"><?php echo 'Rp. ' . number_format($bbbb - $row3['ready_to_pay'], 0, '', ','); ?></font>
+                              <font color="#1bd34f"><?php echo 'Rp. ' . number_format($penggunaanBudget, 0, '', ','); ?></font>
+                          </td>
+                          <td bgcolor="#fcfaa4">
+                              <font class="text-warning"><?php echo 'Rp. ' . number_format($row3['sumi'], 0, '', ','); ?></font>
                           </td>
                           <td bgcolor="#fcfaa4">
                               <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
@@ -101,9 +115,14 @@ if (strpos($tab, 'B1') !== false) : ?>
                         <td><?php echo $d['tahun']; ?></td>
                         <td><?php echo $d['pengaju']; ?></td>
                         <td><?php echo $d['divisi']; ?></td>
-                        <td><?php echo 'Rp. ' . number_format($dataTotalBudget['total_budget'], 0, '', ','); ?></td>
-                          <td>
-                              <font color="#1bd34f"><?php echo 'Rp. ' . number_format($bbbb - $row3['ready_to_pay'], 0, '', ','); ?></font>
+                          <td bgcolor="#f23f2b"><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
+                          <td bgcolor="#f23f2b" class="text-primary"><?php echo 'Rp. ' . number_format($d['totalbudgetnow'] == $d['totalbudget'] ? 0 : $d['totalbudgetnow'], 0, '', ','); ?></td>
+                          <td bgcolor="#f23f2b" style="color: orange"><?php echo 'Rp. ' . number_format(max($d['totalbudgetnow'] - $d['totalbudget'], 0), 0, '', ','); ?></td>
+                          <td bgcolor="#f23f2b">
+                              <font color="#f23f2b"><?php echo 'Rp. ' . number_format($penggunaanBudget, 0, '', ','); ?></font>
+                          </td>
+                          <td bgcolor="#f23f2b">
+                              <font class="text-warning"><?php echo 'Rp. ' . number_format($row3['sumi'], 0, '', ','); ?></font>
                           </td>
                           <td>
                               <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
@@ -132,8 +151,11 @@ if (strpos($tab, 'B1') !== false) : ?>
                   <th>Tahun</th>
                   <th>Nama Yang Mengajukan</th>
                   <th>Divisi</th>
-                  <th>Total</th>
-                  <th>Total Biaya dan Uang Muka</th>
+                    <th>Total Budget Disetujui</th>
+                    <th class="text-primary">Total Budget Baru</th>
+                    <th style="color: orange">Selisih Perubahan Budget</th>
+                    <th style="color: #1bd34f">Total BPU</th>
+                    <th class="text-warning">Total RTP</th>
                   <th>Sisa Budget</th>
                   <th>View</th>
                   <th>Persetujuan</th>
@@ -152,21 +174,27 @@ if (strpos($tab, 'B1') !== false) : ?>
                   $result2 = mysqli_query($koneksi, $query2);
                   $row2 = mysqli_fetch_array($result2);
 
-                  $query3 = "SELECT sum(jumlah) AS ready_to_pay FROM bpu WHERE waktu='$waktu' AND persetujuan='Disetujui (Direksi)' AND status='Belum Di Bayar'";
-                  $result3 = mysqli_query($koneksi, $query3);
-                  $row3 = mysqli_fetch_array($result3);
+                    $useduangkemb = mysqli_query($koneksi, "SELECT SUM(total) AS sumused FROM selesai WHERE waktu='$waktu' AND uangkembaliused='Y'");
+                    $uak = mysqli_fetch_array($useduangkemb);
+                    $uangkembaliused = $uak['sumused'];
 
-                  $query10 = "SELECT sum(uangkembali) AS sum FROM bpu WHERE waktu='$waktu'";
-                  $result10 = mysqli_query($koneksi, $query10);
-                  $row10 = mysqli_fetch_array($result10);
-                  $tysb = $row2['sumasum'] - $row10['sum'];
+                    $query3 = "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as penggunaan, SUM(uangkembali) as uangkembali FROM bpu WHERE waktu = '$waktu' AND is_locked = 0";
+                    $result3 = mysqli_query($koneksi, $query3);
+                    $penggunaan = mysqli_fetch_array($result3);
+
+                    $query4 = "SELECT sum(jumlah) AS sumi FROM bpu WHERE waktu='$waktu' AND persetujuan='Disetujui (Direksi)' AND status='Belum Di Bayar'";
+                    $result4 = mysqli_query($koneksi, $query4);
+                    $row3 = mysqli_fetch_array($result4);
+
+                    $penggunaanBudget = (($penggunaan['penggunaan'] - $penggunaan['uangkembali']) + $uangkembaliused) - $row3['sumi'];
+                    $belumbayar = $d['totalbudget'] - $penggunaanBudget - $row3['sumi'];
 
                   $queryTotalBudget = mysqli_query($koneksi, "SELECT sum(total) as total_budget FROM selesai WHERE waktu = '$d[waktu]'");
                             $dataTotalBudget = mysqli_fetch_assoc($queryTotalBudget);
 
-                  $aaaa = $dataTotalBudget['total_budget'];
-                  $bbbb = $row2['sumasum'];
-                  $belumbayar = $aaaa - ($bbbb - $row3['ready_to_pay']);
+//                  $aaaa = $dataTotalBudget['total_budget'];
+//                  $bbbb = $row2['sumasum'];
+//                  $belumbayar = $aaaa - ($bbbb - $row3['ready_to_pay']);
 
                   if ($d['status'] == "Disetujui") {
                 ?>
@@ -176,10 +204,15 @@ if (strpos($tab, 'B1') !== false) : ?>
                       <td bgcolor="#fcfaa4"><?php echo $d['tahun']; ?></td>
                       <td bgcolor="#fcfaa4"><?php echo $d['pengaju']; ?></td>
                       <td bgcolor="#fcfaa4"><?php echo $d['divisi']; ?></td>
-                      <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($dataTotalBudget['total_budget'], 0, '', ','); ?></td>
-                          <td bgcolor="#fcfaa4">
-                              <font color="#1bd34f"><?php echo 'Rp. ' . number_format($bbbb - $row3['ready_to_pay'], 0, '', ','); ?></font>
-                          </td>
+                        <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
+                        <td bgcolor="#fcfaa4" class="text-primary"><?php echo 'Rp. ' . number_format($d['totalbudgetnow'] == $d['totalbudget'] ? 0 : $d['totalbudgetnow'], 0, '', ','); ?></td>
+                        <td bgcolor="#fcfaa4" style="color: orange"><?php echo 'Rp. ' . number_format(max($d['totalbudgetnow'] - $d['totalbudget'], 0), 0, '', ','); ?></td>
+                        <td bgcolor="#fcfaa4">
+                            <font color="#1bd34f"><?php echo 'Rp. ' . number_format($penggunaanBudget, 0, '', ','); ?></font>
+                        </td>
+                        <td bgcolor="#fcfaa4">
+                            <font class="text-warning"><?php echo 'Rp. ' . number_format($row3['sumi'], 0, '', ','); ?></font>
+                        </td>
                           <td bgcolor="#fcfaa4">
                               <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
                               </font>
@@ -209,10 +242,15 @@ if (strpos($tab, 'B1') !== false) : ?>
                       <td><?php echo $d['tahun']; ?></td>
                       <td><?php echo $d['pengaju']; ?></td>
                       <td><?php echo $d['divisi']; ?></td>
-                      <td><?php echo 'Rp. ' . number_format($dataTotalBudget['total_budget'], 0, '', ','); ?></td>
-                          <td>
-                              <font color="#1bd34f"><?php echo 'Rp. ' . number_format($bbbb - $row3['ready_to_pay'], 0, '', ','); ?></font>
-                          </td>
+                        <td ><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
+                        <td ><?php echo 'Rp. ' . number_format($d['totalbudgetnow'] == $d['totalbudget'] ? 0 : $d['totalbudgetnow'], 0, '', ','); ?></td>
+                        <td  style="color: orange"><?php echo 'Rp. ' . number_format(max($d['totalbudgetnow'] - $d['totalbudget'], 0), 0, '', ','); ?></td>
+                        <td >
+                            <font color="#1bd34f"><?php echo 'Rp. ' . number_format($penggunaanBudget, 0, '', ','); ?></font>
+                        </td>
+                        <td >
+                            <font class="text-warning"><?php echo 'Rp. ' . number_format($row3['sumi'], 0, '', ','); ?></font>
+                        </td>
                           <td>
                               <font color="#f23f2b"><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font>
                               </font>

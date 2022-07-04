@@ -233,6 +233,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                     <th>Harga Satuan (IDR)</th>
                     <th>Quantity</th>
                     <th>Total Harga (IDR)</th>
+                      <th>Total Dibayarkan</th>
                     <th>Sisa Pembayaran</th>
                     <th>Action</th>
 
@@ -259,11 +260,15 @@ $setting = mysqli_fetch_assoc($querySetting);
                   $checkName = [];
                   $waktu = $d['waktu'];
                   $sql = mysqli_query($koneksi, "SELECT * FROM selesai WHERE waktu='$waktu' ORDER BY no");
+                  $totalPembayaran = 0;
                   if ($sql->num_rows == 0) {
                       echo "<tr><td colspan='12' align='center'><b>Tidak ada data</b><br/>Jika dipengajuan data item sudah terisi namun setelah budget disetujui item menjadi hilang. <br/>Silahkan klik button dibawah untuk mensinkronkan ulang item budget anda <br/><button class='btn btn-primary mb-5' data-waktu='$waktu' id='btn-pull-item'>Tarik Data Item Budget</button></td></tr>";
                   }
                   while ($a = mysqli_fetch_array($sql)) {
                     if (!in_array($a["rincian"], $checkName)) :
+                        $querySumTotalBayar = mysqli_query($koneksi, "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as total_bayar FROM bpu where no = '$a[no]' AND waktu = '$waktu' AND is_locked = 0");
+                        $totalBayar = mysqli_fetch_assoc($querySumTotalBayar);
+                        $totalPembayaran = $totalBayar['total_bayar'];
                   ?>
                       <tr>
                         <th scope="row"><?php echo $i++; ?></th>
@@ -289,6 +294,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                         <td><?php echo 'Rp. ' . number_format($a['harga'], 0, '', ','); ?></td>
                         <td><?php echo $a['quantity']; ?></td>
                         <td><?php echo 'Rp. ' . number_format($a['total'], 0, '', ','); ?></td>
+                          <td>Rp. <?= number_format($totalPembayaran) ?></td>
 
                         <!-- Sisa Pembayaran -->
                         <?php
@@ -306,7 +312,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                         $row16 = mysqli_fetch_array($result16);
                         $total16 = $row16[0];
 
-                        $jadinya = ($hargaah - $total) + $total16
+                        $jadinya = $hargaah - $totalPembayaran;
                         ?>
                         <td><?php echo 'Rp. ' . number_format($jadinya, 0, '', ','); ?></td>
                         <!-- //Sisa Pembayaran -->
@@ -745,7 +751,7 @@ echo "Nominal Pajak :<b>Rp. " .number_format($nominalPajak) . " (".$bayar['jenis
                 $uak = mysqli_fetch_array($useduangkemb);
                 $uangkembaliused = $uak['sumused'];
 
-                $query3 = "SELECT CASE WHEN jumlah > 0 THEN SUM(jumlah) ELSE SUM(pengajuan_jumlah) END as penggunaan, SUM(uangkembali) as uangkembali FROM bpu WHERE waktu = '$waktu' AND is_locked = 0";
+                $query3 = "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as penggunaan, SUM(uangkembali) as uangkembali FROM bpu WHERE waktu = '$waktu' AND is_locked = 0";
                 $result3 = mysqli_query($koneksi, $query3);
                 $penggunaan = mysqli_fetch_array($result3);
 
