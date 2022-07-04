@@ -37,7 +37,7 @@ $host = $hostProtocol. '/'. $url[1];
 
 if ($action == 'get-data') {
 
-    $where = 'b.is_locked = 0';
+    $where = ' AND b.is_locked = 0';
     if ($_SESSION['hak_akses'] == 'Level 2' && $_SESSION['jabatan'] == 'Koordinator') {
         $where = " AND c.jenis = 'Rutin' OR b.pengajuan_jumlah < 1000000";
     }
@@ -53,7 +53,7 @@ if ($action == 'get-data') {
 }
 
 if ($action == 'get-data-validasi') {
-    $where = 'b.is_locked = 0';
+    $where = ' AND b.is_locked = 0';
     if ($_SESSION['hak_akses'] == 'Pegawai2' && $_SESSION['level'] == 'Koordinator') {
         $where = " AND IF (c.jenis IN ('B1','B2'), b.pengajuan_jumlah < 1000000, b.pengajuan_jumlah > 0)";
     }
