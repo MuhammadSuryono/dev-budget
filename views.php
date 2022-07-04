@@ -693,7 +693,7 @@ if (!isset($_SESSION['nama_user'])) {
                       <font color='#f23f2b'>Sisa Budget
                   </div>
                   <?php
-                  $belumbayar = $totalBudgetKeseluruhan - $penggunaanBudget - $row3['sumi'] - $totalBudgetBerubah;
+                  $belumbayar = $totalBudgetKeseluruhan - $penggunaanBudget - $row3['sumi'] ;
                   ?>
                   <div class="col-xs-3">: <b><?php echo 'Rp. ' . number_format($belumbayar, 0, '', ','); ?></font></b></div>
               </div>
