@@ -58,8 +58,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                             $result4 = mysqli_query($koneksi, $query4);
                             $row3 = mysqli_fetch_array($result4);
 
-                            $penggunaanBudget = (($penggunaan['penggunaan'] - $penggunaan['uangkembali']) + $uangkembaliused);
-
+                            $penggunaanBudget = (($penggunaan['penggunaan'] - $penggunaan['uangkembali']) + $uangkembaliused) - $row3['sumi'];
                             $belumbayar = $d['totalbudget'] - $penggunaanBudget - $row3['sumi'];
 
                             $arrDocument = [];
@@ -291,7 +290,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                         $result4 = mysqli_query($koneksi, $query4);
                         $row3 = mysqli_fetch_array($result4);
 
-                        $penggunaanBudget = (($penggunaan['penggunaan'] - $penggunaan['uangkembali']) + $uangkembaliused);
+                        $penggunaanBudget = (($penggunaan['penggunaan'] - $penggunaan['uangkembali']) + $uangkembaliused) - $row3['sumi'];
 
                         $belumbayar = $e['totalbudget'] - $penggunaanBudget - $row3['sumi'];
 
