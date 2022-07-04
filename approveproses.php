@@ -36,7 +36,7 @@ if (isset($_POST['submit'])) {
   $divisi = $pengajuan['divisi'];
   $totalbudget = $pengajuan['totalbudgetnow'];
 
-  $update = mysqli_query($koneksi, "UPDATE pengajuan SET status = 'Disetujui', totalbudget = '$totalbudget', penyetuju = '$penyetuju', on_revision_status = '0' WHERE waktu ='$time'");
+  $update = mysqli_query($koneksi, "UPDATE pengajuan SET status = 'Disetujui', penyetuju = '$penyetuju', on_revision_status = '0' WHERE waktu ='$time'");
 
   if ($update) {
 

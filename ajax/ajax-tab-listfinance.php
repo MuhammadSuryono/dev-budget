@@ -57,7 +57,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                             $row3 = mysqli_fetch_array($result4);
 
                             $penggunaanBudget = (($penggunaan['penggunaan'] - $penggunaan['uangkembali']) + $uangkembaliused) - $row3['sumi'];
-                            $belumbayar = $d['totalbudget'] - $penggunaanBudget - $row3['sumi'];
+                            $belumbayar = ($d['totalbudget'] < $d['totalbudgetnow'] ? $d['totalbudgetnow'] : $d['totalbudget']) - $penggunaanBudget - $row3['sumi'];
 
                             $queryTotalBudget = mysqli_query($koneksi, "SELECT sum(total) as total_budget FROM selesai WHERE waktu = '$d[waktu]'");
                             $dataTotalBudget = mysqli_fetch_assoc($queryTotalBudget);
@@ -187,7 +187,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                     $row3 = mysqli_fetch_array($result4);
 
                     $penggunaanBudget = (($penggunaan['penggunaan'] - $penggunaan['uangkembali']) + $uangkembaliused) - $row3['sumi'];
-                    $belumbayar = $d['totalbudget'] - $penggunaanBudget - $row3['sumi'];
+                    $belumbayar = ($d['totalbudget'] < $d['totalbudgetnow'] ? $d['totalbudgetnow'] : $d['totalbudget']) - $penggunaanBudget - $row3['sumi'];
 
                     $queryTotalBudget = mysqli_query($koneksi, "SELECT sum(total) as total_budget FROM selesai WHERE waktu = '$d[waktu]'");
                     $dataTotalBudget = mysqli_fetch_assoc($queryTotalBudget);
