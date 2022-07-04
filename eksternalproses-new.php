@@ -47,8 +47,7 @@ if (is_array($_POST['jumlah'])) {
 $actionProcess = $_GET['action'];
 $no           = $_POST['no'];
 $waktu        = $_POST['waktu'];
-
-$tglcair      = ($_POST['tglcair']) ? $_POST['tglcair'] : null;
+$tglcair      = ($_POST['tglcair']) ? $_POST['tglcair'] : $_POST['tgl'];
 $pengaju      = $_POST['pengaju'];
 $divisi       = $_POST['divisi'];
 $statusbpu    = $_POST['statusbpu'];
@@ -72,8 +71,24 @@ $dataItemBpu = mysqli_fetch_assoc($queryItemBpu);
 $queryPengajuan = mysqli_query($koneksi, "SELECT jenis FROM pengajuan where waktu = '$waktu'");
 $dataPengajuan = mysqli_fetch_assoc($queryPengajuan);
 
-if ($actionProcess == "update" && (strpos(strtolower($dataItemBpu['rincian']), 'kas negara') !== false || strpos(strtolower($dataItemBpu['rincian']), 'penerimaan negara') !== false || strpos(strtolower($dataItemBpu['rincian']), 'pph') !== false || strpos(strtolower($dataItemBpu['rincian']), 'ppn') !== false )) {
-    $queryUser = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi = 'FINANCE' AND hak_akses = 'Level 2' AND level = 'Manager'");
+//if ($actionProcess == "update" && (strpos(strtolower($dataItemBpu['rincian']), 'kas negara') !== false || strpos(strtolower($dataItemBpu['rincian']), 'penerimaan negara') !== false || strpos(strtolower($dataItemBpu['rincian']), 'pph') !== false || strpos(strtolower($dataItemBpu['rincian']), 'ppn') !== false )) {
+//    $queryUser = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi = 'FINANCE' AND hak_akses = 'Level 2' AND level = 'Manager'");
+//    while ($e = mysqli_fetch_assoc($queryUser)) {
+//        if ($e['phone_number'] && !in_array($e['phone_number'], $duplicatePhoneNumber)) {
+//            array_push($emailInternal, $e['phone_number']);
+//            array_push($namaInternal, $e['nama_user']);
+//            array_push($idUserInternal, $e['id_user']);
+//            array_push($dataDivisi, $e['divisi']);
+//            array_push($dataLevel, $e['level']);
+//            array_push($hakAkses, $e['hak_akses']);
+//            array_push($duplicatePhoneNumber, $e['phone_number']);
+//        }
+//    }
+//}
+
+
+if ($pengaju != $_SESSION['nama_user']) {
+    $queryUser = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$pengaju'");
     while ($e = mysqli_fetch_assoc($queryUser)) {
         if ($e['phone_number'] && !in_array($e['phone_number'], $duplicatePhoneNumber)) {
             array_push($emailInternal, $e['phone_number']);
@@ -83,22 +98,8 @@ if ($actionProcess == "update" && (strpos(strtolower($dataItemBpu['rincian']), '
             array_push($dataLevel, $e['level']);
             array_push($hakAkses, $e['hak_akses']);
             array_push($duplicatePhoneNumber, $e['phone_number']);
+            array_push($emails, $e['email']);
         }
-    }
-}
-
-
-$queryUser = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE nama_user = '$pengaju'");
-while ($e = mysqli_fetch_assoc($queryUser)) {
-    if ($e['phone_number'] && !in_array($e['phone_number'], $duplicatePhoneNumber)) {
-        array_push($emailInternal, $e['phone_number']);
-        array_push($namaInternal, $e['nama_user']);
-        array_push($idUserInternal, $e['id_user']);
-        array_push($dataDivisi, $e['divisi']);
-        array_push($dataLevel, $e['level']);
-        array_push($hakAkses, $e['hak_akses']);
-        array_push($duplicatePhoneNumber, $e['phone_number']);
-        array_push($emails, $e['email']);
     }
 }
 
@@ -116,7 +117,7 @@ while ($e = mysqli_fetch_assoc($queryUser)) {
     }
 }
 
-$queryUser = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi = 'FINANCE' AND status_penerima_email_id = '3'");
+$queryUser = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi = 'FINANCE' AND aktif = 'Y'");
 while ($e = mysqli_fetch_assoc($queryUser)) {
     if ($e['phone_number']&& !in_array($e['phone_number'], $duplicatePhoneNumber)) {
         array_push($emailInternal, $e['phone_number']);
@@ -307,7 +308,7 @@ if (isset($_POST['submit'])) {
         } else {
             $tglcairnya = null;
         }
-        
+
         if (is_array($_POST['jumlah'])) {
             $jumlahDiterima = "0";
 
@@ -328,26 +329,27 @@ if (isset($_POST['submit'])) {
                         Nama Penerima    : <strong>$arrnamapenerima[$i]</strong><br>
                         Jumlah Dibayarkan : <strong>Rp. " . number_format($arrjumlah[$i], 0, '', '.') . "</strong><br>
                         Status           : <strong>Sedang Diproses</strong><br><br>
-                        Informasi update status pembayaran akan kami kirimkan kembali melalui email. Jika ada pertanyaan lebih lanjut, silahkan email Divisi Finance ke finance@mri-research-ind.com.<br><br>
+                        Pembayaran anda akan di proses dalam 1-3 hari kerja. Informasi update status pembayaran akan kami kirimkan kembali melalui email. Apabila dalam rentan waktu 1-3 hari kerja pemabayaran belum anda terima, silahkan email Divisi Finance ke finance@mri-research-ind.com.<br><br>
                         Hormat kami,<br>
                         Finance Marketing Research Indonesia";
                     } else if ($_SESSION['divisi'] != 'Direksi') {
                         $msg = "Kepada $arrnamapenerima[$i], <br><br>
                         Berikut informasi status pembayaran Anda:<br><br>
-                        Nama Pembayaran  : <strong>$keterangan_pembayaran</strong><br>
                         No. Rekening Anda : <strong>$arrnorek[$i]</strong><br>
                         Bank             : <strong>" . $bank['namabank'] . "</strong><br>
                         Nama Penerima    : <strong>$arrnamapenerima[$i]</strong><br>
                         Jumlah Dibayarkan : <strong>Rp. " . number_format($arrjumlah[$i], 0, '', '.') . "</strong><br>
-                        Status           : <strong>Diproses</strong><br><br>
-                        Informasi update status pembayaran akan kami kirimkan kembali melalui email. Jika ada pertanyaan lebih lanjut, silahkan email Divisi Finance ke finance@mri-research-ind.com.<br><br>
+                        Keterangan Pembayaran  : <strong>$keterangan_pembayaran</strong><br>
+                        Status           : <strong>Sedang Diproses</strong><br><br>
+                        
+                        Pembayaran anda akan di proses dalam 1-3 hari kerja. Informasi update status pembayaran akan kami kirimkan kembali melalui email. Apabila dalam rentan waktu 1-3 hari kerja pemabayaran belum anda terima, silahkan email Divisi Finance ke finance@mri-research-ind.com.<br><br>
                         Hormat kami,<br>
                         Finance Marketing Research Indonesia
                         ";
                     }
 
                     if ($arremailpenerima[$i] && $actionProcess == "update") {
-                        $message = $emailHelper->sendEmail($msg, $subject, $arremailpenerima[$i], $name = '', $address = "single");
+                        $message = $emailHelper->sendEmail($msg, $aw['rincian'], $arremailpenerima[$i], $name = '', $address = "single");
                     }
                 }
 
@@ -357,7 +359,7 @@ if (isset($_POST['submit'])) {
                         // echo "INSERT NOT UPDATE IF";
                         $insert = mysqli_query($koneksi, "INSERT INTO bpu (no,nama_vendor,tanggalbayar,pengajuan_jumlah,tglcair,namabank,norek,namapenerima,pengaju,divisi,waktu,status,persetujuan,term,statusbpu,transfer_req_id,status_pengajuan_bpu,emailpenerima,ket_pembayaran,created_at) VALUES
                                                         ('$no','$vendorName','$_POST[tgl]','$arrjumlah[$i]','$tglcairnya','$arrnamabank[$i]','$arrnorek[$i]','$arrnamapenerima[$i]','$pengaju','$divisi','$waktu','Belum Di Bayar','Disetujui (Direksi)','$termfinal','$statusbpu','$transferid', 1, '$arremailpenerima[$i]', '$keterangan_pembayaran', '$time')");
-                        
+
                         $idBpu = mysqli_insert_id($koneksi);
                         $insertDataNeedVerifikasi = mysqli_query($koneksi, "INSERT INTO bpu_verify (id_bpu) VALUES ('$idBpu')");
                         $idVerify = mysqli_insert_id($koneksi);

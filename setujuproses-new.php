@@ -336,7 +336,7 @@ if ($_POST['submit'] == 1) {
     }
 
     if ($budget['jenis'] == 'B1' || $budget['jenis'] == 'B2') {
-        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1', '3')");
+        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' ");
         while ($e = mysqli_fetch_assoc($queryEmail)) {
             if ($e['phone_number'] != "" && !in_array($emailUser['phone_number'], $duplicateNumber)) {
                 array_push($email, $e['phone_number']);
@@ -349,7 +349,7 @@ if ($_POST['submit'] == 1) {
             }
         }
     } else {
-        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('2', '3')");
+        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y'");
         while ($e = mysqli_fetch_assoc($queryEmail)) {
             if ($e['phone_number'] != "" && !in_array($emailUser['phone_number'], $duplicateNumber)) {
                 array_push($email, $e['phone_number']);
@@ -464,7 +464,7 @@ else if ($submit == 0) {
         }
 
         if ($budget['jenis'] == 'B1' || $budget['jenis'] == 'B2') {
-            $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1', '3')");
+            $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' ");
             while ($e = mysqli_fetch_assoc($queryEmail)) {
                 if ($e['phone_number'] && !in_array($e['phone_number'], $duplicateNumber)) {
                     array_push($email, $e['phone_number']);
@@ -476,7 +476,7 @@ else if ($submit == 0) {
                 }
             }
         } else {
-            $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('2', '3')");
+            $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y'");
             while ($e = mysqli_fetch_assoc($queryEmail)) {
                 if ($e['phone_number'] && !in_array($e['phone_number'], $duplicateNumber)) {
                     array_push($email, $e['phone_number']);

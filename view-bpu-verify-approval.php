@@ -34,7 +34,7 @@ $setting = mysqli_fetch_assoc($querySetting);
 $oneWeek = date('Y-m-d', strtotime('+7 days'));
 
 $email = [];
-$queryEmailFinance = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('2', '3')");
+$queryEmailFinance = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y'");
 while ($item = mysqli_fetch_assoc($queryEmailFinance)) {
   array_push($email, $item['phone_number']);
 }

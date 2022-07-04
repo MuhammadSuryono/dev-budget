@@ -190,7 +190,7 @@ if ($submit == 1) {
                             }
                         }
                     } else {
-                        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND hak_akses='Manager'");
+                        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y'");
                         while ($e = mysqli_fetch_assoc($queryEmail)) {
                             if ($e['phone_number'] && !in_array($e['phone_number'], $duplicates)) {
                                 array_push($email, $e['phone_number']);
@@ -219,7 +219,7 @@ if ($submit == 1) {
                             }
                         }
                     } else {
-                        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND hak_akses='Manager'");
+                        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y'");
                         while ($e = mysqli_fetch_assoc($queryEmail)) {
                             if ($e['phone_number'] && !in_array($e['phone_number'], $duplicates)) {
                                 $email[] = $e['phone_number'];
@@ -341,7 +341,7 @@ if ($submit == 1) {
         }
 
         if ($pengajuan['jenis'] == 'B1' || $pengajuan['jenis'] == 'B2') {
-            $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1', '3')");
+            $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y'");
             while ($e = mysqli_fetch_assoc($queryEmail)) {
                 if ($e['phone_number']) {
                     array_push($email, $e['email']);
@@ -352,7 +352,7 @@ if ($submit == 1) {
                 }
             }
         } else {
-            $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('2', '3')");
+            $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y'");
             while ($e = mysqli_fetch_assoc($queryEmail)) {
                 if ($e['phone_number']) {
                     array_push($email, $e['phone_number']);

@@ -5,6 +5,7 @@ session_start();
 require "application/config/database.php";
 $con = new Database();
 $koneksi = $con->connect();
+$con->load_database($koneksi);
 
 
 require "vendor/email/send-email.php";
@@ -24,6 +25,9 @@ $phoneNumber = $user['phone_number'];
 
 $querySetting = mysqli_query($koneksi, "SELECT * FROM setting_budget WHERE keterangan = 'approval_bpu'") or die(mysqli_error($koneksi));
 $setting = mysqli_fetch_assoc($querySetting);
+
+$con->update('bpu')->set_value_update('is_locked', true)
+    ->whereRaw("(DATEDIFF(NOW(), bpu.waktustempel) + 1 > 3) AND persetujuan = 'Belum Disetujui'")->save_update();
 ?>
 
 <!DOCTYPE html>

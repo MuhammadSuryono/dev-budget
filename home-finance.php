@@ -39,7 +39,7 @@ $setting = mysqli_fetch_assoc($querySetting);
 $oneWeek = date('Y-m-d', strtotime('+7 days'));
 
 $email = [];
-$queryEmailFinance = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('2', '3')");
+$queryEmailFinance = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y'");
 while ($item = mysqli_fetch_assoc($queryEmailFinance)) {
   array_push($email, $item['phone_number']);
 }
@@ -55,6 +55,9 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
 
   mysqli_query($koneksi, "UPDATE reminder_tanggal_bayar SET has_send_email = 1 WHERE id = $item[id]");
 }
+
+$con->update('bpu')->set_value_update('is_locked', true)
+    ->whereRaw("(DATEDIFF(NOW(), bpu.waktustempel) + 1 > 3) AND status = 'Belum Di Bayar'")->save_update();
 
 
 ?>
