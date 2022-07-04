@@ -1,4 +1,5 @@
 <?php
+error_reporting();
 session_start();
 include_once '../application/config/database.php';
 require_once '../application/config/email.php';
@@ -36,7 +37,7 @@ $host = $hostProtocol. '/'. $url[1];
 
 if ($action == 'get-data') {
 
-    $where = '';
+    $where = 'b.is_locked = 0';
     if ($_SESSION['hak_akses'] == 'Level 2' && $_SESSION['jabatan'] == 'Koordinator') {
         $where = " AND c.jenis = 'Rutin' OR b.pengajuan_jumlah < 1000000";
     }
@@ -52,7 +53,7 @@ if ($action == 'get-data') {
 }
 
 if ($action == 'get-data-validasi') {
-    $where = '';
+    $where = 'b.is_locked = 0';
     if ($_SESSION['hak_akses'] == 'Pegawai2' && $_SESSION['level'] == 'Koordinator') {
         $where = " AND IF (c.jenis IN ('B1','B2'), b.pengajuan_jumlah < 1000000, b.pengajuan_jumlah > 0)";
     }
@@ -104,7 +105,12 @@ if ($action == 'simpan-verifikasi') {
     
     $upload = uploadFile($_FILES);
 
-    $query = mysqli_query($koneksiMriTransfer, "SELECT * FROM jenis_pembayaran WHERE jenispembayaran = '$dataBpu[statusbpu]'") or die(mysqli_error($koneksiMriTransfer));
+    $jenisPembayaran = $dataBpu['statusbpu'];
+    if (in_array($dataBpu['statusbpu'], ["Honor Luar Kota", "Honor Jakarta"])) {
+        $jenisPembayaran = "Honor Eksternal";
+    }
+
+    $query = mysqli_query($koneksiMriTransfer, "SELECT * FROM jenis_pembayaran WHERE jenispembayaran = '$jenisPembayaran'") or die(mysqli_error($koneksiMriTransfer));
     $result = mysqli_fetch_assoc($query);
 
     $metode_pembayaran = "MRI Kas";
