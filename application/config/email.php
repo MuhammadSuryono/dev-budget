@@ -3,7 +3,7 @@
 require_once "httpRequest.php";
 
 class Email {
-    private $host = "http://192.168.8.2:8081/api/v1/email";
+    private $host = "http://180.211.92.131/api/v1/helper";
 
     public function __construct()
     {
@@ -14,7 +14,7 @@ class Email {
     {
         $httpRequest = new HTTPRequester();
 
-        $url = $this->host."/send-notification-message";
+        $url = "/email/send-notification-message";
 
         if ($address == "multiple") {
             $email = implode(",", $email);
@@ -27,7 +27,7 @@ class Email {
             $path = $helper . "document/$attachment.pdf";
             array_push($body, ["attachment" => ["filename" => $attachment.".pdf", "url" => $path]]);
         }
-        $res = $httpRequest->HTTPPost($url, $body);
+        $res = $httpRequest->HTTPPost($url, $body, 'form', $this->host);
         //Something to write to txt log
         // $log  = "User: ".$_SERVER['REMOTE_ADDR'].' - '.date("F j, Y, g:i a").PHP_EOL.
         // "Attempt: ".(json_encode($res)).PHP_EOL.

@@ -80,6 +80,10 @@ $setting = mysqli_fetch_assoc($querySetting);
   $code = $_GET['code'];
   $select = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE noid='$code'");
   $d = mysqli_fetch_assoc($select);
+  //$con->update('bpu')->set_value_update('status','Telah Di Bayar')->where('waktu', '=', $d['waktu'])
+  //    ->where('persetujuan', 'LIKE', 'Disetujui%')
+  //    ->whereRaw(" AND jumlahbayar != '0'")->save_update();
+  //
 
 
   $cariselisih = mysqli_query($koneksi, "SELECT totalbudget,totalbudgetnow FROM pengajuan WHERE waktu='$d[waktu]'");
@@ -482,8 +486,8 @@ $setting = mysqli_fetch_assoc($querySetting);
                               // } else if ($statusPengajuanRealisasi == 3) {
                               //   $color = '#9932CC';
                               // }
-
-                              echo "<td bgcolor=' $color '>";
+                                $isLockedStyle = $bayar['is_locked'] == true ? 'filter: blur(1px); cursor: not-allowed; background: url("https://www.freeiconspng.com/thumbs/lock-icon/lock-icon-11.png") no-repeat; background-size: contain; background-position-y: center;':'';
+                              echo "<td bgcolor=' $color ' style='border: 1px black solid;$isLockedStyle'>";
                               // echo "<table>";
                               // echo "<tr><td>Tanggal Pembuatan</td><td> : <b>". date('Y-m-d', strtotime($waktustempel)) . "</b></td></tr>";
                               // echo "<tr><td>No. Term</td><td> : <b>$term</b></td></tr>";
@@ -722,16 +726,15 @@ $setting = mysqli_fetch_assoc($querySetting);
             $uak = mysqli_fetch_array($useduangkemb);
             $uangkembaliused = $uak['sumused'];
 
-            $query3 = "SELECT (SUM(jumlah) - SUM(uangkembali)) as penggunaan FROM bpu WHERE waktu = '$waktu' AND
-(persetujuan = 'Disetujui (Direksi)' OR persetujuan = 'Disetujui (Sri Dewi Marpaung)')";
+            $query3 = "SELECT CASE WHEN jumlah > 0 THEN SUM(jumlah) ELSE SUM(pengajuan_jumlah) END as penggunaan, SUM(uangkembali) as uangkembali FROM bpu WHERE waktu = '$waktu' AND is_locked = 0";
             $result3 = mysqli_query($koneksi, $query3);
             $penggunaan = mysqli_fetch_array($result3);
 
-            $query3 = "SELECT sum(jumlah) AS sumi FROM bpu WHERE waktu='$waktu' AND persetujuan='Disetujui (Direksi)' AND status='Belum Di Bayar'";
-            $result3 = mysqli_query($koneksi, $query3);
-            $row3 = mysqli_fetch_array($result3);
+            $query4 = "SELECT sum(jumlah) AS sumi FROM bpu WHERE waktu='$waktu' AND persetujuan='Disetujui (Direksi)' AND status='Belum Di Bayar'";
+            $result4 = mysqli_query($koneksi, $query4);
+            $row3 = mysqli_fetch_array($result4);
 
-            $penggunaanBudget = ($penggunaan['penggunaan'] + $uangkembaliused);
+            $penggunaanBudget = (($penggunaan['penggunaan'] - $penggunaan['uangkembali']) + $uangkembaliused) - $row3['sumi'];
 
             $queryTotalUangKembali = "SELECT SUM(uangkembali) as uangkembali FROM bpu WHERE waktu = '$waktu'";
             $resUangKembali = mysqli_query($koneksi, $queryTotalUangKembali);

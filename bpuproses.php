@@ -204,7 +204,8 @@ if (isset($_POST['submit'])) {
         echo "<script language='javascript'>";
         echo "alert('GAGAL!!, Kamu tidak bisa mengajukan lebih dari sisa Pembayaran')";
         echo "</script>";
-        echo "<script> document.location.href='view-finance" . $isNonRutin  . "-manager.php?code=" . $numb . "'; </script>";
+        echo "<script> 
+ment.location.href='view-finance" . $isNonRutin  . "-manager.php?code=" . $numb . "'; </script>";
       } else {
         echo "<script language='javascript'>";
         echo "alert('GAGAL!!, Kamu tidak bisa mengajukan lebih dari sisa Pembayaran')";
@@ -274,7 +275,7 @@ if (isset($_POST['submit'])) {
         $idBpu = mysqli_insert_id($koneksi);
         
         $insert = mysqli_query($koneksi, "INSERT INTO tb_jatuh_tempo (id_bpu, tanggal_jatuh_tempo) VALUES ('$idBpu', '$tanggalJatuhTempo')") or die(mysqli_error($koneksi));
-        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1','2', '3')");
+        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y'");
         while ($e = mysqli_fetch_assoc($queryEmail)) {
           if (@unserialize($e['hak_button'])) {
             $buttonAkses = unserialize($e['hak_button']);
@@ -297,7 +298,7 @@ if (isset($_POST['submit'])) {
         $idBpu = mysqli_insert_id($koneksi);
         $insert = mysqli_query($koneksi, "INSERT INTO tb_jatuh_tempo (id_bpu, tanggal_jatuh_tempo) VALUES ('$idBpu', '$tanggalJatuhTempo')") or die(mysqli_error($koneksi));
 
-        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1','2', '3')");
+        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y'");
         while ($e = mysqli_fetch_assoc($queryEmail)) {
           if (@unserialize($e['hak_button'])) {
             $buttonAkses = unserialize($e['hak_button']);
@@ -456,7 +457,7 @@ if (isset($_POST['submit'])) {
               $insert = mysqli_query($koneksi, "INSERT INTO tb_jatuh_tempo (id_bpu, tanggal_jatuh_tempo) VALUES ('$idBpu', '$tanggalJatuhTempo')") or die(mysqli_error($koneksi));
           }
 
-        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1', '3')");
+        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y'");
         while ($e = mysqli_fetch_assoc($queryEmail)) {
           if (@unserialize($e['hak_button'])) {
             $buttonAkses = unserialize($e['hak_button']);
@@ -507,7 +508,7 @@ if (isset($_POST['submit'])) {
               $insert = mysqli_query($koneksi, "INSERT INTO tb_jatuh_tempo (id_bpu, tanggal_jatuh_tempo) VALUES ('$idBpu', '$tanggalJatuhTempo')") or die(mysqli_error($koneksi));
           }
 
-        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y' AND status_penerima_email_id IN ('1','2', '3')");
+        $queryEmail = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE divisi='FINANCE' AND aktif='Y'");
         while ($e = mysqli_fetch_assoc($queryEmail)) {
           if (@unserialize($e['hak_button'])) {
             $buttonAkses = unserialize($e['hak_button']);
@@ -590,8 +591,10 @@ if (isset($_POST['submit'])) {
       BPU telah diajukan dengan keterangan sebagai berikut:<br><br>
       Nama Project      : <strong>$namaProject</strong><br>
       Nama Pengaju      : <strong>$pengaju</strong><br>
-      Nama Penerima     : <strong>$namapenerima</strong><br>
+      Nama Penerima     : <strong>".implode(', ', $namapenerima)."</strong><br>
       Jumlah Diajukan   : <strong>Rp. " . number_format($jumlah, 0, '', ',') . "</strong><br>
+      
+      
       ";
       if ($keterangan) {
         $msg .= "Keterangan:<strong> $keterangan </strong><br><br>";

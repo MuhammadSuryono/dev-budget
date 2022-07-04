@@ -333,7 +333,7 @@ $helper = new Helper();
                           <?php
                           $no = $a['no'];
                           $waktu = $a['waktu'];
-                          $pilihtotal = mysqli_query($koneksi, "SELECT total FROM selesai WHERE no='$no' AND waktu='$waktu'");
+                          $pilihtotal = mysqli_query($koneksi, "SELECT total FROM selesai WHERE no='$no' AND waktu='$waktu' and is_locked = 0");
                           $aw = mysqli_fetch_assoc($pilihtotal);
                           $hargaah = $aw['total'];
                           $query = "SELECT sum(jumlahbayar) AS sum FROM bpu WHERE no='$no' AND waktu='$waktu'";
@@ -536,8 +536,9 @@ $helper = new Helper();
                                 // } else if ($statusPengajuanRealisasi == 3) {
                                 //   $color = '#9932CC';
                                 // }
+                                  $isLockedStyle = $bayar['is_locked'] == true ? 'filter: blur(1px); cursor: not-allowed; background: url("https://www.freeiconspng.com/thumbs/lock-icon/lock-icon-11.png") no-repeat; background-size: contain; background-position-y: center;':'';
 
-                                echo "<td bgcolor=' $color '>";
+                                echo "<td bgcolor=' $color ' style='border: 1px solid black;$isLockedStyle'>";
                                 echo "No. BPU :<b> $noidbpu";
                                 echo "</b><br>";
                                 echo "No. Term:<b> $termm";
@@ -754,7 +755,7 @@ $helper = new Helper();
               </div>
 
               <?php
-              $query2 = "SELECT sum(jumlah) AS total_pembayaran FROM bpu WHERE waktu='$waktu'";
+              $query2 = "SELECT sum(jumlah) AS total_pembayaran FROM bpu WHERE waktu='$waktu' and is_locked = 0";
               $result2 = mysqli_query($koneksi, $query2);
               $row2 = mysqli_fetch_array($result2);
   
@@ -766,7 +767,7 @@ $helper = new Helper();
               $result10 = mysqli_query($koneksi, $query10);
               $row10 = mysqli_fetch_array($result10);
 
-              $query3 = "SELECT sum(jumlah) AS sumi FROM bpu WHERE waktu='$waktu' AND persetujuan='Disetujui (Direksi)' AND status='Belum Di Bayar'";
+              $query3 = "SELECT sum(jumlah) AS sumi FROM bpu WHERE waktu='$waktu' AND persetujuan='Disetujui (Direksi)' AND status='Belum Di Bayar' and is_locked = 0";
               $result3 = mysqli_query($koneksi, $query3);
               $row3 = mysqli_fetch_array($result3);
               
