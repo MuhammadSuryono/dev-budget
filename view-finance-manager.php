@@ -644,7 +644,7 @@ echo "Nominal Pajak :<b>Rp. " .number_format($nominalPajak) . " (".$bayar['jenis
                                 <button type="button" class="btn btn-danger btn-small" onclick="hapus_bpu('<?php echo $no; ?>','<?php echo $waktu; ?>','<?php echo $term; ?>')">Hapus</button>
                               <?php
                               } else if ($persetujuan == 'Pending' || $persetujuan == 'Belum Disetujui' && $d['jenis'] == 'B2' && ($statusPengajuanBpu == 0 || !$statusPengajuanBpu)) { ?>
-                                <?php if ($total['jumlah_total'] <= $setting['plafon']) : ?>
+                                <?php if ($total['jumlah_total'] <= $setting['plafon'] && $bayar['is_locked'] == 0) : ?>
                                   <button type="button" class="btn btn-success btn-small" onclick="setujuiBpu('<?php echo $no; ?>','<?php echo $waktu; ?>', '<?= $term ?>')">Setujui</button>
                                   </br>
                                 <?php endif; ?>
@@ -666,7 +666,7 @@ echo "Nominal Pajak :<b>Rp. " .number_format($nominalPajak) . " (".$bayar['jenis
                                 <!-- <button type="button" style="margin-bottom: 5px; margin-top: 10px;" class="btn btn-info" onclick="realisasi('<?php echo $no; ?>','<?php echo $waktu; ?>', '<?= $termm ?>', '<?= $jumlbayar ?>', '<?= $pengajuan_realisasi ?>', '<?= $pengajuan_uangkembali ?>', '<?= $pengajuan_tanggalrealisasi ?>', '<?= $sisarealisasi ?>' , '<?= $fileuploadRealisasi ?>')">Verifikasi Realisasi</button> -->
                               <?php
                               }
-                              if ($statusPengajuanBpu == 1  && in_array("verifikasi_bpu", $buttonAkses) && !$isEksternalProcess) : ?>
+                              if ($statusPengajuanBpu == 1  && in_array("verifikasi_bpu", $buttonAkses) && !$isEksternalProcess && $bayar['is_locked'] == 0) : ?>
                                 <br>
                                 <button type="button" style="margin-bottom: 5px; margin-top: 10px;" class="btn btn-info" onclick="verifikasiBpu('<?php echo $no; ?>','<?php echo $waktu; ?>', '<?= $term ?>')">Verifikasi BPU</button>
                                 <?php

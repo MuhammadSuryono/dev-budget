@@ -735,7 +735,7 @@ echo "Nominal Pajak :<b>Rp. " .number_format($bayar['nominal_pajak'] == null ? 0
                                 <!-- <button type="button" style="margin-bottom: 5px; margin-top: 10px;" class="btn btn-info" onclick="realisasi('<?php echo $no; ?>','<?php echo $waktu; ?>', '<?= $termm ?>', '<?= $jumlbayar ?>', '<?= $pengajuan_realisasi ?>', '<?= $pengajuan_uangkembali ?>', '<?= $pengajuan_tanggalrealisasi ?>', '<?= $sisarealisasi ?>' , '<?= $fileuploadRealisasi ?>')">Verifikasi Realisasi</button> -->
                               <?php
                               }
-                              if ($statusPengajuanBpu == 1  && in_array("verifikasi_bpu", $buttonAkses)) : ?>
+                              if ($statusPengajuanBpu == 1  && in_array("verifikasi_bpu", $buttonAkses) && $bayar['is_locked'] == 0) : ?>
                                 <br>
                                 <button type="button" style="margin-bottom: 5px; margin-top: 10px;" class="btn btn-info" onclick="verifikasiBpu('<?php echo $no; ?>','<?php echo $waktu; ?>', '<?= $term ?>')">Verifikasi BPU</button>
                               <?php
