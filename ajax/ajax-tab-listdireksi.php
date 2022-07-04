@@ -329,9 +329,9 @@ if (strpos($tab, 'B1') !== false) : ?>
                                 <td bgcolor="#fcfaa4"><?php echo $e['tahun']; ?></td>
                                 <td bgcolor="#fcfaa4"><?php echo $e['pengaju']; ?></td>
                                 <td bgcolor="#fcfaa4"><?php echo $e['divisi']; ?></td>
-                                <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($d['totalbudget'], 0, '', ','); ?></td>
-                                <td bgcolor="#fcfaa4" class="text-primary"><?php echo 'Rp. ' . number_format($d['totalbudgetnow'] == $d['totalbudget'] ? 0 : $d['totalbudgetnow'], 0, '', ','); ?></td>
-                                <td bgcolor="#fcfaa4" style="color: orange"><?php echo 'Rp. ' . number_format(max($d['totalbudgetnow'] - $d['totalbudget'], 0), 0, '', ','); ?></td>
+                                <td bgcolor="#fcfaa4"><?php echo 'Rp. ' . number_format($e['totalbudget'], 0, '', ','); ?></td>
+                                <td bgcolor="#fcfaa4" class="text-primary"><?php echo 'Rp. ' . number_format($e['totalbudgetnow'] == $e['totalbudget'] ? 0 : $e['totalbudgetnow'], 0, '', ','); ?></td>
+                                <td bgcolor="#fcfaa4" style="color: orange"><?php echo 'Rp. ' . number_format(max($e['totalbudgetnow'] - $e['totalbudget'], 0), 0, '', ','); ?></td>
                                 <td bgcolor="#fcfaa4">
                                     <font color="#1bd34f"><?php echo 'Rp. ' . number_format($penggunaanBudget, 0, '', ','); ?></font>
                                 </td>
