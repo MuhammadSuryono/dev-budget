@@ -62,7 +62,7 @@ if (!isset($_SESSION['nama_user'])) {
     </div>
   </nav>
 
-  <div class="container">
+  <div class="container-fluid">
 
     <?php
 
@@ -159,9 +159,10 @@ if (!isset($_SESSION['nama_user'])) {
                       <th>Kota</th>
                       <th>Status</th>
                       <th>Penerima Uang</th>
-                      <th>Harga (IDR)</th>
-                      <th>Total Quantity</th>
-                      <th>Total Harga (IDR)</th>
+                        <th>Harga Satuan (IDR)</th>
+                        <th>Quantity</th>
+                        <th>Total Harga (IDR)</th>
+                        <th>Total DiBayarkan (IDR)</th>
                       <th>Sisa Pembayaran</th>
 
                       <?php
@@ -196,12 +197,16 @@ if (!isset($_SESSION['nama_user'])) {
                     $waktu = $d['waktu'];
                     $checkName = [];
                     $sql = mysqli_query($koneksi, "SELECT * FROM selesai WHERE waktu='$waktu' ORDER BY no");
+                    $totalPembayaran = 0;
                     if ($sql->num_rows == 0) {
                         echo "<tr><td colspan='12' align='center'><b>Tidak ada data</b><br/>Jika dipengajuan data item sudah terisi namun setelah budget disetujui item menjadi hilang. <br/>Silahkan klik button dibawah untuk mensinkronkan ulang item budget anda <br/><button class='btn btn-primary mb-5' data-waktu='$waktu' id='btn-pull-item'>Tarik Data Item Budget</button></td></tr>";
                     }
                     $totalBiaya = 0;
                     while ($a = mysqli_fetch_array($sql)) {
                       if (!in_array($a["rincian"], $checkName)) :
+                          $querySumTotalBayar = mysqli_query($koneksi, "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as total_bayar FROM bpu where no = '$a[no]' AND waktu = '$waktu' AND is_locked = 0");
+                          $totalBayar = mysqli_fetch_assoc($querySumTotalBayar);
+                          $totalPembayaran = $totalBayar['total_bayar'];
                     ?>
                         <tr>
                           <th scope="row"><?php echo $i++; ?></th>
@@ -225,12 +230,12 @@ if (!isset($_SESSION['nama_user'])) {
                                 }
                                 ?>
                             </td>
-                          <td><?php echo 'Rp. ' . number_format($a['harga'], 0, '', ','); ?></td>
-                          <td>
-                            <center><?php echo $a['quantity']; ?></center>
-                          </td>
-                          <td><?php echo 'Rp. ' . number_format($a['total'], 0, '', ','); ?></td>
 
+                            <td><?php echo 'Rp. ' . number_format($a['harga'], 0, '', ','); ?></td>
+                            <td><?php echo $a['quantity']; ?></td>
+                            <td><?php echo 'Rp. ' . number_format($a['total'], 0, '', ','); ?></td>
+                            <td><?php echo 'Rp. ' . number_format($totalPembayaran, 0, '', ','); ?></td>
+                            <!-- Sisa Pembayaran -->
                           <!-- Sisa Pembayaran -->
                           <?php
                           $no = $a['no'];
@@ -369,60 +374,58 @@ if (!isset($_SESSION['nama_user'])) {
                               $dataBank = mysqli_fetch_assoc($queryBank);
                               $bank = $dataBank['namabank'];
 
-                                if ($uangkembali == 0) {
-                                  $jumlahjadi = $jumlbayar;
-                                } else if ($kembreal < $jumlbayar) {
-                                  $jumlahjadi = $jumlbayar;
-                                } else {
-                                  $jumlahjadi = $realisasi;
-                                }
+                                  if ($uangkembali == 0) {
+                                      $jumlahjadi = $jumlbayar;
+                                  } else if ($kembreal < $jumlbayar) {
+                                      $jumlahjadi = $jumlbayar;
+                                  } else {
+                                      $jumlahjadi = $realisasi;
+                                  }
 
-                                $selstat = mysqli_query($koneksi, "SELECT status FROM selesai WHERE waktu='$waktu' AND no='$no'");
-                                $ss = mysqli_fetch_assoc($selstat);
-                                $exin = $ss['status'];
+                                  $selstat = mysqli_query($koneksi, "SELECT status FROM selesai WHERE waktu='$waktu' AND no='$no'");
+                                  $ss = mysqli_fetch_assoc($selstat);
+                                  $exin = $ss['status'];
 
+                                  if ($persetujuan == 'Belum Disetujui' && $statusbayar == 'Belum Di Bayar' && $statusPengajuanBpu == '1') {
+                                      $color = 'orange';
+                                  } else if ($persetujuan == 'Belum Disetujui' && $statusbayar == 'Belum Di Bayar') {
+                                      $color = '#ffd3d3';
+                                  } else if (($persetujuan == 'Disetujui (Direksi)' || $persetujuan == 'Disetujui (Sri Dewi Marpaung)' || $persetujuan == 'Disetujui oleh sistem') && $statusbayar == 'Belum Di Bayar') {
+                                      $color = '#fff5c6';
+                                  } else if ($persetujuan == 'Pending' && $statusbayar == 'Belum Di Bayar') {
+                                      $color = 'orange';
+                                  } else if (($persetujuan == 'Disetujui (Direksi)' || $persetujuan == 'Disetujui (Sri Dewi Marpaung)' || $persetujuan == 'Disetujui oleh sistem') && $statusbayar == 'Telah Di Bayar' &&
+                                      ($exin == 'Honor Eksternal' || $exin == 'Vendor/Supplier' || $exin == 'Lumpsum' || $exin == 'Honor SHP Jabodetabek' ||
+                                          $exin == 'Honor SHI/PWT Jabodetabek' || $exin == 'Honor SHP Luar Kota' || $exin == 'Honor SHI/PWT Luar Kota' ||
+                                          $exin == 'Honor Jakarta' || $exin == 'Honor Luar Kota' || $exin == 'STKB TRK Jakarta' || $exin == 'STKB TRK Luar Kota' || $exin == 'STKB OPS' || $exin == 'Honor Area Head')
+                                  ) {
+                                      $color = '#d5f9bd';
+                                  } else if (($persetujuan == 'Disetujui (Direksi)' || $persetujuan == 'Disetujui (Sri Dewi Marpaung)' || $persetujuan == 'Disetujui oleh sistem') && $statusbayar == 'Telah Di Bayar' && ($exin == 'Pulsa' || $exin == 'Biaya External' || $exin == 'Biaya' || $exin == 'Biaya Lumpsum')) {
+                                      $color = '#d5f9bd';
+                                  } else if (($persetujuan == 'Disetujui (Direksi)' || $persetujuan == 'Disetujui (Sri Dewi Marpaung)' || $persetujuan == 'Disetujui oleh sistem') && $statusbayar == 'Telah Di Bayar' && ($exin == 'UM' || $exin == 'UM Burek')) {
+                                      $color = '#8aad70';
+                                  } else if (($persetujuan == 'Disetujui (Direksi)' || $persetujuan == 'Disetujui (Sri Dewi Marpaung)' || $persetujuan == 'Disetujui oleh sistem') && $statusbayar == 'Realisasi (Direksi)' && ($exin == 'UM' || $exin == 'UM Burek')) {
+                                      $color = '#d5f9bd';
+                                  } else if (($persetujuan == 'Disetujui (Direksi)' || $persetujuan == 'Disetujui (Sri Dewi Marpaung)' || $persetujuan == 'Disetujui oleh sistem') && $statusbayar == 'Realisasi (Finance)' && ($exin == 'UM' || $exin == 'UM Burek')) {
+                                      $color = '#d5f9bd';
+                                  }
 
-                                if ($persetujuan == 'Belum Disetujui' && $statusbayar == 'Belum Di Bayar' && $statusPengajuanBpu == '1') {
-                                  $color = 'orange';
-                                } else if ($persetujuan == 'Belum Disetujui' && $statusbayar == 'Belum Di Bayar') {
-                                  $color = '#ffd3d3';
-                                } else if (($persetujuan == 'Disetujui (Direksi)' || $persetujuan == 'Disetujui (Sri Dewi Marpaung)' || $persetujuan == 'Disetujui oleh sistem') && $statusbayar == 'Belum Di Bayar') {
-                                  $color = '#fff5c6';
-                                } else if ($persetujuan == 'Pending' && $statusbayar == 'Belum Di Bayar') {
-                                  $color = 'orange';
-                                } else if (($persetujuan == 'Disetujui (Direksi)' || $persetujuan == 'Disetujui (Sri Dewi Marpaung)' || $persetujuan == 'Disetujui oleh sistem') && $statusbayar == 'Telah Di Bayar' &&
-                                  ($exin == 'Honor Eksternal' || $exin == 'Vendor/Supplier' || $exin == 'Lumpsum' || $exin == 'Honor SHP Jabodetabek' ||
-                                    $exin == 'Honor SHI/PWT Jabodetabek' || $exin == 'Honor SHP Luar Kota' || $exin == 'Honor SHI/PWT Luar Kota' ||
-                                    $exin == 'Honor Jakarta' || $exin == 'Honor Luar Kota' || $exin == 'STKB TRK Jakarta' || $exin == 'STKB TRK Luar Kota' || $exin == 'STKB OPS' || $exin == 'Honor Area Head')
-                                ) {
-                                  $color = '#d5f9bd';
-                                } else if (($persetujuan == 'Disetujui (Direksi)' || $persetujuan == 'Disetujui (Sri Dewi Marpaung)' || $persetujuan == 'Disetujui oleh sistem') && $statusbayar == 'Telah Di Bayar' && ($exin == 'Pulsa' || $exin == 'Biaya External' || $exin == 'Biaya' || $exin == 'Biaya Lumpsum')) {
-                                  $color = '#d5f9bd';
-                                } else if (($persetujuan == 'Disetujui (Direksi)' || $persetujuan == 'Disetujui (Sri Dewi Marpaung)' || $persetujuan == 'Disetujui oleh sistem') && $statusbayar == 'Telah Di Bayar' && ($exin == 'UM' || $exin == 'UM Burek')) {
-                                  $color = '#8aad70';
-                                } else if (($persetujuan == 'Disetujui (Direksi)' || $persetujuan == 'Disetujui (Sri Dewi Marpaung)' || $persetujuan == 'Disetujui oleh sistem') && $statusbayar == 'Realisasi (Direksi)' && ($exin == 'UM' || $exin == 'UM Burek')) {
-                                  $color = '#d5f9bd';
-                                } else if (($persetujuan == 'Disetujui (Direksi)' || $persetujuan == 'Disetujui (Sri Dewi Marpaung)' || $persetujuan == 'Disetujui oleh sistem') && $statusbayar == 'Realisasi (Finance)' && ($exin == 'UM' || $exin == 'UM Burek')) {
-                                  $color = '#d5f9bd';
-                                }
+                                  if ($statusPengajuanBpu == 0 && ($persetujuan == 'Belum Disetujui' && $statusbayar == 'Belum Di Bayar')) {
+                                      $color = '#ffd3d3';
+                                  } else if ($statusPengajuanBpu == 2) {
+                                      $color = '#ff3b3b';
+                                  } else if ($statusPengajuanBpu == 3) {
+                                      $color = '#DEB887';
+                                  }
 
-                                if ($statusPengajuanBpu == 0 && ($persetujuan == 'Belum Disetujui' && $statusbayar == 'Belum Di Bayar')) {
-                                  $color = '#ffd3d3';
-                                } else if ($statusPengajuanBpu == 2) {
-                                  $color = '#ff3b3b';
-                                } else if ($statusPengajuanBpu == 3) {
-                                  $color = '#DEB887';
-                                }
-
-                                // if ($statusPengajuanRealisasi == 1) {
-                                //   $color = '#8aad70';
-                                // } else if ($statusPengajuanRealisasi == 2) {
-                                //   $color = '#ff3b3b';
-                                // } else if ($statusPengajuanRealisasi == 3) {
-                                //   $color = '#9932CC';
-                                // }
-
-                                echo "<td bgcolor=' $color '>";
+                                  // if ($statusPengajuanRealisasi == 1) {
+                                  //   $color = '#8aad70';
+                                  // } else if ($statusPengajuanRealisasi == 2) {
+                                  //   $color = '#ff3b3b';
+                                  // } else if ($statusPengajuanRealisasi == 3) {
+                                  //   $color = '#9932CC';
+                                  // }
+                                  $isLockedStyle = $bayar['is_locked'] == true ? 'filter: blur(1px); cursor: not-allowed; background: url("https://www.freeiconspng.com/thumbs/lock-icon/lock-icon-11.png") no-repeat; background-size: contain; background-position-y: center;':'';echo "<td bgcolor=' $color ' style='border: 1px black solid; $isLockedStyle'>";
                                 echo "No. Term:<b> $term";
                                 echo "</b><br>";
                                 echo "No. STKB :<b> $noStkb";
@@ -668,7 +671,7 @@ if (!isset($_SESSION['nama_user'])) {
                   $uak = mysqli_fetch_array($useduangkemb);
                   $uangkembaliused = $uak['sumused'];
 
-                  $query3 = "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as penggunaan, SUM(uangkembali) as uangkembali FROM bpu WHERE waktu = '$waktu'  AND is_locked = 0";
+                  $query3 = "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as penggunaan, SUM(uangkembali) as uangkembali FROM bpu WHERE waktu = '$waktu' AND is_locked = 0";
                   $result3 = mysqli_query($koneksi, $query3);
                   $penggunaan = mysqli_fetch_array($result3);
 
