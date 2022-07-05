@@ -24,8 +24,18 @@ if ($_POST['no'] && $_POST['waktu']) {
   $queryItem = mysqli_query($koneksi, "SELECT * FROM selesai WHERE waktu = '$waktu' AND no = '$id'");
   $item = mysqli_fetch_assoc($queryItem);
 
+    $queryBpu = "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as total FROM bpu WHERE no = '$id' AND waktu = '$waktu'";
+    $mysqlQuery = mysqli_query($koneksi, $queryBpu);
+
+    $total = 0;
+    while($row = mysqli_fetch_assoc($mysqlQuery)) {
+        $total = $row['total'];
+    }
+
   $sql = "SELECT * FROM bpu WHERE noid='$noidbpu' AND no = '$id' AND waktu = '$waktu' AND term = '$term'";
   $result = $koneksi->query($sql);
+
+  $sisaPembayaran = $item['total'] - $total;
   foreach ($result as $baris) {
 
 ?>
@@ -39,16 +49,17 @@ if ($_POST['no'] && $_POST['waktu']) {
       <input type="hidden" name="lastedit" value="<?php echo $_SESSION['nama_user']; ?>">
       <input type="hidden" name="persetujuan" value="<?php echo $baris['persetujuan']; ?>">
       <input type="hidden" name="status" value="<?php echo $baris['status']; ?>">
+        <div id="alert-error-than"></div>
 
       <?php if ($baris['status_pengajuan_bpu'] != 0) : ?>
         <div class="form-group">
           <label for="jumlah" class="control-label">Request BPU (IDR) :</label>
-          <input type="text" class="form-control" id="jumlah" value="<?php echo $baris['pengajuan_jumlah']; ?>" disabled>
+          <input type="text" class="form-control" id="jumlahBpu" onchange="onChangeInput(this)" value="<?php echo $baris['pengajuan_jumlah']; ?>" disabled>
         </div>
       <?php else : ?>
         <div class="form-group">
           <label for="jumlah" class="control-label">BPU (IDR) :</label>
-          <input type="text" class="form-control" id="jumlah" value="<?php echo $baris['jumlah']; ?>" name="jumlah">
+          <input type="text" class="form-control" id="jumlahBpu" onchange="onChangeInput(this)" value="<?php echo $baris['jumlah']; ?>" name="jumlah">
         </div>
       <?php endif; ?>
 
@@ -76,12 +87,12 @@ if ($_POST['no'] && $_POST['waktu']) {
       ?>
         <div class="form-group">
           <label for="jumlah" class="control-label">Realisasi Biaya (IDR) :</label>
-          <input type="text" class="form-control" id="jumlah" value="<?php echo $baris['realisasi']; ?>" name="realisasi" readonly>
+          <input type="text" class="form-control" id="jumlahRealisasi" value="<?php echo $baris['realisasi']; ?>" name="realisasi" readonly>
         </div>
 
         <div class="form-group">
           <label for="jumlah" class="control-label">Uang Kembali (IDR) :</label>
-          <input type="text" class="form-control" id="jumlah" value="<?php echo $baris['uangkembali']; ?>" name="uangkembali" readonly>
+          <input type="text" class="form-control" id="jumlahUangKembali" value="<?php echo $baris['uangkembali']; ?>" name="uangkembali" readonly>
         </div>
 
         <div class="form-group">
@@ -211,7 +222,7 @@ if ($_POST['no'] && $_POST['waktu']) {
         <input type="text" class="form-control" id="alasan" name="alasan">
       </div>
 
-      <button class="btn btn-primary" type="submit" name="submit">Update</button>
+      <button class="btn btn-primary" id="updateBpu" type="submit" name="submit">Update</button>
 
     </form>
 
@@ -223,6 +234,59 @@ $koneksi->close();
 <!-- <script src="http://code.jquery.com/jquery-latest.min.js"></script> -->
 <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
 <script>
+    var inputJumlah = document.getElementById("jumlahBpu")
+    var sisaPembayaran = '<?= $sisaPembayaran ?>';
+    var jabatan = '<?= $_SESSION["jabatan"]?>';
+    var divisi = '<?= $_SESSION["divisi"]?>';
+
+    var alertError = document.getElementById("alert-error-than")
+    var submitBtn = document.getElementById("updateBpu")
+
+    sisaPembayaran = parseInt(sisaPembayaran)
+
+    function onChangeInput(e) {
+        var val = parseInt(e.value)
+        if (val > sisaPembayaran) {
+            inputJumlah.value = sisaPembayaran
+            alertError.innerHTML = `<div class="alert alert-warning" role="alert">
+                Total melebihi sisa pembayaran, total otomatis di atur sama dengan sisa pembayaran
+            </div>`;
+            submitBtn.disabled = true
+        } else {
+            submitBtn.disabled = false
+            alertError.innerHTML = ''
+        }
+
+        if (divisi === 'FINANCE' && jabatan === 'Manager' && value > 1000000) {
+            submitBtn.disabled = true
+        } else {
+            submitBtn.disabled = false
+        }
+    }
+
+    // inputJumlah.addEventListener('change', (e) => {
+    //     console.log("CHANGE", e.target.value)
+    //     // var value = e.target.value
+    //     // value = parseInt(value)
+    //     //
+    //     // if (value > sisaPembayaran) {
+    //     //     inputJumlah.value = sisaPembayaran
+    //     //     alertError.innerHTML = `<div class="alert alert-warning" role="alert">
+    //     //         Total melebihi sisa pembayaran, total otomatis di atur sama dengan sisa pembayaran
+    //     //     </div>`;
+    //     //     submitBtn.disabled = true
+    //     // } else {
+    //     //     submitBtn.disabled = false
+    //     //     alertError.innerHTML = ''
+    //     // }
+    //     //
+    //     // if (divisi === 'FINANCE' && jabatan === 'Manager' && value > 1000000) {
+    //     //     submitBtn.disabled = true
+    //     // } else {
+    //     //     submitBtn.disabled = false
+    //     // }
+    // })
+
   $(document).on('click', '.btn-hapus-penerima', function() {
     $(this).parent().parent().parent().remove();
   })
