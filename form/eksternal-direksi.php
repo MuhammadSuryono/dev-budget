@@ -9,7 +9,7 @@ while ($row = $mysqlQuery->fetch_assoc()) {
 $no = $_POST['no'];
 $waktu = $_POST['waktu'];
 
-$queryBpu = "SELECT max(term) as last_term, SUM(jumlah) as total FROM bpu WHERE no = '$no' AND waktu = '$waktu'";
+$queryBpu = "SELECT max(term) as last_term, SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as total FROM bpu WHERE no = '$no' AND waktu = '$waktu' and is_locked = 0";
 $mysqlQuery = mysqli_query($koneksi, $queryBpu);
 
 $lastTerm = 0;
@@ -85,26 +85,26 @@ $sisaPembayaran = $totalPengajuan - $total;
 <?php } ?>
 
 <script>
-    let sisaPembayaran = '<?= $sisaPembayaran ?>';
-    let lastTerm = '<?= $lastTerm ?>';
-    let totalTerm = '<?= $totalTerm ?>';
-    let jabatan = '<?= $_SESSION["jabatan"]?>';
-    let divisi = '<?= $_SESSION["divisi"]?>';
+    var sisaPembayaran = '<?= $sisaPembayaran ?>';
+    var lastTerm = '<?= $lastTerm ?>';
+    var totalTerm = '<?= $totalTerm ?>';
+    var jabatan = '<?= $_SESSION["jabatan"]?>';
+    var divisi = '<?= $_SESSION["divisi"]?>';
     
     sisaPembayaran = parseInt(sisaPembayaran)
     lastTerm = parseInt(lastTerm)
 
-    let inputJumlah = document.getElementById("jumlah")
-    let totalTermInput = document.getElementById("total-term")
-    let alertError = document.getElementById("alert-more-than")
-    let submitBtn = document.getElementById("submit-eksternal")
+    var inputJumlah = document.getElementById("jumlah")
+    var totalTermInput = document.getElementById("total-term")
+    var alertError = document.getElementById("alert-more-than")
+    var submitBtn = document.getElementById("submit-eksternal")
 
     if (lastTerm == 0) {
         totalTermInput.value = 1
     }
     totalTermInput.value = totalTerm
     inputJumlah.addEventListener('change', (e) => {
-        let value = e.target.value
+        var value = e.target.value
         value = parseInt(value)
 
         if (lastTerm == 0 && value < sisaPembayaran) {
@@ -120,8 +120,9 @@ $sisaPembayaran = $totalPengajuan - $total;
             alertError.innerHTML = `<div class="alert alert-warning" role="alert">
                 Total melebihi sisa pembayaran, total otomatis di atur sama dengan sisa pembayaran 
             </div>`;
-            submitBtn.disabled = false
+            submitBtn.disabled = true
         } else {
+            submitBtn.disabled = false
             alertError.innerHTML = ''
         }
 
@@ -131,4 +132,10 @@ $sisaPembayaran = $totalPengajuan - $total;
             submitBtn.disabled = false
         }
     })
+
+    if (divisi === 'FINANCE' && jabatan === 'Manager' && inputJumlah.value > 1000000) {
+        submitBtn.disabled = true
+    } else {
+        submitBtn.disabled = false
+    }
 </script>

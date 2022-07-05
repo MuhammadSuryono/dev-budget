@@ -249,17 +249,11 @@ if (isset($_POST['submit'])) {
     $aw = mysqli_fetch_assoc($pilihtotal);
     $hargaah = $aw['total'];
 
-    $query = "SELECT sum(jumlah) AS sum FROM bpu WHERE no='$no' AND waktu='$waktu'";
-    $result = mysqli_query($koneksi, $query);
-    $row = mysqli_fetch_array($result);
-    $total = $row[0];
-
-    $query2 = "SELECT sum(uangkembali) AS sum FROM bpu WHERE no='$no' AND waktu='$waktu'";
-    $result2 = mysqli_query($koneksi, $query2);
-    $row2 = mysqli_fetch_array($result2);
-    $total2 = $row2[0];
+    $querySumTotalBayar = mysqli_query($koneksi, "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as total_bayar, sum(uangkembali) as uangkembali FROM bpu where no = '$no' AND waktu = '$waktu' AND is_locked = 0");
+    $totalBayar = mysqli_fetch_assoc($querySumTotalBayar);
+    $totalPembayaran = $totalBayar['total_bayar'];
     
-    $jadinya = $hargaah - $total + $total2;
+    $jadinya = $hargaah - ($totalPembayaran + $totalBayar['uangkembali']);
 
     if ($jumlah > $jadinya) {
         if ($_SESSION['divisi'] == 'FINANCE') {
@@ -267,12 +261,12 @@ if (isset($_POST['submit'])) {
                 echo "<script language='javascript'>";
                 echo "alert('GAGAL!!, Kamu tidak bisa mengajukan lebih dari sisa Pembayaran')";
                 echo "</script>";
-                echo "<script> document.location.href='view-finance" . $isNonRutin  . "-manager.php?code=" . $numb . "'; </script>";
+                echo "<script> document.location.href='" . $_SERVER['HTTP_REFERER']  . "'; </script>";
             } else {
                 echo "<script language='javascript'>";
                 echo "alert('GAGAL!!, Kamu tidak bisa mengajukan lebih dari sisa Pembayaran')";
                 echo "</script>";
-                echo "<script> document.location.href='view-finance" . $isNonRutin  . ".php?code=" . $numb . "'; </script>";
+                echo "<script> document.location.href='" . $_SERVER['HTTP_REFERER']  . "'; </script>";
             }
         } else {
             echo "<script language='javascript'>";
