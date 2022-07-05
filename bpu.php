@@ -25,8 +25,8 @@ if ($_POST['no'] && $_POST['waktu']) {
   $waktu = $_POST['waktu'];
   $code = isset($_POST['id']) ? $_POST['id'] : null;
 
-  $queryBpu = "SELECT max(term) as last_term, SUM(jumlah) as total FROM bpu WHERE no = '$id' AND waktu = '$waktu'";
-  $mysqlQuery = mysqli_query($koneksi, $queryBpu);
+    $queryBpu = "SELECT max(term) as last_term, SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as total FROM bpu WHERE no = '$id' AND waktu = '$waktu' and is_locked = 0";
+    $mysqlQuery = mysqli_query($koneksi, $queryBpu);
 
   $lastTerm = 0;
   $total = 0;
@@ -91,7 +91,7 @@ if ($_POST['no'] && $_POST['waktu']) {
         if ($statusbpu != "Biaya Lumpsum") { ?>
         <div class="form-group">
             <label for="rincian" class="control-label">Total BPU (IDR)s :</label>
-            <input class="form-control" name="jumlah" id="id_step2-number_2" type="text" required>
+            <input class="form-control" name="jumlah" id="id_step2-number_2" type="text" value="<?= $sisaPembayaran ?>" required>
         </div>
         <?php
         }
@@ -150,7 +150,7 @@ if ($_POST['no'] && $_POST['waktu']) {
         </div>
               <?php } ?>
 
-        <button class="btn btn-primary" type="submit" name="submit">SUBMIT</button>
+          <button class="btn btn-primary" type="submit" id="btnSubmitBpu" name="submit">SUBMIT</button>
 
       <?php
       } else if ($statusbpu == 'Biaya') {
@@ -195,7 +195,7 @@ if ($_POST['no'] && $_POST['waktu']) {
           </div>
         </div>
 
-        <button class="btn btn-primary" type="submit" name="submit">SUBMIT</button>
+          <button class="btn btn-primary" type="submit" id="btnSubmitBpu" name="submit">SUBMIT</button>
       <?php
       }
 
@@ -277,7 +277,7 @@ if ($_POST['no'] && $_POST['waktu']) {
               <input type="file" class="form-control" accept="image/*,application/pdf" name="gambar" id="fileInputBpu" required>
               <img class="img-responsive" style="display: block; margin-left: auto;  margin-right: auto; background-repeat: no-repeat; background-size: cover; background-attachment: fixed;" src="" alt="" id="imageBpu">
           </div>
-          <button class="btn btn-primary" type="submit" name="submit">SUBMIT</button>
+          <button class="btn btn-primary" type="submit" id="btnSubmitBpu" name="submit">SUBMIT</button>
       <?php } else {
       ?>
         <div class="div-penerima">
@@ -313,26 +313,27 @@ if ($_POST['no'] && $_POST['waktu']) {
           </div>
         </div>
 
-        <button class="btn btn-primary" type="submit" name="submit">SUBMIT</button>
+        <button class="btn btn-primary" type="submit" id="btnSubmitBpu" name="submit">SUBMIT</button>
       <?php
       }
       ?>
     </form>
 
     <script>
-      let sisaPembayaran = '<?= $sisaPembayaran ?>';
+      var sisaPembayaran = '<?= $sisaPembayaran ?>';
       sisaPembayaran = parseInt(sisaPembayaran)
-      let inputJumlah = document.getElementById("id_step2-number_2")
+      var inputJumlah = document.getElementById("id_step2-number_2")
 
       var optionBank = document.getElementsByClassName("bank");
       var emailPenerima = document.getElementsByClassName("email");
       var namaRekeningPenerima = document.getElementsByClassName("nama-norek");
       var dataListSelected = document.getElementsByClassName("brow");
       var norek = document.getElementsByClassName("norek");
-      let totalBpu = 0;
-      let totalBpuNominal = document.getElementById("totalBpuNominal");
+      var totalBpu = 0;
+      var totalBpuNominal = document.getElementById("totalBpuNominal");
 
-      let alertError = document.getElementById("alert-more-than")
+      var alertError = document.getElementById("alert-more-than")
+      var submitBtn = document.getElementById("btnSubmitBpu")
 
       function formatNumber(num) {
           return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
@@ -346,14 +347,16 @@ if ($_POST['no'] && $_POST['waktu']) {
           inputJumlah.addEventListener('change', (e) => {
               let value = e.target.value
               value = parseInt(value)
+              console.log(value)
 
               if (value > sisaPembayaran) {
                   inputJumlah.value = sisaPembayaran
                   alertError.innerHTML = `<div class="alert alert-warning" role="alert">
                 Total melebihi sisa pembayaran, total otomatis di atur sama dengan sisa pembayaran
             </div>`;
-                  submitBtn.disabled = false
+                  submitBtn.disabled = true
               } else {
+                  submitBtn.disabled = false
                   alertError.innerHTML = ''
               }
           })
