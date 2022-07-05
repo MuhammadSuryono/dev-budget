@@ -57,8 +57,10 @@ while ($item = mysqli_fetch_assoc($queryReminderPembayaran)) {
 }
 
 $con->update('bpu')->set_value_update('is_locked', true)
-    ->whereRaw("(DATEDIFF(NOW(), bpu.waktustempel) + 1 > 3) AND status = 'Belum Di Bayar'")->save_update();
-
+    ->whereRaw("((DATEDIFF(NOW(), bpu.waktustempel)) -
+            ((WEEK(NOW()) - WEEK(bpu.waktustempel)) * 2) -
+            (case when weekday(NOW()) = 6 then 1 else 0 end) -
+            (case when weekday(bpu.waktustempel) = 5 then 1 else 0 end)) > 3 AND status = 'Belum Di Bayar'")->save_update();
 
 ?>
 
