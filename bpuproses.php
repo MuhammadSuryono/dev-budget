@@ -106,11 +106,11 @@ if (isset($_POST['submit'])) {
   $pilihtotal = mysqli_query($koneksi, "SELECT total FROM selesai WHERE no='$no' AND waktu='$waktu'");
   $aw = mysqli_fetch_assoc($pilihtotal);
   $hargaah = $aw['total'];
-  $query = "SELECT sum(jumlah) AS sum FROM bpu WHERE no='$no' AND waktu='$waktu'";
-  $result = mysqli_query($koneksi, $query);
-  $row = mysqli_fetch_array($result);
-  $total = $row[0];
-  $query2 = "SELECT sum(realisasi) AS sum FROM bpu WHERE no='$no' AND waktu='$waktu'";
+    $querySumTotalBayar = mysqli_query($koneksi, "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as total_bayar, sum(uangkembali) as uangkembali FROM bpu where no = '$no' AND waktu = '$waktu' AND is_locked = 0");
+    $totalBayar = mysqli_fetch_assoc($querySumTotalBayar);
+    $totalPembayaran = $totalBayar['total_bayar'];
+
+    $query2 = "SELECT sum(realisasi) AS sum FROM bpu WHERE no='$no' AND waktu='$waktu'";
   $result2 = mysqli_query($koneksi, $query2);
   $row2 = mysqli_fetch_array($result2);
   $total2 = $row2[0];
@@ -118,8 +118,8 @@ if (isset($_POST['submit'])) {
   $result3 = mysqli_query($koneksi, $query3);
   $row3 = mysqli_fetch_array($result3);
   $total3 = $row3[0];
-  $cobadulutot = $total - $total2;
-  $jadinya = $hargaah - $total;
+  $cobadulutot = ($totalPembayaran + $totalBayar['uangkembali']) - $total2;
+  $jadinya = $hargaah - ($totalPembayaran + $totalBayar['uangkembali']);
 
 
   $duplicates = [];

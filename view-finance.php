@@ -325,7 +325,7 @@ $helper = new Helper();
                             }
                             
                               // echo $a['status'];
-                              if ($aksesSes != "Level 1") {
+                              if ($aksesSes != "Level 1" && $jadinya != 0) {
                               ?>
                                 <!-- <?php if ($a['status'] == 'UM' || $a['status'] == 'Pulsa' || $a['status'] == 'Biaya External' || $a['status'] == 'Biaya' || $a['status'] == 'UM Burek' || $a['status'] == 'Biaya Lumpsum') {
                                       if ($a['status'] == 'Biaya Lumpsum' || $a['status'] == 'UM' || $a['status'] == 'UM Burek') {

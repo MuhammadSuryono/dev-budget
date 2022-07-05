@@ -12,6 +12,7 @@ $cuti = new Cuti();
 
 $con = new Database();
 $koneksi = $con->connect();
+$con->load_database($koneksi);
 require "vendor/email/send-email.php";
 
 $wa = new Whastapp();
@@ -217,6 +218,8 @@ if ($statusbpu == "") {
     $statusbpu = $bpu["statusbpu"];
 }
 
+$bpuVerify = $con->select()->from('bpu_verify')->where('id_bpu', '=', $bpu['noid'])->first();
+
 $eksternal = ['Honor Eksternal','Honor Area Head','STKB OPS', 'STKB TRK Luar Kota', 'Honor Luar Kota', 'Honor Jakarta', 'STKB TRK Jakarta', 'Vendor/Supplier'];
 $isEksternalProcess = in_array($statusbpu, $eksternal);
 $path = '/view-bpu-verify.php?id='.$bpuVerify["id"].'&bpu='.$bpuVerify["id_bpu"];
@@ -249,30 +252,31 @@ if (isset($_POST['submit'])) {
     $aw = mysqli_fetch_assoc($pilihtotal);
     $hargaah = $aw['total'];
 
-    $query = "SELECT sum(jumlah) AS sum FROM bpu WHERE no='$no' AND waktu='$waktu'";
-    $result = mysqli_query($koneksi, $query);
-    $row = mysqli_fetch_array($result);
-    $total = $row[0];
-
-    $query2 = "SELECT sum(uangkembali) AS sum FROM bpu WHERE no='$no' AND waktu='$waktu'";
-    $result2 = mysqli_query($koneksi, $query2);
-    $row2 = mysqli_fetch_array($result2);
-    $total2 = $row2[0];
+    $querySumTotalBayar = mysqli_query($koneksi, "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as total_bayar, sum(uangkembali) as uangkembali FROM bpu where no = '$no' AND waktu = '$waktu' AND is_locked = 0");
+    $totalBayar = mysqli_fetch_assoc($querySumTotalBayar);
+    $totalPembayaran = $totalBayar['total_bayar'];
     
-    $jadinya = $hargaah - $total + $total2;
+    $jadinya = $hargaah - ($totalPembayaran + $totalBayar['uangkembali']);
 
-    if ($jumlah > $jadinya) {
+    if ($jumlah > $bpuVerify["total_verify"]) {
+        echo "<script language='javascript'>";
+        echo "alert('GAGAL!!, Kamu tidak bisa mengajukan lebih dari sisa total yang telah diverifikasi')";
+        echo "</script>";
+        echo "<script> document.location.href='" . $_SERVER['HTTP_REFERER']  . "'; </script>";
+    }
+
+    if ($jumlah > ($totalPembayaran + $totalBayar['uangkembali'])) {
         if ($_SESSION['divisi'] == 'FINANCE') {
             if ($_SESSION['hak_akses'] == 'Manager') {
                 echo "<script language='javascript'>";
                 echo "alert('GAGAL!!, Kamu tidak bisa mengajukan lebih dari sisa Pembayaran')";
                 echo "</script>";
-                echo "<script> document.location.href='view-finance" . $isNonRutin  . "-manager.php?code=" . $numb . "'; </script>";
+                echo "<script> document.location.href='" . $_SERVER['HTTP_REFERER']  . "'; </script>";
             } else {
                 echo "<script language='javascript'>";
                 echo "alert('GAGAL!!, Kamu tidak bisa mengajukan lebih dari sisa Pembayaran')";
                 echo "</script>";
-                echo "<script> document.location.href='view-finance" . $isNonRutin  . ".php?code=" . $numb . "'; </script>";
+                echo "<script> document.location.href='" . $_SERVER['HTTP_REFERER']  . "'; </script>";
             }
         } else {
             echo "<script language='javascript'>";
@@ -622,7 +626,7 @@ if (isset($_POST['submit'])) {
                     echo "<script language='javascript'>";
                     echo "alert('$notification')";
                     echo "</script>";
-                    echo "<script> document.location.href='view-bpu-verify.php?id=".$idVerify."&bpu=".$idBpu."&status=success'; </script>";
+                    echo "<script> document.location.href='" . $_SERVER['HTTP_REFERER']  . "'; </script>";
                 } else {
                     if ($_SESSION['hak_akses'] == 'Manager') {
                         echo "<script language='javascript'>";
@@ -633,7 +637,7 @@ if (isset($_POST['submit'])) {
                         echo "<script language='javascript'>";
                         echo "alert('$notification')";
                         echo "</script>";
-                        echo "<script> document.location.href='view-finance" . $isNonRutin  . ".php?code=" . $numb . "'; </script>";
+                        echo "<script> document.location.href='" . $_SERVER['HTTP_REFERER']  . "'; </script>";
                     }
                 }
                 
@@ -648,7 +652,7 @@ if (isset($_POST['submit'])) {
             echo "<script language='javascript'>";
             echo "alert('$notification')";
             echo "</script>";
-            echo "<script> document.location.href='".$q[1]."'; </script>";
+            echo "<script> document.location.href='" . $_SERVER['HTTP_REFERER']  . "'; </script>";
         }
     } else {
         echo "Pembuatan Budget External Gagal";
