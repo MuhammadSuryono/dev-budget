@@ -62,8 +62,6 @@ $con->update('bpu')->set_value_update('is_locked', true)
             (case when weekday(NOW()) = 6 then 1 else 0 end) -
             (case when weekday(bpu.waktustempel) = 5 then 1 else 0 end)) > 3 AND status = 'Belum Di Bayar'")->save_update();
 
-echo $con->get_query();
-exit();
 ?>
 
 <!DOCTYPE html>
