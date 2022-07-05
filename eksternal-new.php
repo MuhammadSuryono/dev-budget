@@ -1,4 +1,5 @@
 <?php
+error_reporting(0);
 session_start();
 require "application/config/database.php";
 
@@ -7,7 +8,6 @@ $koneksi = $con->connect();
 
 if (!isset($_SESSION['nama_user'])) {
     header("location:login.php");
-    // die('location:login.php');//jika belum login jangan lanjut
 }
 
 $level = $_SESSION['level'];
