@@ -265,7 +265,7 @@ if (isset($_POST['submit'])) {
         echo "<script> document.location.href='" . $_SERVER['HTTP_REFERER']  . "'; </script>";
     }
 
-    if ($jumlah > ($totalPembayaran + $totalBayar['uangkembali'])) {
+    if ($jumlah > ($jadinya)) {
         if ($_SESSION['divisi'] == 'FINANCE') {
             if ($_SESSION['hak_akses'] == 'Manager') {
                 echo "<script language='javascript'>";
