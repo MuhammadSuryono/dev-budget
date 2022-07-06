@@ -126,16 +126,10 @@ $sisaPembayaran = $totalPengajuan - $total;
             alertError.innerHTML = ''
         }
 
-        if (divisi === 'FINANCE' && jabatan === 'Manager' && value > 1000000) {
-            submitBtn.disabled = true
-        } else {
-            submitBtn.disabled = false
-        }
+        // if (divisi === 'FINANCE' && jabatan === 'Manager' && value > 1000000) {
+        //     submitBtn.disabled = true
+        // } else {
+        //     submitBtn.disabled = false
+        // }
     })
-
-    if (divisi === 'FINANCE' && jabatan === 'Manager' && inputJumlah.value > 1000000) {
-        submitBtn.disabled = true
-    } else {
-        submitBtn.disabled = false
-    }
 </script>
