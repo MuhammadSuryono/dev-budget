@@ -258,7 +258,7 @@ if (isset($_POST['submit'])) {
     
     $jadinya = $hargaah - ($totalPembayaran + $totalBayar['uangkembali']);
 
-    if ($jumlah > $bpuVerify["total_verify"]) {
+    if (($jumlah > $bpuVerify["total_verify"]) && $actionProcess == 'update') {
         echo "<script language='javascript'>";
         echo "alert('GAGAL!!, Kamu tidak bisa mengajukan lebih dari sisa total yang telah diverifikasi')";
         echo "</script>";
