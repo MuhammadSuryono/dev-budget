@@ -237,31 +237,24 @@ if (!isset($_SESSION['nama_user'])) {
                             <td><?php echo 'Rp. ' . number_format($totalPembayaran, 0, '', ','); ?></td>
                             <!-- Sisa Pembayaran -->
                           <!-- Sisa Pembayaran -->
-                          <?php
-                          $no = $a['no'];
-                          $waktu = $a['waktu'];
-                          $pilihtotal = mysqli_query($koneksi, "SELECT total, status FROM selesai WHERE no='$no' AND waktu='$waktu'");
-                          $aw = mysqli_fetch_assoc($pilihtotal);
-                          $hargaah = $aw['total'];
+                            <?php
+                            $no = $a['no'];
+                            $waktu = $a['waktu'];
+                            $pilihtotal = mysqli_query($koneksi, "SELECT total FROM selesai WHERE no='$no' AND waktu='$waktu'");
+                            $aw = mysqli_fetch_assoc($pilihtotal);
+                            $hargaah = $aw['total'];
+                            $query = "SELECT sum(jumlah) AS sum FROM bpu WHERE no='$no' AND waktu='$waktu' and is_locked = 0";
+                            $result = mysqli_query($koneksi, $query);
+                            $row = mysqli_fetch_array($result);
+                            $total = $row[0];
+                            $query16 = "SELECT sum(uangkembali) AS sum FROM bpu WHERE no='$no' AND waktu='$waktu'";
+                            $result16 = mysqli_query($koneksi, $query16);
+                            $row16 = mysqli_fetch_array($result16);
+                            $total16 = $row16[0];
 
-                          $query = "SELECT sum(jumlah) AS sum FROM bpu WHERE no='$no' AND waktu='$waktu'";
-                          $result = mysqli_query($koneksi, $query);
-                          $row = mysqli_fetch_array($result);
-                          $total = $row[0];
-
-                          $query16 = "SELECT sum(uangkembali) AS sum FROM bpu WHERE no='$no' AND waktu='$waktu'";
-                          $result16 = mysqli_query($koneksi, $query16);
-                          $row16 = mysqli_fetch_array($result16);
-                          $total16 = $row16[0];
-
-                          $jadinya = $hargaah - $total;
-
-                          if ($aw['status'] != 'UM Burek') {
-                            $totalBiaya += $jadinya;
-                          }
-                          ?>
-                          <td><?php echo 'Rp. ' . number_format($jadinya, 0, '', ','); ?></td>
-                          <!-- //Sisa Pembayaran -->
+                            $jadinya = $hargaah - $totalPembayaran;
+                            ?>
+                            <td><?php echo 'Rp. ' . number_format($jadinya, 0, '', ','); ?></td>
 
                           <?php
                           if ($hakAkses != "Level 1") {
