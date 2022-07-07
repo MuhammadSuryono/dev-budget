@@ -50,7 +50,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                             $uak = mysqli_fetch_array($useduangkemb);
                             $uangkembaliused = $uak['sumused'];
 
-                            $query3 = "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as penggunaan, SUM(uangkembali) as uangkembali FROM bpu WHERE waktu = '$waktu' AND is_locked = 0";
+                            $query3 = "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as penggunaan, SUM(uangkembali) as uangkembali FROM bpu WHERE waktu = '$waktu' AND is_locked = 0 AND status_pengajuan_bpu = 2";
                             $result3 = mysqli_query($koneksi, $query3);
                             $penggunaan = mysqli_fetch_array($result3);
 
@@ -282,7 +282,7 @@ if (strpos($tab, 'B1') !== false) : ?>
                         $uak = mysqli_fetch_array($useduangkemb);
                         $uangkembaliused = $uak['sumused'];
 
-                        $query3 = "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as penggunaan, SUM(uangkembali) as uangkembali FROM bpu WHERE waktu = '$waktu' AND is_locked = 0";
+                        $query3 = "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as penggunaan, SUM(uangkembali) as uangkembali FROM bpu WHERE waktu = '$waktu' AND is_locked = 0 AND status_pengajuan_bpu = 2";
                         $result3 = mysqli_query($koneksi, $query3);
                         $penggunaan = mysqli_fetch_array($result3);
 
