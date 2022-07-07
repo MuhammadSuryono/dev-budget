@@ -327,7 +327,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                   }
                   while ($a = mysqli_fetch_array($sql)) {
                     if (!in_array($a["rincian"], $checkName)) :
-                        $querySumTotalBayar = mysqli_query($koneksi, "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as total_bayar FROM bpu where no = '$a[no]' AND waktu = '$waktu' AND is_locked = 0");
+                        $querySumTotalBayar = mysqli_query($koneksi, "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as total_bayar FROM bpu where no = '$a[no]' AND waktu = '$waktu' AND is_locked = 0 AND status_pengajuan_bpu = 2");
                         $totalBayar = mysqli_fetch_assoc($querySumTotalBayar);
                         $totalPembayaran = $totalBayar['total_bayar'];
                   ?>

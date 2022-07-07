@@ -252,7 +252,7 @@ if (isset($_POST['submit'])) {
     $aw = mysqli_fetch_assoc($pilihtotal);
     $hargaah = $aw['total'];
 
-    $querySumTotalBayar = mysqli_query($koneksi, "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as total_bayar, sum(uangkembali) as uangkembali FROM bpu where no = '$no' AND waktu = '$waktu' AND is_locked = 0");
+    $querySumTotalBayar = mysqli_query($koneksi, "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as total_bayar, sum(uangkembali) as uangkembali FROM bpu where no = '$no' AND waktu = '$waktu' AND is_locked = 0 AND status_pengajuan_bpu = 2");
     $totalBayar = mysqli_fetch_assoc($querySumTotalBayar);
     $totalPembayaran = $totalBayar['total_bayar'];
     
@@ -265,7 +265,7 @@ if (isset($_POST['submit'])) {
         echo "<script> document.location.href='" . $_SERVER['HTTP_REFERER']  . "'; </script>";
     }
 
-    if ($jumlah > ($jadinya)) {
+    if ($jumlah > ($jadinya) && $actionProcess != 'update') {
         if ($_SESSION['divisi'] == 'FINANCE') {
             if ($_SESSION['hak_akses'] == 'Manager') {
                 echo "<script language='javascript'>";
