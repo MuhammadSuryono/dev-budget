@@ -130,6 +130,7 @@ $helper = new Helper();
     $code = $_GET['code'];
     $select = mysqli_query($koneksi, "SELECT * FROM pengajuan WHERE noid='$code'");
     $d = mysqli_fetch_assoc($select);
+    $waktu = $d['waktu'];
 
     $queryUser = mysqli_query($koneksi, "SELECT * FROM tb_user WHERE id_user = '$_SESSION[id_user]'");
     $user = mysqli_fetch_assoc($queryUser);
@@ -191,7 +192,7 @@ $helper = new Helper();
 
         <ul id="myTab" class="nav nav-tabs" role="tablist">
 
-          <li role="presentation" class="active">
+          <li role="presentation">
             <a href="#budget" id="budget-tab" role="tab" data-toggle="tab" aria-controls="budget" aria-expanded="true">Budget</a>
           </li>
 
@@ -202,13 +203,79 @@ $helper = new Helper();
           <li role="presentation">
             <a href="#rincian" role="tab" id="rincian-tab" data-toggle="tab" aria-controls="rincian">Rincian BPU</a>
           </li>
-
+            <?php if ($d['jenis'] == 'Rutin') { ?>
+            <li role="presentation"  class="active">
+                <a href="#pengajuanKas" role="tab" id="pengajuanKas-tab" data-toggle="tab" aria-controls="rincian">Pengajuan Kas</a>
+            </li>
+            <?php } ?>
         </ul>
 
         <div id="myTabContent" class="tab-content">
           <!-- Tab -->
-
-          <div role="tabpanel" class="tab-pane fade in active" id="budget" aria-labelledby="home-tab">
+            <div role="tabpanel" class="tab-pane fade in active" id="pengajuanKas" aria-labelledby="pengajuanKas-tab">
+                <div class="container-fluid" style="margin: 20px">
+                    <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#pengajuanKasModal"><i class="fa fa-plus"></i> Buat Pengajuan</button>
+                    <a href="print-pengajuan-kas.php?code=<?= $d['noid'] ?>" target="_blank" class="btn btn-success btn-sm"><i class="fa fa-print"></i> Cetak Pengajuan</a>
+                    <div class="table-responsive" style="margin-top: 10px">
+                        <table class="table table-hover tabe-striped table-bordered">
+                            <thead class="warning">
+                                <tr class="warning">
+                                    <th rowspan="2" style="width:5%">No Item BPU</th>
+                                    <th rowspan="2">Tanggal Jatuh Tempo</th>
+                                    <th rowspan="2">Keterangan</th>
+                                    <th rowspan="2">All Budget</th>
+                                    <th colspan="2">Bank BCA (PALL)</th>
+                                    <th colspan="2">Bank Mandiri (KAS)</th>
+                                </tr>
+                                <tr class="warning">
+                                    <th>Term 1</th>
+                                    <th>Term 2</th>
+                                    <th>Term 1</th>
+                                    <th>Term 2</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <?php
+                            $dataPengajuan = $con->select("p.*, s.rincian as rincianItem, s.total as totalBudget, s.no as noItem")->from('pengajuan_kas_item p')
+                                ->join('selesai s', 's.id = p.item_id')
+                                ->where('p.id_pengajuan_budget', '=', $d['noid'])->get();
+                            foreach($dataPengajuan as $key => $value) {
+                            ?>
+                                <tr>
+                                    <td><?= $value['noItem'] ?></td>
+                                    <td><?= $value['jatuh_tempo'] ?></td>
+                                    <td><?= $value['rincianItem'] ?></td>
+                                    <td>Rp. <?= number_format($value['totalBudget']) ?></td>
+                                    <td>
+                                        Rp. <?= $value['type_kas'] == 'pall' && $value['term'] == 1 ? number_format($value['total_pengajuan']) : 0 ?>
+                                    </td>
+                                    <td>Rp. <?= $value['type_kas'] == 'pall' && $value['term'] == 2 ? number_format($value['total_pengajuan']) : 0 ?></td>
+                                    <td>Rp. <?= $value['type_kas'] == 'kas' && $value['term'] == 1 ? number_format($value['total_pengajuan']) : 0 ?></td>
+                                    <td>Rp. <?= $value['type_kas'] == 'kas' && $value['term'] == 2 ? number_format($value['total_pengajuan']) : 0 ?></td>
+                                </tr>
+                            <?php } ?>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal fade" id="pengajuanKasModal" tabindex="-1" role="dialog" aria-labelledby="pengajuanKasModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="pengajuanKasModalLabel">Pengajuan Modal</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <form id="formPengajuanKas">
+                                <div class="modal-body" id="bodyPengajuanKas">
+                                </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          <div role="tabpanel" class="tab-pane fade" id="budget" aria-labelledby="home-tab">
 
             <div class="panel panel-warning" data-widget="{&quot;draggable&quot;: &quot;false&quot;}" data-widget-static="">
               <div class="panel-body no-padding">
@@ -228,7 +295,6 @@ $helper = new Helper();
                       <th>Pembayaran</th>
 
                       <?php
-                      $waktu = $d['waktu'];
                       $selno = mysqli_query($koneksi, "SELECT no FROM selesai WHERE waktu ='$waktu'");
                       $wkwk = mysqli_fetch_assoc($selno);
                       $no = $wkwk['no'];
@@ -256,7 +322,7 @@ $helper = new Helper();
                     }
                     while ($a = mysqli_fetch_array($sql)) {
                       if (!in_array($a["rincian"], $checkName)) :
-                          $querySumTotalBayar = mysqli_query($koneksi, "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as total_bayar FROM bpu where no = '$a[no]' AND waktu = '$waktu' AND is_locked = 0 AND status_pengajuan_bpu = 2");
+                          $querySumTotalBayar = mysqli_query($koneksi, "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as total_bayar FROM bpu where no = '$a[no]' AND waktu = '$waktu' AND is_locked = 0");
                           $totalBayar = mysqli_fetch_assoc($querySumTotalBayar);
                           $totalPembayaran = $totalBayar['total_bayar'];
                         $no = $a['no'];
@@ -1765,6 +1831,94 @@ $helper = new Helper();
           });
         }
       </script>
+
+
+        <script>
+            const params = new Proxy(new URLSearchParams(window.location.search), {
+                get: (searchParams, prop) => searchParams.get(prop),
+            });
+            $(document).ready(function(){
+                $('#pengajuanKasModal').on('shown.bs.modal', function () {
+                    document.getElementById('bodyPengajuanKas').innerHTML = ''
+                    $.ajax({
+                        type: 'get',
+                        url: `PengajuanUangKas.php?code=${params.code}&action=formPengajuan`,
+                        data: {},
+                        success: function(data) {
+                            document.getElementById('bodyPengajuanKas').innerHTML = data
+                        }
+                    });
+                })
+            })
+
+            $("#formPengajuanKas").on("submit", function (e) {
+                e.preventDefault();
+
+                let form = $(this);
+                // console.log(form.serializeArray())
+                var valueList = [];
+                var total = 0;
+                var error = false
+                $('#allRincianItem tr').each(function() {
+                    $(this).find("input[name='idSelectItem']:checked").each(function() {
+                        var values = [];
+                        $(this).closest("td").siblings("td").each(function() {
+                            if ($(this)[0].cellIndex === 7) {
+                                if (parseInt($(this)[0].firstChild.value) == 0) {
+                                    error = true
+                                    alert("Nominal yang anda masukkan harus lebih dari 0 untuk item " + values[1])
+                                }
+
+                                if (parseInt($(this)[0].firstChild.value) > values[5]) {
+                                    error = true
+                                    console.log($(this)[0].firstChild.value > values[5])
+                                    alert("Nominal yang anda masukkan lebih besar dari sisa item untuk " + values[1])
+                                }
+                                total += parseInt($(this)[0].firstChild.value)
+                                values.push($(this)[0].firstChild.value);
+                            }else if ($(this)[0].cellIndex === 1) {
+                                values.push($(this)[0].children[0].value);
+                            }else if ($(this)[0].cellIndex === 6) {
+                                values.push($(this)[0].children[0].value);
+                            }else {
+                                values.push($(this).text());
+                            }
+                        });
+                        valueList.push(values.join(";"));
+                    });
+                });
+                console.log(valueList)
+
+                if (!error) {
+                    $.ajax({
+                        type: 'post',
+                        url: `PengajuanUangKas.php?code=${params.code}&action=createRequest`,
+                        data: {
+                            dataValueList: valueList,
+                            typeKas: $('#typeKas').val(),
+                            term: $('#termPengajuan').val(),
+                            total: total
+                        },
+                        success: function(data) {
+                            try {
+                                let resp = JSON.parse(data)
+                                if (resp.status == true) {
+                                    alert("Berhasil menyimpan pengajuan")
+                                    $('#pengajuanKasModal').modal('hide')
+                                    setTimeout(() => {
+                                        window.location.reload()
+                                    }, 2000)
+                                } else {
+                                    alert("Tidak bisa membuat pengajuan. Terjadi kesalahan ketika menyimpan")
+                                }
+                            } catch (e) {
+                                alert("Tidak bisa membuat pengajuan. Terjadi kesalahan ketika menyimpan")
+                            }
+                        }
+                    });
+                }
+            });
+        </script>
 
 </body>
 
