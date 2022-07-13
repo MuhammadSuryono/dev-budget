@@ -277,7 +277,7 @@ $helper = new Helper();
                       $selno = mysqli_query($koneksi, "SELECT no FROM selesai WHERE waktu ='$waktu'");
                       $wkwk = mysqli_fetch_assoc($selno);
                       $no = $wkwk['no'];
-                      $liatbayarth = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no' AND status_pengajuan_bpu != 2");
+                      $liatbayarth = mysqli_query($koneksi, "SSELECT * FROM bpu WHERE waktu='$waktu' AND no='$no' AND (status_pengajuan_bpu != 2 or status_pengajuan_bpu is NULL)");
                       if (mysqli_num_rows($liatbayarth) == 0) {
                         echo "";
                       } else {
@@ -397,7 +397,7 @@ $helper = new Helper();
                           <?php
                           // }
                           $arrCheck = [];
-                          $liatbayar = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no' AND status_pengajuan_bpu != 2");
+                          $liatbayar = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no' ");
                           if (mysqli_num_rows($liatbayar) == 0) {
                             echo "";
                           } else {

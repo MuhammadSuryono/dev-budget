@@ -178,7 +178,7 @@ if (!isset($_SESSION['nama_user'])) {
                       $selno = mysqli_query($koneksi, "SELECT no FROM selesai WHERE waktu ='$waktu'");
                       $wkwk = mysqli_fetch_assoc($selno);
                       $no = $wkwk['no'];
-                      $liatbayarth = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no' AND status_pengajuan_bpu != 2");
+                      $liatbayarth = mysqli_query($koneksi, "SSELECT * FROM bpu WHERE waktu='$waktu' AND no='$no' AND (status_pengajuan_bpu != 2 or status_pengajuan_bpu is NULL)");
                       if (mysqli_num_rows($liatbayarth) == 0) {
                         echo "";
                       } else {
@@ -204,7 +204,7 @@ if (!isset($_SESSION['nama_user'])) {
                     $totalBiaya = 0;
                     while ($a = mysqli_fetch_array($sql)) {
                       if (!in_array($a["rincian"], $checkName)) :
-                          $querySumTotalBayar = mysqli_query($koneksi, "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as total_bayar FROM bpu where no = '$a[no]' AND waktu = '$waktu' AND is_locked = 0 AND status_pengajuan_bpu = 2");
+                          $querySumTotalBayar = mysqli_query($koneksi, "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as total_bayar FROM bpu where no = '$a[no]' AND waktu = '$waktu' AND is_locked = 0  AND (status_pengajuan_bpu != 2 OR status_pengajuan_bpu IS NULL)");
                           $totalBayar = mysqli_fetch_assoc($querySumTotalBayar);
                           $totalPembayaran = $totalBayar['total_bayar'];
                     ?>
@@ -664,7 +664,7 @@ if (!isset($_SESSION['nama_user'])) {
                   $uak = mysqli_fetch_array($useduangkemb);
                   $uangkembaliused = $uak['sumused'];
 
-                  $query3 = "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as penggunaan, SUM(uangkembali) as uangkembali FROM bpu WHERE waktu = '$waktu' AND is_locked = 0 AND status_pengajuan_bpu = 2";
+                  $query3 = "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as penggunaan, SUM(uangkembali) as uangkembali FROM bpu WHERE waktu = '$waktu' AND is_locked = 0  AND (status_pengajuan_bpu != 2 OR status_pengajuan_bpu IS NULL)";
                   $result3 = mysqli_query($koneksi, $query3);
                   $penggunaan = mysqli_fetch_array($result3);
 
