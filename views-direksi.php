@@ -181,7 +181,7 @@ $setting = mysqli_fetch_assoc($querySetting);
         </li>
 
           <?php if ($d['jenis'] == 'Rutin') { ?>
-              <li role="presentation"  class="active">
+              <li role="presentation">
                   <a href="#pengajuanKas" role="tab" id="pengajuanKas-tab" data-toggle="tab" aria-controls="rincian">Pengajuan Kas</a>
               </li>
           <?php } ?>
@@ -191,6 +191,10 @@ $setting = mysqli_fetch_assoc($querySetting);
       <div id="myTabContent" class="tab-content">
         <!-- Tab -->
           <?php if ($d['jenis'] == 'Rutin') {
+              $rekening = $con->select("b.id_rekening, a.rekening, a.bank, a.type_kas, a.id_kas")->from('pengajuan_kas_item b')
+                  ->join('develop.kas a', 'a.id_kas = b.id_rekening')
+                  ->where('b.id_pengajuan_budget', '=', $d['noid'])
+                  ->group_by('b.id_rekening')->get();
               $dataPengajuanKas = $con->select('a.*, b.flow_name')->from('pengajuan_kas a')->join('flow_pengajuan_kas b', 'a.status = b.status_code')->where('a.id_pengajuan_budget', '=', $d['noid'])->first();
 
               if ($dataPengajuanKas == null) {
@@ -198,7 +202,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                   $dataPengajuanKas = $con->select('a.*, b.flow_name')->from('pengajuan_kas a')->join('flow_pengajuan_kas b', 'a.status = b.status_code')->where('b.id_pengajuan_budget', '=', $d['noid'])->first();
               }
               ?>
-              <div role="tabpanel" class="tab-pane fade in active" id="pengajuanKas" aria-labelledby="pengajuanKas-tab">
+              <div role="tabpanel" class="tab-pane fade in" id="pengajuanKas" aria-labelledby="pengajuanKas-tab">
                   <div class="container-fluid" style="margin: 20px">
                       <?php
                       if ($dataPengajuanKas['status'] == 0) {
@@ -235,21 +239,34 @@ $setting = mysqli_fetch_assoc($querySetting);
                       <?php } ?>
 
                       <div class="table-responsive" style="margin-top: 10px">
-                          <table class="table table-hover tabe-striped table-bordered">
+                          <table class="table table-hover table-striped table-bordered">
                               <thead class="warning">
                               <tr class="warning">
-                                  <th rowspan="2" style="width:5%">No Item BPU</th>
+                                  <th rowspan="2" style="width:5%">No Item</th>
                                   <th rowspan="2">Tanggal Jatuh Tempo</th>
                                   <th rowspan="2">Keterangan</th>
                                   <th rowspan="2">All Budget</th>
-                                  <th colspan="2">Bank BCA (PALL)</th>
-                                  <th colspan="2">Bank Mandiri (KAS)</th>
+                                  <?php
+                                  foreach($rekening as $rek) {
+                                      $type_kas = 'KAS';
+                                      if ($rek['type_kas'] == 'mri-pall') { $type_kas = 'PALL'; }
+
+                                      $bank = 'Bank Mandiri';
+                                      if ($rek['bank'] == 'CENAIDJA') { $bank = 'Bank BCA'; }
+                                      ?>
+                                      <th colspan="2"><?= $bank ?> (<?= $type_kas ?>)<br><?= $rek['rekening'] ?></th>
+                                  <?php } ?>
                               </tr>
                               <tr class="warning">
-                                  <th>Term 1</th>
-                                  <th>Term 2</th>
-                                  <th>Term 1</th>
-                                  <th>Term 2</th>
+                                  <?php
+                                  foreach($rekening as $rek) {
+                                      ?>
+                                      <th>Term 1</th>
+                                      <th>Term 2</th>
+                                      <?php
+                                      ${"totalterm1" . $rek['rekening']} = 0;
+                                      ${"totalterm2" . $rek['rekening']} = 0;
+                                  } ?>
                               </tr>
                               </thead>
                               <tbody>
@@ -264,14 +281,40 @@ $setting = mysqli_fetch_assoc($querySetting);
                                       <td><?= $value['jatuh_tempo'] ?></td>
                                       <td><?= $value['rincianItem'] ?></td>
                                       <td>Rp. <?= number_format($value['totalBudget']) ?></td>
-                                      <td>
-                                          Rp. <?= $value['type_kas'] == 'pall' && $value['term'] == 1 ? number_format($value['total_pengajuan']) : 0 ?>
-                                      </td>
-                                      <td>Rp. <?= $value['type_kas'] == 'pall' && $value['term'] == 2 ? number_format($value['total_pengajuan']) : 0 ?></td>
-                                      <td>Rp. <?= $value['type_kas'] == 'kas' && $value['term'] == 1 ? number_format($value['total_pengajuan']) : 0 ?></td>
-                                      <td>Rp. <?= $value['type_kas'] == 'kas' && $value['term'] == 2 ? number_format($value['total_pengajuan']) : 0 ?></td>
+
+                                      <?php
+                                      foreach($rekening as $rek) {
+                                          ${"term1" . $rek['rekening']} = 0;
+                                          ${"term2" . $rek['rekening']} = 0;
+
+                                          if ($value['id_rekening'] == $rek['id_kas'] AND $value['term'] == 1) {
+                                              ${"term1" . $rek['rekening']} = $value['total_pengajuan'];
+                                              ${"term2" . $rek['rekening']} = 0;
+                                          } else if ($value['id_rekening'] == $rek['id_kas'] AND $value['term'] == 2) {
+                                              ${"term1" . $rek['rekening']} = 0;
+                                              ${"term2" . $rek['rekening']} = $value['total_pengajuan'];
+                                          }
+                                          ?>
+                                          <td>Rp. <?= number_format(${"term1" . $rek['rekening']}, 0, ',', '.') ?></td>
+                                          <td>Rp. <?= number_format(${"term2" . $rek['rekening']}, 0, ',', '.') ?></td>
+                                          <?php
+
+                                          ${"totalterm1" . $rek['rekening']} += ${"term1" . $rek['rekening']};
+                                          ${"totalterm2" . $rek['rekening']} += ${"term2" . $rek['rekening']};
+                                      } ?>
+                                  </tr>
+                              <?php }
+                              if ($rekening != NULL) {
+                                  ?>
+                                  <tr class="warning">
+                                      <td colspan="4">Total</td>
+                                      <?php foreach ($rekening as $rek) { ?>
+                                          <td>Rp. <?= number_format(${"totalterm1" . $rek['rekening']}, 0, ',', '.') ?></td>
+                                          <td>Rp. <?= number_format(${"totalterm2" . $rek['rekening']}, 0, ',', '.') ?></td>
+                                      <?php } ?>
                                   </tr>
                               <?php } ?>
+
                               </tbody>
                           </table>
                       </div>
@@ -319,7 +362,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                   </div>
               </div>
           <?php } ?>
-        <div role="tabpanel" class="tab-pane fade in" id="budget" aria-labelledby="home-tab">
+        <div role="tabpanel" class="tab-pane fade in active" id="budget" aria-labelledby="home-tab">
 
           <div class="panel panel-warning" data-widget="{&quot;draggable&quot;: &quot;false&quot;}" data-widget-static="">
             <div class="panel-body no-padding">

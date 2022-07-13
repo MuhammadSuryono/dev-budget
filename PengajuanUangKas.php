@@ -18,6 +18,10 @@ class PengajuanUangKas extends Database
     {
         $dataPengajuan = $this->select("*")->from('pengajuan')->where('noid', '=', $_GET['code'])->first();
         $items = $this->select()->where('waktu', '=', $dataPengajuan['waktu'])->get('selesai');
+        $this->set_name_db(DB_DEVELOP);
+        $this->init_connection();
+        $developConnection = $this->connect();
+        $itemKasQuery = mysqli_query($developConnection, "SELECT * FROM kas WHERE keterangan = 'Kas Umum' OR label_kas = 'Kas Umum'");
         require_once "form/pengajuan-uang-kas.php";
     }
 
@@ -26,9 +30,20 @@ class PengajuanUangKas extends Database
         try {
             foreach ($_POST['dataValueList'] as $value) {
                 $explode = explode(";", $value);
-                $this->insert('pengajuan_kas_item')->set_value_insert('id_pengajuan_budget', $_GET['code'])
-                    ->set_value_insert('item_id', $explode[0])
-                    ->set_value_insert('total_pengajuan', $explode[6])->save_insert();
+                $check = $this->select()->from('pengajuan_item_kas')->where('item_id', '=', $explode[0])->where('term', '=', $_POST['term'])->first();
+                if ($check != null) {
+                    $this->update('pengajuan_kas_item')
+                        ->set_value_insert('total_pengajuan', $explode[6] + $check['total_pengajuan'])->where('item_id', '=', $explode[0])->where('term', '=', $_POST['term'])
+                        ->save_update();
+                } else {
+                    $this->insert('pengajuan_kas_item')->set_value_insert('id_pengajuan_budget', $_GET['code'])
+                        ->set_value_insert('item_id', $explode[0])
+                        ->set_value_insert('jatuh_tempo', $_POST['JatuhTempo'])
+                        ->set_value_insert('type_kas', $_POST['typeKas'])
+                        ->set_value_insert('id_rekening', $_POST['typeKas'])
+                        ->set_value_insert('term', $_POST['term'])
+                        ->set_value_insert('total_pengajuan', $explode[6])->save_insert();
+                }
             }
             echo json_encode(['status' => true]);
         } catch (Exception $exception) {
