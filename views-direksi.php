@@ -86,7 +86,7 @@ $setting = mysqli_fetch_assoc($querySetting);
   //
 
 
-  $cariselisih = mysqli_query($koneksi, "SELECT totalbudget,totalbudgetnow FROM pengajuan WHERE waktu='$d[waktu]'");
+  $cariselisih = mysqli_query($koneksi, "SELECT SUM(totalbudget) as totalbudget,sum(totalbudgetnow) as  totalbudgetnow FROM pengajuan WHERE waktu='$d[waktu]'");
   $cs = mysqli_fetch_array($cariselisih);
   $totalbudget      = $cs['totalbudget'];
   $totalbudgetnow   = $cs['totalbudgetnow'];
@@ -387,7 +387,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                     $selno = mysqli_query($koneksi, "SELECT no FROM selesai WHERE waktu ='$waktu'");
                     $wkwk = mysqli_fetch_assoc($selno);
                     $no = $wkwk['no'];
-                    $liatbayarth = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no' AND status_pengajuan_bpu != 2");
+                    $liatbayarth = mysqli_query($koneksi, "SSELECT * FROM bpu WHERE waktu='$waktu' AND no='$no' AND (status_pengajuan_bpu != 2 or status_pengajuan_bpu is NULL)");
                     if (mysqli_num_rows($liatbayarth) == 0) {
                       echo "";
                     } else {
@@ -408,7 +408,8 @@ $setting = mysqli_fetch_assoc($querySetting);
                     $totalPembayaran = 0;
                   while ($a = mysqli_fetch_array($sql)) {
                     if (!in_array($a["rincian"], $checkName)) :
-                      $querySumTotalBayar = mysqli_query($koneksi, "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as total_bayar FROM bpu where no = '$a[no]' AND waktu = '$waktu' AND is_locked = 0 AND status_pengajuan_bpu = 2");
+                      $querySumTotalBayar = mysqli_query($koneksi, "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as total_bayar FROM bpu where no = '$a[no]' AND waktu = '$waktu' AND is_locked = 0 AND (status_pengajuan_bpu != 2 OR status_pengajuan_bpu IS NULL)");
+                    
                       $totalBayar = mysqli_fetch_assoc($querySumTotalBayar);
                       $totalPembayaran = $totalBayar['total_bayar'];
                   ?>
@@ -473,7 +474,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                         <!-- Tombol Eksternal -->
                         <?php
 
-                        $crbpu = mysqli_query($koneksi, "SELECT * FROM bpu WHERE no ='$no' AND waktu = '$waktu' AND status_pengajuan_bpu != 2");
+                        $crbpu = mysqli_query($koneksi, "SELECT * FROM bpu WHERE no ='$no' AND waktu = '$waktu' ");
 
                         if ($a['status'] == 'UM' || $a['status'] == 'UM Burek') {
                         ?>
@@ -896,7 +897,7 @@ $setting = mysqli_fetch_assoc($querySetting);
             $uak = mysqli_fetch_array($useduangkemb);
             $uangkembaliused = $uak['sumused'];
 
-            $query3 = "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as penggunaan, SUM(uangkembali) as uangkembali FROM bpu WHERE waktu = '$waktu' AND is_locked = 0 AND status_pengajuan_bpu = 2";
+            $query3 = "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as penggunaan, SUM(uangkembali) as uangkembali FROM bpu WHERE waktu = '$waktu' AND is_locked = 0 AND (status_pengajuan_bpu != 2 OR status_pengajuan_bpu IS NULL)";
             $result3 = mysqli_query($koneksi, $query3);
             $penggunaan = mysqli_fetch_array($result3);
 

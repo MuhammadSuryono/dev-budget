@@ -225,7 +225,7 @@ if (!isset($_SESSION['nama_user'])) {
 
                           <?php
                           $arrCheck = [];
-                          $liatbayar = mysqli_query($koneksi, "SELECT * FROM bpu WHERE waktu='$waktu' AND no='$no' ORDER BY term");
+                          $liatbayar = mysqli_query($koneksi, "SSELECT * FROM bpu WHERE waktu='$waktu' AND no='$no' AND (status_pengajuan_bpu != 2 or status_pengajuan_bpu is NULL)ORDER BY term");
                           if (mysqli_num_rows($liatbayar) == 0) {
                             echo "";
                           } else {

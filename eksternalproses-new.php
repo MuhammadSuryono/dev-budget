@@ -252,7 +252,7 @@ if (isset($_POST['submit'])) {
     $aw = mysqli_fetch_assoc($pilihtotal);
     $hargaah = $aw['total'];
 
-    $querySumTotalBayar = mysqli_query($koneksi, "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as total_bayar, sum(uangkembali) as uangkembali FROM bpu where no = '$no' AND waktu = '$waktu' AND is_locked = 0 AND status_pengajuan_bpu = 2");
+    $querySumTotalBayar = mysqli_query($koneksi, "SELECT SUM(CASE WHEN jumlah > 0 THEN jumlah ELSE pengajuan_jumlah END) as total_bayar, sum(uangkembali) as uangkembali FROM bpu where no = '$no' AND waktu = '$waktu' AND is_locked = 0 AND (status_pengajuan_bpu != 2 OR status_pengajuan_bpu IS NULL)");
     $totalBayar = mysqli_fetch_assoc($querySumTotalBayar);
     $totalPembayaran = $totalBayar['total_bayar'];
     

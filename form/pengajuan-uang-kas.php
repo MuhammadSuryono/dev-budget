@@ -12,9 +12,23 @@
             <label>Jenis Kas</label>
             <select class="form-control" id="typeKas" required>
                 <option value="">Pilih Jenis Kas</option>
-                <option value="pall">MRI Pall</option>
-                <option value="kas">MRI Kas</option>
+                <?php
+                while ($q = mysqli_fetch_array($itemKasQuery)) {
+                    $bank = "MANDIRI";
+                    if ($q['bank'] == 'CENAIDJA') {
+                        $bank = 'BCA';
+                    }
+                    $typeKas = "KAS";
+                    if ($q['type_kas'] == 'mri-pall') $typeKas = 'PALL';
+                    echo "<option value='$q[id_kas]'>BANK $bank ($typeKas) - $q[rekening]</option>";
+                }
+                ?>
             </select>
+        </div>
+
+        <div class="col-sm-6">
+            <label>Tanggal Jatuh Tempo</label>
+            <input type="date" id="JatuhTempo" class="form-control" required>
         </div>
     </div>
     <div class="table-responsive">
@@ -50,13 +64,13 @@
                     <td><?= $item['status'] ?></td>
                     <td><?= $item['penerima'] ?></td>
                     <td>Rp. <?= number_format($selisih) ?> <input class="form-check-input" type="hidden" value="<?= $selisih ?>"></td>
-                    <td><input type="number" class="form-control input-value" name="nominalPengajuan" value="0"></td>
+                    <td><input type="number" class="form-control input-value txtCal" name="nominalPengajuan" onkeyup="setnum()" value="0"></td>
                 </tr>
             <?php } } ?>
             </tbody>
         </table>
         <div class="text-right">
-            <h4><strong>Total Diajukan: Rp. 0</strong></h4>
+            <h4><strong>Total Diajukan: Rp. <span id="total_sum_value">0</span></strong></h4>
         </div>
     </div>
     <button class="btn btn-success btn-sm" type="submit">Buat Pengajuan</button>
