@@ -427,8 +427,7 @@ $setting = mysqli_fetch_assoc($querySetting);
 
                             } ?>
                             <?php
-
-                            if ($a['status'] == "Honor Eksternal") { ?>
+                            if (in_array($a['status'], ["Honor Eksternal","Vendor/Supplier"])) { ?>
                                 <button type="button" class="btn btn-success btn-small" onclick="eksternal('<?php echo $no; ?>','<?php echo $waktu; ?>')">Eksternal</button>
                             <?php }
                             if ($a['status'] == "Honor Luar Kota") {
