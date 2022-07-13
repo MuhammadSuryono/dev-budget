@@ -212,10 +212,54 @@ $helper = new Helper();
 
         <div id="myTabContent" class="tab-content">
           <!-- Tab -->
+            <?php if ($d['jenis'] == 'Rutin') {
+                $dataPengajuanKas = $con->select('a.*, b.flow_name')->from('pengajuan_kas a')->join('flow_pengajuan_kas b', 'a.status = b.status_code')->where('a.id_pengajuan_budget', '=', $d['noid'])->first();
+
+                if ($dataPengajuanKas == null) {
+                    $con->insert('pengajuan_kas')->set_value_insert('id_pengajuan_budget', $d['noid'])->save_insert();
+                    $dataPengajuanKas = $con->select('a.*, b.flow_name')->from('pengajuan_kas a')->join('flow_pengajuan_kas b', 'a.status = b.status_code')->where('b.id_pengajuan_budget', '=', $d['noid'])->first();
+                }
+                ?>
             <div role="tabpanel" class="tab-pane fade in active" id="pengajuanKas" aria-labelledby="pengajuanKas-tab">
                 <div class="container-fluid" style="margin: 20px">
-                    <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#pengajuanKasModal"><i class="fa fa-plus"></i> Buat Pengajuan</button>
-                    <a href="print-pengajuan-kas.php?code=<?= $d['noid'] ?>" target="_blank" class="btn btn-success btn-sm"><i class="fa fa-print"></i> Cetak Pengajuan</a>
+                    <?php
+                        if ($dataPengajuanKas['status'] == 0) {
+                            echo '<div class="alert alert-warning" role="alert" style="">
+                              Anda belum membuat pengajuan KAS, Silahkan buat pengajuan dan Ajukan
+                            </div>';
+                        }
+
+                        if ($dataPengajuanKas['status'] != 0 && !in_array($dataPengajuanKas['status'], [110,220,330]) && $dataPengajuanKas['status'] != 1) {
+                            echo '<div class="alert alert-warning" role="alert" style="">
+                                  Status Pengajuan anda '.$dataPengajuanKas['flow_name'].'
+                                </div>';
+                        }
+
+                        if (in_array($dataPengajuanKas['status'], [110,220,330])) {
+                            echo '<div class="alert alert-danger" role="alert" style="">
+                                  Pengajuan anda telah di tolak oleh <b>'.$dataPengajuanKas["reject_by"].'</b>, dengan keterangan <b>'.$dataPengajuanKas["description"].'</b>  Silahkan perbaiki data pengajuan anda
+                                </div>';
+                        }
+
+                        if ($dataPengajuanKas['status'] == 1) {
+                            echo '<div class="alert alert-success" role="alert" style="">
+                                      Pengajuan anda telah di Setujui oleh <b>'.$dataPengajuanKas["approval_by"].'</b>
+                                </div>';
+                        }
+                    ?>
+
+                    <a href="print-pengajuan-kas.php?code=<?= $d['noid'] ?>" target="_blank" class="btn btn-warning btn-sm"><i class="fa fa-print"></i> Cetak Pengajuan</a>
+                    <?php
+                    if(in_array($dataPengajuanKas['status'], [0,110,220,330])) { ?>
+                        <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#pengajuanKasModal"><i class="fa fa-plus"></i> Buat Pengajuan</button>
+                        <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#konfirmasiPengajuan"><i class="fa fa-plus"></i> Ajukan Kas</button>
+                    <?php } ?>
+                    <?php
+                    if(in_array($dataPengajuanKas['status'], [11]) && $_SESSION['hak_akses'] == 'Pegawai2') { ?>
+                        <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#konfirmasiPenolakan"><i class="fa fa-plus"></i> Penolakan Check 1</button>
+                        <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#konfirmasiApprove"><i class="fa fa-plus"></i> Validasi Check 1</button>
+                    <?php } ?>
+
                     <div class="table-responsive" style="margin-top: 10px">
                         <table class="table table-hover tabe-striped table-bordered">
                             <thead class="warning">
@@ -257,7 +301,7 @@ $helper = new Helper();
                             </tbody>
                         </table>
                     </div>
-                    <div class="modal fade" id="pengajuanKasModal" tabindex="-1" role="dialog" aria-labelledby="pengajuanKasModalLabel" aria-hidden="true">
+                    <div class="modal fade" id="pengajuanKasModal" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="pengajuanKasModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-lg" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -273,8 +317,70 @@ $helper = new Helper();
                             </div>
                         </div>
                     </div>
+
+                    <div class="modal fade" id="konfirmasiPengajuan" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="konfirmasiPengajuanLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="konfirmasiPengajuanLabel">Konfirmasi Pengajuan</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body" id="bodyPengajuanKas">
+                                    Apakah anda yakin ingin mengajukan kas ini ?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" id="btnAjukanKas">Iya, Ajukan</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="konfirmasiPenolakan" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="konfirmasiPenolakanLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="konfirmasiPenolakanLabel">Konfirmasi Penolakan</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body" id="bodyPengajuanKas">
+                                    Apakah anda yakin ingin menolak pengajuan kas ini ?
+                                    <input id="descriptionReject" class="form-control" placeholder="Keterangan Penolakan">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" id="btnTolakPengajuanKas">Iya, Tolak</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="konfirmasiApprove" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="konfirmasiApproveLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="konfirmasiApproveLabel">Konfirmasi Approve Pengajuan</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body" id="bodyPengajuanKas">
+                                    Apakah anda yakin ingin menyetujui pengajuan kas ini ?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" id="btnApproveKas">Iya, Setujui</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+            <?php } ?>
           <div role="tabpanel" class="tab-pane fade" id="budget" aria-labelledby="home-tab">
 
             <div class="panel panel-warning" data-widget="{&quot;draggable&quot;: &quot;false&quot;}" data-widget-static="">
@@ -1846,6 +1952,83 @@ $helper = new Helper();
                         data: {},
                         success: function(data) {
                             document.getElementById('bodyPengajuanKas').innerHTML = data
+                        }
+                    });
+                })
+
+                $('#btnAjukanKas').on('click', function () {
+                    $('#btnAjukanKas').prop('disabled', true);
+                    $.ajax({
+                        type: 'post',
+                        url: `PengajuanUangKas.php?code=${params.code}&action=createRequestPengajuan`,
+                        data: {},
+                        success: function(data) {
+                            try {
+                                let resp = JSON.parse(data)
+                                if (resp.status == true) {
+                                    alert("Berhasil menyimpan pengajuan")
+                                    $('#konfirmasiPengajuan').modal('hide')
+                                    window.location.reload()
+                                } else {
+                                    $('#btnAjukanKas').prop('disabled', false);
+                                    alert("Tidak bisa membuat pengajuan. Terjadi kesalahan ketika menyimpan")
+                                }
+                            } catch (e) {
+                                $('#btnAjukanKas').prop('disabled', false);
+                                alert("Tidak bisa membuat pengajuan. Terjadi kesalahan ketika menyimpan")
+                            }
+                        }
+                    });
+                })
+
+                $('#btnTolakPengajuanKas').on('click', function () {
+                    $('#btnTolakPengajuanKas').prop('disabled', true);
+                    $.ajax({
+                        type: 'post',
+                        url: `PengajuanUangKas.php?code=${params.code}&action=rejectRequest`,
+                        data: {
+                            description: $('#descriptionReject').val()
+                        },
+                        success: function(data) {
+                            try {
+                                let resp = JSON.parse(data)
+                                if (resp.status == true) {
+                                    alert("Berhasil menyimpan penolakan pengajuan")
+                                    $('#konfirmasiPenolakan').modal('hide')
+                                    window.location.reload()
+                                } else {
+                                    $('#btnTolakPengajuanKas').prop('disabled', false);
+                                    alert("Tidak bisa menyimpan penolakan pengajuan. Terjadi kesalahan ketika menyimpan")
+                                }
+                            } catch (e) {
+                                $('#btnTolakPengajuanKas').prop('disabled', false);
+                                alert("Tidak bisa menyimpan penolakan pengajuan. Terjadi kesalahan ketika menyimpan")
+                            }
+                        }
+                    });
+                })
+
+                $('#btnApproveKas').on('click', function () {
+                    $('#btnApproveKas').prop('disabled', true);
+                    $.ajax({
+                        type: 'post',
+                        url: `PengajuanUangKas.php?code=${params.code}&action=acceptRequest`,
+                        data: {},
+                        success: function(data) {
+                            try {
+                                let resp = JSON.parse(data)
+                                if (resp.status == true) {
+                                    alert("Berhasil menyetujui pengajuan")
+                                    $('#konfirmasiApprove').modal('hide')
+                                    window.location.reload()
+                                } else {
+                                    $('#btnApproveKas').prop('disabled', false);
+                                    alert("Tidak bisa menyimpan pengajuan. Terjadi kesalahan ketika menyimpan")
+                                }
+                            } catch (e) {
+                                $('#btnApproveKas').prop('disabled', false);
+                                alert("Tidak bisa menyimpan pengajuan. Terjadi kesalahan ketika menyimpan")
+                            }
                         }
                     });
                 })
