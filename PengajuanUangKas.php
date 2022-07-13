@@ -45,7 +45,7 @@ class PengajuanUangKas extends Database
                         ->set_value_insert('total_pengajuan', $explode[6])->save_insert();
                 }
             }
-            echo json_encode(['status' => true]);
+            echo json_encode(['status' => true, 'query' => $this->get_query()]);
         } catch (Exception $exception) {
             echo json_encode(['status' => false]);
         }
