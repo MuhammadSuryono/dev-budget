@@ -30,7 +30,7 @@ class PengajuanUangKas extends Database
         try {
             foreach ($_POST['dataValueList'] as $value) {
                 $explode = explode(";", $value);
-                $check = $this->select()->from('pengajuan_item_kas')->where('item_id', '=', $explode[0])->where('term', '=', $_POST['term'])->first();
+                $check = $this->select()->from('pengajuan_kas_item')->where('item_id', '=', $explode[0])->where('term', '=', $_POST['term'])->first();
                 $queryGet = $this->get_query();
                 if ($check != null) {
                     $this->update('pengajuan_kas_item')
