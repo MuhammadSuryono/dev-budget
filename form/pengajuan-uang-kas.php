@@ -32,20 +32,27 @@
                 </tr>
             </thead>
             <tbody id="allRincianItem">
-            <?php foreach ($items as $key => $item) { ?>
+            <?php foreach ($items as $key => $item) {
+                $dataPengajuan = $this->select()->from('pengajuan_kas_item')->where('item_id', '=', $item['id'])->first();
+                $selisih = $item['total'];
+                if (isset($dataPengajuan)) {
+                    $selisih = $item['total'] - $dataPengajuan['total_pengajuan'];
+                }
+                if ($dataPengajuan == null || $selisih != 0) {
+                ?>
                 <tr>
                     <td>
                         <input class="form-check-input" type="checkbox" name="idSelectItem" value="1">
                     </td>
-                    <td><?= $key + 1 ?> <input class="form-check-input" type="hidden" value="<?= $item['id'] ?>"></td>
+                    <td><?= $item['no'] ?> <input class="form-check-input" type="hidden" value="<?= $item['id'] ?>"></td>
                     <td><?= $item['rincian'] ?></td>
                     <td><?= $item['kota'] ?></td>
                     <td><?= $item['status'] ?></td>
                     <td><?= $item['penerima'] ?></td>
-                    <td>Rp. <?= number_format($item['total']) ?> <input class="form-check-input" type="hidden" value="<?= $item['total'] ?>"></td>
-                    <td><input type="text" class="form-control" name="nominalPengajuan" value="0"></td>
+                    <td>Rp. <?= number_format($selisih) ?> <input class="form-check-input" type="hidden" value="<?= $selisih ?>"></td>
+                    <td><input type="number" class="form-control input-value" name="nominalPengajuan" value="0"></td>
                 </tr>
-            <?php } ?>
+            <?php } } ?>
             </tbody>
         </table>
         <div class="text-right">
