@@ -34,7 +34,7 @@ class PengajuanUangKas extends Database
                 $queryGet = $this->get_query();
                 if ($check != null) {
                     $this->update('pengajuan_kas_item')
-                        ->set_value_insert('total_pengajuan', $explode[6] + $check['total_pengajuan'])->where('item_id', '=', $explode[0])->where('term', '=', $_POST['term'])
+                        ->set_value_update('total_pengajuan', $explode[6] + $check['total_pengajuan'])->where('item_id', '=', $explode[0])->where('term', '=', $_POST['term'])
                         ->save_update();
                 } else {
                     $this->insert('pengajuan_kas_item')->set_value_insert('id_pengajuan_budget', $_GET['code'])
@@ -46,7 +46,7 @@ class PengajuanUangKas extends Database
                         ->set_value_insert('total_pengajuan', $explode[6])->save_insert();
                 }
             }
-            echo json_encode(['status' => true, 'query' => $queryGet]);
+            echo json_encode(['status' => true]);
         } catch (Exception $exception) {
             echo json_encode(['status' => false]);
         }
@@ -58,7 +58,7 @@ class PengajuanUangKas extends Database
             $dataPengajuan = $this->select()->from('pengajuan_kas')->where('id_pengajuan_budget', '=', $_GET['code'])->first();
             $lastStep = 11;
             $status = 11;
-            if ($dataPengajuan['last_step'] != '') {
+            if ($dataPengajuan['last_step'] != '0') {
                 $lastStep = $dataPengajuan['last_step'];
                 $status = $dataPengajuan['last_step'];
             }
@@ -67,13 +67,14 @@ class PengajuanUangKas extends Database
                 ->set_value_update('last_step', $lastStep)
                 ->set_value_update('created_by', $_SESSION['nama_user'])
                 ->where('id_pengajuan_budget', '=', $_GET['code'])->save_update();
+            $queryUpdate = $this->get_query();
 
             $currentFlow = $this->select()->from('flow_pengajuan_kas')->where('status_code', '=', $status)->first();
             $userNext = $this->select()->from('tb_user')->where('id_user', '=', $currentFlow['pic'])->first();
             $this->whatsapp->sendMessage($userNext['phone_number'], $this->messageRequestPeresetujuanPengajuan($userNext['nama_user'], $currentFlow['flow_name']));
             $creator = $this->select()->from('tb_user')->where('nama_user', '=', $dataPengajuan['created_by'])->first();
             $this->whatsapp->sendMessage($creator['phone_number'], $this->messageNextPengajuan($dataPengajuan['created_by'], $userNext['nama_user'], $currentFlow['flow_name']));
-            echo json_encode(['status' => true, 'query' => $this->get_query()]);
+            echo json_encode(['status' => true, 'query' => $queryUpdate]);
         } catch (Exception $exception) {
             echo json_encode(['status' => false]);
         }
