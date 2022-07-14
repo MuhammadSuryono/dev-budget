@@ -47,12 +47,12 @@
             </thead>
             <tbody id="allRincianItem">
             <?php foreach ($items as $key => $item) {
-                $dataPengajuan = $this->select()->from('pengajuan_kas_item')->where('item_id', '=', $item['id'])->first();
+                $dataPengajuan = $this->select('SUM(total_pengajuan) as total_pengajuan')->from('pengajuan_kas_item')->where('item_id', '=', $item['id'])->first();
                 $selisih = $item['total'];
                 if (isset($dataPengajuan)) {
                     $selisih = $item['total'] - $dataPengajuan['total_pengajuan'];
                 }
-                if ($dataPengajuan == null || $selisih != 0) {
+                if ($selisih != 0) {
                 ?>
                 <tr>
                     <td>
