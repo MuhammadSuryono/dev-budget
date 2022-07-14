@@ -89,6 +89,7 @@ class ModelBudget
     {
         try {
             $this->set_query_select();
+            if (!$this->mysql) die("Connection error: " . mysqli_connect_error());
             $query = mysqli_query($this->mysql, $this->get_query());
             $this->data = mysqli_fetch_assoc($query);
             return $this->data;

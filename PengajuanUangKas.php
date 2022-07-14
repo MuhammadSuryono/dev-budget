@@ -30,7 +30,8 @@ class PengajuanUangKas extends Database
         try {
             foreach ($_POST['dataValueList'] as $value) {
                 $explode = explode(";", $value);
-                $check = $this->select()->from('pengajuan_item_kas')->where('item_id', '=', $explode[0])->where('term', '=', $_POST['term'])->first();
+                $check = $this->select()->from('pengajuan_kas_item')->where('item_id', '=', $explode[0])->where('term', '=', $_POST['term'])->first();
+                $queryGet = $this->get_query();
                 if ($check != null) {
                     $this->update('pengajuan_kas_item')
                         ->set_value_insert('total_pengajuan', $explode[6] + $check['total_pengajuan'])->where('item_id', '=', $explode[0])->where('term', '=', $_POST['term'])
@@ -45,7 +46,7 @@ class PengajuanUangKas extends Database
                         ->set_value_insert('total_pengajuan', $explode[6])->save_insert();
                 }
             }
-            echo json_encode(['status' => true]);
+            echo json_encode(['status' => true, 'query' => $queryGet]);
         } catch (Exception $exception) {
             echo json_encode(['status' => false]);
         }
