@@ -17,12 +17,14 @@ $koneksiDevelop = $con->connect();
 require_once("dompdf/dompdf_config.inc.php");
 
 $code = $_GET['code'];
-$select = mysqli_query($koneksi, "SELECT p.*, s.rincian as rincianItem, s.total as totalBudget, s.no as noItem FROM pengajuan_kas_item p JOIN selesai s ON s.id = p.item_id WHERE id_pengajuan_budget='$code'");
+$select = mysqli_query($koneksi,
+    "SELECT p.*, s.rincian as rincianItem, s.total as totalBudget, s.no as noItem FROM pengajuan_kas_item p 
+    JOIN selesai s ON s.id = p.item_id WHERE id_pengajuan_budget='$code' and term = '$_GET[term]'");
 
 $db = mysqli_query($koneksi, "SELECT b.id_rekening, a.rekening, a.bank, a.type_kas, a.id_kas
 								FROM `pengajuan_kas_item` b
 								JOIN develop.kas a ON a.id_kas = b.id_rekening
-								WHERE b.id_pengajuan_budget ='$code'
+								WHERE b.id_pengajuan_budget ='$code' and  b.term = '$_GET[term]'
 								GROUP BY b.id_rekening");
 $dd = array();
 while ($d = mysqli_fetch_array($db)) {
@@ -35,7 +37,7 @@ $approve = mysqli_query($koneksi, "SELECT a.*, b.e_sign AS ttd_created, c.e_sign
 								LEFT JOIN tb_user c ON a.checker_1=c.nama_user
 								LEFT JOIN tb_user d ON a.checker_2=d.nama_user
 								LEFT JOIN tb_user e ON a.approval_by=e.nama_user
-								WHERE a.id_pengajuan_budget ='$code'
+								WHERE a.id_pengajuan_budget ='$code' and a.term = '$_GET[term]'
 								");
 $ttd = mysqli_fetch_assoc($approve);
 
@@ -179,7 +181,7 @@ $html .= '
 $dompdf = new DOMPDF();
 $dompdf->load_html($html);
 $dompdf->render();
-$dompdf->stream("Nama File.pdf", array("Attachment" => false));
+$dompdf->stream($_GET['code'] . ".pdf", array("Attachment" => false));
 
 
 function hari_ini(){
