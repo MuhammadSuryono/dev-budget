@@ -191,132 +191,189 @@ $setting = mysqli_fetch_assoc($querySetting);
       <div id="myTabContent" class="tab-content">
         <!-- Tab -->
           <?php if ($d['jenis'] == 'Rutin') {
-              $rekening = $con->select("b.id_rekening, a.rekening, a.bank, a.type_kas, a.id_kas")->from('pengajuan_kas_item b')
-                  ->join('develop.kas a', 'a.id_kas = b.id_rekening')
-                  ->where('b.id_pengajuan_budget', '=', $d['noid'])
-                  ->group_by('b.id_rekening')->get();
-              $dataPengajuanKas = $con->select('a.*, b.flow_name')->from('pengajuan_kas a')->join('flow_pengajuan_kas b', 'a.status = b.status_code')->where('a.id_pengajuan_budget', '=', $d['noid'])->first();
+              $dataPengajuanKas = $con->select('a.*, b.flow_name')
+                  ->from('pengajuan_kas a')
+                  ->join('flow_pengajuan_kas b', 'a.status = b.status_code')
+                  ->where('a.id_pengajuan_budget', '=', $d['noid'])->get();
 
               if ($dataPengajuanKas == null) {
-                  $con->insert('pengajuan_kas')->set_value_insert('id_pengajuan_budget', $d['noid'])->save_insert();
-                  $dataPengajuanKas = $con->select('a.*, b.flow_name')->from('pengajuan_kas a')->join('flow_pengajuan_kas b', 'a.status = b.status_code')->where('b.id_pengajuan_budget', '=', $d['noid'])->first();
+                  $con->insert('pengajuan_kas')->set_value_insert('id_pengajuan_budget', $d['noid'])->set_value_insert('term', 1)->save_insert();
               }
+
+              $dataPengajuanKas = $con->select('a.*, b.flow_name')
+                  ->from('pengajuan_kas a')
+                  ->join('flow_pengajuan_kas b', 'a.status = b.status_code')
+                  ->where('a.id_pengajuan_budget', '=', $d['noid'])
+                  ->order_by('term', 'asc')->get();
               ?>
               <div role="tabpanel" class="tab-pane fade in" id="pengajuanKas" aria-labelledby="pengajuanKas-tab">
                   <div class="container-fluid" style="margin: 20px">
-                      <?php
-                      if ($dataPengajuanKas['status'] == 0) {
-                          echo '<div class="alert alert-warning" role="alert" style="">
+                      <ul id="pengajuanKasItemTab" class="nav nav-tabs" role="tablist">
+                          <?php
+                          $alreadyActive = false;
+                          foreach($dataPengajuanKas as $kas) {
+                              $active = $kas['status'] != 1 && $alreadyActive == false ? 'active' : '';
+                              if ($active == 'active' && $alreadyActive == false) $alreadyActive = true;
+                              ?>
+                              <li role="presentation" class="<?= $active ?>">
+                                  <a href="#tab<?= $kas['id'] ?>" role="tab" id="<?= $kas['id'] ?>-tab" data-toggle="tab" aria-controls="rincian">Term <?= $kas['term'] ?></a>
+                              </li>
+                          <?php } ?>
+                      </ul>
+                      <div id="pengajuanKasItemTabContent" class="tab-content">
+                          <?php
+                          $alreadyActive = false;
+                          foreach($dataPengajuanKas as $kas) {
+                              $active = $kas['status'] != 1 && $alreadyActive == false ? 'active' : '';
+                              if ($active == 'active' && $alreadyActive == false) $alreadyActive = true;
+
+                              $rekening = $con->select("b.id_rekening, a.rekening, a.bank, a.type_kas, a.id_kas")
+                                  ->from('pengajuan_kas_item b')
+                                  ->join('develop.kas a', 'a.id_kas = b.id_rekening')
+                                  ->where('b.id_pengajuan_budget', '=', $d['noid'])
+                                  ->where('b.term', '=', $kas['term'])
+                                  ->group_by('b.id_rekening')->get();
+                              ?>
+                              <div role="tabpanel" class="tab-pane fade in <?= $active ?>" id="tab<?= $kas['id'] ?>" aria-labelledby="<?= $kas['id'] ?>-tab">
+                                  <div class="container-fluid">
+                                      <?php
+                                      if ($kas['status'] == 0) {
+                                          echo '<div class="alert alert-warning" role="alert" style="">
                               Pengajuan belum dibuat, Silahkan buat pengajuan dan Ajukan
                             </div>';
-                      }
+                                      }
 
-                      if ($dataPengajuanKas['status'] != 0 && !in_array($dataPengajuanKas['status'], [110,220,330]) && $dataPengajuanKas['status'] != 1) {
-                          echo '<div class="alert alert-warning" role="alert" style="">
-                                  Status Pengajuan '.$dataPengajuanKas['flow_name'].'
+                                      if ($kas['status'] != 0 && !in_array($kas['status'], [110,220,330]) && $kas['status'] != 1) {
+                                          echo '<div class="alert alert-warning" role="alert" style="">
+                                  Status Pengajuan '.$kas['flow_name'].'
                                 </div>';
-                      }
+                                      }
 
-                      if (in_array($dataPengajuanKas['status'], [110,220,330])) {
-                          echo '<div class="alert alert-danger" role="alert" style="">
-                                  Pengajuan telah di tolak oleh <b>'.$dataPengajuanKas["reject_by"].'</b>, dengan keterangan <b>'.$dataPengajuanKas["description"].'</b>
+                                      if (in_array($kas['status'], [110,220,330])) {
+                                          echo '<div class="alert alert-danger" role="alert" style="">
+                                  Pengajuan telah di tolak oleh <b>'.$kas["reject_by"].'</b>, dengan keterangan <b>'.$kas["description"].'</b>  Silahkan perbaiki data pengajuan anda
                                 </div>';
-                      }
+                                      }
 
-                      if ($dataPengajuanKas['status'] == 1) {
-                          echo '<div class="alert alert-success" role="alert" style="">
-                                      Pengajuan telah di Setujui oleh <b>'.$dataPengajuanKas["approval_by"].'</b>
+                                      if ($kas['status'] == 1) {
+                                          echo '<div class="alert alert-success" role="alert" style="">
+                                      Pengajuan telah di Setujui oleh <b>'.$kas["approval_by"].'</b>
                                 </div>';
-                      }
-                      ?>
-
-                      <a href="print-pengajuan-kas.php?code=<?= $d['noid'] ?>" target="_blank" class="btn btn-warning btn-sm"><i class="fa fa-print"></i> Cetak Pengajuan</a>
-
-                      <?php
-                      if($dataPengajuanKas['status'] == 33) { ?>
-                          <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#konfirmasiPenolakan"><i class="fa fa-plus"></i> Tolak Pengajuan</button>
-                          <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#konfirmasiApprove"><i class="fa fa-plus"></i> Approve Pengajuan</button>
-                      <?php } ?>
-
-                      <div class="table-responsive" style="margin-top: 10px">
-                          <table class="table table-hover table-striped table-bordered">
-                              <thead class="warning">
-                              <tr class="warning">
-                                  <th rowspan="2" style="width:5%">No Item</th>
-                                  <th rowspan="2">Tanggal Jatuh Tempo</th>
-                                  <th rowspan="2">Keterangan</th>
-                                  <th rowspan="2">All Budget</th>
-                                  <?php
-                                  foreach($rekening as $rek) {
-                                      $type_kas = 'KAS';
-                                      if ($rek['type_kas'] == 'mri-pall') { $type_kas = 'PALL'; }
-
-                                      $bank = 'Bank Mandiri';
-                                      if ($rek['bank'] == 'CENAIDJA') { $bank = 'Bank BCA'; }
+                                      }
                                       ?>
-                                      <th colspan="2"><?= $bank ?> (<?= $type_kas ?>)<br><?= $rek['rekening'] ?></th>
-                                  <?php } ?>
-                              </tr>
-                              <tr class="warning">
-                                  <?php
-                                  foreach($rekening as $rek) {
-                                      ?>
-                                      <th>Term 1</th>
-                                      <th>Term 2</th>
-                                      <?php
-                                      ${"totalterm1" . $rek['rekening']} = 0;
-                                      ${"totalterm2" . $rek['rekening']} = 0;
-                                  } ?>
-                              </tr>
-                              </thead>
-                              <tbody>
-                              <?php
-                              $dataPengajuan = $con->select("p.*, s.rincian as rincianItem, s.total as totalBudget, s.no as noItem")->from('pengajuan_kas_item p')
-                                  ->join('selesai s', 's.id = p.item_id')
-                                  ->where('p.id_pengajuan_budget', '=', $d['noid'])->get();
-                              foreach($dataPengajuan as $key => $value) {
-                                  ?>
-                                  <tr>
-                                      <td><?= $value['noItem'] ?></td>
-                                      <td><?= $value['jatuh_tempo'] ?></td>
-                                      <td><?= $value['rincianItem'] ?></td>
-                                      <td>Rp. <?= number_format($value['totalBudget']) ?></td>
+
+                                      <a href="print-pengajuan-kas.php?code=<?= $d['noid'] ?>&term=<?= $kas['term']?>" target="_blank" class="btn btn-warning btn-sm"><i class="fa fa-print"></i> Cetak Pengajuan</a>
 
                                       <?php
-                                      foreach($rekening as $rek) {
-                                          ${"term1" . $rek['rekening']} = 0;
-                                          ${"term2" . $rek['rekening']} = 0;
-
-                                          if ($value['id_rekening'] == $rek['id_kas'] AND $value['term'] == 1) {
-                                              ${"term1" . $rek['rekening']} = $value['total_pengajuan'];
-                                              ${"term2" . $rek['rekening']} = 0;
-                                          } else if ($value['id_rekening'] == $rek['id_kas'] AND $value['term'] == 2) {
-                                              ${"term1" . $rek['rekening']} = 0;
-                                              ${"term2" . $rek['rekening']} = $value['total_pengajuan'];
-                                          }
-                                          ?>
-                                          <td>Rp. <?= number_format(${"term1" . $rek['rekening']}, 0, ',', '.') ?></td>
-                                          <td>Rp. <?= number_format(${"term2" . $rek['rekening']}, 0, ',', '.') ?></td>
-                                          <?php
-
-                                          ${"totalterm1" . $rek['rekening']} += ${"term1" . $rek['rekening']};
-                                          ${"totalterm2" . $rek['rekening']} += ${"term2" . $rek['rekening']};
-                                      } ?>
-                                  </tr>
-                              <?php }
-                              if ($rekening != NULL) {
-                                  ?>
-                                  <tr class="warning">
-                                      <td colspan="4">Total</td>
-                                      <?php foreach ($rekening as $rek) { ?>
-                                          <td>Rp. <?= number_format(${"totalterm1" . $rek['rekening']}, 0, ',', '.') ?></td>
-                                          <td>Rp. <?= number_format(${"totalterm2" . $rek['rekening']}, 0, ',', '.') ?></td>
+                                      if(in_array($kas['status'], [33])) { ?>
+                                          <button class="btn btn-danger btn-sm" onclick="tolakPengajuanKas('<?= $kas['id'] ?>')" ><i class="fa fa-plus"></i> Tolak Pengajuan</button>
+                                          <button class="btn btn-success btn-sm" onclick="validasiPengajuanKas('<?= $kas['id'] ?>')" ><i class="fa fa-plus"></i> Approve Pengajuan</button>
                                       <?php } ?>
-                                  </tr>
-                              <?php } ?>
 
-                              </tbody>
-                          </table>
+                                      <div class="table-responsive" style="margin-top: 10px">
+                                          <table class="table table-hover table-striped table-bordered">
+                                              <thead class="warning">
+                                              <tr class="warning">
+                                                  <th style="width:5%">No Item</th>
+                                                  <th >Tanggal Jatuh Tempo</th>
+                                                  <th >Keterangan</th>
+                                                  <th >All Budget</th>
+                                                  <?php
+                                                  foreach($rekening as $rek) {
+                                                      $type_kas = 'KAS';
+                                                      if ($rek['type_kas'] == 'mri-pall') { $type_kas = 'PALL'; }
+
+                                                      $bank = 'Bank Mandiri';
+                                                      if ($rek['bank'] == 'CENAIDJA') { $bank = 'Bank BCA'; }
+                                                      ?>
+                                                      <th><?= $bank ?> (<?= $type_kas ?>)<br><?= $rek['rekening'] ?></th>
+                                                  <?php } ?>
+                                              </tr>
+                                              </thead>
+                                              <tbody>
+                                              <?php
+                                              $dataPengajuan = $con->select("p.*, s.rincian as rincianItem, s.total as totalBudget, s.no as noItem")
+                                                  ->from('pengajuan_kas_item p')
+                                                  ->join('selesai s', 's.id = p.item_id')
+                                                  ->where('p.term', '=', $kas['term'])
+                                                  ->where('p.id_pengajuan_budget', '=', $d['noid'])->get();
+                                              foreach($dataPengajuan as $key => $value) {
+                                                  ?>
+                                                  <tr>
+                                                      <td><?= $value['noItem'] ?></td>
+                                                      <td><?= $value['jatuh_tempo'] ?></td>
+                                                      <td><?= $value['rincianItem'] ?></td>
+                                                      <td>Rp. <?= number_format($value['totalBudget']) ?></td>
+
+                                                      <?php
+                                                      foreach($rekening as $rek) {
+                                                          ${"term1" . $rek['rekening']} = 0;
+
+                                                          if ($value['id_rekening'] == $rek['id_kas']) {
+                                                              ${"term1" . $rek['rekening']} = $value['total_pengajuan'];
+                                                          }
+                                                          ?>
+                                                          <td>Rp. <?= number_format(${"term1" . $rek['rekening']}, 0, ',', '.') ?></td>
+                                                          <?php
+
+                                                          ${"totalterm1" . $rek['rekening']} += ${"term1" . $rek['rekening']};
+                                                      } ?>
+                                                  </tr>
+                                              <?php }
+                                              if ($rekening != NULL) {
+                                                  ?>
+                                                  <tr class="warning">
+                                                      <td colspan="4">Total</td>
+                                                      <?php foreach ($rekening as $rek) { ?>
+                                                          <td>Rp. <?= number_format(${"totalterm1" . $rek['rekening']}, 0, ',', '.') ?></td>
+                                                      <?php } ?>
+                                                  </tr>
+                                              <?php } ?>
+
+                                              </tbody>
+                                          </table>
+                                      </div>
+                                  </div>
+                              </div>
+                          <?php } ?>
+                      </div>
+
+                      <div class="modal fade" id="pengajuanKasModal" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="pengajuanKasModalLabel" aria-hidden="true">
+                          <div class="modal-dialog modal-lg" role="document">
+                              <div class="modal-content">
+                                  <div class="modal-header">
+                                      <h5 class="modal-title" id="pengajuanKasModalLabel">Pengajuan Modal</h5>
+                                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                      </button>
+                                  </div>
+                                  <form id="formPengajuanKas">
+                                      <div class="modal-body" id="bodyPengajuanKas">
+                                      </div>
+                                  </form>
+                              </div>
+                          </div>
+                      </div>
+
+                      <div class="modal fade" id="konfirmasiPengajuan" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="konfirmasiPengajuanLabel" aria-hidden="true">
+                          <div class="modal-dialog" role="document">
+                              <div class="modal-content">
+                                  <div class="modal-header">
+                                      <h5 class="modal-title" id="konfirmasiPengajuanLabel">Konfirmasi Pengajuan</h5>
+                                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                      </button>
+                                  </div>
+                                  <div class="modal-body" id="bodyPengajuanKas">
+                                      <input type="hidden" value="" id="idPengajuanKas">
+                                      Apakah anda yakin ingin mengajukan kas ini ?
+                                  </div>
+                                  <div class="modal-footer">
+                                      <button type="button" class="btn btn-primary" id="btnAjukanKas">Iya, Ajukan</button>
+                                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                  </div>
+                              </div>
+                          </div>
                       </div>
 
                       <div class="modal fade" id="konfirmasiPenolakan" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="konfirmasiPenolakanLabel" aria-hidden="true">
@@ -1667,7 +1724,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                     $('#btnTolakPengajuanKas').prop('disabled', true);
                     $.ajax({
                         type: 'post',
-                        url: `PengajuanUangKas.php?code=${params.code}&action=rejectRequest`,
+                        url: `PengajuanUangKas.php?code=${params.code}&idPengajuanKas=${$('#idPengajuanKas').val()}&action=rejectRequest`,
                         data: {
                             description: $('#descriptionReject').val()
                         },
@@ -1694,7 +1751,7 @@ $setting = mysqli_fetch_assoc($querySetting);
                     $('#btnApproveKas').prop('disabled', true);
                     $.ajax({
                         type: 'post',
-                        url: `PengajuanUangKas.php?code=${params.code}&action=acceptRequest`,
+                        url: `PengajuanUangKas.php?code=${params.code}&idPengajuanKas=${$('#idPengajuanKas').val()}&action=acceptRequest`,
                         data: {},
                         success: function(data) {
                             try {
@@ -1715,6 +1772,24 @@ $setting = mysqli_fetch_assoc($querySetting);
                     });
                 })
             })
+
+
+            function createPengajuanKas(id) {
+                $('#idPengajuanKas').val(id)
+                $('#konfirmasiPengajuan').modal('show')
+            }
+
+            function validasiPengajuanKas(id) {
+                $('#idPengajuanKas').val(id)
+                $('#konfirmasiApprove').modal('show')
+
+            }
+
+            function tolakPengajuanKas(id) {
+                $('#idPengajuanKas').val(id)
+                $('#konfirmasiPenolakan').modal('show')
+
+            }
 
 
         </script>

@@ -31,7 +31,12 @@ class PengajuanUangKas extends Database
             foreach ($_POST['dataValueList'] as $value) {
                 $explode = explode(";", $value);
                 $check = $this->select()->from('pengajuan_kas_item')->where('item_id', '=', $explode[0])->where('term', '=', $_POST['term'])->first();
-                $queryGet = $this->get_query();
+                $checkPengajuan = $this->select()->from('pengajuan_kas')
+                    ->where('id_pengajuan_budget', '=', $_GET['code'])
+                    ->where('term', '=', $_POST['term'])->first();
+                if ($checkPengajuan == null) {
+                    $this->insert('pengajuan_kas')->set_value_insert('id_pengajuan_budget', $_GET['code'])->set_value_insert('term', $_POST['term'])->save_insert();
+                }
                 if ($check != null) {
                     $this->update('pengajuan_kas_item')
                         ->set_value_update('total_pengajuan', $explode[6] + $check['total_pengajuan'])->where('item_id', '=', $explode[0])->where('term', '=', $_POST['term'])
@@ -55,7 +60,7 @@ class PengajuanUangKas extends Database
     public function createPengajuan()
     {
         try {
-            $dataPengajuan = $this->select()->from('pengajuan_kas')->where('id_pengajuan_budget', '=', $_GET['code'])->first();
+            $dataPengajuan = $this->select()->from('pengajuan_kas')->where('id', '=', $_GET['idPengajuanKas'])->first();
             $lastStep = 11;
             $status = 11;
             if ($dataPengajuan['last_step'] != '0') {
@@ -66,7 +71,7 @@ class PengajuanUangKas extends Database
                 ->set_value_update('status', $status)
                 ->set_value_update('last_step', $lastStep)
                 ->set_value_update('created_by', $_SESSION['nama_user'])
-                ->where('id_pengajuan_budget', '=', $_GET['code'])->save_update();
+                ->where('id', '=', $_GET['idPengajuanKas'])->save_update();
             $queryUpdate = $this->get_query();
 
             $currentFlow = $this->select()->from('flow_pengajuan_kas')->where('status_code', '=', $status)->first();
@@ -83,12 +88,12 @@ class PengajuanUangKas extends Database
     public function rejectPengajuan()
     {
         try {
-            $dataPengajuan = $this->select()->from('pengajuan_kas')->where('id_pengajuan_budget', '=', $_GET['code'])->first();
+            $dataPengajuan = $this->select()->from('pengajuan_kas')->where('id', '=', $_GET['idPengajuanKas'])->first();
             $this->update('pengajuan_kas')
                 ->set_value_update('status', $dataPengajuan['status'] . '0')
                 ->set_value_update('reject_by', $_SESSION['nama_user'])
                 ->set_value_update('description', $_POST['description'])
-                ->where('id_pengajuan_budget', '=', $_GET['code'])->save_update();
+                ->where('id', '=', $_GET['idPengajuanKas'])->save_update();
 
             $creator = $this->select()->from('tb_user')->where('nama_user', '=', $dataPengajuan['created_by'])->first();
             $resp = $this->whatsapp->sendMessage($creator['phone_number'], $this->messagePenolakan($dataPengajuan['created_by'], $dataPengajuan['description']));
@@ -101,7 +106,9 @@ class PengajuanUangKas extends Database
     public function validationPengajuan()
     {
         try {
-            $dataPengajuan = $this->select('a.*, b.flow_name, b.sequence')->from('pengajuan_kas a')->join('flow_pengajuan_kas b', 'a.status = b.status_code')->where('a.id_pengajuan_budget', '=', $_GET['code'])->first();
+            $dataPengajuan = $this->select('a.*, b.flow_name, b.sequence')->from('pengajuan_kas a')
+                ->join('flow_pengajuan_kas b', 'a.status = b.status_code')
+                ->where('a.id', '=', $_GET['idPengajuanKas'])->first();
             $nextStatus = $dataPengajuan['status'];
             $currentFlow = $this->select()->from('flow_pengajuan_kas')->where('status_code', '=', $dataPengajuan['status'])->first();
             if ($dataPengajuan['status'] == 33) $nextStatus = 1;
@@ -113,7 +120,7 @@ class PengajuanUangKas extends Database
                 ->set_value_update('status', $nextStatus)
                 ->set_value_update('last_step', $nextStatus)
                 ->set_value_update($currentFlow['as'], $_SESSION['nama_user'])
-                ->where('id_pengajuan_budget', '=', $_GET['code'])->save_update();
+                ->where('id', '=', $_GET['idPengajuanKas'])->save_update();
 
             if ($nextStatus != 1) {
                 $userNext = $this->select()->from('tb_user')->where('id_user', '=', $flow['pic'])->first();
@@ -125,7 +132,7 @@ class PengajuanUangKas extends Database
                 $creator = $this->select()->from('tb_user')->where('nama_user', '=', $dataPengajuan['created_by'])->first();
                 $this->whatsapp->sendMessage($creator['phone_number'], $this->messageNextPengajuan($dataPengajuan['created_by'], $_SESSION['nama_user'], $flow['flow_name']));
             }
-            echo json_encode(['status' => true, 'query' => $this->get_query()]);
+            echo json_encode(['status' => true, 'query' => $_GET]);
         } catch (Exception $exception) {
             echo json_encode(['status' => false]);
         }
