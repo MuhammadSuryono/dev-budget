@@ -233,6 +233,12 @@ $setting = mysqli_fetch_assoc($querySetting);
                                   ->where('b.id_pengajuan_budget', '=', $d['noid'])
                                   ->where('b.term', '=', $kas['term'])
                                   ->group_by('b.id_rekening')->get();
+
+                              $dataPengajuan = $con->select("p.*, s.rincian as rincianItem, s.total as totalBudget, s.no as noItem")
+                                  ->from('pengajuan_kas_item p')
+                                  ->join('selesai s', 's.id = p.item_id')
+                                  ->where('p.term', '=', $kas['term'])
+                                  ->where('p.id_pengajuan_budget', '=', $d['noid'])->get();
                               ?>
                               <div role="tabpanel" class="tab-pane fade in <?= $active ?>" id="tab<?= $kas['id'] ?>" aria-labelledby="<?= $kas['id'] ?>-tab">
                                   <div class="container-fluid">
@@ -262,8 +268,9 @@ $setting = mysqli_fetch_assoc($querySetting);
                                       }
                                       ?>
 
-                                      <a href="print-pengajuan-kas.php?code=<?= $d['noid'] ?>&term=<?= $kas['term']?>" target="_blank" class="btn btn-warning btn-sm"><i class="fa fa-print"></i> Cetak Pengajuan</a>
-
+                                      <?php if ($dataPengajuan != null) { ?>
+                                          <a href="print-pengajuan-kas.php?code=<?= $d['noid'] ?>&term=<?= $kas['term']?>" target="_blank" class="btn btn-warning btn-sm"><i class="fa fa-print"></i> Cetak Pengajuan</a>
+                                      <?php } ?>
                                       <?php
                                       if(in_array($kas['status'], [33])) { ?>
                                           <button class="btn btn-danger btn-sm" onclick="tolakPengajuanKas('<?= $kas['id'] ?>')" ><i class="fa fa-plus"></i> Tolak Pengajuan</button>
@@ -292,11 +299,6 @@ $setting = mysqli_fetch_assoc($querySetting);
                                               </thead>
                                               <tbody>
                                               <?php
-                                              $dataPengajuan = $con->select("p.*, s.rincian as rincianItem, s.total as totalBudget, s.no as noItem")
-                                                  ->from('pengajuan_kas_item p')
-                                                  ->join('selesai s', 's.id = p.item_id')
-                                                  ->where('p.term', '=', $kas['term'])
-                                                  ->where('p.id_pengajuan_budget', '=', $d['noid'])->get();
                                               foreach($dataPengajuan as $key => $value) {
                                                   ?>
                                                   <tr>

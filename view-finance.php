@@ -255,6 +255,12 @@ $helper = new Helper();
                                 ->where('b.id_pengajuan_budget', '=', $d['noid'])
                                 ->where('b.term', '=', $kas['term'])
                                 ->group_by('b.id_rekening')->get();
+
+                            $dataPengajuan = $con->select("p.*, s.rincian as rincianItem, s.total as totalBudget, s.no as noItem")
+                                ->from('pengajuan_kas_item p')
+                                ->join('selesai s', 's.id = p.item_id')
+                                ->where('p.term', '=', $kas['term'])
+                                ->where('p.id_pengajuan_budget', '=', $d['noid'])->get();
                         ?>
                         <div role="tabpanel" class="tab-pane fade in <?= $active ?>" id="tab<?= $kas['id'] ?>" aria-labelledby="<?= $kas['id'] ?>-tab">
                             <div class="container-fluid">
@@ -283,13 +289,15 @@ $helper = new Helper();
                                 </div>';
                                 }
                                 ?>
-
+                                <?php if ($dataPengajuan != null) { ?>
                                 <a href="print-pengajuan-kas.php?code=<?= $d['noid'] ?>&term=<?= $kas['term']?>" target="_blank" class="btn btn-warning btn-sm"><i class="fa fa-print"></i> Cetak Pengajuan</a>
                                 <?php
+                                }
                                 if(in_array($kas['status'], [0,110,220,330])) { ?>
                                     <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#pengajuanKasModal"><i class="fa fa-plus"></i> Buat Pengajuan</button>
+                                    <?php if($dataPengajuan != null) { ?>
                                     <button class="btn btn-success btn-sm" onclick="createPengajuanKas('<?= $kas['id'] ?>')"><i class="fa fa-plus"></i> Ajukan Kas</button>
-                                <?php } ?>
+                                <?php } } ?>
                                 <?php
                                 if(in_array($kas['status'], [11]) && $_SESSION['hak_akses'] == 'Pegawai2') { ?>
                                     <button class="btn btn-danger btn-sm" onclick="tolakPengajuanKas('<?= $kas['id'] ?>')" ><i class="fa fa-plus"></i> Penolakan Check 1</button>
@@ -318,11 +326,6 @@ $helper = new Helper();
                                         </thead>
                                         <tbody>
                                         <?php
-                                        $dataPengajuan = $con->select("p.*, s.rincian as rincianItem, s.total as totalBudget, s.no as noItem")
-                                            ->from('pengajuan_kas_item p')
-                                            ->join('selesai s', 's.id = p.item_id')
-                                            ->where('p.term', '=', $kas['term'])
-                                            ->where('p.id_pengajuan_budget', '=', $d['noid'])->get();
                                         foreach($dataPengajuan as $key => $value) {
                                             ?>
                                             <tr>

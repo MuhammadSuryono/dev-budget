@@ -76,7 +76,7 @@ class PengajuanUangKas extends Database
 
             $currentFlow = $this->select()->from('flow_pengajuan_kas')->where('status_code', '=', $status)->first();
             $userNext = $this->select()->from('tb_user')->where('id_user', '=', $currentFlow['pic'])->first();
-            $this->whatsapp->sendMessage($userNext['phone_number'], $this->messageRequestPeresetujuanPengajuan($userNext['nama_user'], $currentFlow['flow_name']));
+            $this->whatsapp->sendMessage($userNext['phone_number'], $this->messageRequestPeresetujuanPengajuan($userNext['nama_user'], $currentFlow['flow_name'], $userNext['nama_user']));
             $creator = $this->select()->from('tb_user')->where('nama_user', '=', $dataPengajuan['created_by'])->first();
             $this->whatsapp->sendMessage($creator['phone_number'], $this->messageNextPengajuan($dataPengajuan['created_by'], $userNext['nama_user'], $currentFlow['flow_name']));
             echo json_encode(['status' => true, 'query' => $queryUpdate]);
@@ -158,7 +158,7 @@ Terimakasih
 
         return "
 Dear $nextUser
-Pengajuan pengisian Kas *$pengajuan[nama]* dalam status *$status*
+Pengajuan pengisian Kas *$pengajuan[nama]* dalam status *$status* oleh *Anda*
 
 Silahkan lakukan proses selanjutnya
 Terimakasih
