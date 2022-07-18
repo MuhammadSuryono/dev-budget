@@ -54,6 +54,12 @@ $html = "<html>
             height: 0cm;
             font-size:12px;
         }
+        @font-face {
+          font-family: 'Open Sans';
+          font-style: normal;
+          font-weight: normal;
+          src: url(http://themes.googleusercontent.com/static/fonts/opensans/v8/cJZKeOuBrn4kERxqtaUH3aCWcynf_cDxXwCLxiixG1c.ttf) format('truetype');
+        }
     </style>
 </head>
 <body>";
@@ -61,13 +67,13 @@ $html = "<html>
 $html .= '
        <br>
        <h3><center>FORM PENGAJUAN MRI PALL & MRI KAS (NON PROJECT)</center></h3>
-       <table border="1" cellpadding="10" cellspacing="0" style="width=100%;">
-           <thead style="text-align:center; font-size: 100%;">
+       <table border="1" cellpadding="10" width="100%" cellspacing="0" style="width=100%;">
+           <thead style="text-align:center; font-size: 9pt; text-transform: uppercase">
                <tr class="warning">
-                   <th rowspan="2" style="width:5%">No Item</th>
-                   <th rowspan="2">Tanggal Jatuh Tempo</th>
-                   <th rowspan="2">Keterangan</th>
-                   <th rowspan="2">All Budget</th>';
+                   <th  style="width:5%">No Item</th>
+                   <th >Tanggal Jatuh Tempo</th>
+                   <th >Keterangan</th>
+                   <th >All Budget</th>';
 
 foreach($dd as $d) {
     $type_kas = 'KAS';
@@ -76,17 +82,7 @@ foreach($dd as $d) {
     $bank = 'Bank Mandiri';
     if ($d['bank'] == 'CENAIDJA') { $bank = 'Bank BCA'; }
 
-    $html .=      '<th colspan="2">'.$bank.' ('.$type_kas.')<br>'.$d['rekening'].'</th>';
-}
-$html .=       '</tr>
-               		<tr class="warning">';
-
-foreach($dd as $d) {
-    $html .=       '<th>Term 1</th>
-                   <th>Term 2</th>';
-
-    ${"totalterm1" . $d['rekening']} = 0;
-    ${"totalterm2" . $d['rekening']} = 0;
+    $html .=      '<th>'.$bank.' ('.$type_kas.')<br>'.$d['rekening'].'</th>';
 }
 $html .=       '</tr>
            </thead>
@@ -95,25 +91,19 @@ $html .=       '</tr>
 while ($a = mysqli_fetch_array($select)) {
 
 
-    $html .= '<tr>
+    $html .= '<tr style="font-size: 8pt">
            			<td>'.$a['item_id'].'</td>
-           			<td>'.date('d M Y', strtotime($a['jatuh_tempo'])).'</td>
+           			<td style="text-align: center">'.date('d M Y', strtotime($a['jatuh_tempo'])).'</td>
            			<td>'.$a['rincianItem'].'</td>
-           			<td>'.number_format($a['totalBudget'], 0, ',', '.').'</td>';
+           			<td>Rp. '.number_format($a['totalBudget'], 0, ',', '.').'</td>';
 
     foreach($dd as $d) {
         ${"term1" . $d['rekening']} = 0;
-        ${"term2" . $d['rekening']} = 0;
 
-        if ($a['id_rekening'] == $d['id_kas'] AND $a['term'] == 1) {
+        if ($a['id_rekening'] == $d['id_kas']) {
             ${"term1" . $d['rekening']} = $a['total_pengajuan'];
-            ${"term2" . $d['rekening']} = 0;
-        } else if ($a['id_rekening'] == $d['id_kas'] AND $a['term'] == 2) {
-            ${"term1" . $d['rekening']} = 0;
-            ${"term2" . $d['rekening']} = $a['total_pengajuan'];
         }
-        $html .=	'<td>'.number_format(${"term1" . $d['rekening']}, 0, ',', '.').'</td>
-           			<td>'.number_format(${"term2" . $d['rekening']}, 0, ',', '.').'</td>';
+        $html .=	'<td>Rp. '.number_format(${"term1" . $d['rekening']}, 0, ',', '.').'</td>';
 
         ${"totalterm1" . $d['rekening']} += ${"term1" . $d['rekening']};
         ${"totalterm2" . $d['rekening']} += ${"term2" . $d['rekening']};
@@ -124,19 +114,18 @@ while ($a = mysqli_fetch_array($select)) {
 
 }
 
-$html .= '<tr>
- 				<td colspan="4">Total</td>';
+$html .= '<tr style="font-weight: bold">
+ 				<td colspan="4" style="text-align: center">Total</td>';
 foreach($dd as $d) {
 
-    $html .= '<td>'.number_format(${"totalterm1" . $d['rekening']}, 0, ',', '.').'</td>
- 				<td>'.number_format(${"totalterm2" . $d['rekening']}, 0, ',', '.').'</td>';
+    $html .= '<td>Rp. '.number_format(${"totalterm1" . $d['rekening']}, 0, ',', '.').'</td>';
 }
 $html .= '</tr>
  			';
 $html .='</tbody>
            </table>';
 
-$html .='	<table style="font-size: 80%; width: 80%; margin-top: 20px; text-align: center;">
+$html .='	<table style="font-size: 80%; width: 100%; margin-top: 20px; text-align: center;">
 			<tbody>
 				<tr>
 					<td></td>
@@ -154,19 +143,19 @@ $html .='	<table style="font-size: 80%; width: 80%; margin-top: 20px; text-align
 
 				</tr>
 				<tr>
-					<td style="height: 100px;"><img src="uploads/sign/'.$ttd['ttd_created'].'" width="100px"></td>
-					<td><img src="uploads/sign/'.$ttd['ttd_checker1'].'" width="100px"></td>
-					<td><img src="uploads/sign/'.$ttd['ttd_checker2'].'" width="100px"></td>
+					<td style="height: 100px;"><img src="uploads/sign/'.$ttd['ttd_created'].'" width="100px" alt="cerated"></td>
+					<td><img src="uploads/sign/'.$ttd['ttd_checker1'].'" width="100px" alt="check1"></td>
+					<td><img src="uploads/sign/'.$ttd['ttd_checker2'].'" width="100px" alt="check2"></td>
 					<td></td>
-					<td><img src="uploads/sign/'.$ttd['ttd_approval'].'" width="100px"></td>
+					<td><img src="uploads/sign/'.$ttd['ttd_approval'].'" width="100px" alt="approved"></td>
 
 				</tr>
 				<tr>
-					<td>'.$ttd['created_by'].'</td>
-					<td>'.$ttd['checker_1'].'</td>
-					<td>'.$ttd['checker_2'].'</td>
+					<td><u>'.$ttd['created_by'].'</u></td>
+					<td><u>'.$ttd['checker_1'].'</u></td>
+					<td><u>'.$ttd['checker_2'].'</u></td>
 					<td></td>
-					<td>'.$ttd['approval_by'].'</td>
+					<td><u>'.$ttd['approval_by'].'</u></td>
 				</tr>
 			</tbody>
            </table>
@@ -220,5 +209,5 @@ function hari_ini(){
             $hari_ini = "Tidak di ketahui";
             break;
     }
-    return "<b >" . $hari_ini . "< /b>";
+    return "<b >" . $hari_ini . "</b>";
 }
