@@ -322,6 +322,7 @@ $helper = new Helper();
                                                 ?>
                                                 <th><?= $bank ?> (<?= $type_kas ?>)<br><?= $rek['rekening'] ?></th>
                                             <?php } ?>
+                                            <th>Aksi</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -347,6 +348,7 @@ $helper = new Helper();
 
                                                     ${"totalterm1" . $rek['rekening']} += ${"term1" . $rek['rekening']};
                                                 } ?>
+                                                <td><button class="btn btn-danger btn-sm" onclick="deleteItem(<?= $value['id'] ?>)">Hapus</button> </td>
                                             </tr>
                                         <?php }
                                         if ($rekening != NULL) {
@@ -2243,6 +2245,32 @@ $helper = new Helper();
                 $('#konfirmasiPenolakan').modal('show')
 
             }
+
+            function deleteItem(id) {
+                if (confirm("Apakah anda yakin ingin meghapus data berikut ?") == true) {
+                    $.ajax({
+                        type: 'post',
+                        url: `PengajuanUangKas.php?id=${id}&action=deleteItem`,
+                        data: {},
+                        success: function(data) {
+                            try {
+                                let resp = JSON.parse(data)
+                                if (resp.status == true) {
+                                    alert("Berhasil menghapus data pengajuan")
+                                    setTimeout(() => {
+                                        window.location.reload()
+                                    }, 2000)
+                                } else {
+                                    alert("Tidak bisa menghapus data pengajuan. Terjadi kesalahan ketika menghapus")
+                                }
+                            } catch (e) {
+                                alert("Tidak bisa menghapus data pengajuan. Terjadi kesalahan ketika menghapus")
+                            }
+                        }
+                    });
+                }
+            }
+
         </script>
 
 </body>

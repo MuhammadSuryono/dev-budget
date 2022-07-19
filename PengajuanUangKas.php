@@ -176,6 +176,13 @@ Pengajuan pengisian Kas *$pengajuan[nama]* anda *$status* oleh *$nextUser*
 Terimakasih
         ";
     }
+
+    public function deleteItem()
+    {
+        $id = $_GET['id'];
+        $this->delete('pengajuan_kas_item')->where('id', '=', $id)->save_delete();
+        echo json_encode(['status' => true, 'query' => $_GET]);
+    }
 }
 
 $pengajuan = new PengajuanUangKas();
@@ -184,4 +191,4 @@ if ($_GET['action'] == 'createRequest') $pengajuan->createRequest();
 if ($_GET['action'] == 'createRequestPengajuan') $pengajuan->createPengajuan();
 if ($_GET['action'] == 'rejectRequest') $pengajuan->rejectPengajuan();
 if ($_GET['action'] == 'acceptRequest') $pengajuan->validationPengajuan();
-
+if ($_GET['action'] == 'deleteItem') $pengajuan->deleteItem();
