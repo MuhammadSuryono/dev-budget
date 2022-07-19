@@ -348,7 +348,9 @@ $helper = new Helper();
 
                                                     ${"totalterm1" . $rek['rekening']} += ${"term1" . $rek['rekening']};
                                                 } ?>
+                                                <?php if(in_array($kas['status'], [0,110,220,330])) { ?>
                                                 <td><button class="btn btn-danger btn-sm" onclick="deleteItem(<?= $value['id'] ?>)">Hapus</button> </td>
+                                                <?php } ?>
                                             </tr>
                                         <?php }
                                         if ($rekening != NULL) {
